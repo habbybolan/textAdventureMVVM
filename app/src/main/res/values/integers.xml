@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="textView_size_normal">10</integer>
+    <integer name="textView_size_label">12</integer>
+    <integer name="btn_drop_height">35</integer>
+    <integer name="btn_drop_width">70</integer>
+
+</resources>

@@ -1,0 +1,324 @@
+	
+{"allEncounters":[
+	{"desert":[
+		{"type":"choice",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"combat",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"trap",
+			"encounters":[
+			{},
+			{},
+			{},
+			]
+		},
+
+		{"type":"shop",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"benefit",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"quest",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		}
+	]},
+
+	{"forest":[
+
+		{"type":"dungeon",
+			"encounters":[
+            	{"dialogue":["As you walk over some leaves, you hear a thud. Clearing the leaves, you discover a wooden hatch painted black with a white circle and a single line crossing over it.",
+            	"In the distance, you notice a large, stone spiraling tower sitting just above the canopy of trees. Walking closer, you see a slightly opened door. Painted over it is a white circle with a line running across it."
+            	]}
+            ]
+		},
+
+		{"type":"multi_level",
+			"encounters":[
+                {"dialogue":["Walking up to a large rock overpass, you see a ."],
+                "options":[{"name":"go left",
+                        "encounter":{"type":"combat",
+                                "dialogue":"spiders descend from its web, landing in front of you.",
+                                "fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]},
+                                "next":{"type":"end",
+                                        "dialogue":"You reached the end of the thing."
+                                        }
+                                }
+                        },
+                        {"name":"go right",
+                        "encounter":{"type":"benefit",
+                                "dialogue":"You hear a powerful, reverberating voice echo past a large, expansive oak tree. It says a reward is awaiting for you traveller. Walking around the tree, a 10ft marble statue with glowing red ruby eyes looks down at you.",
+                                "next":{"type":"end",
+                                        "dialogue":"You reached the end."
+                                        }
+                                }
+                        }]
+                }
+			]
+		},
+
+		{"type":"choice",
+			"encounters":[
+				{"dialogue":["You see a bag laying against a tree.",
+							"A bag, alone and suspiciously placed, hangs from a tree branch.",
+							"A dirty bag lays under some leaves, just barely able to be seen."
+							],
+				"options":[{"name": "Check Bag",
+							"Check Bag":[
+									{"type":"small_benefit",
+                                    		    "small_benefit":[
+                                    		        {"dialogue":[""]}
+                                    		    ]
+
+                                    		}
+									]}
+						    ]
+				}
+			]
+		},
+
+		{"type":"combat",
+			"encounters":[
+			{"dialogue":["spiders descend from its web, landing in front of you.",
+						"Spiders crawl down from the tree with the ferocity of a creature that hasn't eaten for days."
+						],
+			"fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]}},
+
+			{"dialogue":["A bony hand breaks through the ground and grabs you by the ankle.",
+						"Multiple bony arms reach out through a pile of leaves on the ground."
+						],
+			"fight":{"enemyType":["skeleton", "skeleton", "skeleton"], "type":["normal","normal","normal"]}}
+			]
+		},
+
+		{"type":"trap",
+			"encounters":[
+				{"dialogue":["As some small branches and pine cones start raining around you, the sound of crashing branches quickly approaches from above.",
+							"In the conrner of your eye, you see a large branch swinging into you."
+							], 
+				"fail":{"dialogue":"You weren't fast enough. The unknown object hits you in the head and you fall to the ground, everything going black in an instant.",
+						"debuff":[{"debuff":"stun", "duration":"1"}, {"debuff":"bleed"}]},
+				"success":"jumping to the side, you are able to just barely avoid a large branch that smashes into the ground, creating a ripple through the surrounding leaves."
+				},
+
+				{"dialogue":["As you take a step, you feel your foot go through the ground as all of your weight pushes into a hole, previously covered by leaves and sticks"], 
+				"fail":{"dialogue":"You couldn't grab yourself in time and you foot penetrates through a protruding root.",
+						"debuff":[{"debuff":"bleed"}, {"debuff":"damage", "damage":"5"}]},
+				"success":"jumping to the side, you are able to just barely avoid a large branch that smashes into the ground, creating a ripple through the surrounding leaves."
+				}
+			]
+		},
+
+		{"type":"shop",
+			"encounters":[
+				{"dialogue":["Following a well used trail, you see a small, wooden cabin with a symbol of gold etched into the door."
+					]}
+			]
+		},
+
+		{"type":"benefit",
+			"encounters":[
+				{"dialogue":["You hear a powerful, reverberating voice echo past a large, expansive oak tree. It says a reward is awaiting for you traveller. Walking around the tree, a 10ft marble statue with glowing red ruby eyes looks down at you."
+				]}
+			]
+		},
+
+		{"type":"small_benefit",
+		    "encounters":[
+		        {"dialogue":["A small glint underneath some leaves appears."]}
+		    ]
+
+		},
+
+		{"type":"quest",
+			"encounters":[
+                {"type":"deliver",
+                "deliver":[
+                    {"dialogue":"deliver 1",
+                    "item_name":"item 1",
+                    "conversation":{"dialogue":"1",
+                                    "next":{"dialogue":"2",
+                                            "next":{"dialogue":"3"}
+                                            }
+                                    },
+                     "accept_dialogue":"Thanks for accepting",
+                     "decline_dialogue":"declined"
+                    },
+                   {"dialogue":"deliver 2",
+                   "item_name":"item 2",
+                   "conversation":{"dialogue":"1",
+                                   "next":{"dialogue":"2",
+                                           "next":{"dialogue":"3"}
+                                           }
+                                   },
+                    "accept_dialogue":"Thanks for accepting",
+                    "decline_dialogue":"You leave the man and continue on your path"
+                   }
+                 ]},
+                {"type":"combat",
+                    "combat":[
+                    {"dialogue":"combat 1",
+                    "conversation":{"dialogue":"6",
+                                "next":{"dialogue":"7",
+                                        "next":{"dialogue":"8"}
+                                        }
+                                },
+                    "combat":{
+                            "dialogue":"A bony hand breaks through the ground and grabs you by the ankle.",
+                            "fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]},
+                            "next":{"type":"end",
+                                    "dialogue":"You reached the end of the thing."
+                                    }
+                            },
+                    "accept_dialogue":"Thanks for accepting",
+                    "decline_dialogue":"You leave the man and continue on your path"
+                    },
+                    {"dialogue":"combat 2",
+                    "conversation":{"dialogue":"9",
+                                "next":{"dialogue":"10",
+                                        "next":{"dialogue":"11"}
+                                        }
+                                },
+                    "combat":{
+                            "dialogue":"A bony hand breaks through the ground and grabs you by the ankle.",
+                            "deliver_accepted_dialogue":"Thank you.",
+                            "fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]},
+                            "next":{"type":"end",
+                                    "dialogue":"You reached the end of the thing."
+                                    }
+                            },
+                    "accept_dialogue":"Thanks for accepting",
+                    "decline_dialogue":"You leave the man and continue on your path"
+                    }
+                ]}
+            ]
+		}
+	]},
+
+	{"grassland":[
+		{"type":"choice",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"combat",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"trap",
+			"encounters":[
+			{},
+			{},
+			{},
+			]
+		},
+
+		{"type":"shop",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"benefit",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"quest",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		}
+	]},
+
+	{"snow":[
+		{"type":"choice",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"combat",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"trap",
+			"encounters":[
+			{},
+			{},
+			{},
+			]
+		},
+
+		{"type":"shop",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"benefit",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		},
+
+		{"type":"quest",
+			"encounters":[
+			{},
+			{},
+			{}
+			]
+		}
+	]}
+]}

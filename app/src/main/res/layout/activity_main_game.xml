@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="mainGameViewModel"
+            type="com.habbybolan.textadventure.viewmodel.MainGameViewModel" />
+        <variable
+            name="characterViewModel"
+            type="com.habbybolan.textadventure.viewmodel.CharacterViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.MainGameActivity">
+
+        <Button
+            android:id="@+id/btn_character"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="80dp"
+            android:text="Character"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="@{()-> mainGameViewModel.gotoCharacterFragment()}"/>
+
+        <Button
+            android:id="@+id/btn_game"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="80dp"
+            android:text="GAME"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="@{()-> mainGameViewModel.gotoGameFragment()}" />
+
+        <ImageView
+            android:id="@+id/health_mana_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_character"
+            app:srcCompat="@drawable/health_mana" />
+
+        <TextView
+            android:id="@+id/txt_health_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@{characterViewModel.health}"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/health_mana_image"
+            app:layout_constraintEnd_toEndOf="@+id/health_mana_image"
+            app:layout_constraintHorizontal_bias="0.232"
+            app:layout_constraintStart_toStartOf="@+id/health_mana_image"
+            app:layout_constraintTop_toTopOf="@+id/health_mana_image"
+            app:layout_constraintVertical_bias="0.523" />
+
+        <TextView
+            android:id="@+id/txt_mana_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@{characterViewModel.mana}"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/health_mana_image"
+            app:layout_constraintEnd_toEndOf="@+id/health_mana_image"
+            app:layout_constraintHorizontal_bias="0.776"
+            app:layout_constraintStart_toStartOf="@+id/health_mana_image"
+            app:layout_constraintTop_toTopOf="@+id/health_mana_image"
+            app:layout_constraintVertical_bias="0.523" />
+
+        <TextView
+            android:id="@+id/txt_turn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Level"
+            app:layout_constraintEnd_toStartOf="@+id/btn_character"
+            app:layout_constraintTop_toBottomOf="@+id/btn_character" />
+
+        <TextView
+            android:id="@+id/txt_turn_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="28dp"
+            android:text="@{mainGameViewModel.turnCounter}"
+            app:layout_constraintStart_toEndOf="@+id/txt_turn"
+            app:layout_constraintTop_toBottomOf="@+id/btn_character" />
+
+        <TextView
+            android:id="@+id/txt_gold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Gold"
+            app:layout_constraintStart_toEndOf="@+id/btn_game"
+            app:layout_constraintTop_toBottomOf="@+id/btn_game" />
+
+        <TextView
+            android:id="@+id/txt_gold_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:layout_marginEnd="12dp"
+            android:text="@{characterViewModel.gold}"
+            app:layout_constraintEnd_toStartOf="@+id/txt_gold"
+            app:layout_constraintTop_toBottomOf="@+id/btn_game" />
+
+        <FrameLayout
+            android:id="@+id/fragment_container_character"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="@{mainGameViewModel.characterFragmentVisible}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/health_mana_image">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fragment_container_game"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="@{mainGameViewModel.gameFragmentVisible}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/health_mana_image">
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
