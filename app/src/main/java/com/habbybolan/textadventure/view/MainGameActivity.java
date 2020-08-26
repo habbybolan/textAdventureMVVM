@@ -85,10 +85,10 @@ public class MainGameActivity extends AppCompatActivity {
                 combatObject.setInitialCombat(encounter, view);
                 break;*/
             case MainGameViewModel.TRAP_TYPE:
-                TrapFragment trapFragment = new TrapFragment(mainGameViewModel, characterViewModel);
+                TrapFragment trapFragment = new TrapFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .add(R.id.fragment_container_game, trapFragment)
+                        .replace(R.id.fragment_container_game, trapFragment)
                         .commit();
                 break;
             /*case SHOP_TYPE:

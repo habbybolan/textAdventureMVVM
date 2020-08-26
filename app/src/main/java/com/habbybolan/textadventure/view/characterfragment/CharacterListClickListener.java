@@ -1,5 +1,7 @@
 package com.habbybolan.textadventure.view.characterfragment;
 
+import com.habbybolan.textadventure.model.inventory.Inventory;
+
 public interface CharacterListClickListener {
-    void onLongClicked(int position);
+    void onLongClicked(Inventory inventory);
 }

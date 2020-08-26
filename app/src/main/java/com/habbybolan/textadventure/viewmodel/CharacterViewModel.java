@@ -8,6 +8,8 @@ import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.model.characterentity.Character;
+import com.habbybolan.textadventure.model.characterentity.Damage;
+import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
@@ -21,7 +23,7 @@ holds current character data used to tie the data to necessary views
 public class CharacterViewModel extends BaseObservable {
 
     private Character character;
-    Context context;
+    private Damage damage;
 
     // retrieve a character from memory
     // todo: this dependency may be confusing? - inject dependency from somewhere else preferably
@@ -30,6 +32,7 @@ public class CharacterViewModel extends BaseObservable {
         String characterData = save.readCharacterData(context);
         DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
         character = new Character(characterData, mDbHelper, context);
+        damage = new Damage();
 
         // todo: test
         character.addInputDotMap("1", 10);
@@ -37,6 +40,27 @@ public class CharacterViewModel extends BaseObservable {
         character.addInputDotMap("2", 5);
         character.addInputSpecialMap("2", 5);
     }
+
+    // Observable for adding and deleting abilities from the RecyclerView in CharacterFragment
+    private ObservableField<Ability> abilityObserverAdd = new ObservableField<>();
+    @Bindable
+    public ObservableField<Ability> getAbilityObserverAdd() {
+        return abilityObserverAdd;
+    }
+    private ObservableField<Ability> abilityObserverRemove = new ObservableField<>();
+    @Bindable
+    public ObservableField<Ability> getAbilityObserverRemove() {
+        return abilityObserverRemove;
+    }
+    public void removeAbility(Ability ability) {
+        character.removeAbility(ability);
+        abilityObserverRemove.set(ability);
+    }
+    public void addAbility(Ability ability) {
+        character.addAbility(ability);
+        abilityObserverAdd.set(ability);
+    }
+
 
     public ArrayList<String> mapIntoList(Map<String, Integer> map) {
         ArrayList<String> list = new ArrayList<>();
@@ -46,16 +70,62 @@ public class CharacterViewModel extends BaseObservable {
         return list;
     }
 
+    // direct damage applied to player character
+    public void damageCharacter(int damageAmount) {
+        damage.damageTarget(character, damageAmount);
+        notifyPropertyChanged(BR.health);
+    }
+
+    // ** Dot **
+    // dot applied to player character
+    public void addDot(String dot, boolean isInfinite) {
+        damage.addNewDot(dot, isInfinite, character);
+        notifyPropertyChanged(BR.dotMap);
+        dotObserverAdd.set(dot);
+    }
+    // dot removed from player character
+    public void removeDot(String dot) {
+        dotObserverRemove.set(dot);
+    }
+    // apply the effects of any dots and decrement their duration
+        // removes any dots with duration = 0
+    public void applyDots() {
+        ArrayList<String> isRemoved = damage.applyDots(character);
+        for (String dotRemoved : isRemoved) {
+            dotObserverRemove.set(dotRemoved);
+        }
+    }
+
+    // ** special **
+    // special applied to player character
+    public void addSpecial(String special, int duration) {
+        damage.addNewSpecial(special, duration, character);
+        notifyPropertyChanged(BR.specialMap);
+        specialObserverAdd.set(special);
+    }
+    // special removed from player character
+    public void removeSpecial(String special) {
+        specialObserverRemove.set(special);
+    }
+
+    // heal player character
+    public void addHealth(int heal) {
+        setHealth(character.getHealth() + heal);
+    }
+    // mana regen player character
+    public void changeMana(int mana) {
+        setMana(character.getMana() + mana);
+    }
+
+
     // *** character arrays ***
 
         // DOT EFFECTS
     private ObservableField<String> dotObserverAdd = new ObservableField<>();
-    @Bindable
     public ObservableField<String> getDotObserverAdd() {
         return dotObserverAdd;
     }
     private ObservableField<String> dotObserverRemove = new ObservableField<>();
-    @Bindable
     public ObservableField<String> getDotObserverRemove() {
         return dotObserverRemove;
     }
@@ -69,7 +139,6 @@ public class CharacterViewModel extends BaseObservable {
         notifyPropertyChanged(BR.dotMap);
         // observed by CharacterViewModel
         dotObserverRemove.set(key);
-        notifyPropertyChanged(BR.dotObserverRemove);
     }
     public void addInputDotMap(String key, int duration) {
         // observed by XML
@@ -77,7 +146,6 @@ public class CharacterViewModel extends BaseObservable {
         notifyPropertyChanged(BR.dotMap);
         // observed by CharacterViewModel
         dotObserverAdd.set(key);
-        notifyPropertyChanged(BR.dotObserverAdd);
     }
 
         // SPECIAL EFFECTS
@@ -124,7 +192,6 @@ public class CharacterViewModel extends BaseObservable {
         character.addStatIncreaseList(statIncrease);
         notifyPropertyChanged(BR.statIncreaseList);
     }
-
 
     @Bindable
     public List<ArrayList<Object>> getStatDecreaseList() {

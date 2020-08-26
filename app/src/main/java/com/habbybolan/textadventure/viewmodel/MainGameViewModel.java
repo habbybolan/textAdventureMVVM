@@ -1,8 +1,10 @@
 package com.habbybolan.textadventure.viewmodel;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.View;
 
+import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 import androidx.databinding.ObservableField;
@@ -36,6 +38,7 @@ public class MainGameViewModel extends BaseObservable {
     // keeps track of the location
     private int location = FOREST;
     private String location_type = FOREST_TYPE;
+    private Typeface font;
 
     private int encounterLayout;
 
@@ -73,6 +76,7 @@ public class MainGameViewModel extends BaseObservable {
 
     public MainGameViewModel(Context context) {
         this.context = context;
+        font = ResourcesCompat.getFont(context, R.font.press_start_2p);
         gotoNextEncounter();
     }
 
@@ -212,6 +216,10 @@ public class MainGameViewModel extends BaseObservable {
 
     public int getEncounterLayout() {
         return encounterLayout;
+    }
+
+    public Typeface getFont() {
+        return font;
     }
 
 }

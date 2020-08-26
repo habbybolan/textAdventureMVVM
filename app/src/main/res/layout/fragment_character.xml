@@ -29,8 +29,7 @@
                     android:layout_height="31dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="24dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="Items"
+                    android:text="@string/item_plural"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +38,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_item_list"
                     android:layout_width="395dp"
-                    android:layout_height="182dp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -58,8 +57,7 @@
                     android:layout_height="30dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="24dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="Weapons"
+                    android:text="@string/weapon_plural"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +66,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_weapon_list"
                     android:layout_width="395dp"
-                    android:layout_height="174dp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -88,8 +86,7 @@
                     android:layout_height="26dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="24dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="Abilities"
+                    android:text="@string/ability_plural"
                     android:textAlignment="viewStart"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -99,7 +96,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_ability_list"
                     android:layout_width="395dp"
-                    android:layout_height="366dp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -119,8 +116,7 @@
                     android:layout_height="30dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="20dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="Stats"
+                    android:text="@string/stat_plural"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -133,9 +129,8 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="60dp"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="STR"
-                    android:textSize="10sp"
+                    android:textSize="@dimen/txt_size_medium"
+                    android:text="@string/strength_short"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/stats" />
 
@@ -144,8 +139,9 @@
                     android:layout_width="34dp"
                     android:layout_height="22dp"
                     android:gravity="center"
-                    app:stat="@{characterVM.intelligence}"
-                    app:base="@{characterVM.intBase}"
+                    android:textSize="@dimen/txt_size_small"
+                    app:stat="@{characterVM.strength}"
+                    app:base="@{characterVM.strBase}"
                     app:layout_constraintEnd_toEndOf="@+id/strength"
                     app:layout_constraintStart_toStartOf="@+id/strength"
                     app:layout_constraintTop_toBottomOf="@+id/strength" />
@@ -156,9 +152,8 @@
                     android:layout_height="25dp"
                     android:layout_marginStart="50dp"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="SPD"
-                    android:textSize="10sp"
+                    android:text="@string/speed_short"
+                    android:textSize="@dimen/txt_size_medium"
                     app:layout_constraintStart_toEndOf="@+id/constitution"
                     app:layout_constraintTop_toBottomOf="@+id/stats" />
 
@@ -167,7 +162,9 @@
                     android:layout_width="34dp"
                     android:layout_height="22dp"
                     android:gravity="center"
-                    android:text="0(0)"
+                    android:textSize="@dimen/txt_size_small"
+                    app:stat="@{characterVM.speed}"
+                    app:base="@{characterVM.spdBase}"
                     app:layout_constraintEnd_toEndOf="@+id/speed"
                     app:layout_constraintStart_toStartOf="@+id/speed"
                     app:layout_constraintTop_toBottomOf="@+id/speed" />
@@ -178,9 +175,8 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="50dp"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="INT"
-                    android:textSize="10sp"
+                    android:text="@string/intelligence_short"
+                    android:textSize="@dimen/txt_size_medium"
                     app:layout_constraintStart_toEndOf="@+id/strength"
                     app:layout_constraintTop_toBottomOf="@+id/stats" />
 
@@ -189,7 +185,9 @@
                     android:layout_width="34dp"
                     android:layout_height="22dp"
                     android:gravity="center"
-                    android:text="0(0)"
+                    android:textSize="@dimen/txt_size_small"
+                    app:stat="@{characterVM.intelligence}"
+                    app:base="@{characterVM.intBase}"
                     app:layout_constraintEnd_toEndOf="@+id/intelligence"
                     app:layout_constraintStart_toStartOf="@+id/intelligence"
                     app:layout_constraintTop_toBottomOf="@+id/intelligence" />
@@ -200,9 +198,8 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="50dp"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/press_start_2p"
-                    android:text="CON"
-                    android:textSize="10sp"
+                    android:text="@string/constitution_short"
+                    android:textSize="@dimen/txt_size_medium"
                     app:layout_constraintStart_toEndOf="@+id/intelligence"
                     app:layout_constraintTop_toBottomOf="@+id/stats" />
 
@@ -211,7 +208,9 @@
                     android:layout_width="34dp"
                     android:layout_height="22dp"
                     android:gravity="center"
-                    android:text="0(0)"
+                    android:textSize="@dimen/txt_size_small"
+                    app:stat="@{characterVM.constitution}"
+                    app:base="@{characterVM.conBase}"
                     app:layout_constraintEnd_toEndOf="@+id/constitution"
                     app:layout_constraintStart_toStartOf="@+id/constitution"
                     app:layout_constraintTop_toBottomOf="@+id/constitution" />
@@ -246,8 +245,7 @@
                             android:id="@+id/dots"
                             android:layout_width="128dp"
                             android:layout_height="24dp"
-                            android:fontFamily="@font/press_start_2p"
-                            android:text="DOTS"
+                            android:text="@string/dot_plural"
                             android:gravity="center"
                             android:textSize="12sp"
                             android:textStyle="bold"
@@ -256,8 +254,10 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_dots"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_marginTop="15dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
 
                     </LinearLayout>
 
@@ -272,8 +272,7 @@
                             android:id="@+id/specials"
                             android:layout_width="128dp"
                             android:layout_height="24dp"
-                            android:fontFamily="@font/press_start_2p"
-                            android:text="Special Effects"
+                            android:text="@string/special_plural"
                             android:gravity="center"
                             android:textColor="#6A6A6A"
                             android:textSize="12sp"
@@ -283,15 +282,19 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_special_effects"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_marginTop="15dp"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
 
                     </LinearLayout>
 
                 </LinearLayout>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
         </LinearLayout>
+
     </ScrollView>
+
 </layout>

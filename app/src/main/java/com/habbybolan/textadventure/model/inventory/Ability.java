@@ -92,6 +92,19 @@ public class Ability implements Inventory{
         setVariables(mDbHelper, abilityID);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        else if (o.getClass() != getClass()) return false;
+        else if (o == this) return true;
+        else return (checkAbilityEquality((Ability) o));
+    }
+
+    // helper for checking if 2 ability scrolls are equal
+    private boolean checkAbilityEquality(Ability ability) {
+        return ability.getName().equals(getName());
+    }
+
     private void setVariables(DatabaseAdapter mDbHelper, int abilityID) throws ExecutionException, InterruptedException {
         Cursor cursor = mDbHelper.getData(table);
         cursor.moveToPosition(abilityID - 1);

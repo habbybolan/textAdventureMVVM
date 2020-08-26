@@ -55,7 +55,7 @@ public class CharacterDotListAdapter extends RecyclerView.Adapter<CharacterDotLi
 
     @Override
     public int getItemCount() {
-        return dotList.size();
+        return dotList != null? dotList.size() : 0;
     }
 
     // adds new dot effect to the list if it doesn't already exist

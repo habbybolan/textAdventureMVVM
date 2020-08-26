@@ -77,6 +77,19 @@ public class Item implements Inventory{
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        else if (o.getClass() != getClass()) return false;
+        else if (o == this) return true;
+        else return (checkItemEquality((Item) o));
+    }
+
+    // helper for checking if 2 ability scrolls are equal
+    private boolean checkItemEquality(Item item) {
+        return item.getName().equals(getName());
+    }
+
     private static boolean isInteger(String s) {
         boolean isValidInteger = false;
         try {

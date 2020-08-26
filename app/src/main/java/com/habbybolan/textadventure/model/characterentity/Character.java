@@ -82,6 +82,8 @@ public class Character implements CharacterEntity {
     private boolean isBleed = false;
     private boolean isPoison = false;
     private boolean isFrostBurn = false;
+    private boolean isHealDot = false;
+    private boolean isManaDot = false;
 
     // specials
     private boolean isStun = false;
@@ -115,7 +117,7 @@ public class Character implements CharacterEntity {
     private Bitmap bitmapAlive;
     private Bitmap bitmapDead;
 
-    Context context;
+    private Context context;
 
     public Character(String characterData, DatabaseAdapter mDbHelper, Context context) {
         this.context = context;
@@ -783,6 +785,14 @@ public class Character implements CharacterEntity {
         return isFrostBurn;
     }
     @Override
+    public boolean getIsHealDot() {
+        return isHealDot;
+    }
+    @Override
+    public boolean getIsManaDot() {
+        return isManaDot;
+    }
+    @Override
     public void setIsFire(boolean isFire) {
         this.isFire = isFire;
     }
@@ -797,6 +807,14 @@ public class Character implements CharacterEntity {
     @Override
     public void setIsFrostBurn(boolean isFrostBurn) {
         this.isFrostBurn = isFrostBurn;
+    }
+    @Override
+    public void setIsHealDot(boolean isHealDot) {
+        this.isHealDot = isHealDot;
+    }
+    @Override
+    public void setIsManaDot(boolean isManaDot) {
+        this.isManaDot = isManaDot;
     }
 
 

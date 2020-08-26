@@ -102,7 +102,7 @@ public class JsonAssetFileReader {
         @Override
         protected JSONObject doInBackground(Void ... voids) {
             try {
-                // get the jason object and array
+                // get the json object and array
                 JSONObject obj = new JSONObject(json);
                 JSONArray jsonArray = obj.getJSONArray("allEncounters");
                 JSONObject encounterTemp = jsonArray.getJSONObject(location);
@@ -212,10 +212,10 @@ public class JsonAssetFileReader {
         return new parseRandomJSONData().execute().get();
     }
 
-    private String getRandomDialogue(JSONObject dialogue) throws JSONException {
+    private JSONObject getRandomDialogue(JSONObject dialogue) throws JSONException {
         JSONArray dialogueArray = dialogue.getJSONArray("dialogue");
         int index = getRandomJsonArrayIndex(dialogueArray);
-        return dialogueArray.getString(index);
+        return dialogueArray.getJSONObject(index);
     }
 
     // return a random index in the JSONArray

@@ -32,12 +32,16 @@ public interface CharacterEntity {
     void setIsInvincible(boolean isInvincible);
     void setIsSilence(boolean isInvincible);
     void setIsInvisible(boolean isInvisible);
+    void setIsHealDot(boolean isHealDot);
+    void setIsManaDot(boolean isManaDot);
 
     boolean getIsStun();
     boolean getIsConfuse();
     boolean getIsInvincible();
     boolean getIsSilence();
     boolean getIsInvisible();
+    boolean getIsHealDot();
+    boolean getIsManaDot();
 
     // ArrayLists
 

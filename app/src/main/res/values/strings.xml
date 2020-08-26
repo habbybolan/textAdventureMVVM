@@ -61,10 +61,27 @@
     <string name="full_on">You are full on </string>
     <string name="not_enough_gold">You do not have enough gold for that</string>
     <string name="already_added">This is already added to your inventory</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="abandon">Abandon</string>
     <string name='new_game'>New Game</string>
     <string name='continue_game'>Continue</string>
+
+    <string name='leave_encounter'>Move on</string>
+    <string name='font'>press_start_2p</string>
+    <string name="drop_button">Drop</string>
+
+    <string name="intelligence_short">INT</string>
+    <string name="strength_short">STR</string>
+    <string name="constitution_short">CON</string>
+    <string name="speed_short">SPD</string>
+
+    <string name="ability_plural">Abilities</string>
+    <string name="weapon_plural">Weapons</string>
+    <string name="item_plural">Items</string>
+
+    <string name="dot_plural">Dots</string>
+    <string name="special_plural">Special Effects</string>
+    <string name="stat_plural">Stats</string>
+
+    <string name='continue_dialogue'>Continue</string>
 </resources>

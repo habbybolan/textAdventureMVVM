@@ -55,7 +55,7 @@ public class CharacterSpecialListAdapter extends RecyclerView.Adapter<CharacterS
 
     @Override
     public int getItemCount() {
-        return specialList.size();
+        return specialList != null ? specialList.size() : 0;
     }
 
     // adds new dot effect to the list if it doesn't already exist

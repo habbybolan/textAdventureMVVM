@@ -8,7 +8,7 @@
     </data>
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         tools:context=".view.encounters.trapencounter.TrapFragment">
         <LinearLayout
             android:id="@+id/trap_container"
@@ -16,25 +16,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <GridView
-                android:id="@+id/gv_btn_options"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:numColumns="2">
-            </GridView>
-
-            <Button
-                android:id="@+id/btn_next_encounter"
+            <LinearLayout
+                android:id="@+id/layout_btn_options"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="button" />
+                android:orientation="horizontal">
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_dialogue"
                 android:layout_width="match_parent"
-                android:layout_height="209dp" />
-
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

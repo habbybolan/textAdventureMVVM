@@ -27,6 +27,19 @@ public class Weapon implements Inventory {
         setVariables(mDbHelper, weaponID);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        else if (o.getClass() != getClass()) return false;
+        else if (o == this) return true;
+        else return (checkWeaponEquality((Weapon) o));
+    }
+
+    // helper for checking if 2 ability scrolls are equal
+    private boolean checkWeaponEquality(Weapon weapon) {
+        return weapon.getName().equals(getName());
+    }
+
     // sets all the variables that describe the weapon
     private void setVariables(DatabaseAdapter mDbHelper, int weaponID) throws ExecutionException, InterruptedException {
         Cursor cursor = mDbHelper.getData(table);

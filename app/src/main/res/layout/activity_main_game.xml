@@ -20,6 +20,7 @@
             android:layout_width="120dp"
             android:layout_height="40dp"
             android:layout_marginStart="80dp"
+            android:textSize="@dimen/txt_size_medium"
             android:text="Character"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,6 +31,7 @@
             android:layout_width="120dp"
             android:layout_height="40dp"
             android:layout_marginEnd="80dp"
+            android:textSize="@dimen/txt_size_medium"
             android:text="GAME"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -80,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
+            android:textSize="@dimen/txt_size_medium"
             android:text="Level"
             app:layout_constraintEnd_toStartOf="@+id/btn_character"
             app:layout_constraintTop_toBottomOf="@+id/btn_character" />
@@ -90,6 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="28dp"
+            android:textSize="@dimen/txt_size_medium"
             android:text="@{mainGameViewModel.turnCounter}"
             app:layout_constraintStart_toEndOf="@+id/txt_turn"
             app:layout_constraintTop_toBottomOf="@+id/btn_character" />
@@ -99,6 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
+            android:textSize="@dimen/txt_size_medium"
             android:text="Gold"
             app:layout_constraintStart_toEndOf="@+id/btn_game"
             app:layout_constraintTop_toBottomOf="@+id/btn_game" />
@@ -109,6 +114,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:layout_marginEnd="12dp"
+            android:textSize="@dimen/txt_size_medium"
             android:text="@{characterViewModel.gold}"
             app:layout_constraintEnd_toStartOf="@+id/txt_gold"
             app:layout_constraintTop_toBottomOf="@+id/btn_game" />

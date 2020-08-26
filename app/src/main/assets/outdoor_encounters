@@ -120,15 +120,15 @@
 
 		{"type":"trap",
 			"encounters":[
-				{"dialogue":["As some small branches and pine cones start raining around you, the sound of crashing branches quickly approaches from above.",
-							"In the conrner of your eye, you see a large branch swinging into you."
+				{"dialogue":[{"dialogue":"As some small branches and pine cones start raining around you, the sound of crashing branches quickly approaches from above.",
+				                "next":{"dialogue":"With only a second to react, time comes to a halt as you decide your next action."}}
 							], 
 				"fail":{"dialogue":"You weren't fast enough. The unknown object hits you in the head and you fall to the ground, everything going black in an instant.",
 						"debuff":[{"debuff":"stun", "duration":"1"}, {"debuff":"bleed"}]},
 				"success":"jumping to the side, you are able to just barely avoid a large branch that smashes into the ground, creating a ripple through the surrounding leaves."
 				},
 
-				{"dialogue":["As you take a step, you feel your foot go through the ground as all of your weight pushes into a hole, previously covered by leaves and sticks"], 
+				{"dialogue":[{"dialogue":"As you take a step, you feel your foot go through the ground as all of your weight pushes into a hole, previously covered by leaves and sticks"}],
 				"fail":{"dialogue":"You couldn't grab yourself in time and you foot penetrates through a protruding root.",
 						"debuff":[{"debuff":"bleed"}, {"debuff":"damage", "damage":"5"}]},
 				"success":"jumping to the side, you are able to just barely avoid a large branch that smashes into the ground, creating a ripple through the surrounding leaves."

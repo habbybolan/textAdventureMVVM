@@ -1,6 +1,5 @@
 package com.habbybolan.textadventure.view.characterfragment;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 
 public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWeaponListAdapter.ViewHolder> {
 
-    private ArrayList<Weapon> weapons = new ArrayList<>();
+    private ArrayList<Weapon> weapons;
     private int selectedPosition = 0;
     CharacterListClickListener listener;
 
@@ -34,10 +33,12 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
         private TextView weaponDetails;
         private Button btnDrop;
         private CharacterListClickListener listener;
+        private ArrayList<Weapon> weapons;
 
-        public ViewHolder(View characterView, CharacterListClickListener listener) {
+        public ViewHolder(View characterView, CharacterListClickListener listener, ArrayList<Weapon> weapons) {
             super(characterView);
             this.listener = listener;
+            this.weapons = weapons;
             weaponLabel = characterView.findViewById(R.id.weapon_label);
             weaponDetails = characterView.findViewById(R.id.weapon_detail);
             btnDrop = characterView.findViewById(R.id.btn_drop_weapon);
@@ -52,11 +53,10 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
 
         @Override
         public boolean onLongClick(View v) {
-            listener.onLongClicked(getAdapterPosition());
+            listener.onLongClicked(weapons.get(getAdapterPosition()));
             return true;
         }
     }
-
 
     // inflate the layout used for the recyclerView
     @NonNull
@@ -66,7 +66,7 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
         // Inflate the custom layout
         View characterView = LayoutInflater.from(parent.getContext()).inflate(R.layout.character_weapon_list_details, parent, false);
         // Return a new holder instance
-        return new CharacterWeaponListAdapter.ViewHolder(characterView, listener);
+        return new CharacterWeaponListAdapter.ViewHolder(characterView, listener, weapons);
     }
 
     // set details of the views
@@ -79,22 +79,31 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
         String weaponDetailText = weapons.get(position).getName();
         final TextView weaponDetail = holder.weaponDetails;
         weaponDetail.setText(weaponDetailText);
-
-        if (position != selectedPosition) weaponDetail.setTextColor(Color.BLACK);
-        else weaponDetail.setTextColor(Color.RED);
-        weaponDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // check if any items are selected first
-                if (selectedPosition >= 0) notifyItemChanged(selectedPosition);
-                selectedPosition = position;
-                weaponDetail.setTextColor(Color.RED);
-            }
-        });
     }
 
     @Override
     public int getItemCount() {
-        return weapons.size();
+        return weapons != null ? weapons.size() : 0;
+    }
+
+    // adds new weapon to the list
+    public void addNewWeapon(Weapon newWeapon) {
+        weapons.add(newWeapon);
+        notifyItemInserted(weapons.size()-1);
+    }
+
+    // remove a weapon from the list
+    public void removeWeapon(Weapon weaponToRemove) {
+        for (int i = 0; i < weapons.size(); i++) {
+            if (weapons.get(i).equals(weaponToRemove)) {
+                removeWeaponAtIndex(i);
+                break;
+            }
+        }
+    }
+    // remove an weapon from the list
+    private void removeWeaponAtIndex(int index) {
+        weapons.remove(index);
+        notifyItemRemoved(index);
     }
 }

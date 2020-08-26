@@ -1,6 +1,5 @@
 package com.habbybolan.textadventure.view.characterfragment;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 
 public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItemListAdapter.ViewHolder> {
 
-    private ArrayList<Item> items = new ArrayList<>();
+    private ArrayList<Item> items;
     private int selectedPosition = 0;
     CharacterListClickListener listener;
 
@@ -34,10 +33,12 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
         private TextView itemDetails;
         private Button btnDrop;
         private CharacterListClickListener listener;
+        private ArrayList<Item> items;
 
-        public ViewHolder(View characterView, CharacterListClickListener listener) {
+        public ViewHolder(View characterView, CharacterListClickListener listener, ArrayList<Item> items) {
             super(characterView);
             this.listener = listener;
+            this.items = items;
             itemLabel = characterView.findViewById(R.id.item_label);
             itemDetails = characterView.findViewById(R.id.item_detail);
             btnDrop = characterView.findViewById(R.id.btn_drop_item);
@@ -52,7 +53,7 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
 
         @Override
         public boolean onLongClick(View v) {
-            listener.onLongClicked(getAdapterPosition());
+            listener.onLongClicked(items.get(getAdapterPosition()));
             return true;
         }
     }
@@ -66,7 +67,7 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
         // Inflate the custom layout
         View characterView = LayoutInflater.from(parent.getContext()).inflate(R.layout.character_item_list_details, parent, false);
         // Return a new holder instance
-        return new ViewHolder(characterView, listener);
+        return new ViewHolder(characterView, listener, items);
     }
 
     // set details of the views
@@ -79,22 +80,31 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
         String itemDetailText = items.get(position).getName();
         final TextView itemDetail = holder.itemDetails;
         itemDetail.setText(itemDetailText);
-
-        if (position != selectedPosition) itemDetail.setTextColor(Color.BLACK);
-        else itemDetail.setTextColor(Color.RED);
-        itemDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // check if any items are selected first
-                if (selectedPosition >= 0) notifyItemChanged(selectedPosition);
-                selectedPosition = position;
-                itemDetail.setTextColor(Color.RED);
-            }
-        });
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return items != null ? items.size() : 0;
+    }
+
+    // adds new item to the list
+    public void addNewItem(Item newItem) {
+        items.add(newItem);
+        notifyItemInserted(items.size()-1);
+    }
+
+    // remove an item from the list
+    public void removeItem(Item itemToRemove) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).equals(itemToRemove)) {
+                removeItemAtIndex(i);
+                break;
+            }
+        }
+    }
+    // remove an item from the list
+    private void removeItemAtIndex(int index) {
+        items.remove(index);
+        notifyItemRemoved(index);
     }
 }

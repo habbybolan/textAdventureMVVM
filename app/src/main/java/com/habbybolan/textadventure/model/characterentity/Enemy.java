@@ -62,6 +62,8 @@ public class Enemy implements CharacterEntity {
     private boolean isInvincible = false;
     private boolean isSilence = false;
     private boolean isInvisible = false;
+    private boolean isHealDot = false;
+    private boolean isManaDot = false;
 
     // stats
     private int strBase = 0;
@@ -483,6 +485,14 @@ public class Enemy implements CharacterEntity {
     public void setIsFrostBurn(boolean isFrostBurn) {
         this.isFrostBurn = isFrostBurn;
     }
+    @Override
+    public void setIsHealDot(boolean isHealDot) {
+        this.isHealDot = isHealDot;
+    }
+    @Override
+    public void setIsManaDot(boolean isManaDot) {
+        this.isManaDot = isManaDot;
+    }
 
 
     public void setIsAlive(boolean isAlive) {
@@ -573,6 +583,14 @@ public class Enemy implements CharacterEntity {
     }
     public boolean getIsInvisible() {
         return isInvisible;
+    }
+    @Override
+    public boolean getIsHealDot() {
+        return isHealDot;
+    }
+    @Override
+    public boolean getIsManaDot() {
+        return isManaDot;
     }
     // stats
     public int getStrIncrease() {

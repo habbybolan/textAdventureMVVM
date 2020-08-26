@@ -17,7 +17,7 @@ public class TrapModel {
     }
 
     // do speed check for the trap
-    private boolean isSuccessfulEscape() {
+    public boolean isSuccessfulEscape() {
         Random rand = new Random();
         int valToBeat = rand.nextInt(100);
         // each point of speed adds 5%
@@ -25,7 +25,7 @@ public class TrapModel {
     }
 
     // returns true if a disarm trap exists, and removes the trap from inventory
-    private boolean checkInventoryForTrapItem() {
+    public boolean checkInventoryForTrapItem() {
         ArrayList<Item> items = characterVM.getCharacter().getItems();
         for (Item trapItem : items) {
             if (trapItem.getEscapeTrap() == 1) {
@@ -35,6 +35,4 @@ public class TrapModel {
         }
         return false;
     }
-
-
 }

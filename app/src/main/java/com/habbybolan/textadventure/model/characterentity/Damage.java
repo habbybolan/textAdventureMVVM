@@ -1,19 +1,26 @@
-package com.habbybolan.textadventure.model;
+package com.habbybolan.textadventure.model.characterentity;
+import com.habbybolan.textadventure.model.inventory.Ability;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+
 /*
 deals with damage, stats changes, and ability effects (AOE, DOT, specials, damage)
  - all combat actions
  */
-
-
 public class Damage {
-    /*
 
     public Damage() {
+        // empty constructor
     }
 
     // check any buffs or protections that characterEntity has
-    // remove the damage amount from target health if no protection
-    // or remove target's temporary extra health and direct health if any overflow of damage
+        // remove the damage amount from target health if no protection
+        // or remove target's temporary extra health and direct health if any overflow of damage
     public void damageTarget(CharacterEntity target, int damage) {
         int overFlow = 0; // keeps track of damage if it gets rid of all tempExtraHealth
         if ((target.getTempExtraHealth() - damage) < 0) {
@@ -25,13 +32,10 @@ public class Damage {
         }
         // direct health takes damage if any overFlow from tempHealth
         target.setHealth(target.getHealth() - overFlow);
-        // update the view model for change in health status
-        if (target instanceof Character)
-            model.setHealthManaChange(CharacterChangeViewModel.HEALTH);
     }
 
     // returns a random damage number between damageMin and damageMax
-    // apply any additional strength the user has to the damage
+        // apply any additional strength the user has to the damage
     public int getRandomAmount(int min, int max, CharacterEntity user) {
         int damageDifference = max - min;
         Random rand  = new Random();
@@ -45,9 +49,6 @@ public class Damage {
         if (target.getHealth() > target.getMaxHealth()) {
             target.setHealth(target.getMaxHealth());
         }
-        // update the view model for change in health status
-        if (target instanceof Character)
-            model.setHealthManaChange(CharacterChangeViewModel.HEALTH);
     }
 
     // regenerates mana for a specific amount
@@ -56,9 +57,6 @@ public class Damage {
         if (target.getMana() > target.getMaxMana()) {
             target.setMana(target.getMaxMana());
         }
-        // update the view model for change in mana status
-        if (target instanceof Character)
-            model.setHealthManaChange(CharacterChangeViewModel.MANA);
     }
 
     // regenerates mana for a specific amount
@@ -67,9 +65,6 @@ public class Damage {
         if (target.getMana() < 0) {
             target.setMana(0);
         }
-        // update the view model for change in mana status
-        if (target instanceof Character)
-            model.setHealthManaChange(CharacterChangeViewModel.MANA);
     }
 
 
@@ -79,9 +74,6 @@ public class Damage {
     // adds a new ability and applies its effects - stat increases, specials, and dots
     public void addNewAbilityEffects(Ability ability, CharacterEntity entity) {
         // todo: scale with Intelligence
-        //if (!entity.appliedAbilities.contains(ability) ) {
-        //    entity.appliedAbilities.add(ability);
-        //} // todo: appliedAbilities unnecessary?
         if (ability.getMinDamage() != 0) damageTarget(entity, getRandomAmount(ability.getMinDamage(), ability.getMaxDamage(), entity));
         if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
         // specials
@@ -95,8 +87,8 @@ public class Damage {
         if (ability.getIsPoison() == 1) addNewDot(POISON, false, entity);
         if (ability.getIsBleed() == 1) addNewDot(BLEED, false, entity);
         if (ability.getIsFrostBurn() == 1) addNewDot(FROSTBURN, false, entity);
-        if (ability.getIsHealDot() == 1) addNewDot(HEALTH, false, entity);
-        if (ability.getIsManaDot() == 1) addNewDot(MANA, false, entity);
+        if (ability.getIsHealDot() == 1) addNewDot(HEALTH_DOT, false, entity);
+        if (ability.getIsManaDot() == 1) addNewDot(MANA_DOT, false, entity);
         // direct heal/mana
         if (ability.getHealMin() != 0) healTarget(entity, getRandomAmount(ability.getHealMin(), ability.getHealMax(), entity));
         if (ability.getManaMin() != 0) manaTarget(entity, getRandomAmount(ability.getManaMin(), ability.getManaMax(), entity));
@@ -129,67 +121,72 @@ public class Damage {
     // ***SPECIALS ***
 
     // adds a new special to specialMap if not already existing - alter isSpecial value if new
-    // if exists, it reset the time for the special
-    public void addNewSpecial(String special, int duration, CharacterEntity entity) {
-        if (entity.specialMap.containsKey(special)) {
+        // if exists, it reset the time for the special
+    public void addNewSpecial(String special, int newDuration, CharacterEntity entity) {
+        Integer prevDuration = entity.specialMap.get(special);
+        if (prevDuration != null) {
             // < 0  value indicates the special is permanently set from an item
-            if (entity.specialMap.get(special) > 0 && entity.specialMap.get(special) < duration) {
-                entity.specialMap.put(special, duration);
+            if (prevDuration > 0 && prevDuration < newDuration) {
+                entity.specialMap.put(special, newDuration);
             }
         } else {
             alterIsSpecial(special, entity);
-            entity.specialMap.put(special, duration);
-        }
-        // update the view model for change in special status
-        if (entity instanceof Character) {
-            model.setSpecialChange(special);
+            entity.specialMap.put(special, newDuration);
         }
     }
 
     // check if the special is active on the enemy
-    // active returns 1, otherwise 0
+        // active returns 1, otherwise 0
     public boolean checkSpecials(String special, CharacterEntity entity) {
-        if (special.equals(STUN)) {
-            return entity.getIsStun() == 1;
-        } else if (special.equals(CONFUSE)) {
-            return entity.getIsConfuse() == 1;
-        } else if (special.equals(INVINCIBILITY)) {
-            return entity.getIsInvincible() == 1;
-        } else if (special.equals(SILENCE)) {
-            return entity.getIsSilence() == 1;
-            // otherwise INVISIBILITY
-        } else {
-            return entity.getIsInvisible() == 1;
+        switch (special) {
+            case STUN:
+                return entity.getIsStun();
+            case CONFUSE:
+                return entity.getIsConfuse();
+            case INVINCIBILITY:
+                return entity.getIsInvincible();
+            case SILENCE:
+                return entity.getIsSilence();
+            case INVISIBILITY:
+                return entity.getIsInvisible();
         }
+        throw new IllegalArgumentException();
     }
 
     // decrements the special duration left
-    // if the duration is 0 after decrement, then set isSpecial value to 0
-    // if the value < 0, do nothing, permanent special
+        // if the duration is 0 after decrement, then set isSpecial value to 0
+        // if the value < 0, do nothing, permanent special
     public void decrSpecialDuration(CharacterEntity entity) {
         for (String key : entity.specialMap.keySet()) {
-            entity.specialMap.put(key, entity.specialMap.get(key)-1);
-            if (entity.specialMap.get(key) == 0) {
-                alterIsSpecial(key, entity); // changes
-                entity.specialMap.remove(key);
-                model.setSpecialChange(key);
+            Integer duration = entity.specialMap.get(key);
+            if (duration != null) {
+                entity.specialMap.put(key, --duration);
+                if (duration == 0) {
+                    alterIsSpecial(key, entity);
+                    entity.specialMap.remove(key);
+                }
             }
         }
     }
 
-    // change the value of isSpecial value (0->1 or 1->0)
+    // change the value of isSpecial boolean value
     public void alterIsSpecial(String special, CharacterEntity entity) {
-        if (special.equals(STUN)) {
-            entity.setIsStun(Math.abs(entity.getIsStun()-1));
-        } else if (special.equals(CONFUSE)) {
-            entity.setIsConfuse(Math.abs(entity.getIsConfuse()-1));
-        } else if (special.equals(INVINCIBILITY)) {
-            entity.setIsInvincible(Math.abs(entity.getIsInvincible()-1));
-        } else if (special.equals(SILENCE)) {
-            entity.setIsInvincible(Math.abs(entity.getIsSilence()-1));
-            // otherwise INVISIBILITY
-        } else {
-            entity.setIsInvisible(Math.abs(entity.getIsInvisible()-1));
+        switch (special) {
+            case STUN:
+                entity.setIsStun(!entity.getIsStun());
+                break;
+            case CONFUSE:
+                entity.setIsConfuse(!entity.getIsConfuse());
+                break;
+            case INVINCIBILITY:
+                entity.setIsInvincible(!entity.getIsInvincible());
+                break;
+            case SILENCE:
+                entity.setIsInvincible(!entity.getIsSilence());
+                break;
+            case INVISIBILITY:
+                entity.setIsInvisible(!entity.getIsInvisible());
+                break;
         }
     }
 
@@ -199,6 +196,11 @@ public class Damage {
     public static final String INVINCIBILITY = "invincible";
     public static final String SILENCE = "silence";
     public static final String INVISIBILITY = "invisible";
+
+    // returns true if String is a special
+    public boolean isSpecial(String check) {
+        return (check.equals(STUN) || check.equals(CONFUSE) || check.equals(INVISIBILITY) || check.equals(INVINCIBILITY) || check.equals(SILENCE));
+    }
 
 
 
@@ -235,8 +237,6 @@ public class Damage {
         statValues.add(amount);
         entity.statIncreaseList.add(statValues);
         findStatToIncrease((String)statValues.get(0), (int)statValues.get(2), entity);
-        if (entity instanceof Character)
-            model.setStatChange(stat);
         updateStats(entity);
     }
 
@@ -288,8 +288,6 @@ public class Damage {
                 break;
         }
         findStatToAlter(stat, entity);
-        if (entity instanceof Character)
-            model.setStatChange(stat);
     }
 
     // add a new stat decrease - can stack these, each stat decrease represented as the list inside a list
@@ -301,8 +299,6 @@ public class Damage {
         statValues.add(amount);
         entity.statDecreaseList.add(statValues);
         findStatToDecrease((String)statValues.get(0), (int)statValues.get(2), entity);
-        if (entity instanceof Character)
-            model.setStatChange(stat);
         updateStats(entity);
     }
 
@@ -354,8 +350,6 @@ public class Damage {
                 break;
         }
         findStatToAlter(stat, entity);
-        if (entity instanceof Character)
-            model.setStatChange(stat);
     }
 
     // alter the stat amount, given it's new statIncrease or statDecrease
@@ -532,7 +526,7 @@ public class Damage {
 
     // todo: alter isStatus values in Enemy and Character - add them first
     // adds a new Dot to to dotMap if not already existing
-    // if exists, it reset the time for the dot
+        // if exists, it reset the time for the dot
     public void addNewDot(String dot, boolean setInfinite, CharacterEntity entity) {
         int duration = 0;
         switch (dot) {
@@ -548,75 +542,100 @@ public class Damage {
             case FROSTBURN:
                 duration = FROSTBURN_DURATION;
                 break;
-            case HEALTH:
-                duration = HEAL_DURATION;
+            case HEALTH_DOT:
+                duration = HEAL_DOT_DURATION;
                 break;
-            case MANA:
-                duration = MANA_DURATION;
+            case MANA_DOT:
+                duration = MANA_DOT_DURATION;
                 break;
             default: // shouldn't reach this
                 break;
         }
-        if (setInfinite) duration = -1; // negative duration if DOT set as infinite
-        // set dot as infinite if setInfinite
-        if (entity.specialMap.containsKey(dot)) {
-            if (entity.specialMap.get(dot) > 0) entity.specialMap.put(dot, duration);
+        // set dot as infinite (-1) if setInfinite
+        if (setInfinite) duration = -1;
+        Integer prevDotDuration = entity.dotMap.get(dot);
+        if (prevDotDuration != null) {
+            // reset the duration
+            if (prevDotDuration > 0) entity.dotMap.put(dot, duration);
         } else {
             alterIsDot(dot, entity);
-            entity.specialMap.put(dot, duration);
+            entity.dotMap.put(dot, duration);
         }
-
-        if (entity instanceof Character) model.setDotChange(dot);
     }
 
+    // swap the isDot on entity
     private void alterIsDot(String dot, CharacterEntity entity) {
-        if (dot.equals(FIRE)) {
-            entity.setIsFire(Math.abs(entity.getIsFire()-1));
-        } else if (dot.equals(BLEED)) {
-            entity.setIsBleed(Math.abs(entity.getIsBleed()-1));
-        } else if (dot.equals(POISON)) {
-            entity.setIsPoison(Math.abs(entity.getIsPoison()-1));
-        } else if (dot.equals(FROSTBURN)) {
-            entity.setIsFrostBurn(Math.abs(entity.getIsFrostBurn()-1));
+        switch (dot) {
+            case FIRE:
+                entity.setIsFire(!entity.getIsFire());
+                break;
+            case BLEED:
+                entity.setIsBleed(!entity.getIsBleed());
+                break;
+            case POISON:
+                entity.setIsPoison(!entity.getIsPoison());
+                break;
+            case FROSTBURN:
+                entity.setIsFrostBurn(!entity.getIsFrostBurn());
+                break;
+            case HEALTH_DOT:
+                entity.setIsHealDot(!entity.getIsHealDot());
+                break;
+            case MANA_DOT:
+                entity.setIsManaDot(!entity.getIsManaDot());
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
     // applies the effect of the DOT and decrements the time remaining in DotMap
-    // if duration == 0, then remove from the dotMap
-    public void applyDots(CharacterEntity entity) {
+        // if duration == 0, then remove from the dotMap
+        // returns true if any dots applied are removed
+    public ArrayList<String> applyDots(CharacterEntity entity) {
+        ArrayList<String> dotsRemoved = new ArrayList<>();
         Iterator<Map.Entry<String, Integer>> iter = entity.dotMap.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Integer> entry = iter.next();
             String key = entry.getKey();
-            int value = entity.dotMap.get(key);
-            findDotToApply(key, entity);
-            entity.dotMap.put(key, value-1);
-            if (value-1 == 0) {
-                alterIsDot(key, entity);
-                iter.remove();
+            Integer value = entity.dotMap.get(key);
+            if (value != null) {
+                findDotToApply(key, entity);
+                entity.dotMap.put(key, value - 1);
+                if (value - 1 == 0) {
+                    dotsRemoved.add(key);
+                    alterIsDot(key, entity);
+                    iter.remove();
+                }
             }
         }
-        if (entity instanceof Character) model.setDotChange("");
+        return dotsRemoved;
     }
     // helper for applyDots
-    // find the proper method to call for using a specific dot
+        // find the proper method to call for using a specific dot
     private void findDotToApply(String dot, CharacterEntity entity) {
-        if (dot.equals(FIRE)) {
-            this.applyFire(entity);
-        } else if (dot.equals(POISON)) {
-            this.applyPoison(entity);
-        } else if (dot.equals(BLEED)) {
-            this.applyBleed(entity);
-        } else if (dot.equals(FROSTBURN)) {
-            this.applyFrostBurn(entity);
-        } else if (dot.equals(HEALTH)) {
-            this.applyHealthDot(entity);
-            // otherwise MANA
-        } else {
-            this.applyManaDot(entity);
+        switch (dot) {
+            case FIRE:
+                this.applyFire(entity);
+                break;
+            case POISON:
+                this.applyPoison(entity);
+                break;
+            case BLEED:
+                this.applyBleed(entity);
+                break;
+            case FROSTBURN:
+                this.applyFrostBurn(entity);
+                break;
+            case HEALTH_DOT:
+                this.applyHealthDot(entity);
+                break;
+            case MANA_DOT:
+                this.applyManaDot(entity);
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
-
 
     // Dot effects - static
     public static final String FIRE = "fire";
@@ -631,12 +650,17 @@ public class Damage {
     public static final String FROSTBURN = "frostBurn";
     public final int FROSTBURN_DURATION = 1;
     public final int FROSTBURN_DAMAGE = 1;
-    public static final String HEALTH = "heal";
-    public final int HEAL_DURATION = 3;
-    public final int HEAL_AMOUNT = 5;
-    public static final String MANA = "mana";
-    public final int MANA_DURATION = 3;
-    public final int MANA_AMOUNT = 5;
+    public static final String HEALTH_DOT = "healDot";
+    public final int HEAL_DOT_DURATION = 3;
+    public final int HEAL_DOT_AMOUNT = 5;
+    public static final String MANA_DOT = "manaDOt";
+    public final int MANA_DOT_DURATION = 3;
+    public final int MANA_DOT_AMOUNT = 5;
+
+    // return true if String is a dot
+    public boolean isDot(String check) {
+        return (check.equals(FIRE) || check.equals(POISON) || check.equals(BLEED) || check.equals(FROSTBURN) || check.equals(HEALTH_DOT) || check.equals(MANA_DOT));
+    }
 
     // status application of damage over times
     public void applyFire(CharacterEntity entity) {
@@ -653,9 +677,9 @@ public class Damage {
         damageTarget(entity, FROSTBURN_DAMAGE);
     }
     public void applyHealthDot(CharacterEntity entity) {
-        healTarget(entity, HEAL_AMOUNT);
+        healTarget(entity, HEAL_DOT_AMOUNT);
     }
     public void applyManaDot(CharacterEntity entity) {
-        manaTarget(entity, MANA_AMOUNT);
-    }*/
+        manaTarget(entity, MANA_DOT_AMOUNT);
+    }
 }
