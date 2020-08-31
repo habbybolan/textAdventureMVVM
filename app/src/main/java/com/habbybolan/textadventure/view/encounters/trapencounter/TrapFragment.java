@@ -60,6 +60,7 @@ public class TrapFragment extends Fragment {
         setUpDialogueRV();
         // create state listener and go into first state
         TrapStateListener();
+
         return trapBinder.getRoot();
     }
 
@@ -84,7 +85,11 @@ public class TrapFragment extends Fragment {
         switch(state) {
             // first state
             case TrapEncounterViewModel.firstState:
-                dialogueState();
+                try {
+                    dialogueState();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
                 // second state
             case TrapEncounterViewModel.secondState:
@@ -120,21 +125,28 @@ public class TrapFragment extends Fragment {
 
     // first state
         // set up the dialogue with recyclerView
-    private void dialogueState() {
-        Button btnContinue = new Button(getContext());
-        btnContinue.setText(getResources().getString(R.string.continue_dialogue));
-        btnContinue.setTypeface(mainGameVM.getFont());
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    trapEncounterVM.firstState();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+    private void dialogueState() throws JSONException {
+        JSONObject dialogue = encounter.getJSONObject("dialogue");
+        // if there is only 1 dialogue snippet, then don't create a 'continue' button
+        if (!dialogue.has("next")) {
+            trapEncounterVM.firstState();
+        } else {
+            // otherwise, multiple dialogue snippets
+            trapEncounterVM.firstState();
+            Button btnContinue = new Button(getContext());
+            btnContinue.setText(getResources().getString(R.string.continue_dialogue));
+            btnContinue.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        trapEncounterVM.firstState();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
-        trapBinder.layoutBtnOptions.addView(btnContinue);
+            });
+            trapBinder.layoutBtnOptions.addView(btnContinue);
+        }
     }
 
     // second state
@@ -143,7 +155,6 @@ public class TrapFragment extends Fragment {
         trapBinder.layoutBtnOptions.removeAllViews();
         Button btnDodgeTrap = new Button(getContext());
         //btnDodgeTrap.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.txt_size_normal));
-        btnDodgeTrap.setTypeface(mainGameVM.getFont());
         String dodge = "Dodge Trap";
         btnDodgeTrap.setText(dodge);
         btnDodgeTrap.setOnClickListener(new View.OnClickListener() {
@@ -159,7 +170,6 @@ public class TrapFragment extends Fragment {
         trapBinder.layoutBtnOptions.addView(btnDodgeTrap);
 
         Button btnUseItem = new Button(getContext());
-        btnUseItem.setTypeface(mainGameVM.getFont());
         String useItem = "Use Item";
         btnUseItem.setText(useItem);
         btnUseItem.setOnClickListener(new View.OnClickListener() {
@@ -182,7 +192,6 @@ public class TrapFragment extends Fragment {
         trapBinder.layoutBtnOptions.removeAllViews();
         Button leaveButton = new Button(getContext());
         leaveButton.setText(getResources().getString(R.string.leave_encounter));
-        leaveButton.setTypeface(mainGameVM.getFont());
         leaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

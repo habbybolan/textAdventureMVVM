@@ -8,8 +8,10 @@ import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.model.characterentity.Character;
-import com.habbybolan.textadventure.model.characterentity.Damage;
+import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
@@ -23,7 +25,6 @@ holds current character data used to tie the data to necessary views
 public class CharacterViewModel extends BaseObservable {
 
     private Character character;
-    private Damage damage;
 
     // retrieve a character from memory
     // todo: this dependency may be confusing? - inject dependency from somewhere else preferably
@@ -32,36 +33,248 @@ public class CharacterViewModel extends BaseObservable {
         String characterData = save.readCharacterData(context);
         DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
         character = new Character(characterData, mDbHelper, context);
-        damage = new Damage();
-
-        // todo: test
-        character.addInputDotMap("1", 10);
-        character.addInputSpecialMap("1", 10);
-        character.addInputDotMap("2", 5);
-        character.addInputSpecialMap("2", 5);
     }
 
-    // Observable for adding and deleting abilities from the RecyclerView in CharacterFragment
-    private ObservableField<Ability> abilityObserverAdd = new ObservableField<>();
+    // ** Inventory **
+
+        // Abilities
+    // Observable for adding and deleting abilities and updating RecyclerView in CharacterFragment
+    private ObservableField<Integer> abilityObserverAdd = new ObservableField<>();
     @Bindable
-    public ObservableField<Ability> getAbilityObserverAdd() {
+    public ObservableField<Integer> getAbilityObserverAdd() {
         return abilityObserverAdd;
     }
-    private ObservableField<Ability> abilityObserverRemove = new ObservableField<>();
+    private ObservableField<Integer> abilityObserverRemove = new ObservableField<>();
     @Bindable
-    public ObservableField<Ability> getAbilityObserverRemove() {
+    public ObservableField<Integer> getAbilityObserverRemove() {
         return abilityObserverRemove;
     }
     public void removeAbility(Ability ability) {
-        character.removeAbility(ability);
-        abilityObserverRemove.set(ability);
+        int index = character.removeAbility(ability);
+        if (index >= 0) abilityObserverRemove.set(index);
     }
     public void addAbility(Ability ability) {
-        character.addAbility(ability);
-        abilityObserverAdd.set(ability);
+        int index = character.addAbility(ability);
+        abilityObserverAdd.set(index);
+    }
+    public void removeAbilityAtIndex(int index) {
+        character.removeAbilityAtIndex(index);
+        abilityObserverRemove.set(index);
+    }
+    public ArrayList<Ability> getAbilities() {
+        return character.getAbilities();
+    }
+
+        // Weapons
+    // Observable for adding and deleting weapons and updating RecyclerView in CharacterFragment
+    private ObservableField<Integer> weaponObserverAdd = new ObservableField<>();
+    @Bindable
+    public ObservableField<Integer> getWeaponObserverAdd() {
+        return weaponObserverAdd;
+    }
+    private ObservableField<Integer> weaponObserverRemove = new ObservableField<>();
+    @Bindable
+    public ObservableField<Integer> getWeaponObserverRemove() {
+        return weaponObserverRemove;
+    }
+    public ArrayList<Weapon> getWeapons() {
+        return character.getWeapons();
+    }
+    public void removeWeapon(Weapon weapon) {
+        int index = character.removeWeapon(weapon);
+        if (index >= 0) weaponObserverRemove.set(index);
+    }
+    public void addWeapon(Weapon weapon) {
+        int index = character.addWeapon(weapon);
+        weaponObserverAdd.set(index);
+    }
+    public void removeWeaponAtIndex(int index) {
+        character.removeWeaponAtIndex(index);
+        weaponObserverRemove.set(index);
+    }
+
+        // Items
+    // Observable for adding and deleting items and updating RecyclerView in CharacterFragment
+    private ObservableField<Integer> itemObserverAdd = new ObservableField<>();
+    @Bindable
+    public ObservableField<Integer> getItemObserverAdd() {
+        return itemObserverAdd;
+    }
+    private ObservableField<Integer> itemObserverRemove = new ObservableField<>();
+    @Bindable
+    public ObservableField<Integer> getItemObserverRemove() {
+        return itemObserverRemove;
+    }
+    public ArrayList<Item> getItems() {
+        return character.getItems();
+    }
+    public void removeItem(Item item) {
+        int index = character.removeItem(item);
+        removeItemAtIndex(index);
+    }
+    public void removeItemAtIndex(int index) {
+        Item item = character.removeItemAtIndex(index);
+        if (!item.getIsConsumable()) {
+            // stat changes
+            if (item.getStrChange() != 0) setStrength(character.getStrength() - item.getStrChange());
+            if (item.getIntChange() != 0) setIntelligence(character.getIntelligence() - item.getIntChange());
+            if (item.getConChange() != 0) setConstitution(character.getConstitution() - item.getConChange());
+            if (item.getSpdChange() != 0) setSpeed(character.getSpeed() - item.getSpdChange());
+            if (item.getEvasionChange() != 0) setEvasion(character.getEvasion() - item.getEvasionChange());
+            if (item.getBlockChange() != 0) setBlock(character.getBlock() - item.getBlockChange());
+            // bar changes
+            if (item.getHealthChange() != 0) {
+                setMaxHealth(character.getMaxHealth() - item.getHealthChange());
+                setHealth(character.getHealthAfterItemRemoval(item.getHealthChange()));
+            }
+            if (item.getManaChange() != 0) {
+                setMaxMana(character.getMaxMana() - item.getManaChange());
+                setMana(character.getManaAfterItemRemoval(item.getManaChange()));
+            }
+            // special changes
+            if (item.getIsConfuse()) if (!character.isStillSpecialEffect(CharacterEntity.CONFUSE)) setIsConfuse(false);
+            if (item.getIsStun()) if (!character.isStillSpecialEffect(CharacterEntity.STUN)) setIsStun(false);
+            if (item.getIsSilence()) if (!character.isStillSpecialEffect(CharacterEntity.SILENCE)) setIsSilence(false);
+            if (item.getIsInvisible()) if (!character.isStillSpecialEffect(CharacterEntity.INVISIBILITY)) setIsInvisible(false);
+            if (item.getIsInvincible()) if (!character.isStillSpecialEffect(CharacterEntity.INVINCIBILITY)) setIsInvincible(false);
+            // DOT changes
+            if (item.getIsFire()) if (!character.removeInputDotMap(CharacterEntity.FIRE, true)) dotObserverRemove.set(CharacterEntity.FIRE);
+            if (item.getIsBleed()) if (!character.removeInputDotMap(CharacterEntity.BLEED, true)) dotObserverRemove.set(CharacterEntity.BLEED);
+            if (item.getIsPoison()) if (!character.removeInputDotMap(CharacterEntity.POISON, true)) dotObserverRemove.set(CharacterEntity.POISON);
+            if (item.getIsFrostBurn()) if (!character.removeInputDotMap(CharacterEntity.FROSTBURN, true)) dotObserverRemove.set(CharacterEntity.FROSTBURN);
+            if (item.getIsHealthDot()) if (!character.removeInputDotMap(CharacterEntity.HEALTH_DOT, true)) dotObserverRemove.set(CharacterEntity.HEALTH_DOT);
+            if (item.getIsManaDot()) if (!character.removeInputDotMap(CharacterEntity.MANA_DOT, true)) dotObserverRemove.set(CharacterEntity.MANA_DOT);
+        }
+        itemObserverRemove.set(index);
+    }
+    public void addItem(Item item) {
+        int index = character.addItem(item);
+        if (!item.getIsConsumable()) {
+            // stat changes
+            if (item.getStrChange() != 0) setStrength(character.getStrength() + item.getStrChange());
+            if (item.getIntChange() != 0) setIntelligence(character.getIntelligence() + item.getIntChange());
+            if (item.getConChange() != 0) setConstitution(character.getConstitution() + item.getConChange());
+            if (item.getSpdChange() != 0) setSpeed(character.getSpeed() + item.getSpdChange());
+            if (item.getEvasionChange() != 0) setEvasion(character.getEvasion() + item.getEvasionChange());
+            if (item.getBlockChange() != 0) setBlock(character.getBlock() + item.getBlockChange());
+            // bar changes
+            if (item.getHealthChange() != 0) {
+                setMaxHealth(character.getMaxHealth() + item.getHealthChange());
+                setHealth(character.getHealth() + item.getHealthChange());
+            }
+            if (item.getManaChange() != 0) {
+                setMaxMana(character.getMaxMana() + item.getManaChange());
+                setMana(character.getMana() + item.getManaChange());
+            }
+            // special changes
+            if (item.getIsConfuse()) if (character.addNewSpecial(CharacterEntity.CONFUSE, 0, true)) specialObserverAdd.set(CharacterEntity.CONFUSE);
+            if (item.getIsStun()) if (character.addNewSpecial(CharacterEntity.STUN, 0, true)) specialObserverAdd.set(CharacterEntity.STUN);
+            if (item.getIsSilence()) if (character.addNewSpecial(CharacterEntity.SILENCE, 0, true)) specialObserverAdd.set(CharacterEntity.SILENCE);
+            if (item.getIsInvisible()) if (character.addNewSpecial(CharacterEntity.INVISIBILITY, 0, true)) specialObserverAdd.set(CharacterEntity.INVISIBILITY);
+            if (item.getIsInvincible()) if (character.addNewSpecial(CharacterEntity.INVINCIBILITY, 0, true)) specialObserverAdd.set(CharacterEntity.INVINCIBILITY);
+            // DOT changes
+            if (item.getIsFire()) if (character.addNewDot(CharacterEntity.FIRE, true)) dotObserverAdd.set(CharacterEntity.FIRE);
+            if (item.getIsBleed()) if (character.addNewDot(CharacterEntity.BLEED, true)) dotObserverAdd.set(CharacterEntity.BLEED);
+            if (item.getIsPoison()) if (character.addNewDot(CharacterEntity.POISON, true)) dotObserverAdd.set(CharacterEntity.POISON);
+            if (item.getIsFrostBurn()) if (character.addNewDot(CharacterEntity.FROSTBURN, true)) dotObserverAdd.set(CharacterEntity.FROSTBURN);
+            if (item.getIsHealthDot()) if (character.addNewDot(CharacterEntity.HEALTH_DOT, true)) dotObserverAdd.set(CharacterEntity.HEALTH_DOT);
+            if (item.getIsManaDot()) if (character.addNewDot(CharacterEntity.MANA_DOT, true)) dotObserverAdd.set(CharacterEntity.MANA_DOT);
+        }
+        itemObserverAdd.set(index);
+    }
+    // consume an item
+    public void consumeItem(Item item) {
+        if (!item.getIsConsumable()) throw new IllegalArgumentException();
+        int index = character.removeItem(item);
+        // stat change
+        if (item.getStrChange() > 0) {
+            character.addNewStatIncrease(CharacterEntity.STR, item.getDuration(), item.getStrChange());
+            notifyPropertyChanged(BR.strIncrease);
+            notifyPropertyChanged(BR.strength);
+        }
+        if (item.getStrChange() < 0) {
+            character.addNewStatDecrease(CharacterEntity.STR, item.getDuration(), item.getStrChange());
+            notifyPropertyChanged(BR.strDecrease);
+            notifyPropertyChanged(BR.strength);
+        }
+        if (item.getIntChange() > 0) {
+            character.addNewStatIncrease(CharacterEntity.INT, item.getDuration(), item.getIntChange());
+            notifyPropertyChanged(BR.intIncrease);
+            notifyPropertyChanged(BR.intelligence);
+        }
+        if (item.getIntChange() < 0) {
+            character.addNewStatDecrease(CharacterEntity.INT, item.getDuration(), item.getIntChange());
+            notifyPropertyChanged(BR.intDecrease);
+            notifyPropertyChanged(BR.intelligence);
+        }
+        if (item.getConChange() > 0) {
+            character.addNewStatIncrease(CharacterEntity.CON, item.getDuration(), item.getConChange());
+            notifyPropertyChanged(BR.conIncrease);
+            notifyPropertyChanged(BR.constitution);
+        }
+        if (item.getConChange() < 0) {
+            character.addNewStatDecrease(CharacterEntity.CON, item.getDuration(), item.getConChange());
+            notifyPropertyChanged(BR.conDecrease);
+            notifyPropertyChanged(BR.constitution);
+        }
+        if (item.getSpdChange() > 0) {
+            character.addNewStatIncrease(CharacterEntity.SPD, item.getDuration(), item.getSpdChange());
+            notifyPropertyChanged(BR.spdIncrease);
+            notifyPropertyChanged(BR.speed);
+        }
+        if (item.getSpdChange() < 0) {
+            character.addNewStatDecrease(CharacterEntity.SPD, item.getDuration(), item.getSpdChange());
+            notifyPropertyChanged(BR.spdDecrease);
+            notifyPropertyChanged(BR.speed);
+        }
+        if (item.getBlockChange() > 0) {
+            character.addNewStatIncrease(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange());
+            notifyPropertyChanged(BR.blockIncrease);
+            notifyPropertyChanged(BR.block);
+        }
+        if (item.getBlockChange() < 0) {
+            character.addNewStatDecrease(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange());
+            notifyPropertyChanged(BR.blockDecrease);
+            notifyPropertyChanged(BR.block);
+        }
+        if (item.getEvasionChange() > 0) {
+            character.addNewStatIncrease(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange());
+            notifyPropertyChanged(BR.evasionIncrease);
+            notifyPropertyChanged(BR.evasion);
+        }
+        if (item.getEvasionChange() < 0) {
+            character.addNewStatDecrease(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange());
+            notifyPropertyChanged(BR.evasionDecrease);
+            notifyPropertyChanged(BR.evasion);
+        }
+        // health/mana
+        if (item.getHealthChange() > 0) character.healTarget(item.getHealthChange());
+        if (item.getHealthChange() < 0) character.damageTarget(item.getHealthChange());
+        if (item.getManaChange() > 0) character.manaTarget(item.getManaChange());
+        if (item.getManaChange() < 0) character.loseManaTarget(item.getManaChange());
+        // specials
+        if (item.getIsConfuse()) character.addNewSpecial(CharacterEntity.CONFUSE, item.getDuration(), false);
+        if (item.getIsStun()) character.addNewSpecial(CharacterEntity.STUN, item.getDuration(), false);
+        if (item.getIsSilence()) character.addNewSpecial(CharacterEntity.SILENCE, item.getDuration(), false);
+        if (item.getIsInvisible()) character.addNewSpecial(CharacterEntity.INVISIBILITY, item.getDuration(), false);
+        if (item.getIsInvincible()) character.addNewSpecial(CharacterEntity.INVINCIBILITY, item.getDuration(), false);
+        // DOTS
+        if (item.getIsFire()) character.addNewDot(CharacterEntity.FIRE, false);
+        if (item.getIsBleed()) character.addNewDot(CharacterEntity.BLEED, false);
+        if (item.getIsPoison()) character.addNewDot(CharacterEntity.POISON, false);
+        if (item.getIsFrostBurn()) character.addNewDot(CharacterEntity.FROSTBURN, false);
+        itemObserverRemove.set(index);
     }
 
 
+    // direct damage applied to player character
+    public void damageCharacter(int damageAmount) {
+        character.damageTarget(damageAmount);
+        notifyPropertyChanged(BR.health);
+    }
+
+
+    // character arrays
     public ArrayList<String> mapIntoList(Map<String, Integer> map) {
         ArrayList<String> list = new ArrayList<>();
         for (Map.Entry<String, Integer> pair : map.entrySet()) {
@@ -70,57 +283,8 @@ public class CharacterViewModel extends BaseObservable {
         return list;
     }
 
-    // direct damage applied to player character
-    public void damageCharacter(int damageAmount) {
-        damage.damageTarget(character, damageAmount);
-        notifyPropertyChanged(BR.health);
-    }
+    // ** Dot Effects **
 
-    // ** Dot **
-    // dot applied to player character
-    public void addDot(String dot, boolean isInfinite) {
-        damage.addNewDot(dot, isInfinite, character);
-        notifyPropertyChanged(BR.dotMap);
-        dotObserverAdd.set(dot);
-    }
-    // dot removed from player character
-    public void removeDot(String dot) {
-        dotObserverRemove.set(dot);
-    }
-    // apply the effects of any dots and decrement their duration
-        // removes any dots with duration = 0
-    public void applyDots() {
-        ArrayList<String> isRemoved = damage.applyDots(character);
-        for (String dotRemoved : isRemoved) {
-            dotObserverRemove.set(dotRemoved);
-        }
-    }
-
-    // ** special **
-    // special applied to player character
-    public void addSpecial(String special, int duration) {
-        damage.addNewSpecial(special, duration, character);
-        notifyPropertyChanged(BR.specialMap);
-        specialObserverAdd.set(special);
-    }
-    // special removed from player character
-    public void removeSpecial(String special) {
-        specialObserverRemove.set(special);
-    }
-
-    // heal player character
-    public void addHealth(int heal) {
-        setHealth(character.getHealth() + heal);
-    }
-    // mana regen player character
-    public void changeMana(int mana) {
-        setMana(character.getMana() + mana);
-    }
-
-
-    // *** character arrays ***
-
-        // DOT EFFECTS
     private ObservableField<String> dotObserverAdd = new ObservableField<>();
     public ObservableField<String> getDotObserverAdd() {
         return dotObserverAdd;
@@ -135,20 +299,21 @@ public class CharacterViewModel extends BaseObservable {
     }
     public void removeInputDotMap(String key) {
         // observed by XML
-        character.removeInputDotMap(key);
+        character.removeInputDotMap(key, true);
         notifyPropertyChanged(BR.dotMap);
         // observed by CharacterViewModel
         dotObserverRemove.set(key);
     }
-    public void addInputDotMap(String key, int duration) {
+    public void addInputDotMap(String key, boolean isInfinite) {
         // observed by XML
-        character.addInputDotMap(key, duration);
+        boolean isChanged = character.addNewDot(key, isInfinite);
         notifyPropertyChanged(BR.dotMap);
         // observed by CharacterViewModel
-        dotObserverAdd.set(key);
+        if (isChanged) dotObserverAdd.set(key);
     }
 
-        // SPECIAL EFFECTS
+    // ** Special Effects **
+
     private ObservableField<String> specialObserverAdd = new ObservableField<>();
     @Bindable
     public ObservableField<String> getSpecialObserverAdd() {
@@ -165,20 +330,22 @@ public class CharacterViewModel extends BaseObservable {
     }
     public void removeInputSpecialMap(String key) {
         // observed by XML
-        character.removeInputSpecialMap(key);
+        removeInputSpecialMap(key);
         notifyPropertyChanged(BR.specialMap);
         // observed by CharacterViewModel
         specialObserverRemove.set(key);
         notifyPropertyChanged(BR.specialObserverRemove);
     }
-    public void addInputSpecialMap(String key, int duration) {
+    public void addInputSpecialMap(String key, int duration, boolean isInfinite) {
         // observed by XML
-        character.addInputSpecialMap(key, duration);
+        character.addNewSpecial(key, duration, isInfinite);
         notifyPropertyChanged(BR.specialMap);
         // observed by CharacterViewModel
         specialObserverAdd.set(key);
         notifyPropertyChanged(BR.specialObserverAdd);
     }
+
+    // ** Stat Changes **
 
     @Bindable
     public List<ArrayList<Object>> getStatIncreaseList() {
@@ -249,7 +416,6 @@ public class CharacterViewModel extends BaseObservable {
     }
 
     // *** character stat ***
-
         // bars
     @Bindable
     public String getHealth() {
@@ -260,12 +426,28 @@ public class CharacterViewModel extends BaseObservable {
         notifyPropertyChanged(BR.health);
     }
     @Bindable
+    public int getMaxHealth() {
+        return character.getMaxHealth();
+    }
+    public void setMaxHealth(int maxHealth) {
+        character.setMaxHealth(maxHealth);
+        notifyPropertyChanged(BR.maxHealth);
+    }
+    @Bindable
     public String getMana() {
         return String.valueOf(character.getMana());
     }
     public void setMana(int mana) {
         character.setMana(mana);
         notifyPropertyChanged(BR.mana);
+    }
+    @Bindable
+    public int getMaxMana() {
+        return character.getMaxMana();
+    }
+    public void setMaxMana(int maxMana) {
+        character.setMaxMana(maxMana);
+        notifyPropertyChanged(BR.maxMana);
     }
         // misc
     @Bindable
@@ -276,39 +458,7 @@ public class CharacterViewModel extends BaseObservable {
         character.setGold(gold);
         notifyPropertyChanged(BR.gold);
     }
-        // DOTS
-    @Bindable
-    public boolean getIsFire() {
-        return character.getIsFire();
-    }
-    public void setIsFire(boolean isFire) {
-        character.setIsFire(isFire);
-        notifyPropertyChanged(BR.isFire);
-    }
-    @Bindable
-    public boolean getIsBleed() {
-        return character.getIsBleed();
-    }
-    public void setIsBleed(boolean isBleed) {
-        character.setIsBleed(isBleed);
-        notifyPropertyChanged(BR.isBleed);
-    }
-    @Bindable
-    public boolean getIsPoison() {
-        return character.getIsPoison();
-    }
-    public void setIsPoison(boolean isPoison) {
-        character.setIsPoison(isPoison);
-        notifyPropertyChanged(BR.isPoison);
-    }
-    @Bindable
-    public boolean getIsFrostBurn() {
-        return character.getIsFrostBurn();
-    }
-    public void setIsFrostBurn(boolean isFrostBurn) {
-        character.setIsFrostBurn(isFrostBurn);
-        notifyPropertyChanged(BR.isFrostBurn);
-    }
+
         // specials
     @Bindable
     public boolean getIsStun() {

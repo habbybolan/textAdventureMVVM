@@ -29,24 +29,26 @@ public class Item implements Inventory{
     private int healthChange = 0;
     private int manaChange = 0;
     // specials
-    private int isConfuse = 0;
-    private int isStun = 0;
-    private int isSilence = 0;
-    private int isInvincible = 0;
-    private int isInvisible = 0;
+    private boolean isConfuse = false;
+    private boolean isStun = false;
+    private boolean isSilence = false;
+    private boolean isInvincible = false;
+    private boolean isInvisible = false;
     // consumable
-    private int isConsumable = 0;
+    private boolean isConsumable = false;
     // tier
     private int tier = 0;
     // ability
     private Ability ability;
     // trap disablers
-    private int escapeTrap = 0;
+    private boolean escapeTrap = false;
     // DOTS
-    private int isFire = 0;
-    private int isBleed = 0;
-    private int isPoison = 0;
-    private int isFrostBurn = 0;
+    private boolean isFire = false;
+    private boolean isBleed = false;
+    private boolean isPoison = false;
+    private boolean isFrostBurn = false;
+    private boolean isHealthDot = false;
+    private boolean isManaDot = false;
     // duration
     private int duration = 0;
     // value for quest deliver encounter
@@ -152,33 +154,33 @@ public class Item implements Inventory{
         setExpChange(cursor.getInt(expChange));
         // specials
         int confuse = cursor.getColumnIndex("confuse");
-        setIsConfuse(cursor.getInt(confuse));
+        setIsConfuse(cursor.getInt(confuse)==1);
         int stun = cursor.getColumnIndex("stun");
-        setIsStun(stun);
+        setIsStun(cursor.getInt(stun)==1);
         int silence = cursor.getColumnIndex("silence");
-        setIsSilence(cursor.getInt(silence));
+        setIsSilence(cursor.getInt(silence)==1);
         int invincible = cursor.getColumnIndex("invincible");
-        setIsInvincible(cursor.getInt(invincible));
+        setIsInvincible(cursor.getInt(invincible)==1);
         int invisible = cursor.getColumnIndex("invisible");
-        setIsInvisible(cursor.getInt(invisible));
+        setIsInvisible(cursor.getInt(invisible)==1);
         // description
         int description = cursor.getColumnIndex("description");
         setDescription(cursor.getString(description));
         int consumable = cursor.getColumnIndex("consumable");
-        setIsConsumable(cursor.getInt(consumable));
+        setIsConsumable(cursor.getInt(consumable)==1);
         int tier = cursor.getColumnIndex("tier");
         setTier(cursor.getInt(tier));
         int escapeTrapColIndex = cursor.getColumnIndex("escape_trap");
-        setEscapeTrap(cursor.getInt(escapeTrapColIndex));
+        setEscapeTrap(cursor.getInt(escapeTrapColIndex)==1);
         // DOTS
         int fireColIndex = cursor.getColumnIndex("fire");
-        setIsFire(cursor.getInt(fireColIndex));
+        setIsFire(cursor.getInt(fireColIndex)==1);
         int bleedColIndex = cursor.getColumnIndex("bleed");
-        setIsBleed(cursor.getInt(bleedColIndex));
+        setIsBleed(cursor.getInt(bleedColIndex)==1);
         int poisonColIndex = cursor.getColumnIndex("poison");
-        setIsPoison(cursor.getInt(poisonColIndex));
+        setIsPoison(cursor.getInt(poisonColIndex)==1);
         int frostBurnColIndex = cursor.getColumnIndex("frostBurn");
-        setIsFrostBurn(cursor.getInt(frostBurnColIndex));
+        setIsFrostBurn(cursor.getInt(frostBurnColIndex)==1);
         // duration
         int durationColIndex = cursor.getColumnIndex("duration");
         setDuration(cursor.getInt(durationColIndex));
@@ -222,44 +224,50 @@ public class Item implements Inventory{
     public void setExpChange(int expChange) {
         this.expChange = expChange;
     }
-    public void setIsConfuse(int isConfuse) {
+    public void setIsConfuse(boolean isConfuse) {
         this.isConfuse = isConfuse;
     }
-    public void setIsStun(int isStun) {
+    public void setIsStun(boolean isStun) {
         this.isStun = isStun;
     }
-    public void setIsSilence(int isSilence) {
+    public void setIsSilence(boolean isSilence) {
         this.isSilence = isSilence;
     }
-    public void setIsInvincible(int isInvincible) {
+    public void setIsInvincible(boolean isInvincible) {
         this.isInvincible = isInvincible;
     }
-    public void setIsInvisible(int isInvisible) {
+    public void setIsInvisible(boolean isInvisible) {
         this.isInvisible = isInvisible;
     }
     public void setDescription(String description) {
         this.description = description;
     }
-    public void setIsConsumable(int isConsumable) {
+    public void setIsConsumable(boolean isConsumable) {
         this.isConsumable = isConsumable;
     }
     public void setTier(int tier) {
         this.tier = tier;
     }
-    public void setEscapeTrap(int escapeTrap) {
+    public void setEscapeTrap(boolean escapeTrap) {
         this.escapeTrap = escapeTrap;
     }
-    public void setIsFire(int isFire) {
+    public void setIsFire(boolean isFire) {
         this.isFire = isFire;
     }
-    public void setIsBleed(int isBleed) {
+    public void setIsBleed(boolean isBleed) {
         this.isBleed = isBleed;
     }
-    public void setIsPoison(int isPoison) {
+    public void setIsPoison(boolean isPoison) {
         this.isPoison = isPoison;
     }
-    public void setIsFrostBurn(int isFrostBurn) {
+    public void setIsFrostBurn(boolean isFrostBurn) {
         this.isFrostBurn = isFrostBurn;
+    }
+    public void setIsHealthDot(boolean isHealthDot) {
+        this.isHealthDot = isHealthDot;
+    }
+    public void setIsManaDot(boolean isManaDot) {
+        this.isManaDot = isManaDot;
     }
     private void setDuration(int duration) {
         this.duration = duration;
@@ -306,41 +314,47 @@ public class Item implements Inventory{
     public Ability getAbility() {
         return ability;
     }
-    public int getIsConfuse() {
+    public boolean getIsConfuse() {
         return isConfuse;
     }
-    public int getIsStun() {
+    public boolean getIsStun() {
         return isStun;
     }
-    public int getIsSilence() {
+    public boolean getIsSilence() {
         return isSilence;
     }
-    public int getIsInvincible() {
+    public boolean getIsInvincible() {
         return isInvincible;
     }
-    public int getIsInvisible() {
+    public boolean getIsInvisible() {
         return isInvisible;
     }
-    public int getIsConsumable() {
+    public boolean getIsConsumable() {
         return isConsumable;
     }
     public int getTier() {
         return tier;
     }
-    public int getEscapeTrap() {
+    public boolean getEscapeTrap() {
         return escapeTrap;
     }
-    public int getIsFire() {
+    public boolean getIsFire() {
         return isFire;
     }
-    public int getIsBleed() {
+    public boolean getIsBleed() {
         return isBleed;
     }
-    public int getIsPoison() {
+    public boolean getIsPoison() {
         return isPoison;
     }
-    public int getIsFrostBurn() {
+    public boolean getIsFrostBurn() {
         return isFrostBurn;
+    }
+    public boolean getIsHealthDot() {
+        return isHealthDot;
+    }
+    public boolean getIsManaDot() {
+        return isManaDot;
     }
     public int getDuration() {
         return duration;

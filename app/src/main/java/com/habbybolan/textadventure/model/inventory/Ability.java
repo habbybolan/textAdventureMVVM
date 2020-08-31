@@ -25,24 +25,24 @@ public class Ability implements Inventory{
     private int specialAoe = 0; // numbers of enemies hit by special ability aoe
 
     // specials
-    private int isConfuse = 0; // gives confusion to target, making them attack random
-    private int isStun = 0; // makes the target skip turns
-    private int isRevive = 0; //  revives a target
-    private int isInvincibility = 0; // makes the target invincible
-    private int isSilence = 0; // makes the target unable to use abilities
-    private int isInvisible = 0;
+    private boolean isConfuse = false; // gives confusion to target, making them attack random
+    private boolean isStun = false; // makes the target skip turns
+    private boolean isRevive = false; //  revives a target
+    private boolean isInvincibility = false; // makes the target invincible
+    private boolean isSilence = false; // makes the target unable to use abilities
+    private boolean isInvisible = false;
 
     // if it's a buff (for teammates) or not
-    private int isBuff = 0;
+    private boolean isBuff = false;
 
     // damage over times
-    private int dotDuration = 0;
-    private int isFire = 0; // applies fire
-    private int isPoison = 0; // applies poison
-    private int isFrostBurn = 0; // applies frost burn
-    private int isBleed = 0; // applies bleed
-    private int isHealDot = 0; // health restored after each turn
-    private int isManaDot = 0; // mana restored after each turn
+    private boolean dotDuration = false;
+    private boolean isFire = false; // applies fire
+    private boolean isPoison = false; // applies poison
+    private boolean isFrostBurn = false; // applies frost burn
+    private boolean isBleed = false; // applies bleed
+    private boolean isHealDot = false; // health restored after each turn
+    private boolean isManaDot = false; // mana restored after each turn
 
     // bars
     private int healMin = 0;
@@ -131,35 +131,35 @@ public class Ability implements Inventory{
         setSpecialAoe(cursor.getInt(specialAoeColIndex));
         // set specials
         int isStunColIndex = cursor.getColumnIndex("is_stun");
-        setIsStun(cursor.getInt(isStunColIndex));
+        setIsStun(cursor.getInt(isStunColIndex)==1);
         int isConfuseColIndex = cursor.getColumnIndex("is_confuse");
-        setIsConfuse(cursor.getInt(isConfuseColIndex));
+        setIsConfuse(cursor.getInt(isConfuseColIndex)==1);
         int isReviveColIndex = cursor.getColumnIndex("is_revive");
-        setIsRevive(cursor.getInt(isReviveColIndex));
+        setIsRevive(cursor.getInt(isReviveColIndex)==1);
         int isInvincibilityColIndex = cursor.getColumnIndex("is_invincibility");
-        setIsInvincibility(cursor.getInt(isInvincibilityColIndex));
+        setIsInvincibility(cursor.getInt(isInvincibilityColIndex)==1);
         int isSilenceColIndex = cursor.getColumnIndex("is_silence");
-        setIsSilence(cursor.getInt(isSilenceColIndex));
+        setIsSilence(cursor.getInt(isSilenceColIndex)==1);
         int isInvisibleColIndex = cursor.getColumnIndex("is_invisible");
-        setIsInvisible(cursor.getInt(isInvisibleColIndex));
+        setIsInvisible(cursor.getInt(isInvisibleColIndex)==1);
         // set if ability is a buff
         int isBuffColIndex = cursor.getColumnIndex("is_buff");
-        setIsBuff(cursor.getInt(isBuffColIndex));
+        setIsBuff(cursor.getInt(isBuffColIndex)==1);
         // DOT
         int dotDurationColIndex = cursor.getColumnIndex("dot_duration");
-        setDotDuration(cursor.getInt(dotDurationColIndex));
+        setDotDuration(cursor.getInt(dotDurationColIndex)==1);
         int isFireColIndex = cursor.getColumnIndex("is_fire");
-        setIsFire(cursor.getInt(isFireColIndex));
+        setIsFire(cursor.getInt(isFireColIndex)==1);
         int isPoisonColIndex = cursor.getColumnIndex("is_poison");
-        setIsPoison(cursor.getInt(isPoisonColIndex));
+        setIsPoison(cursor.getInt(isPoisonColIndex)==1);
         int isBleedColIndex = cursor.getColumnIndex("is_bleed");
-        setIsBleed(cursor.getInt(isBleedColIndex));
+        setIsBleed(cursor.getInt(isBleedColIndex)==1);
         int isFrostBurnColIndex = cursor.getColumnIndex("is_frost_burn");
-        setIsFrostBurn(cursor.getInt(isFrostBurnColIndex));
+        setIsFrostBurn(cursor.getInt(isFrostBurnColIndex)==1);
         int healOverTimeColIndex = cursor.getColumnIndex("heal_over_time");
-        setIsHealDot(cursor.getInt(healOverTimeColIndex));
+        setIsHealDot(cursor.getInt(healOverTimeColIndex)==1);
         int manaOverTimeColIndex = cursor.getColumnIndex("mana_over_time");
-        setIsManaDot(cursor.getInt(manaOverTimeColIndex));
+        setIsManaDot(cursor.getInt(manaOverTimeColIndex)==1);
         // bars
         int healMinColIndex = cursor.getColumnIndex("heal_min");
         setHealMin(cursor.getInt(healMinColIndex));
@@ -254,59 +254,59 @@ public class Ability implements Inventory{
         this.specialAoe = specialAoe;
     }
 
-    public void setIsConfuse(int isConfuse) {
+    public void setIsConfuse(boolean isConfuse) {
         this.isConfuse = isConfuse;
     }
 
-    public void setIsStun(int isStun) {
+    public void setIsStun(boolean isStun) {
         this.isStun = isStun;
     }
 
-    public void setIsRevive(int isRevive) {
+    public void setIsRevive(boolean isRevive) {
         this.isRevive = isRevive;
     }
 
-    public void setIsInvincibility(int isInvincibility) {
+    public void setIsInvincibility(boolean isInvincibility) {
         this.isInvincibility = isInvincibility;
     }
 
-    public void setIsSilence(int isSilence) {
+    public void setIsSilence(boolean isSilence) {
         this.isSilence = isSilence;
     }
 
-    public void setIsInvisible(int isInvisible) {
+    public void setIsInvisible(boolean isInvisible) {
         this.isInvisible = isInvisible;
     }
 
-    public void setIsBuff(int isBuff) {
+    public void setIsBuff(boolean isBuff) {
         this.isBuff = isBuff;
     }
 
-    public void setDotDuration(int dotDuration) {
+    public void setDotDuration(boolean dotDuration) {
         this.dotDuration = dotDuration;
     }
 
-    public void setIsFire(int isFire) {
+    public void setIsFire(boolean isFire) {
         this.isFire = isFire;
     }
 
-    public void setIsPoison(int isPoison) {
+    public void setIsPoison(boolean isPoison) {
         this.isPoison = isPoison;
     }
 
-    public void setIsFrostBurn(int isFrostBurn) {
+    public void setIsFrostBurn(boolean isFrostBurn) {
         this.isFrostBurn = isFrostBurn;
     }
 
-    public void setIsBleed(int isBleed) {
+    public void setIsBleed(boolean isBleed) {
         this.isBleed = isBleed;
     }
 
-    public void setIsHealDot(int healOverTime) {
+    public void setIsHealDot(boolean healOverTime) {
         this.isHealDot = healOverTime;
     }
 
-    public void setIsManaDot(int manaOverTime) {
+    public void setIsManaDot(boolean manaOverTime) {
         this.isManaDot = manaOverTime;
     }
 
@@ -415,46 +415,46 @@ public class Ability implements Inventory{
     public int getSpecialAoe() {
         return specialAoe;
     }
-    public int getIsConfuse() {
+    public boolean getIsConfuse() {
         return isConfuse;
     }
-    public int getIsStun() {
+    public boolean getIsStun() {
         return isStun;
     }
-    public int getIsRevive() {
+    public boolean getIsRevive() {
         return isRevive;
     }
-    public int getIsInvincibility() {
+    public boolean getIsInvincibility() {
         return isInvincibility;
     }
-    public int getIsSilence() {
+    public boolean getIsSilence() {
         return isSilence;
     }
-    public int getIsInvisible() {
+    public boolean getIsInvisible() {
         return isInvisible;
     }
-    public int getIsBuff() {
+    public boolean getIsBuff() {
         return isBuff;
     }
-    public int getDotDuration() {
+    public boolean getDotDuration() {
         return dotDuration;
     }
-    public int getIsFire() {
+    public boolean getIsFire() {
         return isFire;
     }
-    public int getIsPoison() {
+    public boolean getIsPoison() {
         return isPoison;
     }
-    public int getIsFrostBurn() {
+    public boolean getIsFrostBurn() {
         return isFrostBurn;
     }
-    public int getIsBleed() {
+    public boolean getIsBleed() {
         return isBleed;
     }
-    public int getIsHealDot() {
+    public boolean getIsHealDot() {
         return isHealDot;
     }
-    public int getIsManaDot() {
+    public boolean getIsManaDot() {
         return isManaDot;
     }
     public int getHealMin() {

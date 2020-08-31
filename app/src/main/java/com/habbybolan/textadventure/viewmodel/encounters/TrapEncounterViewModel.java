@@ -5,7 +5,7 @@ import android.view.View;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.ObservableField;
 
-import com.habbybolan.textadventure.model.characterentity.Damage;
+import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.encounter.TrapModel;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
@@ -91,19 +91,18 @@ public class TrapEncounterViewModel extends BaseObservable {
 
     // helper for second state dealing with failing the trap speed check
     private void failDebuffs() throws JSONException {
-        Damage damage = new Damage();
         JSONObject fail = encounter.getJSONObject("fail");
         // all debuffs (Dot, special, and direct damage applied to character)
         JSONArray debuffs = fail.getJSONArray("debuff");
         for (int i = 0; i < debuffs.length(); i++) {
             JSONObject debuff = debuffs.getJSONObject(i);
             String debuffType = debuff.getString("debuff");
-            if (damage.isDot(debuffType)) {
+            if (CharacterEntity.isDot(debuffType)) {
                 // debuff is a Dot
-                characterVM.addDot(debuffType, false);
-            } else if (damage.isSpecial(debuffType)) {
+                characterVM.addInputDotMap(debuffType, false);
+            } else if (CharacterEntity.isSpecial(debuffType)) {
                 // debuff is a special effect
-                characterVM.addSpecial(debuffType, debuff.getInt("duration"));
+                characterVM.addInputSpecialMap(debuffType, debuff.getInt("duration"), false);
             } else {
                 // otherwise, debuff is direct damage
                 characterVM.damageCharacter(debuff.getInt("damage"));

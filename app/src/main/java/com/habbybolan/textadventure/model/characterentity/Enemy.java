@@ -15,10 +15,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-public class Enemy implements CharacterEntity {
+public class Enemy extends CharacterEntity {
 
     public static final int MAX_ABILITIES = 2;
     public static final int MAX_TIER = 3;
+
+    final static int evasionMultiplier = 1;
+    final static int blockMultiplier = 1;
 
     // Character info
     private int strength;
@@ -250,23 +253,6 @@ public class Enemy implements CharacterEntity {
         }
     }
 
-    // *** ViewModel ***
-    @Override
-    public void removeInputDotMap(String key) {
-        dotMap.remove(key);
-    }
-    @Override
-    public void addInputDotMap(String key, int duration) {
-        dotMap.put(key, duration);
-    }
-    @Override
-    public void removeInputSpecialMap(String key) {
-        specialMap.remove(key);
-    }
-    @Override
-    public void addInputSpecialMap(String key, int duration) {
-        specialMap.put(key, duration);
-    }
 
     @Override
     public void removeZeroStatIncreaseList() {

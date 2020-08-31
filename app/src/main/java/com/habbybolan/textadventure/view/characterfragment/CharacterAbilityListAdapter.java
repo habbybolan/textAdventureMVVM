@@ -3,14 +3,15 @@ package com.habbybolan.textadventure.view.characterfragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.R;
+import com.habbybolan.textadventure.databinding.CharacterAbilityListDetailsBinding;
 import com.habbybolan.textadventure.model.inventory.Ability;
 
 import java.util.ArrayList;
@@ -29,42 +30,34 @@ public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterA
     @NonNull
     @Override
     public CharacterAbilityListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the custom layout
-        View characterView = LayoutInflater.from(parent.getContext()).inflate(R.layout.character_ability_list_details, parent, false);
-        // Return a new holder instance
-        return new CharacterAbilityListAdapter.ViewHolder(characterView, clickListener, abilities);
+        CharacterAbilityListDetailsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.character_ability_list_details, parent, false);
+        return new ViewHolder(binding, clickListener);
     }
 
     // set details of the views
     @Override
     public void onBindViewHolder(@NonNull CharacterAbilityListAdapter.ViewHolder holder, final int position) {
-        String abilityLabelText = "Item " + (position + 1);
-        final TextView abilityLabel = holder.abilityLabel;
-        abilityLabel.setText(abilityLabelText);
-
-        String abilityDetailText = abilities.get(position).getName();
-        final TextView abilityDetail = holder.abilityDetails;
-        abilityDetail.setText(abilityDetailText);
+        Ability ability = abilities.get(position);
+        holder.bind(ability);
     }
 
     // create the views inside the recyclerViewer
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        // each data item is just a string in this case
-        private TextView abilityLabel;
-        private TextView abilityDetails;
-        private CharacterListClickListener listener;
-        ArrayList<Ability> abilities;
+        public CharacterAbilityListDetailsBinding binding;
+        CharacterListClickListener listener;
 
-        ViewHolder(View characterView, CharacterListClickListener listener, ArrayList<Ability> abilities) {
-            super(characterView);
+        ViewHolder(CharacterAbilityListDetailsBinding binding, CharacterListClickListener listener) {
+            super(binding.getRoot());
+            this.binding = binding;
             this.listener = listener;
-            this.abilities = abilities;
-            abilityLabel = characterView.findViewById(R.id.ability_label);
-            abilityDetails = characterView.findViewById(R.id.ability_detail);
-            Button btnDrop = characterView.findViewById(R.id.btn_drop_ability);
 
-            btnDrop.setOnClickListener(this);
-            btnDrop.setOnLongClickListener(this);
+            binding.btnDropAbility.setOnClickListener(this);
+            binding.btnDropAbility.setOnLongClickListener(this);
+        }
+
+        public void bind(Object obj) {
+            binding.setVariable(BR.ability, obj);
+            binding.executePendingBindings();
         }
 
         // only displays a message to hold drop button if trying to remove
@@ -75,7 +68,7 @@ public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterA
         // deleted the inventory element if long click
         @Override
         public boolean onLongClick(View v) {
-            listener.onLongClicked(abilities.get(getAdapterPosition()));
+            listener.onLongClicked(getAdapterPosition());
             return true;
         }
     }
@@ -86,23 +79,11 @@ public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterA
     }
 
     // adds new ability to the list
-    public void addNewAbility(Ability newAbility) {
-        abilities.add(newAbility);
-        notifyItemInserted(abilities.size()-1);
+    public void updateNewAbilityIndex(int index) {
+        notifyItemInserted(index);
     }
 
-    // remove an ability from the list
-    public void removeAbility(Ability abilityToRemove) {
-        for (int i = 0; i < abilities.size(); i++) {
-            if (abilities.get(i).equals(abilityToRemove)) {
-                removeAbilityAtIndex(i);
-                break;
-            }
-        }
-    }
-    // remove an ability from the list
-    private void removeAbilityAtIndex(int index) {
-        abilities.remove(index);
+    public void updateRemovedAbilityIndex(int index) {
         notifyItemRemoved(index);
     }
 }

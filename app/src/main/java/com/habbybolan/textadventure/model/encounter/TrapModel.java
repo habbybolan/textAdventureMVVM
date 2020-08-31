@@ -28,7 +28,7 @@ public class TrapModel {
     public boolean checkInventoryForTrapItem() {
         ArrayList<Item> items = characterVM.getCharacter().getItems();
         for (Item trapItem : items) {
-            if (trapItem.getEscapeTrap() == 1) {
+            if (trapItem.getEscapeTrap()) {
                 items.remove(trapItem);
                 return true;
             }

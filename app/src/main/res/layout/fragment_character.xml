@@ -136,7 +136,7 @@
 
                 <TextView
                     android:id="@+id/strNumber"
-                    android:layout_width="34dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:gravity="center"
                     android:textSize="@dimen/txt_size_small"
@@ -159,7 +159,7 @@
 
                 <TextView
                     android:id="@+id/spdNumber"
-                    android:layout_width="34dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:gravity="center"
                     android:textSize="@dimen/txt_size_small"
@@ -182,15 +182,15 @@
 
                 <TextView
                     android:id="@+id/intNumber"
-                    android:layout_width="34dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:gravity="center"
                     android:textSize="@dimen/txt_size_small"
-                    app:stat="@{characterVM.intelligence}"
                     app:base="@{characterVM.intBase}"
                     app:layout_constraintEnd_toEndOf="@+id/intelligence"
                     app:layout_constraintStart_toStartOf="@+id/intelligence"
-                    app:layout_constraintTop_toBottomOf="@+id/intelligence" />
+                    app:layout_constraintTop_toBottomOf="@+id/intelligence"
+                    app:stat="@{characterVM.intelligence}" />
 
                 <TextView
                     android:id="@+id/constitution"
@@ -205,7 +205,7 @@
 
                 <TextView
                     android:id="@+id/conNumber"
-                    android:layout_width="34dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="22dp"
                     android:gravity="center"
                     android:textSize="@dimen/txt_size_small"
