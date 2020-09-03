@@ -69,6 +69,7 @@
     <string name='leave_encounter'>Move on</string>
     <string name='font'>press_start_2p</string>
     <string name="drop_button">Drop</string>
+    <string name="consume_button">Consume</string>
 
     <string name="intelligence_short">INT</string>
     <string name="strength_short">STR</string>

@@ -9,14 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.CharacterDotSpecialDetailsBinding;
+import com.habbybolan.textadventure.model.effects.SpecialEffect;
 
 import java.util.List;
 
 public class CharacterSpecialListAdapter extends RecyclerView.Adapter<CharacterSpecialListAdapter.ViewHolder> {
 
-    private List<String> specialList;
+    private List<SpecialEffect> specialList;
 
-    public CharacterSpecialListAdapter(List<String> specialList) {
+    public CharacterSpecialListAdapter(List<SpecialEffect> specialList) {
         this.specialList = specialList;
     }
 
@@ -30,8 +31,9 @@ public class CharacterSpecialListAdapter extends RecyclerView.Adapter<CharacterS
             this.binding = binding;
         }
 
-        public void bind(String dialogue) {
-            binding.setDotType(dialogue);
+        public void bind(SpecialEffect special) {
+            binding.setType(special.getType());
+            binding.setDuration(String.valueOf(special.getDuration()));
             binding.executePendingBindings();
         }
     }
@@ -49,7 +51,7 @@ public class CharacterSpecialListAdapter extends RecyclerView.Adapter<CharacterS
     // add the UI elements to the recyclerViewer
     @Override
     public void onBindViewHolder(CharacterSpecialListAdapter.ViewHolder holder, int position) {
-        String special = specialList.get(position);
+        SpecialEffect special = specialList.get(position);
         holder.bind(special);
     }
 
@@ -58,16 +60,15 @@ public class CharacterSpecialListAdapter extends RecyclerView.Adapter<CharacterS
         return specialList != null ? specialList.size() : 0;
     }
 
+    /*
     // adds new dot effect to the list if it doesn't already exist
-    public void addNewSpecial(String special) {
-        if (!specialList.contains(special)) {
-            specialList.add(special);
-            notifyItemInserted(specialList.size() - 1);
-        }
-    }
+    public void addNewSpecial(SpecialEffect special) {
+        specialList.add(special);
+        notifyItemInserted(specialList.size() - 1);
 
+    }
     // deleted a dot effect from the list
-    public void removeSpecial(String deleteSpecial) {
+    public void removeSpecial(SpecialEffect deleteSpecial) {
         for (int i = 0; i < specialList.size(); i++) {
             // check if the dot exists in the list
             if (deleteSpecial.equals(specialList.get(i))) {
@@ -76,5 +77,5 @@ public class CharacterSpecialListAdapter extends RecyclerView.Adapter<CharacterS
                 break;
             }
         }
-    }
+    }*/
 }

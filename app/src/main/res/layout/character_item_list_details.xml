@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
             name="item"
             type="com.habbybolan.textadventure.model.inventory.Item" />
+        <variable
+            name="view"
+            type="android.view.View" />
     </data>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:layout_width="match_parent" android:layout_height="wrap_content">
 
         <TextView
@@ -31,7 +34,21 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="17dp"
             android:layout_marginEnd="0dp"
+            android:background="@drawable/custom_drop_button"
             android:text="@string/drop_button"
             android:textSize="@dimen/txt_size_small" />
+
+        <Button
+            android:id="@+id/btn_consume_item"
+            android:layout_width="@dimen/btn_consume_width"
+            android:layout_height="@dimen/btn_consume_height"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/btn_drop_item"
+            android:background="@drawable/custom_drop_button"
+            android:text="@string/consume_button"
+            android:textSize="@dimen/txt_size_small"
+            android:visibility="@{item.isConsumable ? view.VISIBLE : view.GONE}" />
     </RelativeLayout>
 </layout>

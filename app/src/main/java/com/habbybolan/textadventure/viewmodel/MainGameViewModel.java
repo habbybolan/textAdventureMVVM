@@ -71,7 +71,9 @@ public class MainGameViewModel extends BaseObservable {
     final public static int QUEST = 8; // temporary leave the "area" to finish a specific task for a reward
     final public static String QUEST_TYPE = "quest";
 
-    public MainGameViewModel(Context context) {
+    CharacterViewModel characterVM;
+    public MainGameViewModel(Context context, CharacterViewModel characterVM) {
+        this.characterVM = characterVM;
         this.context = context;
         gotoNextEncounter();
     }
@@ -89,6 +91,10 @@ public class MainGameViewModel extends BaseObservable {
 
     // called by outside this viewModel to start a new encounter
     public void gotoNextEncounter() {
+        characterVM.applyDots();
+        //characterVM.decrementStatChangeDuration();
+        //characterVM.decrementTempExtraDuration();
+        characterVM.decrSpecialDuration();
         try {
             createNewEncounter(context);
         } catch (JSONException e) {

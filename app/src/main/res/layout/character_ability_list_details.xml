@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
             name="ability"
             type="com.habbybolan.textadventure.model.inventory.Ability" />
     </data>
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent" android:layout_height="wrap_content">
 
         <TextView
@@ -33,6 +32,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="17dp"
             android:layout_marginEnd="0dp"
+            android:background="@drawable/custom_drop_button"
             android:text="@string/drop_button"
             android:textSize="@dimen/txt_size_small" />
     </RelativeLayout>

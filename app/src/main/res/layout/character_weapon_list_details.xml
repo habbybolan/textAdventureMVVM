@@ -32,6 +32,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="17dp"
             android:layout_marginEnd="0dp"
+            android:background="@drawable/custom_drop_button"
             android:text="@string/drop_button"
             android:textSize="@dimen/txt_size_small" />
 

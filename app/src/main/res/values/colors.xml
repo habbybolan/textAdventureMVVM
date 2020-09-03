@@ -2,4 +2,7 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorStatBackground">#000000</color>
+
+    <color name="btnDropColorEnabled">#D60E0E</color>
+    <color name="btnDropColorDisabled">#554A4A</color>
 </resources>

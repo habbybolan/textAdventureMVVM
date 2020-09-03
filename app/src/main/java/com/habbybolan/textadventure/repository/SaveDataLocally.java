@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.characterentity.Character;
+import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.viewmodel.CharacterChoiceViewModel;
 
 import org.json.JSONArray;
@@ -315,10 +317,10 @@ public class SaveDataLocally {
                 jsonClassObject.put("isSilence", character.getIsSilence());
                 jsonClassObject.put("invisibility", character.getIsInvisible());
                 JSONArray specialArray = new JSONArray();
-                for (String key: character.getSpecialMap().keySet()) {
+                for (SpecialEffect appliedSpecial: character.getSpecialList()) {
                     JSONArray special = new JSONArray();
-                    special.put(key);
-                    special.put(character.getSpecialMap().get(key));
+                    special.put(appliedSpecial.getType());
+                    special.put(appliedSpecial.getDuration());
                     specialArray.put(special);
                 }
                 jsonClassObject.put("specialMap", specialArray);
@@ -364,13 +366,13 @@ public class SaveDataLocally {
                 jsonClassObject.put("statDecreaseList", statDecreaseArray);
                 // DOT
                 JSONArray dotArray = new JSONArray(); // <key, value>
-                for (String key: character.getDotMap().keySet()) {
+                for (Dot appliedDot: character.getDotList()) {
                     JSONArray dot = new JSONArray();
-                    dot.put(key);
-                    dot.put(character.getDotMap().get(key));
+                    dot.put(appliedDot.getType());
+                    dot.put(appliedDot.getDuration());
                     dotArray.put(dot);
                 }
-                jsonClassObject.put("dotMap", dotArray);
+                jsonClassObject.put("dotList", dotArray);
 
             } catch (JSONException e) {
                 e.printStackTrace();

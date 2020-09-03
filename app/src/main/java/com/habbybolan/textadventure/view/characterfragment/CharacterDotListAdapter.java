@@ -9,29 +9,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.CharacterDotSpecialDetailsBinding;
+import com.habbybolan.textadventure.model.effects.Dot;
 
 import java.util.List;
 
 public class CharacterDotListAdapter extends RecyclerView.Adapter<CharacterDotListAdapter.ViewHolder>{
 
-    private List<String> dotList;
+    private List<Dot> dotList;
 
-    public CharacterDotListAdapter(List<String> dotList) {
+    CharacterDotListAdapter(List<Dot> dotList) {
         this.dotList = dotList;
     }
 
     // holds reference of the binding
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder extends RecyclerView.ViewHolder{
 
         private final CharacterDotSpecialDetailsBinding binding;
 
-        public ViewHolder(CharacterDotSpecialDetailsBinding binding) {
+        ViewHolder(CharacterDotSpecialDetailsBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
-        public void bind(String dialogue) {
-            binding.setDotType(dialogue);
+        void bind(Dot dot) {
+            binding.setType(dot.getType());
+            binding.setDuration(String.valueOf(dot.getDuration()));
             binding.executePendingBindings();
         }
     }
@@ -43,13 +45,13 @@ public class CharacterDotListAdapter extends RecyclerView.Adapter<CharacterDotLi
 
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         CharacterDotSpecialDetailsBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.character_dot_special_details, parent, false);
-        return new CharacterDotListAdapter.ViewHolder(binding);
+        return new ViewHolder(binding);
     }
 
     // add the UI elements to the recyclerViewer
     @Override
     public void onBindViewHolder(CharacterDotListAdapter.ViewHolder holder, int position) {
-        String dot = dotList.get(position);
+        Dot dot = dotList.get(position);
         holder.bind(dot);
     }
 
@@ -58,24 +60,14 @@ public class CharacterDotListAdapter extends RecyclerView.Adapter<CharacterDotLi
         return dotList != null? dotList.size() : 0;
     }
 
+    /*
     // adds new dot effect to the list if it doesn't already exist
-    public void addNewDot(String dot) {
-        if (!dotList.contains(dot)) {
-            dotList.add(dot);
-            notifyItemInserted(dotList.size() - 1);
-        }
+    void newDotAdded() {
+        notifyItemInserted(dotList.size() - 1);
     }
-
     // deleted a dot effect from the list
-    public void removeDot(String deleteDot) {
-        for (int i = 0; i < dotList.size(); i++) {
-            // check if the dot exists in the list
-            if (deleteDot.equals(dotList.get(i))) {
-                dotList.remove(i);
-                notifyItemRemoved(i);
-                break;
-            }
-        }
-    }
+    void dotRemoved(int index) {
+        notifyItemRemoved(index);
+    }*/
 
 }

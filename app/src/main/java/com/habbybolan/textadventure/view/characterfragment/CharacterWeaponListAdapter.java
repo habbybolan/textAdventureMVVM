@@ -7,12 +7,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.Observable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.CharacterWeaponListDetailsBinding;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 
 import java.util.ArrayList;
 
@@ -20,10 +22,12 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
 
     private ArrayList<Weapon> weapons;
     private CharacterListClickListener clickListener;
+    private CharacterViewModel characterVM;
 
-    public CharacterWeaponListAdapter(ArrayList<Weapon> weapons, CharacterListClickListener clickListener) {
+    public CharacterWeaponListAdapter(ArrayList<Weapon> weapons, CharacterViewModel characterVM, CharacterListClickListener clickListener) {
         this.weapons = weapons;
         this.clickListener = clickListener;
+        this.characterVM = characterVM;
     }
 
     // inflate the layout used for the recyclerView
@@ -31,7 +35,7 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
     @Override
     public CharacterWeaponListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         CharacterWeaponListDetailsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.character_weapon_list_details, parent, false);
-        return new CharacterWeaponListAdapter.ViewHolder(binding, clickListener);
+        return new CharacterWeaponListAdapter.ViewHolder(binding, clickListener, characterVM);
     }
 
     // set details of the views
@@ -39,17 +43,20 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
     public void onBindViewHolder(@NonNull CharacterWeaponListAdapter.ViewHolder holder, final int position) {
         Weapon weapon = weapons.get(position);
         holder.bind(weapon);
+        holder.setDropConsumeListener();
     }
 
     // create the views inside the recyclerViewer
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         public CharacterWeaponListDetailsBinding binding;
         CharacterListClickListener listener;
+        CharacterViewModel characterVM;
 
-        ViewHolder(CharacterWeaponListDetailsBinding binding, CharacterListClickListener listener) {
+        ViewHolder(CharacterWeaponListDetailsBinding binding, CharacterListClickListener listener, CharacterViewModel characterVM) {
             super(binding.getRoot());
             this.binding = binding;
             this.listener = listener;
+            this.characterVM = characterVM;
 
             binding.btnDropWeapon.setOnClickListener(this);
             binding.btnDropWeapon.setOnLongClickListener(this);
@@ -58,6 +65,28 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
         public void bind(Object obj) {
             binding.setVariable(BR.weapon, obj);
             binding.executePendingBindings();
+        }
+
+        void setDropConsumeListener() {
+            Boolean state = characterVM.getStateInventoryObserver().get();
+            if (state != null) binding.btnDropWeapon.setEnabled(state);
+            // listener for when an ability is added to character
+            Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
+                @Override
+                public void onPropertyChanged(Observable sender, int propertyId) {
+                    Boolean bool = characterVM.getStateInventoryObserver().get();
+                    if (bool != null) {
+                        if (!bool) {
+                            // disable buttons and discolor
+                            binding.btnDropWeapon.setEnabled(false);
+                        } else {
+                            // enable buttons and give normal color
+                            binding.btnDropWeapon.setEnabled(true);
+                        }
+                    }
+                }
+            };
+            characterVM.getStateInventoryObserver().addOnPropertyChangedCallback(callbackAdd);
         }
 
         // only displays a message to hold drop button if trying to remove

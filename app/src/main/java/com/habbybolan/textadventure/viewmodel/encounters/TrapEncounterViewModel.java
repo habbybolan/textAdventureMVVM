@@ -1,11 +1,14 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
+import android.content.Context;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.ObservableField;
 
-import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
+import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.encounter.TrapModel;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
@@ -27,13 +30,15 @@ public class TrapEncounterViewModel extends BaseObservable {
 
     private JSONObject encounter;
     private JSONObject firstStateJSON;
+    private Context context;
 
-    public TrapEncounterViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter) throws JSONException {
+    public TrapEncounterViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
         this.characterVM = characterVM;
         this.mainGameVM = mainGameVM;
         trapModel = new TrapModel(characterVM);
         this.encounter = encounter;
         firstStateJSON = encounter.getJSONObject("dialogue");
+        this.context = context;
     }
 
     public CharacterViewModel getCharacterVM() {
@@ -97,12 +102,12 @@ public class TrapEncounterViewModel extends BaseObservable {
         for (int i = 0; i < debuffs.length(); i++) {
             JSONObject debuff = debuffs.getJSONObject(i);
             String debuffType = debuff.getString("debuff");
-            if (CharacterEntity.isDot(debuffType)) {
+            if (Dot.isDot(debuffType)) {
                 // debuff is a Dot
-                characterVM.addInputDotMap(debuffType, false);
-            } else if (CharacterEntity.isSpecial(debuffType)) {
+                characterVM.addInputDot(new Dot(debuffType, false));
+            } else if (SpecialEffect.isSpecial(debuffType)) {
                 // debuff is a special effect
-                characterVM.addInputSpecialMap(debuffType, debuff.getInt("duration"), false);
+                characterVM.addInputSpecial(new SpecialEffect(debuffType, debuff.getInt("duration")));
             } else {
                 // otherwise, debuff is direct damage
                 characterVM.damageCharacter(debuff.getInt("damage"));
@@ -111,12 +116,12 @@ public class TrapEncounterViewModel extends BaseObservable {
     }
 
     public void secondStateUseItem() {
-       /* if (trapModel.checkInventoryForTrapItem()) throws JSONException {
-            // todo: show success dialogue in rv
+        if (characterVM.checkInventoryForTrapItem()) {
+            String dialogue = "You throw the escape orb to the ground, the black smoke releasing and engulfing you in an instant. Once the smoke dissipates, Everything around you has changed. A feeling of relief washes over you as you wonder what would have happened if you did not possess that item.";
+            setNewDialogue(dialogue);
+            incrementStateIndex();
         } else {
-            // todo: show toast message for no item to escape
-        }*/
+            Toast.makeText(context, "You don't possess any item to escape.", Toast.LENGTH_SHORT).show();
+        }
     }
-
-
 }

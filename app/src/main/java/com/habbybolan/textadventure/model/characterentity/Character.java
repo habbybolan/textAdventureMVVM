@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 
 import com.habbybolan.textadventure.R;
+import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
@@ -106,16 +108,16 @@ public class Character extends CharacterEntity {
             }
 
             // DOTS
-            JSONArray dotMap = characterObject.getJSONArray("dotMap");
-            for (int i = 0; i < dotMap.length(); i++) {
-                JSONArray dot = (JSONArray) dotMap.get(i);
-                this.dotMap.put(dot.getString(0), dot.getInt(1));
+            JSONArray dotList = characterObject.getJSONArray("dotList");
+            for (int i = 0; i < dotList.length(); i++) {
+                JSONArray dot = (JSONArray) dotList.get(i);
+                this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
             }
             // SPECIAL
             JSONArray specialMap = characterObject.getJSONArray("specialMap");
             for (int i = 0; i < specialMap.length(); i++) {
                 JSONArray special = (JSONArray) specialMap.get(i);
-                this.specialMap.put(special.getString(0), special.getInt(1));
+                this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
             }
             // tempHealth
             JSONArray tempHealthArray = characterObject.getJSONArray("tempHealthList");
@@ -257,6 +259,19 @@ public class Character extends CharacterEntity {
             }
         }
         throw new IllegalArgumentException();
+    }
+    // finds index of an item
+    public int getItemIndex(Item item) {
+        for (int i = 0; i < items.size(); i++) {
+            if (item.equals(items.get(i))) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+    // find item at index
+    public Item getItemAtIndex(int index) {
+        return items.get(index);
     }
     // remove an item at index and return it
     public Item removeItemAtIndex(int index) {

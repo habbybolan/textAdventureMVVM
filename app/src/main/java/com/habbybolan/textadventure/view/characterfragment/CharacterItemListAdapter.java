@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.view.characterfragment;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,22 +8,29 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.Observable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.CharacterItemListDetailsBinding;
 import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 
 import java.util.ArrayList;
 
 public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItemListAdapter.ViewHolder> {
     private ArrayList<Item> items;
-    private CharacterListClickListener clickListener;
+    private CharacterListClickListener dropListener;
+    private CharacterListClickListener consumeListener;
+    private CharacterViewModel characterVM;
+    private Context context;
 
-    public CharacterItemListAdapter(ArrayList<Item> items, CharacterListClickListener clickListener) {
+    public CharacterItemListAdapter(ArrayList<Item> items, CharacterViewModel characterVM, CharacterListClickListener dropListener, CharacterListClickListener consumeListener) {
         this.items = items;
-        this.clickListener = clickListener;
+        this.dropListener = dropListener;
+        this.consumeListener = consumeListener;
+        this.characterVM = characterVM;
     }
 
     // inflate the layout used for the recyclerView
@@ -30,7 +38,7 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
     @Override
     public CharacterItemListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         CharacterItemListDetailsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.character_item_list_details, parent, false);
-        return new CharacterItemListAdapter.ViewHolder(binding, clickListener);
+        return new CharacterItemListAdapter.ViewHolder(binding, dropListener, consumeListener, characterVM);
     }
 
     // set details of the views
@@ -38,20 +46,59 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
     public void onBindViewHolder(@NonNull CharacterItemListAdapter.ViewHolder holder, final int position) {
         Item item = items.get(position);
         holder.bind(item);
+        holder.setDropConsumeListener();
     }
 
     // create the views inside the recyclerViewer
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public CharacterItemListDetailsBinding binding;
-        CharacterListClickListener listener;
+        CharacterListClickListener dropListener;
+        CharacterListClickListener consumeListener;
+        CharacterViewModel characterVM;
 
-        ViewHolder(CharacterItemListDetailsBinding binding, CharacterListClickListener listener) {
+        ViewHolder(CharacterItemListDetailsBinding binding, final CharacterListClickListener dropListener, final CharacterListClickListener consumeListener, CharacterViewModel characterVM) {
             super(binding.getRoot());
             this.binding = binding;
-            this.listener = listener;
+            this.dropListener = dropListener;
+            this.consumeListener = consumeListener;
+            this.characterVM = characterVM;
 
-            binding.btnDropItem.setOnClickListener(this);
-            binding.btnDropItem.setOnLongClickListener(this);
+            // ** drop button **
+
+            // displays a message to hold drop button if trying to remove
+            binding.btnDropItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "Hold to drop item", Toast.LENGTH_SHORT).show();
+                }
+            });
+            // deleted the inventory item if long click
+            binding.btnDropItem.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    dropListener.onLongClicked(getAdapterPosition());
+                    return true;
+                }
+            });
+
+            // ** consume button **
+
+            // displays message to hold consume button if wants to consume
+            binding.btnConsumeItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "Hold to consume item", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // consumes the item clicked
+            binding.btnConsumeItem.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    consumeListener.onLongClicked(getAdapterPosition());
+                    return true;
+                }
+            });
         }
 
         void bind(Object obj) {
@@ -59,16 +106,31 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
             binding.executePendingBindings();
         }
 
-        // only displays a message to hold drop button if trying to remove
-        @Override
-        public void onClick(View v) {
-            Toast.makeText(v.getContext(), "Hold to drop item", Toast.LENGTH_SHORT).show();
-        }
-        // deleted the inventory element if long click
-        @Override
-        public boolean onLongClick(View v) {
-            listener.onLongClicked(getAdapterPosition());
-            return true;
+        void setDropConsumeListener() {
+            Boolean state = characterVM.getStateInventoryObserver().get();
+            if (state != null) {
+                binding.btnDropItem.setEnabled(state);
+                binding.btnConsumeItem.setEnabled(state);
+            }
+            // listener for when an ability is added to character
+            Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
+                @Override
+                public void onPropertyChanged(Observable sender, int propertyId) {
+                    Boolean bool = characterVM.getStateInventoryObserver().get();
+                    if (bool != null) {
+                        if (!bool) {
+                            // disable buttons and discolor
+                            binding.btnDropItem.setEnabled(false);
+                            binding.btnConsumeItem.setEnabled(false);
+                        } else {
+                            // enable buttons and give normal color
+                            binding.btnDropItem.setEnabled(true);
+                            binding.btnConsumeItem.setEnabled(true);
+                        }
+                    }
+                }
+            };
+            characterVM.getStateInventoryObserver().addOnPropertyChangedCallback(callbackAdd);
         }
     }
 

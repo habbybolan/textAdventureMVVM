@@ -2,15 +2,14 @@ package com.habbybolan.textadventure.model.characterentity;
 
 import android.graphics.Bitmap;
 
+import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public abstract class CharacterEntity {
@@ -121,27 +120,20 @@ public abstract class CharacterEntity {
     }
 
     // heals a target for a specific amount
-    public void healTarget(int amount) {
+    public int changeHealth(int amount) {
         setHealth(getHealth()+amount);
-        if (getHealth() > getMaxHealth()) {
-            setHealth(getMaxHealth());
-        }
+        if (getHealth() > getMaxHealth()) setHealth(getMaxHealth());
+        if (getHealth() < 0) setHealth(0);
+        return getHealth();
     }
 
     // regenerates mana for a specific amount
-    public void manaTarget(int amount) {
+    public int changeMana(int amount) {
         setMana(getMana()+amount);
-        if (getMana() > getMaxMana()) {
-            setMana(getMaxMana());
-        }
-    }
+        if (getMana() > getMaxMana()) setMana(getMaxMana());
 
-    // regenerates mana for a specific amount
-    public void loseManaTarget(int amount) {
-        setMana(getMana()-amount);
-        if (getMana() < 0) {
-            setMana(0);
-        }
+        if (getMana() < 0) setMana(0);
+        return getMana();
     }
 
 
@@ -550,21 +542,21 @@ public abstract class CharacterEntity {
         if (ability.getMinDamage() != 0) damageTarget(getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));
         if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
         // specials
-        if (ability.getIsConfuse()) addNewSpecial(CONFUSE, ability.getDuration(), false);
-        if (ability.getIsStun()) addNewSpecial(STUN, ability.getDuration(), false);
-        if (ability.getIsInvincibility()) addNewSpecial(INVINCIBILITY, ability.getDuration(), false);
-        if (ability.getIsSilence()) addNewSpecial(SILENCE, ability.getDuration(), false);
-        if (ability.getIsInvisible()) addNewSpecial(INVISIBILITY, ability.getDuration(), false);
+        if (ability.getIsConfuse()) addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration()));
+        if (ability.getIsStun()) addNewSpecial(new SpecialEffect(SpecialEffect.STUN, ability.getDuration()));
+        if (ability.getIsInvincibility()) addNewSpecial(new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration()));
+        if (ability.getIsSilence()) addNewSpecial(new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration()));
+        if (ability.getIsInvisible()) addNewSpecial(new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration()));
         // DOT
-        if (ability.getIsFire()) addNewDot(FIRE, false);
-        if (ability.getIsPoison()) addNewDot(POISON, false);
-        if (ability.getIsBleed()) addNewDot(BLEED, false);
-        if (ability.getIsFrostBurn()) addNewDot(FROSTBURN, false);
-        if (ability.getIsHealDot()) addNewDot(HEALTH_DOT, false);
-        if (ability.getIsManaDot()) addNewDot(MANA_DOT, false);
+        if (ability.getIsFire()) addNewDot(new Dot(Dot.FIRE, false));
+        if (ability.getIsPoison()) addNewDot(new Dot(Dot.POISON, false));
+        if (ability.getIsBleed()) addNewDot(new Dot(Dot.BLEED, false));
+        if (ability.getIsFrostBurn()) addNewDot(new Dot(Dot.FROSTBURN, false));
+        if (ability.getIsHealDot()) addNewDot(new Dot(Dot.HEALTH_DOT, false));
+        if (ability.getIsManaDot()) addNewDot(new Dot(Dot.MANA_DOT, false));
         // direct heal/mana
-        if (ability.getHealMin() != 0) healTarget(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
-        if (ability.getManaMin() != 0) manaTarget(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
+        if (ability.getHealMin() != 0) changeHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
+        if (ability.getManaMin() != 0) changeMana(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
         // stat increases
         if (ability.getStrIncrease() != 0) addNewStatIncrease(STR, ability.getDuration(), ability.getStrIncrease());
         if (ability.getIntIncrease() != 0) addNewStatIncrease(INT, ability.getDuration(), ability.getIntIncrease());
@@ -586,20 +578,20 @@ public abstract class CharacterEntity {
     // ** Special Effects **
 
     // keep track of special duration left <name, duration> sorted by duration
-    protected Map<String, Integer> specialMap = new HashMap<>();
+    ArrayList<SpecialEffect> specialList = new ArrayList<>();
 
     // returns true if still effected by status effect from other items or applied special effect
-    public boolean isStillSpecialEffect(String specialType) {
-        switch (specialType) {
-            case CONFUSE:
+    public boolean isStillSpecialEffect(SpecialEffect special) {
+        switch (special.getType()) {
+            case SpecialEffect.CONFUSE:
                 return isStillConfuse();
-            case STUN:
+            case SpecialEffect.STUN:
                 return isStillStun();
-            case INVINCIBILITY:
+            case SpecialEffect.INVINCIBILITY:
                 return isStillInvincible();
-            case INVISIBILITY:
+            case SpecialEffect.INVISIBILITY:
                 return isStillInvisible();
-            case SILENCE:
+            case SpecialEffect.SILENCE:
                 return isStillSilence();
             default:
                 throw new IllegalArgumentException();
@@ -614,7 +606,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialMap.containsKey(CONFUSE)) stillConfused = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.CONFUSE, false))) stillConfused = true;
+        setIsConfuse(stillConfused);
         return stillConfused;
     }
     // helper for isStillSpecialEffect to check if stun is still applied after item removal
@@ -626,7 +619,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialMap.containsKey(STUN)) stillStunned = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.STUN, false))) stillStunned = true;
+        setIsStun(stillStunned);
         return stillStunned;
     }
     // helper for isStillSpecialEffect to check if Silence is still applied after item removal
@@ -638,7 +632,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialMap.containsKey(SILENCE)) stillSilenced = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.SILENCE, false))) stillSilenced = true;
+        setIsSilence(stillSilenced);
         return stillSilenced;
     }
     // helper for isStillSpecialEffect to check if Invisibility is still applied after item removal
@@ -650,7 +645,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialMap.containsKey(INVISIBILITY)) stillInvisible = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.INVISIBILITY, false)))stillInvisible = true;
+        setIsInvisible(stillInvisible);
         return stillInvisible;
     }
     // helper for isStillSpecialEffect to check if Invincibility is still applied after item removal
@@ -662,49 +658,59 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialMap.containsKey(INVINCIBILITY)) stillInvincible = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.INVINCIBILITY, false))) stillInvincible = true;
+        setIsInvincible(stillInvincible);
         return stillInvincible;
     }
 
-    public void removeInputSpecialMap(String key) {
-        specialMap.remove(key);
+    public boolean removeInputSpecial(SpecialEffect special) {
+        if (special.getIsInfinite()) {
+            // key may not be in specialList if isInfinite
+            return isStillSpecialEffect(special);
+        }
+        specialList.remove(special);
+        // check if there is an item applying special to character
+        return isStillSpecialEffect(special);
     }
 
     // adds a new special to specialMap if not already existing - alter isSpecial value if new
         // if exists, it reset the time for the special
         // returns true if the special effect went from false->true
-    public boolean addNewSpecial(String special, int newDuration, boolean isInfinite) {
+    public boolean addNewSpecial(SpecialEffect special) {
         boolean isChanged = false;
-        int duration = 0;
-        switch (special) {
-            case STUN:
+        switch (special.getType()) {
+            case SpecialEffect.STUN:
                 if (!getIsStun()) isChanged = true;
                 setIsStun(true);
                 break;
-            case SILENCE:
+            case SpecialEffect.SILENCE:
                 if (!getIsSilence()) isChanged = true;
                 setIsSilence(true);
                 break;
-            case CONFUSE:
+            case SpecialEffect.CONFUSE:
                 if (!getIsConfuse()) isChanged = true;
                 setIsConfuse(true);
                 break;
-            case INVISIBILITY:
+            case SpecialEffect.INVISIBILITY:
                 if (!getIsInvisible()) isChanged = true;
                 setIsInvisible(true);
                 break;
-            case INVINCIBILITY:
+            case SpecialEffect.INVINCIBILITY:
                 if (!getIsInvincible()) isChanged = true;
                 setIsInvincible(true);
                 break;
         }
-        if (!isInfinite) {
-            Integer prevDuration = specialMap.get(special);
-            if (prevDuration != null) {
-                if (duration > prevDuration) specialMap.put(special, duration);
+        if (!special.getIsInfinite()) {
+            // if the duration is not infinite, add to the specialList /
+            if (specialList.contains(special)) {
+                for (SpecialEffect appliedSpecial : specialList) {
+                    if (appliedSpecial.equals(special)) {
+                        if (special.getDuration() > appliedSpecial.getDuration()) appliedSpecial.setDuration(special.getDuration());
+                    }
+                }
             } else {
-                alterIsSpecial(special);
-                specialMap.put(special, duration);
+                alterIsSpecial(special.getType());
+                specialList.add(special);
             }
         }
         return isChanged;
@@ -714,15 +720,15 @@ public abstract class CharacterEntity {
     // active returns 1, otherwise 0
     public boolean checkSpecials(String special) {
         switch (special) {
-            case STUN:
+            case SpecialEffect.STUN:
                 return getIsStun();
-            case CONFUSE:
+            case SpecialEffect.CONFUSE:
                 return getIsConfuse();
-            case INVINCIBILITY:
+            case SpecialEffect.INVINCIBILITY:
                 return getIsInvincible();
-            case SILENCE:
+            case SpecialEffect.SILENCE:
                 return getIsSilence();
-            case INVISIBILITY:
+            case SpecialEffect.INVISIBILITY:
                 return getIsInvisible();
         }
         throw new IllegalArgumentException();
@@ -732,14 +738,10 @@ public abstract class CharacterEntity {
     // if the duration is 0 after decrement, then set isSpecial value to 0
     // if the value < 0, do nothing, permanent special
     public void decrSpecialDuration() {
-        for (String key : specialMap.keySet()) {
-            Integer duration = specialMap.get(key);
-            if (duration != null) {
-                specialMap.put(key, --duration);
-                if (duration == 0) {
-                    alterIsSpecial(key);
-                    specialMap.remove(key);
-                }
+        for (SpecialEffect special : specialList) {
+            special.decrementDuration();
+            if (special.getDuration() == 0) {
+                removeInputSpecial(special);
             }
         }
     }
@@ -747,56 +749,44 @@ public abstract class CharacterEntity {
     // change the value of isSpecial boolean value
     public void alterIsSpecial(String special) {
         switch (special) {
-            case STUN:
+            case SpecialEffect.STUN:
                 setIsStun(!getIsStun());
                 break;
-            case CONFUSE:
+            case SpecialEffect.CONFUSE:
                 setIsConfuse(!getIsConfuse());
                 break;
-            case INVINCIBILITY:
+            case SpecialEffect.INVINCIBILITY:
                 setIsInvincible(!getIsInvincible());
                 break;
-            case SILENCE:
+            case SpecialEffect.SILENCE:
                 setIsInvincible(!getIsSilence());
                 break;
-            case INVISIBILITY:
+            case SpecialEffect.INVISIBILITY:
                 setIsInvisible(!getIsInvisible());
                 break;
         }
     }
 
-    // special effects - static
-    public static final String STUN = "stun";
-    public static final String CONFUSE = "confuse";
-    public static final String INVINCIBILITY = "invincible";
-    public static final String SILENCE = "silence";
-    public static final String INVISIBILITY = "invisible";
-
-    // returns true if String is a special
-    public static boolean isSpecial(String check) {
-        return (check.equals(STUN) || check.equals(CONFUSE) || check.equals(INVISIBILITY) || check.equals(INVINCIBILITY) || check.equals(SILENCE));
-    }
-
 
     // ** Dot effects **
 
-    // keep track of DOT duration left <name, duration> sorted by duration
-    Map<String, Integer> dotMap = new HashMap<>();
+    // list of Dots applied to character
+    ArrayList<Dot> dotList = new ArrayList<>();
 
     /// returns true if still effected by dot effect from other items or applied dots
-    public boolean isStillDotEffect(String dotType) {
-        switch (dotType) {
-            case FIRE:
+    public boolean isStillDotEffect(Dot dot) {
+        switch (dot.getType()) {
+            case Dot.FIRE:
                 return isStillFire();
-            case BLEED:
+            case Dot.BLEED:
                 return isStillBleed();
-            case POISON:
+            case Dot.POISON:
                 return isStillPoison();
-            case FROSTBURN:
+            case Dot.FROSTBURN:
                 return isStillFrostBurn();
-            case HEALTH_DOT:
+            case Dot.HEALTH_DOT:
                 return isStillHealthDot();
-            case MANA_DOT:
+            case Dot.MANA_DOT:
                 return isStillManaDot();
             default:
                 throw new IllegalArgumentException();
@@ -811,7 +801,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (dotMap.containsKey(FIRE)) stillFire = true;
+        if (dotList.contains(new Dot(Dot.FIRE, 0))) stillFire = true;
+        setIsFire(stillFire);
         return stillFire;
     }
     // helper for isStillDotEffect to check if Bleed is still applied after item removal
@@ -823,7 +814,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (dotMap.containsKey(BLEED)) stillBleed = true;
+        if (dotList.contains(new Dot(Dot.BLEED, 0))) stillBleed = true;
+        setIsBleed(stillBleed);
         return stillBleed;
     }
     // helper for isStillDotEffect to check if Poison is still applied after item removal
@@ -835,7 +827,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (dotMap.containsKey(POISON)) stillPoison = true;
+        if (dotList.contains(new Dot(Dot.POISON, 0))) stillPoison = true;
+        setIsPoison(stillPoison);
         return stillPoison;
     }
     // helper for isStillDotEffect to check if FrostBurn is still applied after item removal
@@ -847,7 +840,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (dotMap.containsKey(FROSTBURN)) stillFrostBurn = true;
+        if (dotList.contains(new Dot(Dot.FROSTBURN, 0))) stillFrostBurn = true;
+        setIsFrostBurn(stillFrostBurn);
         return stillFrostBurn;
     }
     // helper for isStillDotEffect to check if Health dot is still applied after item removal
@@ -859,7 +853,8 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (dotMap.containsKey(HEALTH_DOT)) stillHealthDot = true;
+        if (dotList.contains(new Dot(Dot.HEALTH_DOT, 0))) stillHealthDot = true;
+        setIsHealDot(stillHealthDot);
         return stillHealthDot;
     }
     // helper for isStillDotEffect to check if Mana dot is still applied after item removal
@@ -871,94 +866,90 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (dotMap.containsKey(MANA_DOT)) stillManaDot = true;
+        if (dotList.contains(new Dot(Dot.MANA_DOT, 0))) stillManaDot = true;
+        setIsManaDot(stillManaDot);
         return stillManaDot;
     }
 
-    // remove a dot from the dotMap and return true if isDot is still true
-    public boolean removeInputDotMap(String key, boolean isInfinite) {
-        if (isInfinite) {
-            // key may not be in dotMap if isInfinite
-            return (isStillDotEffect(key));
+    // remove a dot from the dotList and return true if isDot is still true
+    public boolean removeInputDot(Dot dot) {
+        if (dot.getIsInfinite()) {
+            // key may not be in dotList if isInfinite
+            return (isStillDotEffect(dot));
         }
-        dotMap.remove(key);
-        return isStillDotEffect(key);
+        dotList.remove(dot);
+        // check if there is an item applying dot to character
+        return isStillDotEffect(dot);
     }
 
-    // adds a new Dot to to dotMap if not already existing
+    // adds a new Dot to to dotList if not already existing
         // if exists, it reset the time for the dot
         // if isInfinite is true, then only make isDot true, not adding to dotMap
         // return true if the isDot is set from false to true
-    public boolean addNewDot(String dot, boolean isInfinite) {
-        int duration = 0;
+    public boolean addNewDot(Dot dot) {
         boolean isChanged = false;
-        switch (dot) {
-            case FIRE:
-                duration = FIRE_DURATION;
+        switch (dot.getType()) {
+            case Dot.FIRE:
                 if (!getIsFire()) isChanged = true;
                 setIsFire(true);
                 break;
-            case POISON:
-                duration = POISON_DURATION;
+            case Dot.POISON:
                 if (!getIsPoison()) isChanged = true;
                 setIsPoison(true);
                 break;
-            case BLEED:
-                duration = BLEED_DURATION;
+            case Dot.BLEED:
                 if (!getIsBleed()) isChanged = true;
                 setIsBleed(true);
                 break;
-            case FROSTBURN:
-                duration = FROSTBURN_DURATION;
+            case Dot.FROSTBURN:
                 if (!getIsFrostBurn()) isChanged = true;
                 setIsFrostBurn(true);
                 break;
-            case HEALTH_DOT:
-                duration = HEAL_DOT_DURATION;
+            case Dot.HEALTH_DOT:
                 if (!getIsHealDot()) isChanged = true;
                 setIsHealDot(true);
                 break;
-            case MANA_DOT:
-                duration = MANA_DOT_DURATION;
+            case Dot.MANA_DOT:
                 if (!getIsManaDot()) isChanged = true;
                 setIsManaDot(true);
                 break;
             default: // shouldn't reach this
                 break;
         }
-        if (!isInfinite) {
-            // if the duration is not infinite, add to the dotMap
-            Integer prevDotDuration = dotMap.get(dot);
-            if (prevDotDuration != null) {
-                // reset the duration
-                if (prevDotDuration > 0) dotMap.put(dot, duration);
+        if (!dot.getIsInfinite()) {
+            // if the duration is not infinite, add to the dotList /
+            if (dotList.contains(dot)) {
+                for (Dot appliedDot : dotList) {
+                    if (appliedDot.equals(dot)) {
+                        if (dot.getDuration() > appliedDot.getDuration()) appliedDot.setDuration(dot.getDuration());
+                    }
+                }
             } else {
-                alterIsDot(dot);
-                dotMap.put(dot, duration);
+                dotList.add(dot);
             }
         }
         return isChanged;
     }
 
     // swap the isDot on entity
-    private void alterIsDot(String dot) {
-        switch (dot) {
-            case FIRE:
+    private void alterIsDot(String dotType) {
+        switch (dotType) {
+            case Dot.FIRE:
                 setIsFire(!getIsFire());
                 break;
-            case BLEED:
+            case Dot.BLEED:
                 setIsBleed(!getIsBleed());
                 break;
-            case POISON:
+            case Dot.POISON:
                 setIsPoison(!getIsPoison());
                 break;
-            case FROSTBURN:
+            case Dot.FROSTBURN:
                 setIsFrostBurn(!getIsFrostBurn());
                 break;
-            case HEALTH_DOT:
+            case Dot.HEALTH_DOT:
                 setIsHealDot(!getIsHealDot());
                 break;
-            case MANA_DOT:
+            case Dot.MANA_DOT:
                 setIsManaDot(!getIsManaDot());
             default:
                 throw new IllegalArgumentException();
@@ -966,99 +957,64 @@ public abstract class CharacterEntity {
     }
 
     // applies the effect of the DOT and decrements the time remaining in DotMap
-    // if duration == 0, then remove from the dotMap
-    // returns true if any dots applied are removed
-    public ArrayList<String> applyDots() {
-        ArrayList<String> dotsRemoved = new ArrayList<>();
-        Iterator<Map.Entry<String, Integer>> iter = dotMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, Integer> entry = iter.next();
-            String key = entry.getKey();
-            Integer value = dotMap.get(key);
-            if (value != null) {
-                findDotToApply(key);
-                dotMap.put(key, value - 1);
-                if (value - 1 == 0) {
-                    dotsRemoved.add(key);
-                    alterIsDot(key);
-                    iter.remove();
-                }
+        // if duration == 0, then remove from the dotMap
+        // returns true if any dots applied are removed
+    public void applyDots() {
+        for (Dot dot : dotList) {
+            findDotToApply(dot.getType());
+            dot.decrementDuration();
+            if (dot.getDuration() == 0) {
+                removeInputDot(dot);
             }
         }
-        return dotsRemoved;
     }
 
     // helper for applyDots
-    // find the proper method to call for using a specific dot
+        // find the proper method to call for using a specific dot
     private void findDotToApply(String dot) {
         switch (dot) {
-            case FIRE:
-                this.applyFire();
+            case Dot.FIRE:
+                applyFire();
                 break;
-            case POISON:
-                this.applyPoison();
+            case Dot.POISON:
+                applyPoison();
                 break;
-            case BLEED:
-                this.applyBleed();
+            case Dot.BLEED:
+                applyBleed();
                 break;
-            case FROSTBURN:
-                this.applyFrostBurn();
+            case Dot.FROSTBURN:
+                applyFrostBurn();
                 break;
-            case HEALTH_DOT:
-                this.applyHealthDot();
+            case Dot.HEALTH_DOT:
+                applyHealthDot();
                 break;
-            case MANA_DOT:
-                this.applyManaDot();
+            case Dot.MANA_DOT:
+                applyManaDot();
                 break;
             default:
                 throw new IllegalArgumentException();
         }
     }
 
-    // Dot effects - static
-    public static final String FIRE = "fire";
-    public final int FIRE_DURATION = 1;
-    public final int FIRE_DAMAGE = 8;
-    public static final String POISON = "poison";
-    public final int POISON_DURATION = 4;
-    public final int POISON_DAMAGE = 2;
-    public static final String BLEED = "bleed";
-    public final int BLEED_DURATION = 3;
-    public final int BLEED_DAMAGE = 4;
-    public static final String FROSTBURN = "frostBurn";
-    public final int FROSTBURN_DURATION = 1;
-    public final int FROSTBURN_DAMAGE = 1;
-    public static final String HEALTH_DOT = "healDot";
-    public final int HEAL_DOT_DURATION = 3;
-    public final int HEAL_DOT_AMOUNT = 5;
-    public static final String MANA_DOT = "manaDOt";
-    public final int MANA_DOT_DURATION = 3;
-    public final int MANA_DOT_AMOUNT = 5;
-
-    // return true if String is a dot
-    public static boolean isDot(String check) {
-        return (check.equals(FIRE) || check.equals(POISON) || check.equals(BLEED) || check.equals(FROSTBURN) || check.equals(HEALTH_DOT) || check.equals(MANA_DOT));
-    }
-
     // status application of damage over times
     public void applyFire() {
-        damageTarget(FIRE_DAMAGE);
+        damageTarget(Dot.FIRE_DAMAGE);
     }
     public void applyPoison() {
-        damageTarget(POISON_DAMAGE);
+        damageTarget(Dot.POISON_DAMAGE);
     }
     public void applyBleed() {
-        damageTarget(BLEED_DAMAGE);
+        damageTarget(Dot.BLEED_DAMAGE);
     }
     public void applyFrostBurn() {
-        addNewSpecial(STUN, FROSTBURN_DURATION, false);
-        damageTarget(FROSTBURN_DAMAGE);
+        addNewSpecial(new SpecialEffect(SpecialEffect.STUN, Dot.FROSTBURN_DURATION));
+        damageTarget(Dot.FROSTBURN_DAMAGE);
     }
     public void applyHealthDot() {
-        healTarget(HEAL_DOT_AMOUNT);
+        changeHealth(Dot.HEAL_DOT_AMOUNT);
     }
     public void applyManaDot() {
-        manaTarget(MANA_DOT_AMOUNT);
+        changeMana(Dot.MANA_DOT_AMOUNT);
     }
 
 
@@ -1380,11 +1336,11 @@ public abstract class CharacterEntity {
         return bitmapDead;
     }
 
-    public Map<String, Integer> getDotMap() {
-        return dotMap;
+    public ArrayList<Dot> getDotList() {
+        return dotList;
     }
-    public Map<String, Integer> getSpecialMap() {
-        return specialMap;
+    public ArrayList<SpecialEffect> getSpecialList() {
+        return specialList;
     }
     public List<ArrayList<Integer>> getTempHealthList() {
         return tempHealthList;

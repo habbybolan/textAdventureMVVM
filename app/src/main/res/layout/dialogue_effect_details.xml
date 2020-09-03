@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <data>
+        <variable
+            name="effectName"
+            type="String" />
+        <variable
+            name="effectPicture"
+            type="Integer"/>
+        <variable
+            name="duration"
+            type="String" />
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/effect_pic"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignParentTop="true"
+            app:imageResource="@{effectPicture}" />
+
+        <TextView
+            android:id="@+id/effect_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/effect_pic"
+            android:text="@{effectName}" />
+
+        <TextView
+            android:id="@+id/effect_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/effect_name"
+            android:text="@{duration}" />
+    </RelativeLayout>
+</layout>

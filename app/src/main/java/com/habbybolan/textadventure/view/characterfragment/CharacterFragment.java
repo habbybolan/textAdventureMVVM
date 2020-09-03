@@ -45,7 +45,7 @@ public class CharacterFragment extends Fragment {
 
     private void setUpAbilityRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvAbilityList;
-        final CharacterAbilityListAdapter adapter = new CharacterAbilityListAdapter(characterVM.getAbilities(), new CharacterListClickListener() {
+        final CharacterAbilityListAdapter adapter = new CharacterAbilityListAdapter(characterVM.getAbilities(), characterVM, new CharacterListClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.removeAbilityAtIndex(index);
@@ -77,7 +77,7 @@ public class CharacterFragment extends Fragment {
 
     private void setUpWeaponRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvWeaponList;
-        final CharacterWeaponListAdapter adapter = new CharacterWeaponListAdapter(characterVM.getWeapons(), new CharacterListClickListener() {
+        final CharacterWeaponListAdapter adapter = new CharacterWeaponListAdapter(characterVM.getWeapons(), characterVM, new CharacterListClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.removeWeaponAtIndex(index);
@@ -109,10 +109,15 @@ public class CharacterFragment extends Fragment {
 
     private void setUpItemRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvItemList;
-        final CharacterItemListAdapter adapter = new CharacterItemListAdapter(characterVM.getItems(), new CharacterListClickListener() {
+        final CharacterItemListAdapter adapter = new CharacterItemListAdapter(characterVM.getItems(), characterVM,  new CharacterListClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.removeItemAtIndex(index);
+            }
+        }, new CharacterListClickListener() {
+            @Override
+            public void onLongClicked(int index) {
+                characterVM.consumeItemAtIndex(index);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -144,51 +149,34 @@ public class CharacterFragment extends Fragment {
     private void setUpDOTRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvDots;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        final CharacterDotListAdapter adapter = new CharacterDotListAdapter(characterVM.mapIntoList(characterVM.getDotMap()));
+        final CharacterDotListAdapter adapter = new CharacterDotListAdapter(characterVM.getDotList());
         recyclerView.setAdapter(adapter);
 
-        // observed whenever CharacterViewModel adds to dotMap
-        Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
+        // observed whenever CharacterViewModel observes change in dotList
+        Observable.OnPropertyChangedCallback callBackDot = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                adapter.addNewDot(characterVM.getDotObserverAdd().get());
+                adapter.notifyDataSetChanged();
             }
         };
-        characterVM.getDotObserverAdd().addOnPropertyChangedCallback(callbackAdd);
-
-        // observed whenever CharacterViewModel removes from dotMap
-        Observable.OnPropertyChangedCallback callbackDelete = new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                adapter.removeDot(characterVM.getDotObserverRemove().get());
-            }
-        };
-        characterVM.getDotObserverRemove().addOnPropertyChangedCallback(callbackDelete);
+        characterVM.getUpdateAllDot().addOnPropertyChangedCallback(callBackDot);
     }
 
     // recyclerViewer and observers for special effects
     private void setUpSpecialRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvSpecialEffects;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        final CharacterSpecialListAdapter adapter = new CharacterSpecialListAdapter(characterVM.mapIntoList(characterVM.getSpecialMap()));
+        final CharacterSpecialListAdapter adapter = new CharacterSpecialListAdapter(characterVM.getSpecialList());
         recyclerView.setAdapter(adapter);
 
-        // observed whenever CharacterViewModel adds to dotMap
-        Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                adapter.addNewSpecial(characterVM.getSpecialObserverAdd().get());
-            }
-        };
-        characterVM.getSpecialObserverAdd().addOnPropertyChangedCallback(callbackAdd);
 
-        // observed whenever CharacterViewModel removes from dotMap
-        Observable.OnPropertyChangedCallback callbackDelete = new Observable.OnPropertyChangedCallback() {
+        // observed whenever CharacterViewModel observes change in specialList
+        Observable.OnPropertyChangedCallback callBackSpecial = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                adapter.removeSpecial(characterVM.getSpecialObserverRemove().get());
+                adapter.notifyDataSetChanged();
             }
         };
-        characterVM.getSpecialObserverRemove().addOnPropertyChangedCallback(callbackDelete);
+        characterVM.getUpdateAllSpecial().addOnPropertyChangedCallback(callBackSpecial);
     }
 }

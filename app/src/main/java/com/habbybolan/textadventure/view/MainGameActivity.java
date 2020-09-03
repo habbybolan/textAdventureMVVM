@@ -28,8 +28,8 @@ public class MainGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        mainGameViewModel = new MainGameViewModel(getApplicationContext());
         characterViewModel = new CharacterViewModel(getApplicationContext());
+        mainGameViewModel = new MainGameViewModel(getApplicationContext(), characterViewModel);
         mainGameBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_game);
         mainGameBinding.setLifecycleOwner(this);
         mainGameBinding.setMainGameViewModel(mainGameViewModel);
@@ -39,14 +39,9 @@ public class MainGameActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.fragment_container_character, characterFragment)
+                .show(characterFragment)
                 .commit();
 
-        /*gameFragment = new GameFragment(characterViewModel, mainGameViewModel);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container_game, gameFragment)
-                .commit()
-         */
         observeEncounterChange();
         mainGameViewModel.getEncounterType().notifyChange();
     }

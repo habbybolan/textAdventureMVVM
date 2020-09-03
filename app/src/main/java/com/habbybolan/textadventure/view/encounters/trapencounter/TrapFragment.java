@@ -10,20 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentTrapBinding;
+import com.habbybolan.textadventure.model.dialogue.Dialogue;
+import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.TrapEncounterViewModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TrapFragment extends Fragment {
 
@@ -53,7 +50,7 @@ public class TrapFragment extends Fragment {
         // Inflate the layout for this fragment
         trapBinder = DataBindingUtil.inflate(inflater, R.layout.fragment_trap, container,false);
         try {
-            trapEncounterVM = new TrapEncounterViewModel(mainGameVM, characterVM, encounter);
+            trapEncounterVM = new TrapEncounterViewModel(mainGameVM, characterVM, encounter, getActivity());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -106,18 +103,20 @@ public class TrapFragment extends Fragment {
     // set up Recycler viewer and Observable data for when further dialogue is added
     private void setUpDialogueRV() {
         trapBinder.layoutBtnOptions.removeAllViews();
-        RecyclerView recyclerView = trapBinder.rvDialogue;
+        final DialogueRecyclerView rv = new DialogueRecyclerView(getContext(), trapBinder.rvDialogue, characterVM);
+
+        /*RecyclerView recyclerView = trapBinder.rvDialogue;
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        List<String> arrayList = new ArrayList<>();
-        final TrapDialogueListAdapter adapter = new TrapDialogueListAdapter(arrayList);
-        recyclerView.setAdapter(adapter);
+        final DialogueAdapter adapter = new DialogueAdapter();
+        recyclerView.setAdapter(adapter);*/
 
         // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
         Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                adapter.addNewDialogue(trapEncounterVM.getNewDialogue().get());
+                Dialogue dialogue = new Dialogue(trapEncounterVM.getNewDialogue().get());
+                rv.addDialogue(dialogue);
             }
         };
         trapEncounterVM.getNewDialogue().addOnPropertyChangedCallback(callback);
@@ -152,9 +151,9 @@ public class TrapFragment extends Fragment {
     // second state
         // set up buttons to either attempt to dodge trap, or use escape item
     private void beforeTrapState() {
+        characterVM.setStateInventoryObserver(false);
         trapBinder.layoutBtnOptions.removeAllViews();
         Button btnDodgeTrap = new Button(getContext());
-        //btnDodgeTrap.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.txt_size_normal));
         String dodge = "Dodge Trap";
         btnDodgeTrap.setText(dodge);
         btnDodgeTrap.setOnClickListener(new View.OnClickListener() {
@@ -175,12 +174,7 @@ public class TrapFragment extends Fragment {
         btnUseItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // todo: using trap item
-                /*try {
-                    trapEncounterVM.secondStateUseItem();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/
+                trapEncounterVM.secondStateUseItem();
             }
         });
         trapBinder.layoutBtnOptions.addView(btnUseItem);
@@ -189,6 +183,7 @@ public class TrapFragment extends Fragment {
     // third and final state
         // set up the button to leave the encounter and goto next
     private void afterTrapState() {
+        characterVM.setStateInventoryObserver(true);
         trapBinder.layoutBtnOptions.removeAllViews();
         Button leaveButton = new Button(getContext());
         leaveButton.setText(getResources().getString(R.string.leave_encounter));
