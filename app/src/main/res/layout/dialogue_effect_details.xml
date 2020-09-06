@@ -14,12 +14,14 @@
     </data>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialogue_distance_top">
 
         <ImageView
             android:id="@+id/effect_pic"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_marginStart="@dimen/dialogue_distance_sides"
             android:layout_alignParentTop="true"
             app:imageResource="@{effectPicture}" />
 
@@ -29,6 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="5dp"
+            android:textSize="@dimen/txt_size_medium"
+            android:textColor="@color/colorEffectDialogue"
             android:layout_toEndOf="@+id/effect_pic"
             android:text="@{effectName}" />
 
@@ -38,6 +42,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="10dp"
+            android:textColor="@color/colorEffectDialogue"
+            android:textSize="@dimen/txt_size_medium"
+
             android:layout_toEndOf="@+id/effect_name"
             android:text="@{duration}" />
     </RelativeLayout>

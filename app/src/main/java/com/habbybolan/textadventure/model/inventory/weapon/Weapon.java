@@ -2,6 +2,7 @@ package com.habbybolan.textadventure.model.inventory.weapon;
 
 import android.database.Cursor;
 
+import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
@@ -21,10 +22,25 @@ public class Weapon implements Inventory {
     static public final String table = "weapons";
     private int weaponID;
 
+    private int pictureResource;
+
     // Constructor where database opened and closed elsewhere
     public Weapon(int weaponID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         this.weaponID = weaponID;
         setVariables(mDbHelper, weaponID);
+        setPictureResource();
+    }
+
+    // sets the picture resource
+    @Override
+    public void setPictureResource() {
+        // todo: get pic based on tier and type
+        pictureResource = R.drawable.sword;
+    }
+
+    @Override
+    public int getPictureResource() {
+        return pictureResource;
     }
 
     @Override

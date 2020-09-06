@@ -153,13 +153,22 @@ public class CharacterFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         // observed whenever CharacterViewModel observes change in dotList
-        Observable.OnPropertyChangedCallback callBackDot = new Observable.OnPropertyChangedCallback() {
+        Observable.OnPropertyChangedCallback callBackDotAdd = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
                 adapter.notifyDataSetChanged();
             }
         };
-        characterVM.getUpdateAllDot().addOnPropertyChangedCallback(callBackDot);
+        characterVM.getUpdateAllDotAdd().addOnPropertyChangedCallback(callBackDotAdd);
+
+        // observed whenever CharacterViewModel observes change in dotList
+        Observable.OnPropertyChangedCallback callBackDotRemove = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                adapter.notifyDataSetChanged();
+            }
+        };
+        characterVM.getUpdateAllDotRemove().addOnPropertyChangedCallback(callBackDotRemove);
     }
 
     // recyclerViewer and observers for special effects
@@ -171,12 +180,21 @@ public class CharacterFragment extends Fragment {
 
 
         // observed whenever CharacterViewModel observes change in specialList
-        Observable.OnPropertyChangedCallback callBackSpecial = new Observable.OnPropertyChangedCallback() {
+        Observable.OnPropertyChangedCallback callBackSpecialAdd = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
                 adapter.notifyDataSetChanged();
             }
         };
-        characterVM.getUpdateAllSpecial().addOnPropertyChangedCallback(callBackSpecial);
+        characterVM.getUpdateAllSpecialAdd().addOnPropertyChangedCallback(callBackSpecialAdd);
+
+        // observed whenever CharacterViewModel observes change in specialList
+        Observable.OnPropertyChangedCallback callBackSpecialRemove = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                adapter.notifyDataSetChanged();
+            }
+        };
+        characterVM.getUpdateAllSpecialRemove().addOnPropertyChangedCallback(callBackSpecialRemove);
     }
 }

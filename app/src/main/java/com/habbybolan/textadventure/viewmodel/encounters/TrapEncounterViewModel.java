@@ -17,12 +17,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TrapEncounterViewModel extends BaseObservable {
+public class TrapEncounterViewModel extends BaseObservable implements EncounterViewModel {
     public static final int firstState = 1;
     public static final int secondState = 2;
     public static final int thirdState = 3;
-    // holds all the UI states of the Trap encounter
-    int[] states = new int[]{firstState, secondState, thirdState};
 
     private CharacterViewModel characterVM;
     private MainGameViewModel mainGameVM;
@@ -32,24 +30,37 @@ public class TrapEncounterViewModel extends BaseObservable {
     private JSONObject firstStateJSON;
     private Context context;
 
-    public TrapEncounterViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
+    private ObservableField<Integer> stateIndex;
+    private ObservableField<String> newDialogue;
+
+    public TrapEncounterViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter,
+                                  Context context) throws JSONException {
         this.characterVM = characterVM;
         this.mainGameVM = mainGameVM;
         trapModel = new TrapModel(characterVM);
         this.encounter = encounter;
         firstStateJSON = encounter.getJSONObject("dialogue");
         this.context = context;
+        stateIndex = new ObservableField<>(1);
+        newDialogue = new ObservableField<>();
     }
 
     public CharacterViewModel getCharacterVM() {
         return characterVM;
     }
 
-    private ObservableField<Integer> stateIndex = new ObservableField<>(1);
+    @Override
     public ObservableField<Integer> getStateIndex() {
         return stateIndex;
     }
+    @Override
+    public int getStateIndexValue() {
+        Integer stateIndex = getStateIndex().get();
+        if (stateIndex != null) return stateIndex;
+        throw new NullPointerException();
+    }
     // increment the state index to next state
+    @Override
     public void incrementStateIndex() {
         Integer state = stateIndex.get();
         if (state != null) {
@@ -59,12 +70,19 @@ public class TrapEncounterViewModel extends BaseObservable {
     }
 
     // updates when a new bit of dialogue needs to be shown
-    private ObservableField<String> newDialogue = new ObservableField<>();
+    @Override
     public ObservableField<String> getNewDialogue() {
         return newDialogue;
     }
+    @Override
     public void setNewDialogue(String newDialogue) {
         this.newDialogue.set(newDialogue);
+    }
+    @Override
+    public String getNewDialogueValue() {
+        String newDialogue = getNewDialogue().get();
+        if (newDialogue != null) return newDialogue;
+        throw new NullPointerException();
     }
 
     public void gotoNextEncounter(View v) {
@@ -72,7 +90,8 @@ public class TrapEncounterViewModel extends BaseObservable {
     }
 
     // show the next dialogue snippet in the first state, called whenever dynamic button clicked
-    public void firstState() throws JSONException {
+    @Override
+    public void firstDialogueState() throws JSONException {
         setNewDialogue(firstStateJSON.getString("dialogue"));
         if (firstStateJSON.has("next")) {
             firstStateJSON = firstStateJSON.getJSONObject("next");

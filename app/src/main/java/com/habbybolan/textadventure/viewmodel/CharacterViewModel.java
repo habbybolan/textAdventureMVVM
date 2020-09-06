@@ -9,9 +9,12 @@ import androidx.databinding.ObservableField;
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
+import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
+import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
@@ -49,15 +52,26 @@ public class CharacterViewModel extends BaseObservable {
 
     // ** Inventory **
 
+    // Inventory object to be added to inventory if user decides to
+    private Inventory inventoryToRetrieve;
+    private Inventory getInventoryToRetrieve() {
+        return inventoryToRetrieve;
+    }
+    public void setInventoryToRetrieve(Inventory inventory) {
+        this.inventoryToRetrieve = inventory;
+    }
+    // set field to null to notify it's already retrieved
+    public void removeInventoryToRetrieve() {
+        inventoryToRetrieve = null;
+    }
+
         // Abilities
     // Observable for adding and deleting abilities and updating RecyclerView in CharacterFragment
     private ObservableField<Integer> abilityObserverAdd = new ObservableField<>();
-    @Bindable
     public ObservableField<Integer> getAbilityObserverAdd() {
         return abilityObserverAdd;
     }
     private ObservableField<Integer> abilityObserverRemove = new ObservableField<>();
-    @Bindable
     public ObservableField<Integer> getAbilityObserverRemove() {
         return abilityObserverRemove;
     }
@@ -65,9 +79,11 @@ public class CharacterViewModel extends BaseObservable {
         int index = character.removeAbility(ability);
         if (index >= 0) abilityObserverRemove.set(index);
     }
-    public void addAbility(Ability ability) {
+    public boolean addAbility(Ability ability) {
+        if (character.getNumAbilities() >= Character.MAX_ABILITIES) return false;
         int index = character.addAbility(ability);
         abilityObserverAdd.set(index);
+        return true;
     }
     public void removeAbilityAtIndex(int index) {
         character.removeAbilityAtIndex(index);
@@ -80,12 +96,10 @@ public class CharacterViewModel extends BaseObservable {
         // Weapons
     // Observable for adding and deleting weapons and updating RecyclerView in CharacterFragment
     private ObservableField<Integer> weaponObserverAdd = new ObservableField<>();
-    @Bindable
     public ObservableField<Integer> getWeaponObserverAdd() {
         return weaponObserverAdd;
     }
     private ObservableField<Integer> weaponObserverRemove = new ObservableField<>();
-    @Bindable
     public ObservableField<Integer> getWeaponObserverRemove() {
         return weaponObserverRemove;
     }
@@ -96,9 +110,11 @@ public class CharacterViewModel extends BaseObservable {
         int index = character.removeWeapon(weapon);
         if (index >= 0) weaponObserverRemove.set(index);
     }
-    public void addWeapon(Weapon weapon) {
+    public boolean addWeapon(Weapon weapon) {
+        if (character.getNumWeapons() >= Character.MAX_WEAPONS) return false;
         int index = character.addWeapon(weapon);
         weaponObserverAdd.set(index);
+        return true;
     }
     public void removeWeaponAtIndex(int index) {
         character.removeWeaponAtIndex(index);
@@ -108,12 +124,10 @@ public class CharacterViewModel extends BaseObservable {
         // Items
     // Observable for adding and deleting items and updating RecyclerView in CharacterFragment
     private ObservableField<Integer> itemObserverAdd = new ObservableField<>();
-    @Bindable
     public ObservableField<Integer> getItemObserverAdd() {
         return itemObserverAdd;
     }
     private ObservableField<Integer> itemObserverRemove = new ObservableField<>();
-    @Bindable
     public ObservableField<Integer> getItemObserverRemove() {
         return itemObserverRemove;
     }
@@ -147,70 +161,71 @@ public class CharacterViewModel extends BaseObservable {
             SpecialEffect special;
             if (item.getIsConfuse()) {
                 special = new SpecialEffect(SpecialEffect.CONFUSE, true);
-                if (!character.removeInputSpecial(special)) updateAllSpecial.set(null);
+                if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsStun()) {
                 special = new SpecialEffect(SpecialEffect.STUN, true);
-                if (!character.removeInputSpecial(special)) updateAllSpecial.set(null);
+                if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsSilence()) {
                 special = new SpecialEffect(SpecialEffect.SILENCE, true);
-                if (!character.removeInputSpecial(special)) updateAllSpecial.set(null);
+                if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsInvisible()) {
                 special = new SpecialEffect(SpecialEffect.INVISIBILITY, true);
-                if (!character.removeInputSpecial(special)) updateAllSpecial.set(null);
+                if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsInvincible()) {
                 special = new SpecialEffect(SpecialEffect.INVINCIBILITY, true);
-                if (!character.removeInputSpecial(special)) updateAllSpecial.set(null);
+                if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
             }
             // DOT changes
             Dot dot;
             if (item.getIsFire()) {
                 dot = new Dot(Dot.FIRE, true);
-                if (!character.removeInputDot(dot)) updateAllDot.set(null);
+                if (!character.removeInputDot(dot)) updateAllDotAdd.set(dot);
 
 
             }
             if (item.getIsBleed()) {
                 dot = new Dot(Dot.BLEED, true);
-                if (!character.removeInputDot(dot)) updateAllDot.set(null);
+                if (!character.removeInputDot(dot)) updateAllDotAdd.set(dot);
 
             }
             if (item.getIsPoison()) {
                 dot = new Dot(Dot.FIRE, true);
-                if (!character.removeInputDot(dot)) updateAllDot.set(null);
+                if (!character.removeInputDot(dot)) updateAllDotAdd.set(dot);
 
             }
             if (item.getIsFrostBurn()) {
                 dot = new Dot(Dot.FROSTBURN, true);
-                if (!character.removeInputDot(dot)) updateAllDot.set(null);
+                if (!character.removeInputDot(dot)) updateAllDotAdd.set(dot);
 
             }
             if (item.getIsHealthDot()) {
                 dot = new Dot(Dot.HEALTH_DOT, true);
-                if (!character.removeInputDot(dot)) updateAllDot.set(null);
+                if (!character.removeInputDot(dot)) updateAllDotAdd.set(dot);
 
             }
             if (item.getIsManaDot()) {
                 dot = new Dot(Dot.MANA_DOT, true);
-                if (!character.removeInputDot(dot)) updateAllDot.set(null);
+                if (!character.removeInputDot(dot)) updateAllDotAdd.set(dot);
 
             }
         }
         itemObserverRemove.set(index);
     }
-    public void addItem(Item item) {
+    public boolean addItem(Item item) {
+        if (character.getNumItems() >= Character.MAX_ITEMS) return false;
         int index = character.addItem(item);
         if (!item.getIsConsumable()) {
             // stat changes
@@ -233,52 +248,53 @@ public class CharacterViewModel extends BaseObservable {
             SpecialEffect special;
             if (item.getIsConfuse()) {
                 special = new SpecialEffect(SpecialEffect.CONFUSE, true);
-                if (character.addNewSpecial(special)) updateAllSpecial.set(null);
+                if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsStun()) {
                 special = new SpecialEffect(SpecialEffect.STUN, true);
-                if (character.addNewSpecial(special)) updateAllSpecial.set(null);
+                if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsSilence()) {
                 special = new SpecialEffect(SpecialEffect.SILENCE, true);
-                if (character.addNewSpecial(special)) updateAllSpecial.set(null);
+                if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsInvisible()) {
                 special = new SpecialEffect(SpecialEffect.INVISIBILITY, true);
-                if (character.addNewSpecial(special)) updateAllSpecial.set(null);
+                if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsInvincible()) {
                 special = new SpecialEffect(SpecialEffect.INVINCIBILITY, true);
-                if (character.addNewSpecial(special)) updateAllSpecial.set(null);
+                if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             // DOT changes
             Dot dot;
             if (item.getIsFire()) {
                 dot = new Dot(Dot.FIRE, true);
-                if (character.addNewDot(dot)) updateAllDot.set(null);
+                if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
             }
             if (item.getIsBleed()) {
                 dot = new Dot(Dot.BLEED, true);
-                if (character.addNewDot(dot)) updateAllDot.set(null);
+                if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
             }
             if (item.getIsPoison()) {
                 dot = new Dot(Dot.POISON, true);
-                if (character.addNewDot(dot)) updateAllDot.set(null);
+                if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
             }
             if (item.getIsFrostBurn()) {
                 dot = new Dot(Dot.FROSTBURN, true);
-                if (character.addNewDot(dot)) updateAllDot.set(null);
+                if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
             }
             if (item.getIsHealthDot()) {
                 dot = new Dot(Dot.HEALTH_DOT, true);
-                if (character.addNewDot(dot)) updateAllDot.set(null);
+                if (character.addNewDot(dot)) updateAllDotAdd.set(null);
             }
             if (item.getIsManaDot()) {
                 dot = new Dot(Dot.MANA_DOT, true);
-                if (character.addNewDot(dot)) updateAllDot.set(null);
+                if (character.addNewDot(dot)) updateAllDotAdd.set(null);
             }
         }
         itemObserverAdd.set(index);
+        return true;
     }
     // consume an item
     public void consumeItem(Item item) {
@@ -385,24 +401,21 @@ public class CharacterViewModel extends BaseObservable {
 
     // direct damage applied to player character
     public void damageCharacter(int damageAmount) {
-        character.damageTarget(damageAmount);
-        notifyPropertyChanged(BR.health);
+        setHealth(character.damageTarget(damageAmount));
     }
 
     // ** Dot Effects **
 
-    public ObservableField<Dot>  getUpdateAllDot() {
-        return updateAllDot;
+    public ObservableField<Dot>  getUpdateAllDotAdd() {
+        return updateAllDotAdd;
     }
-    private ObservableField<Dot> updateAllDot = new ObservableField<>();
-    /*private ObservableField<Dot> dotObserverAdd = new ObservableField<>();
-    public ObservableField<Dot> getDotObserverAdd() {
-        return dotObserverAdd;
+    private ObservableField<Dot> updateAllDotAdd = new ObservableField<>();
+
+    public ObservableField<Dot>  getUpdateAllDotRemove() {
+        return updateAllDotRemove;
     }
-    private ObservableField<Dot> dotObserverRemove = new ObservableField<>();
-    public ObservableField<Dot> getDotObserverRemove() {
-        return dotObserverRemove;
-    }*/
+    private ObservableField<Dot> updateAllDotRemove = new ObservableField<>();
+
     @Bindable
     public ArrayList<Dot> getDotList() {
         return character.getDotList();
@@ -412,38 +425,35 @@ public class CharacterViewModel extends BaseObservable {
         character.removeInputDot(dot);
         notifyPropertyChanged(BR.dotList);
         // observed by CharacterViewModel
-        updateAllDot.set(dot);
+        updateAllDotRemove.set(dot);
     }
     public void addInputDot(Dot dot) {
         // observed by XML
         boolean isChanged = character.addNewDot(dot);
         notifyPropertyChanged(BR.dotList);
         // observed by CharacterViewModel
-        updateAllDot.set(dot);
+        updateAllDotAdd.set(dot);
     }
     public void applyDots() {
         character.applyDots();
         /*for (Dot dot : removedDots) {
             dotObserverRemove.set(dot);
         }*/
-        updateAllDot.set(new Dot(Dot.FIRE, false));
+        // todo: dummy remove - need a specific remove??
+        updateAllDotRemove.set(new Dot(Dot.FIRE, false));
     }
 
     // ** Special Effects **
 
-    private ObservableField<SpecialEffect> updateAllSpecial = new ObservableField<>();
-    public ObservableField<SpecialEffect>  getUpdateAllSpecial() {
-        return updateAllSpecial;
+    private ObservableField<SpecialEffect> updateAllSpecialAdd = new ObservableField<>();
+    public ObservableField<SpecialEffect>  getUpdateAllSpecialAdd() {
+        return updateAllSpecialAdd;
     }
-    /*
-    private ObservableField<SpecialEffect> specialObserverAdd = new ObservableField<>();
-    public ObservableField<SpecialEffect> getSpecialObserverAdd() {
-        return specialObserverAdd;
+
+    private ObservableField<SpecialEffect> updateAllSpecialRemove = new ObservableField<>();
+    public ObservableField<SpecialEffect>  getUpdateAllSpecialRemove() {
+        return updateAllSpecialRemove;
     }
-    private ObservableField<SpecialEffect> specialObserverRemove = new ObservableField<>();
-    public ObservableField<SpecialEffect> getSpecialObserverRemove() {
-        return specialObserverRemove;
-    }*/
 
     @Bindable
     public ArrayList<SpecialEffect> getSpecialList() {
@@ -454,21 +464,22 @@ public class CharacterViewModel extends BaseObservable {
         character.removeInputSpecial(special);
         notifyPropertyChanged(BR.specialList);
         // observed by CharacterViewModel
-        updateAllSpecial.set(special);
+        updateAllSpecialRemove.set(special);
     }
     public void addInputSpecial(SpecialEffect special) {
         // observed by XML
         character.addNewSpecial(special);
         notifyPropertyChanged(BR.specialList);
         // observed by CharacterViewModel
-        updateAllSpecial.set(special);
+        updateAllSpecialAdd.set(special);
     }
     public void decrSpecialDuration() {
         character.decrSpecialDuration();
         /*for (SpecialEffect special : removedSpecials) {
             specialObserverRemove.set(special);
         }*/
-        updateAllSpecial.set(new SpecialEffect(SpecialEffect.STUN, false));
+        // todo: dummy remove - need a specific remove??
+        updateAllSpecialRemove.set(new SpecialEffect(SpecialEffect.STUN, false));
     }
 
     // ** Stat Changes **
@@ -551,12 +562,19 @@ public class CharacterViewModel extends BaseObservable {
     }
 
     // *** character stat ***
+
         // bars
+    @Bindable
+    private ObservableField<HealthDialogue> healthObserve = new ObservableField<>();
+    public ObservableField<HealthDialogue> getHealthObserve() {
+        return healthObserve;
+    }
     @Bindable
     public String getHealth() {
         return String.valueOf(character.getHealth());
     }
     public void setHealth(int health) {
+        healthObserve.set(new HealthDialogue(health - character.getHealth()));
         character.setHealth(health);
         notifyPropertyChanged(BR.health);
     }
@@ -568,11 +586,17 @@ public class CharacterViewModel extends BaseObservable {
         character.setMaxHealth(maxHealth);
         notifyPropertyChanged(BR.maxHealth);
     }
+
+    private ObservableField<ManaDialogue> manaObserve = new ObservableField<>();
+    public ObservableField<ManaDialogue> getManaObserve() {
+        return manaObserve;
+    }
     @Bindable
     public String getMana() {
         return String.valueOf(character.getMana());
     }
     public void setMana(int mana) {
+        manaObserve.set(new ManaDialogue(mana - character.getMana()));
         character.setMana(mana);
         notifyPropertyChanged(BR.mana);
     }

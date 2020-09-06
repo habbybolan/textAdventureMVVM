@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="inventoryPic"
+            type="Integer" />
+        <variable
+            name="inventoryName"
+            type="String" />
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/txt_size_large"
+            app:name="@{inventoryName}"/>
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="@dimen/inventory_image_size"
+            android:layout_height="@dimen/inventory_image_size"
+            android:layout_below="@+id/Title"
+            android:imageResource="@{inventoryPic}" />
+
+        <ImageView
+            android:id="@+id/imageView8"
+            android:layout_width="108dp"
+            android:layout_height="@dimen/inventory_image_size"
+            android:layout_below="@+id/Title"
+            android:layout_toEndOf="@+id/imageView5"
+            app:srcCompat="@drawable/inventory_name_border" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="108dp"
+            android:layout_height="@dimen/inventory_image_size"
+            android:layout_alignEnd="@+id/imageView8"
+            android:layout_alignBottom="@+id/imageView8"
+            android:gravity="center"
+            android:layout_marginStart="6dp"
+            android:textSize="@dimen/txt_size_medium"
+            android:layout_marginEnd="6dp"
+            android:layout_toEndOf="@+id/imageView5"
+            android:text="@{inventoryName}" />
+
+    </RelativeLayout>
+</layout>

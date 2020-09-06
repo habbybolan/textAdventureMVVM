@@ -2,6 +2,7 @@ package com.habbybolan.textadventure.model.inventory;
 
 import android.database.Cursor;
 
+import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import java.util.concurrent.ExecutionException;
@@ -64,6 +65,8 @@ public class Item implements Inventory{
 
     private int itemID;
 
+    private int pictureResource;
+
 
     // constructor where database opened and closed elsewhere
     public Item(String itemIDString, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
@@ -77,6 +80,19 @@ public class Item implements Inventory{
             isGeneric = true;
             itemName = itemIDString;
         }
+        setPictureResource();
+    }
+
+    // sets the picture resource
+    @Override
+    public void setPictureResource() {
+        // todo: get pic based on type and tier
+        pictureResource = R.drawable.sword;
+    }
+
+    @Override
+    public int getPictureResource() {
+        return pictureResource;
     }
 
     @Override

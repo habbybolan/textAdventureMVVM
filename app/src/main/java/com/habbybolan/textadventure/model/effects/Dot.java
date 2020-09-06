@@ -1,5 +1,7 @@
 package com.habbybolan.textadventure.model.effects;
 
+import com.habbybolan.textadventure.R;
+
 /*
 Object to represent Damage Over time effects
  */
@@ -80,6 +82,25 @@ public class Dot implements Effect {
                 break;
             default: // shouldn't reach this
                 break;
+        }
+    }
+
+    public int getIcon() {
+        switch (type) {
+            case Dot.FIRE:
+                return R.drawable.fire_icon;
+            case Dot.BLEED:
+                return R.drawable.bleed_icon;
+            case Dot.POISON:
+                return R.drawable.poison_icon;
+            case Dot.FROSTBURN:
+                return R.drawable.frostburn_icon;
+            case Dot.HEALTH_DOT:
+                return R.drawable.health_dot_icon;
+            case Dot.MANA_DOT:
+                return R.drawable.mana_dot_icon;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 

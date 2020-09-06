@@ -2,6 +2,7 @@ package com.habbybolan.textadventure.model.inventory;
 
 import android.database.Cursor;
 
+import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import java.util.concurrent.ExecutionException;
@@ -78,6 +79,8 @@ public class Ability implements Inventory{
     private int evadeDecrease = 0;
     private int blockDecrease = 0;
 
+    private int pictureResource;
+
     // cost to use ability in mana
     private int cost = 0;
 
@@ -90,6 +93,7 @@ public class Ability implements Inventory{
     public Ability(int abilityID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         this.abilityID = abilityID;
         setVariables(mDbHelper, abilityID);
+        setPictureResource();
     }
 
     @Override
@@ -98,6 +102,18 @@ public class Ability implements Inventory{
         else if (o.getClass() != getClass()) return false;
         else if (o == this) return true;
         else return (checkAbilityEquality((Ability) o));
+    }
+
+    // sets the picture resource
+    @Override
+    public void setPictureResource() {
+        // todo: get pic based on tier and type
+        pictureResource = R.drawable.sword;
+    }
+
+    @Override
+    public int getPictureResource() {
+        return pictureResource;
     }
 
     // helper for checking if 2 ability scrolls are equal

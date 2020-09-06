@@ -39,13 +39,13 @@
 
         <ImageView
             android:id="@+id/health_mana_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/mana_health_bar_width"
+            android:layout_height="@dimen/mana_health_bar_height"
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_character"
-            app:srcCompat="@drawable/health_mana" />
+            app:srcCompat="@drawable/health_mana_bar" />
 
         <TextView
             android:id="@+id/txt_health_value"
@@ -57,7 +57,7 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/health_mana_image"
             app:layout_constraintEnd_toEndOf="@+id/health_mana_image"
-            app:layout_constraintHorizontal_bias="0.232"
+            app:layout_constraintHorizontal_bias="0.277"
             app:layout_constraintStart_toStartOf="@+id/health_mana_image"
             app:layout_constraintTop_toTopOf="@+id/health_mana_image"
             app:layout_constraintVertical_bias="0.523" />
@@ -72,7 +72,7 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/health_mana_image"
             app:layout_constraintEnd_toEndOf="@+id/health_mana_image"
-            app:layout_constraintHorizontal_bias="0.776"
+            app:layout_constraintHorizontal_bias="0.712"
             app:layout_constraintStart_toStartOf="@+id/health_mana_image"
             app:layout_constraintTop_toTopOf="@+id/health_mana_image"
             app:layout_constraintVertical_bias="0.523" />

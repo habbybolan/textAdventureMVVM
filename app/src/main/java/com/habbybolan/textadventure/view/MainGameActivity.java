@@ -9,7 +9,8 @@ import androidx.databinding.Observable;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityMainGameBinding;
 import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
-import com.habbybolan.textadventure.view.encounters.trapencounter.TrapFragment;
+import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
+import com.habbybolan.textadventure.view.encounter.TrapFragment;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
@@ -92,12 +93,15 @@ public class MainGameActivity extends AppCompatActivity {
             case BENEFIT_TYPE:
                 BenefitEncounter benefitObject = new BenefitEncounter(getContext(), character, model, view, this);
                 benefitObject.setInitialBenefit(encounter.getString("dialogue"));
+                break;*/
+            case MainGameViewModel.RANDOM_BENEFIT_TYPE:
+                RandomBenefitFragment randomBenefitFragment = new RandomBenefitFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container_game, randomBenefitFragment)
+                        .commit();
                 break;
-            case SMALL_BENEFIT_TYPE:
-                SmallBenefitEncounter smallBenefitEncounter = new SmallBenefitEncounter(getContext(), character, model, view, this);
-                smallBenefitEncounter.setInitialSmallBenefit(encounter.getString("dialogue"));
-                break;
-            case QUEST_TYPE:
+            /*case QUEST_TYPE:
                 QuestEncounter questEncounter = new QuestEncounter(getContext(), character, damage, view, this, model);
                 questEncounter.setInitialQuest(encounter.getJSONObject("encounter"));
                 break;*/

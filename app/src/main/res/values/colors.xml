@@ -5,4 +5,10 @@
 
     <color name="btnDropColorEnabled">#D60E0E</color>
     <color name="btnDropColorDisabled">#554A4A</color>
+
+    <color name="colorEffectDialogue">#BA4B00</color>
+    <color name="colorNormalDialogue">#000000</color>
+    <color name="colorHealthDialogue">#B30707</color>
+    <color name="colorManaDialogue">#3A89CD</color>
+    <color name="colorInventoryDialogue">#2E7517</color>
 </resources>

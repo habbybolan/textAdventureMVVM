@@ -84,5 +84,10 @@
     <string name="special_plural">Special Effects</string>
     <string name="stat_plural">Stats</string>
 
+    <string name='pick_up_inventory'>Pick Up</string>
+
     <string name='continue_dialogue'>Continue</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

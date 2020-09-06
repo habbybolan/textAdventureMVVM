@@ -97,7 +97,7 @@ public abstract class CharacterEntity {
     // check any buffs or protections that characterEntity has
     // remove the damage amount from target health if no protection
     // or remove target's temporary extra health and direct health if any overflow of damage
-    public void damageTarget(int damage) {
+    public int damageTarget(int damage) {
         int overFlow = 0; // keeps track of damage if it gets rid of all tempExtraHealth
         if ((getTempExtraHealth() - damage) < 0) {
             overFlow = Math.abs(getTempExtraHealth() - damage);
@@ -107,7 +107,7 @@ public abstract class CharacterEntity {
             depleteTempExtraHealth(damage);
         }
         // direct health takes damage if any overFlow from tempHealth
-        setHealth(getHealth() - overFlow);
+        return getHealth() - overFlow;
     }
 
     // returns a random damage number between damageMin and damageMax
@@ -537,6 +537,7 @@ public abstract class CharacterEntity {
     // ***ABILITIES***
 
     // adds a new ability and applies its effects - stat increases, specials, and dots
+    // todo: damage not observed as damageTarget returns value, doesn't set it
     public void addNewAbilityEffects(Ability ability) {
         // todo: scale with Intelligence
         if (ability.getMinDamage() != 0) damageTarget(getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));

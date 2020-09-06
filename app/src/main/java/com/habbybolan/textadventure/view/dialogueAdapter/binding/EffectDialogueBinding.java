@@ -1,4 +1,4 @@
-package com.habbybolan.textadventure.view.dialogueAdapter;
+package com.habbybolan.textadventure.view.dialogueAdapter.binding;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -8,16 +8,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueEffectDetailsBinding;
+import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
 import com.habbybolan.textadventure.model.dialogue.EffectDialogue;
+import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
+import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EffectDialogueBinding extends DataBinder<EffectDialogueBinding.ViewHolder> {
 
-    List<EffectDialogue> effectDialogue = new ArrayList<>();
-    EffectDialogueBinding(DataBindAdapter dataBindAdapter) {
-        super(dataBindAdapter);
+    private List<EffectDialogue> effectDialogue = new ArrayList<>();
+    public EffectDialogueBinding(DialogueAdapter dialogueAdapter) {
+        super(dialogueAdapter);
     }
 
     @Override
@@ -36,7 +39,7 @@ public class EffectDialogueBinding extends DataBinder<EffectDialogueBinding.View
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         DialogueEffectDetailsBinding binding;
-        public ViewHolder(DialogueEffectDetailsBinding binding) {
+        ViewHolder(DialogueEffectDetailsBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
@@ -44,6 +47,8 @@ public class EffectDialogueBinding extends DataBinder<EffectDialogueBinding.View
         void bind(EffectDialogue effectDialogue) {
             binding.setEffectName(effectDialogue.getType());
             binding.setDuration(String.valueOf(effectDialogue.getDuration()));
+            binding.setEffectPicture(effectDialogue.getImageResource());
+            binding.executePendingBindings();
         }
     }
 
@@ -52,8 +57,12 @@ public class EffectDialogueBinding extends DataBinder<EffectDialogueBinding.View
         return effectDialogue.size();
     }
 
-    public void addNewEffectDialogue(EffectDialogue dialogue) {
-        effectDialogue.add(dialogue);
+
+    @Override
+    public void addDialogue(DialogueTypes dialogue) {
+        if (dialogue.getClass() != EffectDialogue.class) throw new IllegalArgumentException();
+        EffectDialogue addDialogue = (EffectDialogue) dialogue;
+        effectDialogue.add(addDialogue);
     }
 
 }

@@ -150,9 +150,9 @@
 			]
 		},
 
-		{"type":"small_benefit",
+		{"type":"random_benefit",
 		    "encounters":[
-		        {"dialogue":["A small glint underneath some leaves appears."]}
+		        {"dialogue":[{"dialogue":"A small glint underneath some leaves appears."}]}
 		    ]
 
 		},

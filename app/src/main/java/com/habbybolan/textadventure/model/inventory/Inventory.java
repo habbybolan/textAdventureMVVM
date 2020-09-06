@@ -1,10 +1,13 @@
 package com.habbybolan.textadventure.model.inventory;
 
 public interface Inventory {
-    public static String TYPE_WEAPON = "weapons";
-    public static String TYPE_ABILITY = "abilities";
-    public static String TYPE_ITEM = "items";
+    static String TYPE_WEAPON = "weapons";
+    static String TYPE_ABILITY = "abilities";
+    static String TYPE_ITEM = "items";
 
-    public String getType();
-    public String getName();
+    String getType();
+    String getName();
+
+    void setPictureResource();
+    int getPictureResource();
 }

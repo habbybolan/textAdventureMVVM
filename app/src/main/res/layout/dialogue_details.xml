@@ -8,14 +8,16 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialogue_distance_top">
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
+            android:layout_marginStart="@dimen/dialogue_distance_sides"
+            android:layout_marginEnd="@dimen/dialogue_distance_sides"
+            android:textColor="@color/colorNormalDialogue"
             android:textSize="@dimen/txt_size_medium"
             android:fontFamily="@font/press_start_2p"
             android:text="@{newDialogue}" />

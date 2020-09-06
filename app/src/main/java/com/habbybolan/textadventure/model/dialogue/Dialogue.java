@@ -1,6 +1,7 @@
 package com.habbybolan.textadventure.model.dialogue;
 
 import com.habbybolan.textadventure.R;
+
 /*
 Represents a simple dialogue object to be shown in the DialogueAdapter
  */

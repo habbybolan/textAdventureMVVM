@@ -66,8 +66,8 @@ public class MainGameViewModel extends BaseObservable {
     final public static String SHOP_TYPE = "shop";
     final public static int BENEFIT = 6; // a random, guaranteed temporary/permanent benefit - stat/health increase, item, weapon
     final public static String BENEFIT_TYPE = "benefit";
-    final public static int SMALL_BENEFIT = 7; // a random reward of either gold/Weapon/Item/Ability
-    final public static String SMALL_BENEFIT_TYPE = "small_benefit";
+    final public static int RANDOM_BENEFIT = 7; // a random reward of either gold/Weapon/Item/Ability
+    final public static String RANDOM_BENEFIT_TYPE = "random_benefit";
     final public static int QUEST = 8; // temporary leave the "area" to finish a specific task for a reward
     final public static String QUEST_TYPE = "quest";
 
@@ -154,12 +154,11 @@ public class MainGameViewModel extends BaseObservable {
             case BENEFIT_TYPE:
                 BenefitEncounter benefitObject = new BenefitEncounter(getContext(), character, model, view, this);
                 benefitObject.setInitialBenefit(encounter.getString("dialogue"));
+                break;*/
+            case RANDOM_BENEFIT_TYPE:
+                encounterLayout = R.layout.fragment_random_benefit;
                 break;
-            case SMALL_BENEFIT_TYPE:
-                SmallBenefitEncounter smallBenefitEncounter = new SmallBenefitEncounter(getContext(), character, model, view, this);
-                smallBenefitEncounter.setInitialSmallBenefit(encounter.getString("dialogue"));
-                break;
-            case QUEST_TYPE:
+           /* case QUEST_TYPE:
                 QuestEncounter questEncounter = new QuestEncounter(getContext(), character, damage, view, this, model);
                 questEncounter.setInitialQuest(encounter.getJSONObject("encounter"));
                 break;*/

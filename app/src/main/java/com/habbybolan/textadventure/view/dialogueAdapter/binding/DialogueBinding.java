@@ -1,4 +1,4 @@
-package com.habbybolan.textadventure.view.dialogueAdapter;
+package com.habbybolan.textadventure.view.dialogueAdapter.binding;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueDetailsBinding;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
+import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
+import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +22,8 @@ public class DialogueBinding extends DataBinder<DialogueBinding.ViewHolder> {
 
     private List<String> dialogue = new ArrayList<>();
 
-    DialogueBinding(DataBindAdapter dataBindingAdapter) {
-        super(dataBindingAdapter);
+    public DialogueBinding(DialogueAdapter dialogueAdapter) {
+        super(dialogueAdapter);
     }
 
     @Override
@@ -46,9 +49,6 @@ public class DialogueBinding extends DataBinder<DialogueBinding.ViewHolder> {
         dialogue.addAll(dataSet);
     }
 
-    void addNewDialogue(Dialogue newDialogue) {
-        dialogue.add(newDialogue.getDialogue());
-    }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -62,6 +62,13 @@ public class DialogueBinding extends DataBinder<DialogueBinding.ViewHolder> {
             binding.setNewDialogue(text);
             binding.executePendingBindings();
         }
+    }
+
+    @Override
+    public void addDialogue(DialogueTypes dialogue) {
+        if (dialogue.getClass() != Dialogue.class) throw new IllegalArgumentException();
+        Dialogue addDialogue = (Dialogue) dialogue;
+        this.dialogue.add(addDialogue.getDialogue());
     }
 
 }

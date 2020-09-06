@@ -6,8 +6,19 @@
     <dimen name="btn_consume_height">35dp</dimen>
     <dimen name="btn_consume_width">40dp</dimen>
 
+    <dimen name="mana_health_bar_height">35dp</dimen>
+    <dimen name="mana_health_bar_width">110dp</dimen>
+
     <dimen name="txt_size_small">8sp</dimen>
     <dimen name="txt_size_medium">10sp</dimen>
     <dimen name="txt_size_normal">12sp</dimen>
     <dimen name="txt_size_large">14sp</dimen>
+
+    <dimen name="dialogue_distance_sides">25sp</dimen>
+    <dimen name="dialogue_distance_top">7sp</dimen>
+
+    <dimen name="icon_size">15dp</dimen>
+    <dimen name="text_from_icon">5dp</dimen>
+
+    <dimen name="inventory_image_size">50dp</dimen>
 </resources>

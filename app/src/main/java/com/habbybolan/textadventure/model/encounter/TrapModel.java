@@ -7,7 +7,7 @@ import java.util.Random;
 holds the business logic for the Trap encounter
  */
 public class TrapModel {
-    private final static int SPD_SCALE = 15;
+    private final static int SPD_SCALE = 5;
 
     CharacterViewModel characterVM;
     public TrapModel(CharacterViewModel characterVM) {

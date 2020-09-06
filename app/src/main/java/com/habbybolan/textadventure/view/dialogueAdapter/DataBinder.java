@@ -4,12 +4,14 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+
 public abstract class DataBinder <T extends RecyclerView.ViewHolder> {
 
-    private DataBindAdapter dataBindAdapter;
+    private DialogueAdapter dialogueAdapter;
 
-    public DataBinder(DataBindAdapter dataBindAdapter) {
-        this.dataBindAdapter = dataBindAdapter;
+    public DataBinder(DialogueAdapter dialogueAdapter) {
+        this.dialogueAdapter = dialogueAdapter;
     }
 
     abstract public T newViewHolder(ViewGroup parent);
@@ -17,4 +19,6 @@ public abstract class DataBinder <T extends RecyclerView.ViewHolder> {
     abstract public void bindViewHolder(T holder, int position);
 
     abstract public int getItemCount();
+
+    abstract public void addDialogue(DialogueTypes dialogue);
 }

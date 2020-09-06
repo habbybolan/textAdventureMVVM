@@ -1,5 +1,7 @@
 package com.habbybolan.textadventure.model.effects;
 
+import com.habbybolan.textadventure.R;
+
 /*
 Object to represent special effects
  */
@@ -14,6 +16,7 @@ public class SpecialEffect implements Effect {
     private String type;
     private int duration;
     private boolean isInfinite = false;
+    private int icon;
 
     public SpecialEffect(String type, int duration) {
         checkValidType(type);
@@ -52,6 +55,23 @@ public class SpecialEffect implements Effect {
         if (o == this) return true;
         SpecialEffect specialEffect = (SpecialEffect) o;
         return specialEffect.getType().equals(getType());
+    }
+
+    public int getIcon() {
+        switch (type) {
+            case SpecialEffect.CONFUSE:
+                return R.drawable.confuse_icon;
+            case SpecialEffect.STUN:
+                return R.drawable.stun_icon;
+            case SpecialEffect.SILENCE:
+                return R.drawable.silence_icon;
+            case SpecialEffect.INVISIBILITY:
+                return R.drawable.invisibility_icon;
+            case SpecialEffect.INVINCIBILITY:
+                return R.drawable.invincibility_icon;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     @Override
