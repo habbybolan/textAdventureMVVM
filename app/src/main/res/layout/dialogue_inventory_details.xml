@@ -16,8 +16,8 @@
 
         <TextView
             android:id="@+id/inventory_name"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignBottom="@id/inventory_pic"
             android:layout_marginStart="@dimen/text_from_icon"
             android:layout_toEndOf="@+id/inventory_pic"

@@ -96,7 +96,6 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
         DatabaseAdapter adapter = new DatabaseAdapter(context);
         // randomly choose Inventory object, Weapon/Item/Ability
         int val = rand.nextInt(3);
-        val = 1;
         Inventory inventory = null;
         try {
             switch (val) {

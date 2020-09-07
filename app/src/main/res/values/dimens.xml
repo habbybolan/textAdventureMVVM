@@ -20,5 +20,10 @@
     <dimen name="icon_size">15dp</dimen>
     <dimen name="text_from_icon">5dp</dimen>
 
+    <dimen name="default_btn_height">42dp</dimen>
+    <dimen name="default_btn_width">97dp</dimen>
+
+    <dimen name="character_frag_title">20dp</dimen>
+
     <dimen name="inventory_image_size">50dp</dimen>
 </resources>

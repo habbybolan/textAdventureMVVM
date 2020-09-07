@@ -10,6 +10,7 @@ import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.DialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.EffectDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.HealthDialogueBinding;
+import com.habbybolan.textadventure.view.dialogueAdapter.binding.InventoryDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.ManaDialogueBinding;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private EffectDialogueBinding effectDialogueBinding;
     private HealthDialogueBinding healthDialogueBinding;
     private ManaDialogueBinding manaDialogueBinding;
+    private InventoryDialogueBinding inventoryDialogueBinding;
 
     public DialogueAdapter() {
         dialogueList = new ArrayList<>();
@@ -28,7 +30,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         effectDialogueBinding = new EffectDialogueBinding(this);
         healthDialogueBinding = new HealthDialogueBinding(this);
         manaDialogueBinding = new ManaDialogueBinding(this);
-
+        inventoryDialogueBinding = new InventoryDialogueBinding(this);
     }
 
     // Return the total item count of DataBinders
@@ -48,7 +50,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType == R.layout.dialogue_details) return dialogueBinding;
         else if (viewType == R.layout.dialogue_effect_details) return effectDialogueBinding;
         else if (viewType == R.layout.dialogue_health_details) return healthDialogueBinding;
-        else return manaDialogueBinding;
+        else if (viewType == R.layout.dialogue_mana_details) return manaDialogueBinding;
+        else return inventoryDialogueBinding;
     }
 
     /*// Define convert logic to the adapter position from the position in the specified DataBinder
@@ -80,5 +83,6 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     // add a new normal dialogue
     void addNewDialogue(DialogueTypes dialogue) {
         dialogueList.add(0, dialogue);
+        notifyItemInserted(0);
     }
 }

@@ -15,27 +15,55 @@
         android:layout_height="match_parent"
         tools:context=".view.MainGameActivity">
 
+        <FrameLayout
+            android:id="@+id/scroll_top"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/scroll_top"
+            app:layout_constraintTop_toTopOf="parent">
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/scroll_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/scroll_bottom"
+            app:layout_constraintBottom_toBottomOf="parent">
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/back_main"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/scroll_back"
+            app:layout_constraintBottom_toTopOf="@id/fragment_container_game"
+            app:layout_constraintTop_toBottomOf="@+id/scroll_top">
+        </FrameLayout>
+
         <Button
             android:id="@+id/btn_character"
             android:layout_width="120dp"
             android:layout_height="40dp"
-            android:layout_marginStart="80dp"
-            android:textSize="@dimen/txt_size_medium"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="76dp"
+            android:background="@drawable/top_button"
+            android:onClick="@{()-> mainGameViewModel.gotoCharacterFragment()}"
             android:text="Character"
+            android:textSize="@dimen/txt_size_medium"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:onClick="@{()-> mainGameViewModel.gotoCharacterFragment()}"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/btn_game"
             android:layout_width="120dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="80dp"
-            android:textSize="@dimen/txt_size_medium"
+            android:layout_marginEnd="60dp"
+            android:onClick="@{()-> mainGameViewModel.gotoGameFragment()}"
+            android:background="@drawable/top_button"
             android:text="GAME"
+            android:textSize="@dimen/txt_size_medium"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:onClick="@{()-> mainGameViewModel.gotoGameFragment()}" />
+            app:layout_constraintTop_toTopOf="@+id/btn_character" />
 
         <ImageView
             android:id="@+id/health_mana_image"
@@ -82,9 +110,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:textSize="@dimen/txt_size_medium"
+            android:layout_marginEnd="60dp"
             android:text="Level"
-            app:layout_constraintEnd_toStartOf="@+id/btn_character"
+            android:textSize="@dimen/txt_size_medium"
+            app:layout_constraintEnd_toStartOf="@+id/health_mana_image"
             app:layout_constraintTop_toBottomOf="@+id/btn_character" />
 
         <TextView
@@ -102,10 +131,11 @@
             android:id="@+id/txt_gold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
             android:layout_marginTop="28dp"
-            android:textSize="@dimen/txt_size_medium"
             android:text="Gold"
-            app:layout_constraintStart_toEndOf="@+id/btn_game"
+            android:textSize="@dimen/txt_size_medium"
+            app:layout_constraintStart_toEndOf="@+id/health_mana_image"
             app:layout_constraintTop_toBottomOf="@+id/btn_game" />
 
         <TextView
@@ -123,20 +153,21 @@
             android:id="@+id/fragment_container_character"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/scroll_back"
             android:visibility="@{mainGameViewModel.characterFragmentVisible}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/scroll_bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/health_mana_image">
-
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/fragment_container_game"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/scroll_back"
             android:visibility="@{mainGameViewModel.gameFragmentVisible}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/scroll_bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/health_mana_image">

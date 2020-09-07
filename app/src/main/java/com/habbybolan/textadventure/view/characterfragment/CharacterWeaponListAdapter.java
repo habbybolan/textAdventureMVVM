@@ -108,11 +108,7 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
     }
 
     // adds new ability to the list
-    public void updateNewWeaponIndex(int index) {
-        notifyItemInserted(index);
-    }
-
-    public void updateRemovedWeaponIndex(int index) {
-        notifyItemRemoved(index);
+    public void updateWeaponChange() {
+        notifyDataSetChanged();
     }
 }

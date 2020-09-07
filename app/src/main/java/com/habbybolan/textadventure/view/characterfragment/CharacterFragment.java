@@ -59,8 +59,7 @@ public class CharacterFragment extends Fragment {
         Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                Integer index = characterVM.getAbilityObserverAdd().get();
-                if (index != null) adapter.updateNewAbilityIndex(index);
+                adapter.updateAbilityChange();
             }
         };
         characterVM.getAbilityObserverAdd().addOnPropertyChangedCallback(callbackAdd);
@@ -68,8 +67,7 @@ public class CharacterFragment extends Fragment {
         Observable.OnPropertyChangedCallback callbackRemove = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                Integer index = characterVM.getAbilityObserverRemove().get();
-                if (index != null) adapter.updateRemovedAbilityIndex(index);
+                adapter.updateAbilityChange();
             }
         };
         characterVM.getAbilityObserverRemove().addOnPropertyChangedCallback(callbackRemove);
@@ -91,8 +89,7 @@ public class CharacterFragment extends Fragment {
         Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                Integer index = characterVM.getWeaponObserverAdd().get();
-                if (index != null) adapter.updateNewWeaponIndex(index);
+                adapter.updateWeaponChange();
             }
         };
         characterVM.getWeaponObserverAdd().addOnPropertyChangedCallback(callbackAdd);
@@ -100,8 +97,7 @@ public class CharacterFragment extends Fragment {
         Observable.OnPropertyChangedCallback callbackRemove = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                Integer index = characterVM.getWeaponObserverRemove().get();
-                if (index != null) adapter.updateRemovedWeaponIndex(index);
+                adapter.updateWeaponChange();
             }
         };
         characterVM.getWeaponObserverRemove().addOnPropertyChangedCallback(callbackRemove);
@@ -128,8 +124,7 @@ public class CharacterFragment extends Fragment {
         Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                Integer index = characterVM.getItemObserverAdd().get();
-                if (index != null) adapter.updateNewItemIndex(index);
+                adapter.updateItemChange();
             }
         };
         characterVM.getItemObserverAdd().addOnPropertyChangedCallback(callbackAdd);
@@ -138,8 +133,7 @@ public class CharacterFragment extends Fragment {
         Observable.OnPropertyChangedCallback callbackRemove = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                Integer index = characterVM.getItemObserverRemove().get();
-                if (index != null) adapter.updateRemovedItemIndex(index);
+                adapter.updateItemChange();
             }
         };
         characterVM.getItemObserverRemove().addOnPropertyChangedCallback(callbackRemove);

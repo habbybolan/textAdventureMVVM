@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
@@ -199,22 +200,32 @@ public class RandomBenefitFragment extends Fragment implements EncounterFragment
             @Override
             public void onClick(View v) {
                 if (inventoryToRetrieve.getType().equals(Inventory.TYPE_ABILITY)) {
-                    // if the inventory object is an Ability, add ability to character
+                    // if inventory is full, don't pick-up Ability
                     if (!characterVM.addAbility((Ability) inventoryToRetrieve)) {
                         // todo: show custom toast message inventory full
+                        Toast.makeText(getContext(), "You are full on Ability Scrolls", Toast.LENGTH_SHORT).show();
                     }
+                    // otherwise, picked up and remove pick-up button
+                    else benefitBinding.layoutBtnOptions.removeView(btnPickUp);
+
                 } else if (inventoryToRetrieve.getType().equals(Inventory.TYPE_ITEM)) {
-                    // if the inventory object is an Item, add Item to character
+                    // if inventory is full, don't pick-up item
                     if (!characterVM.addItem((Item) inventoryToRetrieve)) {
                         // todo: show custom toast message inventory full
+                        Toast.makeText(getContext(), "You are full on Items", Toast.LENGTH_SHORT).show();
                     }
+                    // otherwise, picked up and remove pick-up button
+                    else benefitBinding.layoutBtnOptions.removeView(btnPickUp);
+
                 } else {
-                    // otherwise, add weapon to the character
-                    if (characterVM.addWeapon((Weapon) inventoryToRetrieve)) {
+                    // if inventory is full, cant pick up weapon
+                    if (!characterVM.addWeapon((Weapon) inventoryToRetrieve)) {
                         // todo: show custom toast message inventory full
+                        Toast.makeText(getContext(), "You are full on Weapons", Toast.LENGTH_SHORT).show();
                     }
+                    // otherwise, picked up and remove pick-up button
+                    else benefitBinding.layoutBtnOptions.removeView(btnPickUp);
                 }
-                benefitBinding.layoutBtnOptions.removeView(btnPickUp);
             }
         });
         benefitBinding.layoutBtnOptions.addView(btnPickUp);

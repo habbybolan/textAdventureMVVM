@@ -13,8 +13,8 @@
 
         <Button
             android:id="@+id/btn_new_game"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/default_btn_width"
+            android:layout_height="@dimen/default_btn_height"
             android:layout_marginTop="104dp"
             android:text="@string/new_game"
             app:layout_constraintEnd_toEndOf="parent"
@@ -26,8 +26,8 @@
 
         <Button
             android:id="@+id/btn_continue_game"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/default_btn_width"
+            android:layout_height="@dimen/default_btn_height"
             android:layout_marginTop="104dp"
             android:text="@string/continue_game"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,8 +38,8 @@
 
         <Button
             android:id="@+id/btn_abandon"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_width="@dimen/default_btn_width"
+            android:layout_height="@dimen/default_btn_height"
             android:text="@string/abandon"
             android:textSize="@dimen/txt_size_small"
             app:layout_constraintEnd_toEndOf="parent"

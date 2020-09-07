@@ -1,6 +1,5 @@
 package com.habbybolan.textadventure.view.characterfragment;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
     private CharacterListClickListener dropListener;
     private CharacterListClickListener consumeListener;
     private CharacterViewModel characterVM;
-    private Context context;
 
     public CharacterItemListAdapter(ArrayList<Item> items, CharacterViewModel characterVM, CharacterListClickListener dropListener, CharacterListClickListener consumeListener) {
         this.items = items;
@@ -140,11 +138,8 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
     }
 
     // adds new ability to the list
-    public void updateNewItemIndex(int index) {
-        notifyItemInserted(index);
+    public void updateItemChange() {
+        notifyDataSetChanged();
     }
 
-    public void updateRemovedItemIndex(int index) {
-        notifyItemRemoved(index);
-    }
 }

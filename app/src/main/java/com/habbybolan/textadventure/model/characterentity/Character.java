@@ -198,67 +198,51 @@ public class Character extends CharacterEntity {
 
         // Weapons
     // remove a weapon
-    public int removeWeapon(Weapon weapon) {
-        for (int i = 0; i < weapons.size(); i++) {
-            if (weapons.get(i).equals(weapon)) {
-                weapons.remove(i);
-                numWeapons--;
-                return i;
-            }
-        }
-        throw new IllegalArgumentException();
+    public void removeWeapon(Weapon weapon) {
+        if (!weapons.remove(weapon)) throw new IllegalArgumentException();
+        else numWeapons--;
     }
     // add new weapon - check if weapon list is full before calling this
-    public int addWeapon (Weapon weapon) {
-        if (getWeapons().size() != MAX_WEAPONS) {
+    public void addWeapon (Weapon weapon) {
+        if (weapons.size() != MAX_WEAPONS) {
             numWeapons++;
             weapons.add(weapon);
-            return weapons.size()-1;
-        } else throw new IllegalStateException();
+        }
     }
     // remove a weapon at index
-    public void removeWeaponAtIndex(int index) {
+    public Weapon removeWeaponAtIndex(int index) {
         numWeapons--;
+        Weapon weapon = weapons.get(index);
         weapons.remove(index);
+        return weapon;
     }
 
         // Abilities
     // remove an ability, returning the index removed
-    public int removeAbility(Ability ability) {
-        for (int i = 0; i < abilities.size(); i++) {
-            if (abilities.get(i).equals(ability)) {
-                abilities.remove(i);
-                numAbilities--;
-                return i;
-            }
-        }
-        throw new IllegalArgumentException();
+    public void removeAbility(Ability ability) {
+        if (!abilities.remove(ability)) throw new IllegalArgumentException();
+        else numAbilities--;
     }
     // remove an ability at index
-    public void removeAbilityAtIndex(int index) {
+    public Ability removeAbilityAtIndex(int index) {
         numAbilities--;
+        Ability ability = abilities.get(index);
         abilities.remove(index);
+        return ability;
     }
     // add new Ability - check if ability list is full before calling this
-    public int addAbility(Ability ability) {
-        if (getAbilities().size() != MAX_ABILITIES) {
+    public void addAbility(Ability ability) {
+        if (abilities.size() != MAX_ABILITIES) {
             numAbilities++;
             abilities.add(ability);
-            return abilities.size()-1;
-        } else throw new IllegalStateException();
+        }
     }
 
         // Items
     // remove an item - if not a consumable, remove the effects it had
-    public int removeItem(Item item) {
-        for (int i = 0; i < items.size(); i++) {
-            if (item.equals(items.get(i))) {
-                items.remove(i);
-                numItems--;
-                return i;
-            }
-        }
-        throw new IllegalArgumentException();
+    public void removeItem(Item item) {
+        if (!items.remove(item)) throw new IllegalArgumentException();
+        else numItems--;
     }
     // finds index of an item
     public int getItemIndex(Item item) {
@@ -281,10 +265,11 @@ public class Character extends CharacterEntity {
         return item;
     }
     // add item, returning index of newest
-    public int addItem(Item item) {
-        if (item == null) throw new IllegalArgumentException();
-        items.add(item);
-        return numItems++;
+    public void addItem(Item item) {
+        if (items.size() != MAX_ITEMS) {
+            items.add(item);
+            numItems++;
+        }
     }
 
     // ** bars **

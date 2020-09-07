@@ -9,9 +9,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.EffectDialogue;
 import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
+import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
+import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 
 /*
@@ -40,16 +45,71 @@ public class DialogueRecyclerView {
         setManaListener();
             // inventory listeners
         setAbilityListener();
-        //setWeaponListener();
-        //setItemListener();
+        setWeaponListener();
+        setItemListener();
+    }
+
+    private void setItemListener() {
+        Observable.OnPropertyChangedCallback callBackItemAdd = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Item item = characterVM.getItemObserverAdd().get();
+                if (item != null) {
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(item.getName(), item.getPictureResource(), Inventory.TYPE_ITEM, true);
+                    adapter.addNewDialogue(inventoryDialogue);
+                }
+            }
+        };
+        characterVM.getItemObserverAdd().addOnPropertyChangedCallback(callBackItemAdd);
+
+        Observable.OnPropertyChangedCallback callBackItemRemove = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Item item = characterVM.getItemObserverRemove().get();
+                if (item != null) {
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(item.getName(), item.getPictureResource(), Inventory.TYPE_ITEM, false);
+                    adapter.addNewDialogue(inventoryDialogue);
+                }
+            }
+        };
+        characterVM.getItemObserverRemove().addOnPropertyChangedCallback(callBackItemRemove);
+    }
+
+    private void setWeaponListener() {
+        Observable.OnPropertyChangedCallback callBackWeaponAdd = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Weapon weapon = characterVM.getWeaponObserverAdd().get();
+                if (weapon != null) {
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(weapon.getName(), weapon.getPictureResource(), Inventory.TYPE_WEAPON, true);
+                    adapter.addNewDialogue(inventoryDialogue);
+                }
+            }
+        };
+        characterVM.getWeaponObserverAdd().addOnPropertyChangedCallback(callBackWeaponAdd);
+
+        Observable.OnPropertyChangedCallback callBackWeaponRemove = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Weapon weapon = characterVM.getWeaponObserverRemove().get();
+                if (weapon != null) {
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(weapon.getName(), weapon.getPictureResource(), Inventory.TYPE_WEAPON, false);
+                    adapter.addNewDialogue(inventoryDialogue);
+                }
+            }
+        };
+        characterVM.getWeaponObserverRemove().addOnPropertyChangedCallback(callBackWeaponRemove);
     }
 
     private void setAbilityListener() {
         Observable.OnPropertyChangedCallback callBackAbilityAdd = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                //Ability ability = characterVM.getAbilityObserverAdd().get();
-                //if ()
+                Ability ability = characterVM.getAbilityObserverAdd().get();
+                if (ability != null) {
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), Inventory.TYPE_ABILITY, true);
+                    adapter.addNewDialogue(inventoryDialogue);
+                }
             }
         };
         characterVM.getAbilityObserverAdd().addOnPropertyChangedCallback(callBackAbilityAdd);
@@ -57,7 +117,11 @@ public class DialogueRecyclerView {
         Observable.OnPropertyChangedCallback callBackAbilityRemove = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-
+                Ability ability = characterVM.getAbilityObserverRemove().get();
+                if (ability != null) {
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), Inventory.TYPE_ABILITY, false);
+                    adapter.addNewDialogue(inventoryDialogue);
+                }
             }
         };
         characterVM.getAbilityObserverRemove().addOnPropertyChangedCallback(callBackAbilityRemove);
@@ -73,7 +137,6 @@ public class DialogueRecyclerView {
                 HealthDialogue healthDialogue = characterVM.getHealthObserve().get();
                 if (healthDialogue != null) {
                     adapter.addNewDialogue(healthDialogue);
-                    adapter.notifyItemInserted(0);
                 }
             }
         };
@@ -88,7 +151,6 @@ public class DialogueRecyclerView {
                 ManaDialogue manaDialogue = characterVM.getManaObserve().get();
                 if (manaDialogue != null) {
                     adapter.addNewDialogue(manaDialogue);
-                    adapter.notifyItemInserted(0);
                 }
             }
         };
@@ -98,7 +160,6 @@ public class DialogueRecyclerView {
     // called by fragment/activity to add dialogue to the active dialogue RV
     public void addDialogue(Dialogue dialogue) {
         adapter.addNewDialogue(dialogue);
-        adapter.notifyItemInserted(0);
     }
 
     private void setDotListener() {
@@ -110,7 +171,6 @@ public class DialogueRecyclerView {
                 if (dot != null) {
                     EffectDialogue effectDialogue = new EffectDialogue(dot.getType(), dot.getDuration(), dot.getIcon(), dot.getIsInfinite());
                     adapter.addNewDialogue(effectDialogue);
-                    adapter.notifyItemInserted(0);
                 }
             }
         };
@@ -126,7 +186,6 @@ public class DialogueRecyclerView {
                 if (special != null) {
                     EffectDialogue effectDialogue = new EffectDialogue(special.getType(), special.getDuration(), special.getIcon(), special.getIsInfinite());
                     adapter.addNewDialogue(effectDialogue);
-                    adapter.notifyItemInserted(0);
                 }
             }
         };

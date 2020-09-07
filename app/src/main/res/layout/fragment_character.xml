@@ -27,7 +27,7 @@
                     android:id="@+id/inventory"
                     android:layout_width="111dp"
                     android:layout_height="31dp"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/character_frag_title"
                     android:layout_marginTop="24dp"
                     android:text="@string/item_plural"
                     android:textSize="12sp"
@@ -37,10 +37,11 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_item_list"
-                    android:layout_width="395dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/character_frag_title"
+                    android:layout_marginEnd="@dimen/character_frag_title"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/inventory" />
 
@@ -55,7 +56,7 @@
                     android:id="@+id/weapons"
                     android:layout_width="103dp"
                     android:layout_height="30dp"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/character_frag_title"
                     android:layout_marginTop="24dp"
                     android:text="@string/weapon_plural"
                     android:textSize="12sp"
@@ -65,10 +66,11 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_weapon_list"
-                    android:layout_width="395dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/character_frag_title"
+                    android:layout_marginEnd="@dimen/character_frag_title"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/weapons" />
 
@@ -84,7 +86,7 @@
                     android:id="@+id/abilities"
                     android:layout_width="112dp"
                     android:layout_height="26dp"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/character_frag_title"
                     android:layout_marginTop="24dp"
                     android:text="@string/ability_plural"
                     android:textAlignment="viewStart"
@@ -95,10 +97,11 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_ability_list"
-                    android:layout_width="395dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/character_frag_title"
+                    android:layout_marginEnd="@dimen/character_frag_title"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/abilities"
                     tools:listitem="@layout/character_ability_list_details" />
@@ -114,7 +117,7 @@
                     android:id="@+id/stats"
                     android:layout_width="109dp"
                     android:layout_height="30dp"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/character_frag_title"
                     android:layout_marginTop="20dp"
                     android:text="@string/stat_plural"
                     android:textSize="12sp"

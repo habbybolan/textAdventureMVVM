@@ -8,10 +8,15 @@ public class InventoryDialogue implements DialogueTypes {
     private int imageResource;
     // name of inventory object
     private String name;
+    private String type;
+    private boolean isAdded;
 
-    public InventoryDialogue(int imageResource, String name) {
+
+    public InventoryDialogue(String name, int imageResource, String type, boolean isAdded) {
         this.imageResource = imageResource;
         this.name = name;
+        this.type = type;
+        this.isAdded = isAdded;
     }
 
     public int getImageResource() {
@@ -30,5 +35,13 @@ public class InventoryDialogue implements DialogueTypes {
 
     public int getIcon() {
         return imageResource;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public boolean getIsAdded() {
+        return isAdded;
     }
 }

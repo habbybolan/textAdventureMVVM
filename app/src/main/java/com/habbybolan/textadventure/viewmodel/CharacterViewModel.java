@@ -67,27 +67,26 @@ public class CharacterViewModel extends BaseObservable {
 
         // Abilities
     // Observable for adding and deleting abilities and updating RecyclerView in CharacterFragment
-    private ObservableField<Integer> abilityObserverAdd = new ObservableField<>();
-    public ObservableField<Integer> getAbilityObserverAdd() {
+    private ObservableField<Ability> abilityObserverAdd = new ObservableField<>();
+    public ObservableField<Ability> getAbilityObserverAdd() {
         return abilityObserverAdd;
     }
-    private ObservableField<Integer> abilityObserverRemove = new ObservableField<>();
-    public ObservableField<Integer> getAbilityObserverRemove() {
+    private ObservableField<Ability> abilityObserverRemove = new ObservableField<>();
+    public ObservableField<Ability> getAbilityObserverRemove() {
         return abilityObserverRemove;
     }
     public void removeAbility(Ability ability) {
-        int index = character.removeAbility(ability);
-        if (index >= 0) abilityObserverRemove.set(index);
+        character.removeAbility(ability);
+        abilityObserverRemove.set(ability);
     }
     public boolean addAbility(Ability ability) {
         if (character.getNumAbilities() >= Character.MAX_ABILITIES) return false;
-        int index = character.addAbility(ability);
-        abilityObserverAdd.set(index);
+        character.addAbility(ability);
+        abilityObserverAdd.set(ability);
         return true;
     }
     public void removeAbilityAtIndex(int index) {
-        character.removeAbilityAtIndex(index);
-        abilityObserverRemove.set(index);
+        abilityObserverRemove.set(character.removeAbilityAtIndex(index));
     }
     public ArrayList<Ability> getAbilities() {
         return character.getAbilities();
@@ -95,48 +94,46 @@ public class CharacterViewModel extends BaseObservable {
 
         // Weapons
     // Observable for adding and deleting weapons and updating RecyclerView in CharacterFragment
-    private ObservableField<Integer> weaponObserverAdd = new ObservableField<>();
-    public ObservableField<Integer> getWeaponObserverAdd() {
+    private ObservableField<Weapon> weaponObserverAdd = new ObservableField<>();
+    public ObservableField<Weapon> getWeaponObserverAdd() {
         return weaponObserverAdd;
     }
-    private ObservableField<Integer> weaponObserverRemove = new ObservableField<>();
-    public ObservableField<Integer> getWeaponObserverRemove() {
+    private ObservableField<Weapon> weaponObserverRemove = new ObservableField<>();
+    public ObservableField<Weapon> getWeaponObserverRemove() {
         return weaponObserverRemove;
     }
     public ArrayList<Weapon> getWeapons() {
         return character.getWeapons();
     }
     public void removeWeapon(Weapon weapon) {
-        int index = character.removeWeapon(weapon);
-        if (index >= 0) weaponObserverRemove.set(index);
+        character.removeWeapon(weapon);
+        weaponObserverRemove.set(weapon);
     }
     public boolean addWeapon(Weapon weapon) {
         if (character.getNumWeapons() >= Character.MAX_WEAPONS) return false;
-        int index = character.addWeapon(weapon);
-        weaponObserverAdd.set(index);
+        character.addWeapon(weapon);
+        weaponObserverAdd.set(weapon);
         return true;
     }
     public void removeWeaponAtIndex(int index) {
-        character.removeWeaponAtIndex(index);
-        weaponObserverRemove.set(index);
+        weaponObserverRemove.set(character.removeWeaponAtIndex(index));
     }
 
         // Items
     // Observable for adding and deleting items and updating RecyclerView in CharacterFragment
-    private ObservableField<Integer> itemObserverAdd = new ObservableField<>();
-    public ObservableField<Integer> getItemObserverAdd() {
+    private ObservableField<Item> itemObserverAdd = new ObservableField<>();
+    public ObservableField<Item> getItemObserverAdd() {
         return itemObserverAdd;
     }
-    private ObservableField<Integer> itemObserverRemove = new ObservableField<>();
-    public ObservableField<Integer> getItemObserverRemove() {
+    private ObservableField<Item> itemObserverRemove = new ObservableField<>();
+    public ObservableField<Item> getItemObserverRemove() {
         return itemObserverRemove;
     }
     public ArrayList<Item> getItems() {
         return character.getItems();
     }
     public void removeItem(Item item) {
-        int index = character.getItemIndex(item);
-        removeItemAtIndex(index);
+        removeItemAtIndex(character.getItemIndex(item));
     }
     public void removeItemAtIndex(int index) {
         Item item = character.removeItemAtIndex(index);
@@ -222,11 +219,12 @@ public class CharacterViewModel extends BaseObservable {
 
             }
         }
-        itemObserverRemove.set(index);
+        itemObserverRemove.set(item);
     }
+
     public boolean addItem(Item item) {
         if (character.getNumItems() >= Character.MAX_ITEMS) return false;
-        int index = character.addItem(item);
+        character.addItem(item);
         if (!item.getIsConsumable()) {
             // stat changes
             if (item.getStrChange() != 0) setStrength(character.getStrength() + item.getStrChange());
@@ -293,13 +291,12 @@ public class CharacterViewModel extends BaseObservable {
                 if (character.addNewDot(dot)) updateAllDotAdd.set(null);
             }
         }
-        itemObserverAdd.set(index);
+        itemObserverAdd.set(item);
         return true;
     }
     // consume an item
     public void consumeItem(Item item) {
         if (!item.getIsConsumable()) throw new IllegalArgumentException();
-        int index = character.removeItem(item);
         // stat change
         if (item.getStrChange() > 0) {
             character.addNewStatIncrease(CharacterEntity.STR, item.getDuration(), item.getStrChange());
@@ -377,7 +374,7 @@ public class CharacterViewModel extends BaseObservable {
         if (item.getIsFrostBurn()) character.addNewDot(new Dot(Dot.FROSTBURN, false));
         if (item.getIsHealthDot()) character.addNewDot(new Dot(Dot.HEALTH_DOT, false));
         if (item.getIsManaDot()) character.addNewDot(new Dot(Dot.MANA_DOT, false));
-        itemObserverRemove.set(index);
+        removeItem(item);
     }
     // consume item at index
     public void consumeItemAtIndex(int index) {
@@ -387,14 +384,12 @@ public class CharacterViewModel extends BaseObservable {
     // returns true if a disarm trap exists, and removes the trap from inventory
     public boolean checkInventoryForTrapItem() {
         ArrayList<Item> items = character.getItems();
-        int index = 0;
         for (Item trapItem : items) {
             if (trapItem.getEscapeTrap()) {
                 items.remove(trapItem);
-                itemObserverRemove.set(index);
+                itemObserverRemove.set(trapItem);
                 return true;
             }
-            index++;
         }
         return false;
     }

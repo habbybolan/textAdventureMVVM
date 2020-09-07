@@ -108,11 +108,8 @@ public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterA
     }
 
     // adds new ability to the list
-    void updateNewAbilityIndex(int index) {
+    void updateAbilityChange() {
         notifyDataSetChanged();
     }
 
-    void updateRemovedAbilityIndex(int index) {
-        notifyDataSetChanged();
-    }
 }

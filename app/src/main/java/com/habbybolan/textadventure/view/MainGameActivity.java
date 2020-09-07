@@ -84,6 +84,7 @@ public class MainGameActivity extends AppCompatActivity {
                 TrapFragment trapFragment = new TrapFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
                 getSupportFragmentManager()
                         .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
                         .replace(R.id.fragment_container_game, trapFragment)
                         .commit();
                 break;
@@ -98,6 +99,7 @@ public class MainGameActivity extends AppCompatActivity {
                 RandomBenefitFragment randomBenefitFragment = new RandomBenefitFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
                 getSupportFragmentManager()
                         .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
                         .replace(R.id.fragment_container_game, randomBenefitFragment)
                         .commit();
                 break;
