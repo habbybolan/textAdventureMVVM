@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="type"
+            type="String" />
+        <variable
+            name="amount"
+            type="String" />
+        <variable
+            name="duration"
+            type="String" />
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialogue_distance_top">
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="@dimen/dialogue_distance_sides"
+            android:layout_height="wrap_content"
+            android:text="@{type}"
+            android:textColor="@color/colorEffectDialogue"
+            android:textSize="@dimen/txt_size_medium" />
+
+        <TextView
+            android:id="@+id/amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/type"
+            android:text="@{amount}"
+            android:textColor="@color/colorEffectDialogue"
+            android:textSize="@dimen/txt_size_medium" />
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@{duration}"
+            android:layout_toEndOf="@+id/amount"
+            android:textColor="@color/colorEffectDialogue"
+            android:textSize="@dimen/txt_size_medium" />
+    </RelativeLayout>
+</layout>

@@ -64,8 +64,8 @@ public class MainGameViewModel extends BaseObservable {
     final public static String TRAP_TYPE = "trap";
     final public static int SHOP = 5; // a shop that sells an assortment of random items/weapons/abilities
     final public static String SHOP_TYPE = "shop";
-    final public static int BENEFIT = 6; // a random, guaranteed temporary/permanent benefit - stat/health increase, item, weapon
-    final public static String BENEFIT_TYPE = "benefit";
+    final public static int CHOICE_BENEFIT = 6; // a random, guaranteed temporary/permanent benefit - stat/health increase, item, weapon
+    final public static String CHOICE_BENEFIT_TYPE = "choice_benefit";
     final public static int RANDOM_BENEFIT = 7; // a random reward of either gold/Weapon/Item/Ability
     final public static String RANDOM_BENEFIT_TYPE = "random_benefit";
     final public static int QUEST = 8; // temporary leave the "area" to finish a specific task for a reward

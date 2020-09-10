@@ -9,6 +9,7 @@ import androidx.databinding.Observable;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityMainGameBinding;
 import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
+import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.TrapFragment;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
@@ -90,11 +91,15 @@ public class MainGameActivity extends AppCompatActivity {
                 break;
             /*case SHOP_TYPE:
                 enterLeaveShop(encounter);
-                break;
-            case BENEFIT_TYPE:
-                BenefitEncounter benefitObject = new BenefitEncounter(getContext(), character, model, view, this);
-                benefitObject.setInitialBenefit(encounter.getString("dialogue"));
                 break;*/
+            case MainGameViewModel.CHOICE_BENEFIT_TYPE:
+                ChoiceBenefitFragment choiceBenefitFragment = new ChoiceBenefitFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, choiceBenefitFragment)
+                        .commit();
+                break;
             case MainGameViewModel.RANDOM_BENEFIT_TYPE:
                 RandomBenefitFragment randomBenefitFragment = new RandomBenefitFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
                 getSupportFragmentManager()

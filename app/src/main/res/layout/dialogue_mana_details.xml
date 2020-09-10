@@ -32,7 +32,5 @@
             android:layout_marginStart="@dimen/dialogue_distance_sides"
             android:layout_alignParentTop="true"
             app:imageResource="@{manaPicture}" />
-
-
     </RelativeLayout>
 </layout>

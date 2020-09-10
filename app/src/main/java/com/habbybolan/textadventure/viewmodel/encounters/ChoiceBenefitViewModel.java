@@ -2,10 +2,12 @@ package com.habbybolan.textadventure.viewmodel.encounters;
 
 import android.content.Context;
 
-import androidx.databinding.BaseObservable;
 import androidx.databinding.ObservableField;
 
-import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
+import com.habbybolan.textadventure.model.effects.Effect;
+import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempStat;
+import com.habbybolan.textadventure.model.encounter.ChoiceBenefitModel;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
@@ -16,8 +18,7 @@ import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-public class RandomBenefitViewModel extends BaseObservable implements EncounterViewModel {
+public class ChoiceBenefitViewModel implements EncounterViewModel {
 
 
     private MainGameViewModel mainGameVM;
@@ -25,7 +26,7 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
     private JSONObject encounter;
     private Context context;
     private JSONObject firstStateJSON;
-    private RandomBenefitModel randomBenefitModel;
+    ChoiceBenefitModel choiceBenefitModel;
 
     public static final int firstState = 1;
     public static final int secondState = 2;
@@ -33,8 +34,8 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
 
     private ObservableField<Integer> stateIndex;
     private ObservableField<String> newDialogue;
-
-    public RandomBenefitViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
+    
+    public ChoiceBenefitViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
         this.mainGameVM = mainGameVM;
         this.characterVM = characterVM;
         this.encounter = encounter;
@@ -43,19 +44,22 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
         firstStateJSON = encounter.getJSONObject("dialogue");
         stateIndex = new ObservableField<>(1);
         newDialogue = new ObservableField<>();
-        randomBenefitModel = new RandomBenefitModel(context);
+        choiceBenefitModel = new ChoiceBenefitModel(context);
     }
+
 
     @Override
     public ObservableField<Integer> getStateIndex() {
         return stateIndex;
     }
+
+    @Override
     public int getStateIndexValue() {
         Integer stateIndex = getStateIndex().get();
         if (stateIndex != null) return stateIndex;
         throw new NullPointerException();
     }
-    // increment the state index to next state
+
     @Override
     public void incrementStateIndex() {
         Integer state = stateIndex.get();
@@ -65,22 +69,23 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
         }
     }
 
-    // updates when a new bit of dialogue needs to be shown
     @Override
     public ObservableField<String> getNewDialogue() {
         return newDialogue;
     }
-    public String getNewDialogueValue() {
-        String newDialogue = getNewDialogue().get();
-        if (newDialogue != null) return newDialogue;
-        throw new NullPointerException();
-    }
+
     @Override
     public void setNewDialogue(String newDialogue) {
         this.newDialogue.set(newDialogue);
     }
 
-    // show the next dialogue snippet in the first state, called whenever dynamic button clicked
+    @Override
+    public String getNewDialogueValue() {
+        String newDialogue = getNewDialogue().get();
+        if (newDialogue != null) return newDialogue;
+        throw new NullPointerException();
+    }
+
     @Override
     public void firstDialogueState() throws JSONException {
         setNewDialogue(firstStateJSON.getString("dialogue"));
@@ -91,9 +96,31 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
         }
     }
 
-    // finds a random Inventory loot
-    public Inventory checkState() {
-        return randomBenefitModel.getRandomInventory();
+    // gain a random tangible item
+    public Inventory getTangible() {
+        return choiceBenefitModel.getNewInventory();
+    }
+
+    public void setPermIncrease() {
+        Effect effect = choiceBenefitModel.getNewPermanentStat();
+        if (effect.isTempStat()) {
+            // add permanent stat
+            characterVM.permIncreaseStat((TempStat) effect);
+        } else {
+            // otherwise add the permanent heath/mana increase
+            characterVM.setPermBarIncr((TempBar) effect);
+        }
+    }
+
+    public void setTempIncrease() {
+        Effect effect = choiceBenefitModel.getNewTempStat();
+        if (effect.isTempStat()) {
+            // add permanent stat
+            characterVM.addInputStat((TempStat) effect);
+        } else {
+            // otherwise add the permanent heath/mana increase
+            characterVM.addTempHealthMana((TempBar) effect);
+        }
     }
 
     // if space in inventory, return true and add inventory object to inventory, otherwise return false

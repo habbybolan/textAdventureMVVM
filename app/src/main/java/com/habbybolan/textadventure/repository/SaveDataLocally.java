@@ -329,8 +329,8 @@ public class SaveDataLocally {
                 JSONArray tempHealthArray = new JSONArray(); // <key, value>
                 for (int i = 0; i < character.getTempHealthList().size(); i++) {
                     JSONArray tempHealth = new JSONArray(); // <duration, amount>
-                    tempHealth.put(character.getTempHealthList().get(i).get(0));
-                    tempHealth.put(character.getTempHealthList().get(i).get(1));
+                    tempHealth.put(character.getTempHealthList().get(i).getDuration());
+                    tempHealth.put(character.getTempHealthList().get(i).getAmount());
                     tempHealthArray.put(tempHealth);
                 }
                 jsonClassObject.put("tempHealthList", tempHealthArray);
@@ -339,8 +339,8 @@ public class SaveDataLocally {
                 JSONArray tempManaArray = new JSONArray(); // <key, value>
                 for (int i = 0; i < character.getTempManaList().size(); i++) {
                     JSONArray tempMana = new JSONArray(); // <duration, amount>
-                    tempMana.put(character.getTempManaList().get(i).get(0));
-                    tempMana.put(character.getTempManaList().get(i).get(1));
+                    tempMana.put(character.getTempManaList().get(i).getDuration());
+                    tempMana.put(character.getTempManaList().get(i).getAmount());
                     tempManaArray.put(tempMana);
                 }
                 jsonClassObject.put("tempManaList", tempManaArray);
@@ -348,9 +348,9 @@ public class SaveDataLocally {
                 JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
                 for (int i = 0; i < character.getStatIncreaseList().size(); i++) {
                     JSONArray statIncrease = new JSONArray();
-                    statIncrease.put(character.getStatIncreaseList().get(i).get(0));
-                    statIncrease.put(character.getStatIncreaseList().get(i).get(1));
-                    statIncrease.put(character.getStatIncreaseList().get(i).get(2));
+                    statIncrease.put(character.getStatIncreaseList().get(i).getType());
+                    statIncrease.put(character.getStatIncreaseList().get(i).getDuration());
+                    statIncrease.put(character.getStatIncreaseList().get(i).getAmount());
                     statIncreaseArray.put(statIncrease);
                 }
                 jsonClassObject.put("statIncreaseList", statIncreaseArray);
@@ -358,9 +358,9 @@ public class SaveDataLocally {
                 JSONArray statDecreaseArray = new JSONArray(); // <stat, duration, amount>
                 for (int i = 0; i < character.getStatDecreaseList().size(); i++) {
                     JSONArray statDecrease = new JSONArray();
-                    statDecrease.put(character.getStatDecreaseList().get(i).get(0));
-                    statDecrease.put(character.getStatDecreaseList().get(i).get(1));
-                    statDecrease.put(character.getStatDecreaseList().get(i).get(2));
+                    statDecrease.put(character.getStatDecreaseList().get(i).getType());
+                    statDecrease.put(character.getStatDecreaseList().get(i).getDuration());
+                    statDecrease.put(character.getStatDecreaseList().get(i).getAmount());
                     statDecreaseArray.put(statDecrease);
                 }
                 jsonClassObject.put("statDecreaseList", statDecreaseArray);

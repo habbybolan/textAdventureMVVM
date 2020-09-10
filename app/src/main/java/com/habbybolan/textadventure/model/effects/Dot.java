@@ -5,30 +5,11 @@ import com.habbybolan.textadventure.R;
 /*
 Object to represent Damage Over time effects
  */
-public class Dot implements Effect {
-
-    public static final String FIRE = "fire";
-    public static final int FIRE_DURATION = 1;
-    public static final int FIRE_DAMAGE = 8;
-    public static final String POISON = "poison";
-    public static final int POISON_DURATION = 4;
-    public static final int POISON_DAMAGE = 2;
-    public static final String BLEED = "bleed";
-    public static final int BLEED_DURATION = 3;
-    public static final int BLEED_DAMAGE = 4;
-    public static final String FROSTBURN = "frostBurn";
-    public static final int FROSTBURN_DURATION = 1;
-    public static final int FROSTBURN_DAMAGE = 1;
-    public static final String HEALTH_DOT = "healDot";
-    public static final int HEAL_DOT_DURATION = 3;
-    public static final int HEAL_DOT_AMOUNT = 5;
-    public static final String MANA_DOT = "manaDOt";
-    public static final int MANA_DOT_DURATION = 3;
-    public static final int MANA_DOT_AMOUNT = 5;
+public class Dot extends Effect {
 
     private String type;
     private int duration;
-    private boolean isInfinite = false;
+    private boolean isIndefinite = false;
 
     // creates a dot with a specific duration
     public Dot(String type, int duration) {
@@ -38,11 +19,11 @@ public class Dot implements Effect {
     }
 
     // creates a dot with a default duration
-    public Dot(String type, boolean isInfinite) {
+    public Dot(String type, boolean isIndefinite) {
         checkValidType(type);
         this.type = type;
-        setDefaultDuration();
-        this.isInfinite = isInfinite;
+        this.isIndefinite = isIndefinite;
+        if (!isIndefinite) setDefaultDuration();
     }
 
     // throws IllegalArgumentException if the type for the dot is invalid
@@ -85,6 +66,7 @@ public class Dot implements Effect {
         }
     }
 
+    @Override
     public int getIcon() {
         switch (type) {
             case Dot.FIRE:
@@ -105,8 +87,8 @@ public class Dot implements Effect {
     }
 
     @Override
-    public boolean getIsInfinite() {
-        return isInfinite;
+    public boolean getIsIndefinite() {
+        return isIndefinite;
     }
 
     @Override

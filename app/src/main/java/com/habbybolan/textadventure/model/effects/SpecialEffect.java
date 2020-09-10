@@ -5,18 +5,12 @@ import com.habbybolan.textadventure.R;
 /*
 Object to represent special effects
  */
-public class SpecialEffect implements Effect {
+public class SpecialEffect extends Effect {
 
-    public static final String STUN = "stun";
-    public static final String CONFUSE = "confuse";
-    public static final String INVINCIBILITY = "invincible";
-    public static final String SILENCE = "silence";
-    public static final String INVISIBILITY = "invisible";
 
     private String type;
     private int duration;
-    private boolean isInfinite = false;
-    private int icon;
+    private boolean isIndefinite = false;
 
     public SpecialEffect(String type, int duration) {
         checkValidType(type);
@@ -24,15 +18,15 @@ public class SpecialEffect implements Effect {
         this.duration = duration;
     }
 
-    public SpecialEffect(String type, boolean isInfinite) {
+    public SpecialEffect(String type) {
         checkValidType(type);
         this.type = type;
-        this.isInfinite = isInfinite;
+        isIndefinite = true;
     }
 
     @Override
-    public boolean getIsInfinite() {
-        return isInfinite;
+    public boolean getIsIndefinite() {
+        return isIndefinite;
     }
 
     @Override
@@ -57,6 +51,7 @@ public class SpecialEffect implements Effect {
         return specialEffect.getType().equals(getType());
     }
 
+    @Override
     public int getIcon() {
         switch (type) {
             case SpecialEffect.CONFUSE:

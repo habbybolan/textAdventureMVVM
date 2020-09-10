@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
+import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
@@ -114,48 +116,48 @@ public class Character extends CharacterEntity {
                 this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
             }
             // SPECIAL
-            JSONArray specialMap = characterObject.getJSONArray("specialMap");
-            for (int i = 0; i < specialMap.length(); i++) {
-                JSONArray special = (JSONArray) specialMap.get(i);
+            JSONArray specialList = characterObject.getJSONArray("specialMap");
+            for (int i = 0; i < specialList.length(); i++) {
+                JSONArray special = (JSONArray) specialList.get(i);
                 this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
             }
             // tempHealth
             JSONArray tempHealthArray = characterObject.getJSONArray("tempHealthList");
             for (int i = 0; i < tempHealthArray.length(); i++) {
                 JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
-                ArrayList<Integer> tempHealthInput = new ArrayList<>();
-                tempHealthInput.add(tempHealth.getInt(0)); // duration
-                tempHealthInput.add(tempHealth.getInt(1)); // amount
-                this.tempHealthList.add(tempHealthInput);
+                int duration = tempHealth.getInt(0);
+                int amount = tempHealth.getInt(1);
+                TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
+                tempHealthList.add(tempBar);
             }
             // tempMana
             JSONArray tempManaArray = characterObject.getJSONArray("tempManaList");
             for (int i = 0; i < tempManaArray.length(); i++) {
                 JSONArray tempMana = (JSONArray) tempManaArray.get(i);
-                ArrayList<Integer> tempManaInput = new ArrayList<>();
-                tempManaInput.add(tempMana.getInt(0)); // duration
-                tempManaInput.add(tempMana.getInt(1)); // amount
-                this.tempManaList.add(tempManaInput);
+                int duration = tempMana.getInt(0);
+                int amount = tempMana.getInt(1);
+                TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
+                tempManaList.add(tempBar);
             }
             // stat Increase
             JSONArray statIncreaseArray = characterObject.getJSONArray("statIncreaseList");
             for (int i = 0; i < statIncreaseArray.length(); i++) {
                 JSONArray statIncrease = (JSONArray) statIncreaseArray.get(i);
-                ArrayList<Object> statIncreaseInput = new ArrayList<>();
-                statIncreaseInput.add(statIncrease.getString(0)); // stat type
-                statIncreaseInput.add(statIncrease.getInt(1)); // duration
-                statIncreaseInput.add(statIncrease.getInt(2)); // amount
-                this.statIncreaseList.add(statIncreaseInput);
+                String type = statIncrease.getString(0);
+                int duration = statIncrease.getInt(1);
+                int amount = statIncrease.getInt(2);
+                TempStat tempStat = new TempStat(type, duration, amount);
+                statIncreaseList.add(tempStat);
             }
             // stat Decrease
             JSONArray statDecreaseArray = characterObject.getJSONArray("statDecreaseList");
             for (int i = 0; i < statDecreaseArray.length(); i++) {
                 JSONArray statDecrease = (JSONArray) statDecreaseArray.get(i);
-                ArrayList<Object> statDecreaseInput = new ArrayList<>();
-                statDecreaseInput.add(statDecrease.getString(0)); // stat type
-                statDecreaseInput.add(statDecrease.getInt(1)); // duration
-                statDecreaseInput.add(statDecrease.getInt(2)); // amount
-                this.statIncreaseList.add(statDecreaseInput);
+                String type = statDecrease.getString(0);
+                int duration = statDecrease.getInt(1);
+                int amount = statDecrease.getInt(2);
+                TempStat tempStat = new TempStat(type, duration, amount);
+                statDecreaseList.add(tempStat);
             }
 
         } catch (JSONException e) {

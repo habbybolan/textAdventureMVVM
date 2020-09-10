@@ -5,8 +5,13 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:fontFamily">@font/press_start_2p</item>
         <item name="android:textSize">12sp</item>
+        <item name="buttonStyle">@style/DefaultButton</item>
     </style>
 
-
+    <style name="DefaultButton" parent="android:style/Widget.Button">
+        <item name="android:background">@drawable/custom_default_button</item>
+        <item name="android:layout_width">@dimen/default_btn_width</item>
+        <item name="android:layout_height">@dimen/default_btn_height</item>
+    </style>
 
 </resources>

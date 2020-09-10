@@ -2,23 +2,21 @@ package com.habbybolan.textadventure.model.effects;
 
 import com.habbybolan.textadventure.R;
 
-/*
-object to represent a temporary stat applied
- */
-public class TempStat extends Effect {
+public class TempBar extends Effect {
+
 
     private String type;
     private int duration;
     private boolean isIndefinite;
     private int amount;
 
-    public TempStat(String type, int duration, int amount) {
+    public TempBar(String type, int duration, int amount) {
         this.type = type;
         this.duration = duration;
         this.amount = amount;
     }
 
-    public TempStat(String type, int amount) {
+    public TempBar(String type, int amount) {
         this.type = type;
         isIndefinite = true;
         this.amount = amount;
@@ -31,7 +29,6 @@ public class TempStat extends Effect {
     public void decrementAmount(int amount) {
         this.amount -= amount;
     }
-
 
     @Override
     public String getType() {
@@ -60,8 +57,7 @@ public class TempStat extends Effect {
 
     @Override
     public void checkValidType(String type) {
-        if (!type.equals(STR) && !type.equals(INT) && !type.equals(CON)
-                && !type.equals(SPD) && !type.equals(EVASION) && !type.equals(BLOCK)) {
+        if (!type.equals(TEMP_HEALTH) && !type.equals(TEMP_MANA)) {
             throw new IllegalArgumentException();
         }
     }
@@ -69,20 +65,11 @@ public class TempStat extends Effect {
     @Override
     public int getIcon() {
         switch (type) {
-            case Effect.STR:
-                return R.drawable.sword;
-            case Effect.INT:
-                return R.drawable.sword;
-            case Effect.CON:
-                return R.drawable.sword;
-            case Effect.SPD:
-                return R.drawable.sword;
-            case Effect.BLOCK:
+            case Effect.TEMP_HEALTH:
                 return R.drawable.sword;
             default:
-                // otherwise, evasion
+                // otherwise, temp mana
                 return R.drawable.sword;
         }
     }
-
 }

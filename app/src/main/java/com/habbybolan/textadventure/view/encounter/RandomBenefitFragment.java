@@ -15,10 +15,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentRandomBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
-import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
-import com.habbybolan.textadventure.model.inventory.Item;
-import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
@@ -63,7 +60,6 @@ public class RandomBenefitFragment extends Fragment implements EncounterFragment
         setUpDialogueRV();
         // create state listener and go into first state
         stateListener();
-
 
         return benefitBinding.getRoot();
     }
@@ -199,33 +195,10 @@ public class RandomBenefitFragment extends Fragment implements EncounterFragment
         btnPickUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (inventoryToRetrieve.getType().equals(Inventory.TYPE_ABILITY)) {
-                    // if inventory is full, don't pick-up Ability
-                    if (!characterVM.addAbility((Ability) inventoryToRetrieve)) {
-                        // todo: show custom toast message inventory full
-                        Toast.makeText(getContext(), "You are full on Ability Scrolls", Toast.LENGTH_SHORT).show();
-                    }
-                    // otherwise, picked up and remove pick-up button
-                    else benefitBinding.layoutBtnOptions.removeView(btnPickUp);
-
-                } else if (inventoryToRetrieve.getType().equals(Inventory.TYPE_ITEM)) {
-                    // if inventory is full, don't pick-up item
-                    if (!characterVM.addItem((Item) inventoryToRetrieve)) {
-                        // todo: show custom toast message inventory full
-                        Toast.makeText(getContext(), "You are full on Items", Toast.LENGTH_SHORT).show();
-                    }
-                    // otherwise, picked up and remove pick-up button
-                    else benefitBinding.layoutBtnOptions.removeView(btnPickUp);
-
-                } else {
-                    // if inventory is full, cant pick up weapon
-                    if (!characterVM.addWeapon((Weapon) inventoryToRetrieve)) {
-                        // todo: show custom toast message inventory full
-                        Toast.makeText(getContext(), "You are full on Weapons", Toast.LENGTH_SHORT).show();
-                    }
-                    // otherwise, picked up and remove pick-up button
-                    else benefitBinding.layoutBtnOptions.removeView(btnPickUp);
-                }
+                if (!benefitVM.addNewInventory(inventoryToRetrieve))
+                    Toast.makeText(getContext(), benefitVM.getToastString(inventoryToRetrieve), Toast.LENGTH_SHORT).show();
+                 else
+                     benefitBinding.layoutBtnOptions.removeView(btnPickUp);
             }
         });
         benefitBinding.layoutBtnOptions.addView(btnPickUp);

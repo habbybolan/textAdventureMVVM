@@ -12,6 +12,8 @@ import com.habbybolan.textadventure.view.dialogueAdapter.binding.EffectDialogueB
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.HealthDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.InventoryDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.ManaDialogueBinding;
+import com.habbybolan.textadventure.view.dialogueAdapter.binding.StatDialogueBinding;
+import com.habbybolan.textadventure.view.dialogueAdapter.binding.TempStatDialogueBinding;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private HealthDialogueBinding healthDialogueBinding;
     private ManaDialogueBinding manaDialogueBinding;
     private InventoryDialogueBinding inventoryDialogueBinding;
+    private StatDialogueBinding statDialogueBinding;
+    private TempStatDialogueBinding tempStatDialogueBinding;
 
     public DialogueAdapter() {
         dialogueList = new ArrayList<>();
@@ -31,6 +35,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         healthDialogueBinding = new HealthDialogueBinding(this);
         manaDialogueBinding = new ManaDialogueBinding(this);
         inventoryDialogueBinding = new InventoryDialogueBinding(this);
+        statDialogueBinding = new StatDialogueBinding(this);
+        tempStatDialogueBinding = new TempStatDialogueBinding(this);
     }
 
     // Return the total item count of DataBinders
@@ -51,6 +57,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         else if (viewType == R.layout.dialogue_effect_details) return effectDialogueBinding;
         else if (viewType == R.layout.dialogue_health_details) return healthDialogueBinding;
         else if (viewType == R.layout.dialogue_mana_details) return manaDialogueBinding;
+        else if (viewType == R.layout.dialogue_stat_details) return statDialogueBinding;
+        else if (viewType == R.layout.dialogue_temp_stat_details) return tempStatDialogueBinding;
         else return inventoryDialogueBinding;
     }
 

@@ -7,6 +7,7 @@ public interface EncounterFragment {
     void stateListener();
     void checkState();
     void setUpDialogueRV();
+    // state for going through the beginning dialogue of an encounter
     void dialogueState() throws JSONException;
     void endState();
 }

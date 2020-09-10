@@ -143,9 +143,12 @@
 			]
 		},
 
-		{"type":"benefit",
+		{"type":"choice_benefit",
 			"encounters":[
-				{"dialogue":["You hear a powerful, reverberating voice echo past a large, expansive oak tree. It says a reward is awaiting for you traveller. Walking around the tree, a 10ft marble statue with glowing red ruby eyes looks down at you."
+				{"dialogue":[{"dialogue":"You hear a powerful, reverberating voice echo past a large, expansive oak tree. It says a reward is awaiting for you traveller. Walking around the tree, a large marble statue with glowing red ruby eyes looks down at you."},
+				            {"dialogue":"dialogue1.",
+				            "next":{"dialogue":"dialogue2.",
+				                    "next":{"dialogue":"dialogue3."}}}
 				]}
 			]
 		},

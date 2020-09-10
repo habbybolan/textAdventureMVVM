@@ -114,7 +114,7 @@ public class JsonAssetFileReader {
                 // todo: used for testing specific encounters
                 //Random rand = new Random();
                 //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.RANDOM_BENEFIT);
+                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.CHOICE_BENEFIT);
                 // ***
 
                 // put type into encounter
@@ -181,7 +181,7 @@ public class JsonAssetFileReader {
                         // put in the success object
                         outputEncounter.put("success", encounterTemp.getString("success"));
                         break;
-                    case MainGameViewModel.SHOP_TYPE: case MainGameViewModel.BENEFIT_TYPE: case MainGameViewModel.RANDOM_BENEFIT_TYPE:
+                    case MainGameViewModel.SHOP_TYPE: case MainGameViewModel.CHOICE_BENEFIT_TYPE: case MainGameViewModel.RANDOM_BENEFIT_TYPE:
                         // get a random dialogue from that encounter specific
                         outputEncounter.put("dialogue", getRandomDialogue(encounterTemp));
                         // if there is a conversation dialogue, then add to "conversation" object

@@ -12,7 +12,10 @@ import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
+import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
@@ -66,6 +69,7 @@ public class CharacterViewModel extends BaseObservable {
     }
 
         // Abilities
+
     // Observable for adding and deleting abilities and updating RecyclerView in CharacterFragment
     private ObservableField<Ability> abilityObserverAdd = new ObservableField<>();
     public ObservableField<Ability> getAbilityObserverAdd() {
@@ -93,6 +97,7 @@ public class CharacterViewModel extends BaseObservable {
     }
 
         // Weapons
+
     // Observable for adding and deleting weapons and updating RecyclerView in CharacterFragment
     private ObservableField<Weapon> weaponObserverAdd = new ObservableField<>();
     public ObservableField<Weapon> getWeaponObserverAdd() {
@@ -120,6 +125,7 @@ public class CharacterViewModel extends BaseObservable {
     }
 
         // Items
+
     // Observable for adding and deleting items and updating RecyclerView in CharacterFragment
     private ObservableField<Item> itemObserverAdd = new ObservableField<>();
     public ObservableField<Item> getItemObserverAdd() {
@@ -137,6 +143,7 @@ public class CharacterViewModel extends BaseObservable {
     }
     public void removeItemAtIndex(int index) {
         Item item = character.removeItemAtIndex(index);
+        itemObserverRemove.set(item);
         if (!item.getIsConsumable()) {
             // stat changes
             if (item.getStrChange() != 0) setStrength(character.getStrength() - item.getStrChange());
@@ -148,40 +155,40 @@ public class CharacterViewModel extends BaseObservable {
             // bar changes
             if (item.getHealthChange() != 0) {
                 setMaxHealth(character.getMaxHealth() - item.getHealthChange());
-                setHealth(character.getHealthAfterItemRemoval(item.getHealthChange()));
+                setHealth(character.changeHealth(-item.getHealthChange()));
             }
             if (item.getManaChange() != 0) {
                 setMaxMana(character.getMaxMana() - item.getManaChange());
-                setMana(character.getManaAfterItemRemoval(item.getManaChange()));
+                setMana(character.changeMana(-item.getManaChange()));
             }
             // special changes
             SpecialEffect special;
             if (item.getIsConfuse()) {
-                special = new SpecialEffect(SpecialEffect.CONFUSE, true);
+                special = new SpecialEffect(SpecialEffect.CONFUSE);
                 if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsStun()) {
-                special = new SpecialEffect(SpecialEffect.STUN, true);
+                special = new SpecialEffect(SpecialEffect.STUN);
                 if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsSilence()) {
-                special = new SpecialEffect(SpecialEffect.SILENCE, true);
+                special = new SpecialEffect(SpecialEffect.SILENCE);
                 if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsInvisible()) {
-                special = new SpecialEffect(SpecialEffect.INVISIBILITY, true);
+                special = new SpecialEffect(SpecialEffect.INVISIBILITY);
                 if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
 
             }
             if (item.getIsInvincible()) {
-                special = new SpecialEffect(SpecialEffect.INVINCIBILITY, true);
+                special = new SpecialEffect(SpecialEffect.INVINCIBILITY);
                 if (!character.removeInputSpecial(special)) updateAllSpecialAdd.set(special);
 
             }
@@ -219,12 +226,11 @@ public class CharacterViewModel extends BaseObservable {
 
             }
         }
-        itemObserverRemove.set(item);
     }
-
     public boolean addItem(Item item) {
         if (character.getNumItems() >= Character.MAX_ITEMS) return false;
         character.addItem(item);
+        itemObserverAdd.set(item);
         if (!item.getIsConsumable()) {
             // stat changes
             if (item.getStrChange() != 0) setStrength(character.getStrength() + item.getStrChange());
@@ -236,32 +242,32 @@ public class CharacterViewModel extends BaseObservable {
             // bar changes
             if (item.getHealthChange() != 0) {
                 setMaxHealth(character.getMaxHealth() + item.getHealthChange());
-                setHealth(character.getHealth() + item.getHealthChange());
+                setHealth(character.changeHealth(item.getHealthChange()));
             }
             if (item.getManaChange() != 0) {
                 setMaxMana(character.getMaxMana() + item.getManaChange());
-                setMana(character.getMana() + item.getManaChange());
+                setMana(character.changeMana(item.getManaChange()));
             }
             // special changes
             SpecialEffect special;
             if (item.getIsConfuse()) {
-                special = new SpecialEffect(SpecialEffect.CONFUSE, true);
+                special = new SpecialEffect(SpecialEffect.CONFUSE);
                 if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsStun()) {
-                special = new SpecialEffect(SpecialEffect.STUN, true);
+                special = new SpecialEffect(SpecialEffect.STUN);
                 if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsSilence()) {
-                special = new SpecialEffect(SpecialEffect.SILENCE, true);
+                special = new SpecialEffect(SpecialEffect.SILENCE);
                 if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsInvisible()) {
-                special = new SpecialEffect(SpecialEffect.INVISIBILITY, true);
+                special = new SpecialEffect(SpecialEffect.INVISIBILITY);
                 if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             if (item.getIsInvincible()) {
-                special = new SpecialEffect(SpecialEffect.INVINCIBILITY, true);
+                special = new SpecialEffect(SpecialEffect.INVINCIBILITY);
                 if (character.addNewSpecial(special)) updateAllSpecialAdd.set(special);
             }
             // DOT changes
@@ -291,71 +297,59 @@ public class CharacterViewModel extends BaseObservable {
                 if (character.addNewDot(dot)) updateAllDotAdd.set(null);
             }
         }
-        itemObserverAdd.set(item);
         return true;
     }
     // consume an item
     public void consumeItem(Item item) {
         if (!item.getIsConsumable()) throw new IllegalArgumentException();
+        removeItem(item);
         // stat change
         if (item.getStrChange() > 0) {
-            character.addNewStatIncrease(CharacterEntity.STR, item.getDuration(), item.getStrChange());
-            notifyPropertyChanged(BR.strIncrease);
+            character.addNewStatIncrease(new TempStat(CharacterEntity.STR, item.getDuration(), item.getStrChange()));
             notifyPropertyChanged(BR.strength);
         }
         if (item.getStrChange() < 0) {
-            character.addNewStatDecrease(CharacterEntity.STR, item.getDuration(), item.getStrChange());
-            notifyPropertyChanged(BR.strDecrease);
+            character.addNewStatDecrease(new TempStat(CharacterEntity.STR, item.getDuration(), item.getStrChange()));
             notifyPropertyChanged(BR.strength);
         }
         if (item.getIntChange() > 0) {
-            character.addNewStatIncrease(CharacterEntity.INT, item.getDuration(), item.getIntChange());
-            notifyPropertyChanged(BR.intIncrease);
+            character.addNewStatIncrease(new TempStat(CharacterEntity.INT, item.getDuration(), item.getIntChange()));
             notifyPropertyChanged(BR.intelligence);
         }
         if (item.getIntChange() < 0) {
-            character.addNewStatDecrease(CharacterEntity.INT, item.getDuration(), item.getIntChange());
-            notifyPropertyChanged(BR.intDecrease);
+            character.addNewStatDecrease(new TempStat(CharacterEntity.INT, item.getDuration(), item.getIntChange()));
             notifyPropertyChanged(BR.intelligence);
         }
         if (item.getConChange() > 0) {
-            character.addNewStatIncrease(CharacterEntity.CON, item.getDuration(), item.getConChange());
-            notifyPropertyChanged(BR.conIncrease);
+            character.addNewStatIncrease(new TempStat(CharacterEntity.CON, item.getDuration(), item.getConChange()));
             notifyPropertyChanged(BR.constitution);
         }
         if (item.getConChange() < 0) {
-            character.addNewStatDecrease(CharacterEntity.CON, item.getDuration(), item.getConChange());
-            notifyPropertyChanged(BR.conDecrease);
+            character.addNewStatDecrease(new TempStat(CharacterEntity.CON, item.getDuration(), item.getConChange()));
             notifyPropertyChanged(BR.constitution);
         }
         if (item.getSpdChange() > 0) {
-            character.addNewStatIncrease(CharacterEntity.SPD, item.getDuration(), item.getSpdChange());
-            notifyPropertyChanged(BR.spdIncrease);
+            character.addNewStatIncrease(new TempStat(CharacterEntity.SPD, item.getDuration(), item.getSpdChange()));
             notifyPropertyChanged(BR.speed);
         }
         if (item.getSpdChange() < 0) {
-            character.addNewStatDecrease(CharacterEntity.SPD, item.getDuration(), item.getSpdChange());
-            notifyPropertyChanged(BR.spdDecrease);
+            character.addNewStatDecrease(new TempStat(CharacterEntity.SPD, item.getDuration(), item.getSpdChange()));
             notifyPropertyChanged(BR.speed);
         }
         if (item.getBlockChange() > 0) {
-            character.addNewStatIncrease(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange());
-            notifyPropertyChanged(BR.blockIncrease);
+            character.addNewStatIncrease(new TempStat(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange()));
             notifyPropertyChanged(BR.block);
         }
         if (item.getBlockChange() < 0) {
-            character.addNewStatDecrease(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange());
-            notifyPropertyChanged(BR.blockDecrease);
+            character.addNewStatDecrease(new TempStat(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange()));
             notifyPropertyChanged(BR.block);
         }
         if (item.getEvasionChange() > 0) {
-            character.addNewStatIncrease(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange());
-            notifyPropertyChanged(BR.evasionIncrease);
+            character.addNewStatIncrease(new TempStat(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange()));
             notifyPropertyChanged(BR.evasion);
         }
         if (item.getEvasionChange() < 0) {
-            character.addNewStatDecrease(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange());
-            notifyPropertyChanged(BR.evasionDecrease);
+            character.addNewStatDecrease(new TempStat(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange()));
             notifyPropertyChanged(BR.evasion);
         }
         // health/mana
@@ -374,7 +368,6 @@ public class CharacterViewModel extends BaseObservable {
         if (item.getIsFrostBurn()) character.addNewDot(new Dot(Dot.FROSTBURN, false));
         if (item.getIsHealthDot()) character.addNewDot(new Dot(Dot.HEALTH_DOT, false));
         if (item.getIsManaDot()) character.addNewDot(new Dot(Dot.MANA_DOT, false));
-        removeItem(item);
     }
     // consume item at index
     public void consumeItemAtIndex(int index) {
@@ -406,10 +399,10 @@ public class CharacterViewModel extends BaseObservable {
     }
     private ObservableField<Dot> updateAllDotAdd = new ObservableField<>();
 
-    public ObservableField<Dot>  getUpdateAllDotRemove() {
+    public ObservableField<Void>  getUpdateAllDotRemove() {
         return updateAllDotRemove;
     }
-    private ObservableField<Dot> updateAllDotRemove = new ObservableField<>();
+    private ObservableField<Void> updateAllDotRemove = new ObservableField<>();
 
     @Bindable
     public ArrayList<Dot> getDotList() {
@@ -420,7 +413,7 @@ public class CharacterViewModel extends BaseObservable {
         character.removeInputDot(dot);
         notifyPropertyChanged(BR.dotList);
         // observed by CharacterViewModel
-        updateAllDotRemove.set(dot);
+        updateAllDotRemove.set(null);
     }
     public void addInputDot(Dot dot) {
         // observed by XML
@@ -434,8 +427,8 @@ public class CharacterViewModel extends BaseObservable {
         /*for (Dot dot : removedDots) {
             dotObserverRemove.set(dot);
         }*/
-        // todo: dummy remove - need a specific remove??
-        updateAllDotRemove.set(new Dot(Dot.FIRE, false));
+        // compare with dummy Dot
+        updateAllDotRemove.set(null);
     }
 
     // ** Special Effects **
@@ -444,9 +437,8 @@ public class CharacterViewModel extends BaseObservable {
     public ObservableField<SpecialEffect>  getUpdateAllSpecialAdd() {
         return updateAllSpecialAdd;
     }
-
-    private ObservableField<SpecialEffect> updateAllSpecialRemove = new ObservableField<>();
-    public ObservableField<SpecialEffect>  getUpdateAllSpecialRemove() {
+    private ObservableField<Void> updateAllSpecialRemove = new ObservableField<>();
+    public ObservableField<Void>  getUpdateAllSpecialRemove() {
         return updateAllSpecialRemove;
     }
 
@@ -459,7 +451,7 @@ public class CharacterViewModel extends BaseObservable {
         character.removeInputSpecial(special);
         notifyPropertyChanged(BR.specialList);
         // observed by CharacterViewModel
-        updateAllSpecialRemove.set(special);
+        updateAllSpecialRemove.set(null);
     }
     public void addInputSpecial(SpecialEffect special) {
         // observed by XML
@@ -473,11 +465,111 @@ public class CharacterViewModel extends BaseObservable {
         /*for (SpecialEffect special : removedSpecials) {
             specialObserverRemove.set(special);
         }*/
-        // todo: dummy remove - need a specific remove??
-        updateAllSpecialRemove.set(new SpecialEffect(SpecialEffect.STUN, false));
+        // compare with dummy Dot
+        updateAllSpecialRemove.set(null);
     }
 
     // ** Stat Changes **
+
+        // STATS
+
+    public ObservableField<TempStat>  getUpdateAllStatIncrAdd() {
+        return updateAllStatIncrAdd;
+    }
+    private ObservableField<TempStat> updateAllStatIncrAdd = new ObservableField<>();
+    public ObservableField<TempStat>  getUpdateAllStatIncrRemove() {
+        return updateAllStatIncrRemove;
+    }
+    private ObservableField<TempStat> updateAllStatIncrRemove = new ObservableField<>();
+
+    public ObservableField<TempStat>  getUpdateAllStatDecrAdd() {
+        return updateAllStatDecrAdd;
+    }
+    private ObservableField<TempStat> updateAllStatDecrAdd = new ObservableField<>();
+    public ObservableField<TempStat>  getUpdateAllStatDecrRemove() {
+        return updateAllStatDecrRemove;
+    }
+    private ObservableField<TempStat> updateAllStatDecrRemove = new ObservableField<>();
+
+    // Observer for when the stat value changes
+    public ObservableField<TempStat>  getUpdateAllStatChange() {
+        return updateAllStatChange;
+    }
+    private ObservableField<TempStat> updateAllStatChange = new ObservableField<>();
+
+    // add a temporary stat to the stat incr/decr list
+    public void addInputStat(TempStat tempStat) {
+        if (tempStat.getAmount() > 0) {
+            character.addNewStatIncrease(tempStat);
+            updateAllStatIncrAdd.set(tempStat);
+        } else {
+            character.addNewStatDecrease(tempStat);
+            updateAllStatDecrRemove.set(tempStat);
+        }
+        notifyStatChange(tempStat);
+    }
+
+    private void notifyStatChange(TempStat tempStat) {
+        switch (tempStat.getType()) {
+            case TempStat.STR:
+                notifyPropertyChanged(BR.strength);
+                notifyPropertyChanged(BR.strBase);
+                break;
+            case TempStat.INT:
+                notifyPropertyChanged(BR.intelligence);
+                notifyPropertyChanged(BR.intBase);
+                break;
+            case TempStat.CON:
+                notifyPropertyChanged(BR.constitution);
+                notifyPropertyChanged(BR.conBase);
+                break;
+            case TempStat.SPD:
+                notifyPropertyChanged(BR.speed);
+                notifyPropertyChanged(BR.spdBase);
+                break;
+            case TempStat.EVASION:
+                notifyPropertyChanged(BR.evasion);
+                notifyPropertyChanged(BR.evasionBase);
+                break;
+            case TempStat.BLOCK:
+                notifyPropertyChanged(BR.block);
+                notifyPropertyChanged(BR.blockBase);
+                break;
+        }
+    }
+
+    // given a Stat object, find the correct base value to change
+    public void permIncreaseStat(TempStat stat) {
+        int amount = stat.getAmount();
+        switch (stat.getType()) {
+            case Effect.STR:
+                setStrBase(getStrBase() + amount);
+                setStrength(getStrength() + amount);
+                break;
+            case Effect.INT:
+                setIntBase(getIntBase() + amount);
+                setIntelligence(getIntelligence() + amount);
+                break;
+            case Effect.CON:
+                setConBase(getConBase() + amount);
+                setConstitution(getConstitution() + amount);
+                break;
+            case Effect.SPD:
+                setSpdBase(getSpdBase() + amount);
+                setSpeed(getSpeed() + amount);
+                break;
+            case Effect.EVASION:
+                setEvasionBase(getEvasionBase() + amount);
+                setEvasion(getEvasion() + amount);
+                break;
+            case Effect.BLOCK:
+                setBlockBase(getBlockBase() + amount);
+                setBlock(getBlock() + amount);
+                break;
+        }
+    }
+
+        // BARS
 
     public void decrementStatChangeDuration() {
         character.decrementStatChangeDuration();
@@ -488,43 +580,38 @@ public class CharacterViewModel extends BaseObservable {
         // todo: update binded values
     }
 
-    @Bindable
-    public List<ArrayList<Object>> getStatIncreaseList() {
-        return character.getStatIncreaseList();
+    private ObservableField<TempBar> updateAllBarAdd = new ObservableField<>();
+    public ObservableField<TempBar> getUpdateAllBarAdd() {
+        return updateAllBarAdd;
     }
-    public void removeZeroStatIncreaseList() {
-        character.removeZeroStatIncreaseList();
-        notifyPropertyChanged(BR.statIncreaseList);
+    private ObservableField<Void> updateAllBarRemove = new ObservableField<>();
+    public ObservableField<Void> getUpdateAllBarRemove() {
+        return updateAllBarRemove;
     }
-    public void addStatIncreaseList(ArrayList<Object> statIncrease) {
-        character.addStatIncreaseList(statIncrease);
-        notifyPropertyChanged(BR.statIncreaseList);
+
+    // given tempBar, add it to either TempExtraHealth or TempExtraMana list depending on type
+    public void addTempHealthMana(TempBar tempBar) {
+        if (tempBar.getType().equals(TempBar.TEMP_HEALTH)) {
+            addTempHealthList(tempBar);
+        } else {
+            addTempManaList(tempBar);
+        }
+        updateAllBarAdd.set(tempBar);
     }
 
     @Bindable
-    public List<ArrayList<Object>> getStatDecreaseList() {
-        return character.getStatDecreaseList();
-    }
-    public void removeZeroStatDecreaseList() {
-        character.removeZeroStatDecreaseList();
-        notifyPropertyChanged(BR.statDecreaseList);
-    }
-    public void addStatDecreaseList(ArrayList<Object> statDecrease) {
-        character.addStatDecreaseList(statDecrease);
-        notifyPropertyChanged(BR.statDecreaseList);
-    }
-
-    @Bindable
-    public List<ArrayList<Integer>> getTempHealthList() {
+    public List<TempBar> getTempHealthList() {
         return character.getTempHealthList();
     }
     public void removeZeroTempHealthList() {
         character.removeZeroTempHealthList();
+        updateAllBarRemove.set(null);
         notifyPropertyChanged(BR.tempHealthList);
     }
-    public void addTempHealthList(ArrayList<Integer> tempExtraHealth) {
+    public void addTempHealthList(TempBar tempExtraHealth) {
         character.addTempHealthList(tempExtraHealth);
-        notifyPropertyChanged(BR.tempHealthList);
+        notifyPropertyChanged(BR.health);
+        notifyPropertyChanged(BR.maxHealth);
     }
     @Bindable
     public int getTempExtraHealth() {
@@ -536,16 +623,17 @@ public class CharacterViewModel extends BaseObservable {
     }
 
     @Bindable
-    public List<ArrayList<Integer>> getTempManaList() {
+    public List<TempBar> getTempManaList() {
         return character.getTempManaList();
     }
     public void removeZeroTempManaList() {
         character.removeZeroTempManaList();
         notifyPropertyChanged(BR.tempManaList);
     }
-    public void addTempManaList(ArrayList<Integer> tempExtraMana) {
+    public void addTempManaList(TempBar tempExtraMana) {
         character.addTempManaList(tempExtraMana);
-        notifyPropertyChanged(BR.tempManaList);
+        notifyPropertyChanged(BR.mana);
+        notifyPropertyChanged(BR.maxMana);
     }
     @Bindable
     public int getTempExtraMana() {
@@ -556,9 +644,28 @@ public class CharacterViewModel extends BaseObservable {
         notifyPropertyChanged(BR.tempExtraMana);
     }
 
-    // *** character stat ***
+    public void setPermBarIncr(TempBar tempBar) {
+        if (tempBar.getType().equals(TempBar.TEMP_HEALTH)) {
+            setPermHealthIncr(tempBar);
+        } else {
+            setPermManaIncr(tempBar);
+        }
+    }
 
-        // bars
+    // set a permanent health increase
+    private void setPermHealthIncr(TempBar tempBar) {
+        setMaxHealth(getMaxHealth() + tempBar.getAmount());
+        setHealth(Integer.parseInt(getHealth()) + tempBar.getAmount());
+    }
+
+    // set a permanent mana increase
+    private void setPermManaIncr(TempBar tempBar) {
+        setMaxMana(getMaxMana() + tempBar.getAmount());
+        setMana(Integer.parseInt(getMana()) + tempBar.getAmount());
+    }
+
+
+
     @Bindable
     private ObservableField<HealthDialogue> healthObserve = new ObservableField<>();
     public ObservableField<HealthDialogue> getHealthObserve() {
@@ -568,8 +675,9 @@ public class CharacterViewModel extends BaseObservable {
     public String getHealth() {
         return String.valueOf(character.getHealth());
     }
+    // change the health by healthChange amount
     public void setHealth(int health) {
-        healthObserve.set(new HealthDialogue(health - character.getHealth()));
+        healthObserve.set(new HealthDialogue(health-character.getHealth()));
         character.setHealth(health);
         notifyPropertyChanged(BR.health);
     }
@@ -578,7 +686,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getMaxHealth();
     }
     public void setMaxHealth(int maxHealth) {
-        character.setMaxHealth(maxHealth);
+        character.setMaxHealth(character.getHealth() + maxHealth);
         notifyPropertyChanged(BR.maxHealth);
     }
 
@@ -591,8 +699,8 @@ public class CharacterViewModel extends BaseObservable {
         return String.valueOf(character.getMana());
     }
     public void setMana(int mana) {
-        manaObserve.set(new ManaDialogue(mana - character.getMana()));
-        character.setMana(mana);
+        manaObserve.set(new ManaDialogue(mana));
+        character.setMana(mana - character.getMana());
         notifyPropertyChanged(BR.mana);
     }
     @Bindable
@@ -603,6 +711,7 @@ public class CharacterViewModel extends BaseObservable {
         character.setMaxMana(maxMana);
         notifyPropertyChanged(BR.maxMana);
     }
+
         // misc
     @Bindable
     public String getGold() {
@@ -658,6 +767,7 @@ public class CharacterViewModel extends BaseObservable {
     }
 
         // specials
+
     @Bindable
     public boolean getIsStun() {
         return character.getIsStun();
@@ -697,104 +807,6 @@ public class CharacterViewModel extends BaseObservable {
     public void setIsSilence(boolean isSilence) {
         character.setIsSilence(isSilence);
         notifyPropertyChanged(BR.isSilence);
-    }
-        // STATS
-    @Bindable
-    public int getStrIncrease() {
-        return character.getStrIncrease();
-    }
-    public void setStrIncrease(int strIncrease) {
-        character.setStrIncrease(strIncrease);
-        notifyPropertyChanged(BR.strIncrease);
-    }
-    @Bindable
-    public int getIntIncrease() {
-        return character.getIntIncrease();
-    }
-    public void setIntIncrease(int intIncrease) {
-        character.setIntIncrease(intIncrease);
-        notifyPropertyChanged(BR.intIncrease);
-    }
-    @Bindable
-    public int getConIncrease() {
-        return character.getConIncrease();
-    }
-    public void setConIncrease(int conIncrease) {
-        character.setConIncrease(conIncrease);
-        notifyPropertyChanged(BR.conIncrease);
-    }
-    @Bindable
-    public int getSpdIncrease() {
-        return character.getSpdIncrease();
-    }
-    public void setSpdIncrease(int spdIncrease) {
-        character.setSpdIncrease(spdIncrease);
-        notifyPropertyChanged(BR.spdIncrease);
-    }
-    @Bindable
-    public int getEvasionIncrease() {
-        return character.getEvasionIncrease();
-    }
-    public void setEvasionIncrease(int evasionIncrease) {
-        character.setEvasionIncrease(evasionIncrease);
-        notifyPropertyChanged(BR.evasionIncrease);
-    }
-    @Bindable
-    public int getBlockIncrease() {
-        return character.getBlockIncrease();
-    }
-    public void setBlockIncrease(int blockIncrease) {
-        character.setBlockIncrease(blockIncrease);
-        notifyPropertyChanged(BR.blockIncrease);
-    }
-
-    @Bindable
-    public int getStrDecrease() {
-        return character.getStrDecrease();
-    }
-    public void setStrDecrease(int strDecrease) {
-        character.setStrDecrease(strDecrease);
-        notifyPropertyChanged(BR.strDecrease);
-    }
-    @Bindable
-    public int getIntDecrease() {
-        return character.getIntDecrease();
-    }
-    public void setIntDecrease(int intDecrease) {
-        character.setIntDecrease(intDecrease);
-        notifyPropertyChanged(BR.intDecrease);
-    }
-    @Bindable
-    public int getConDecrease() {
-        return character.getConDecrease();
-    }
-    public void setConDecrease(int conDecrease) {
-        character.setConDecrease(conDecrease);
-        notifyPropertyChanged(BR.conDecrease);
-    }
-    @Bindable
-    public int getSpdDecrease() {
-        return character.getSpdDecrease();
-    }
-    public void setSpdDecrease(int spdDecrease) {
-        character.setSpdDecrease(spdDecrease);
-        notifyPropertyChanged(BR.spdDecrease);
-    }
-    @Bindable
-    public int getEvasionDecrease() {
-        return character.getEvasionDecrease();
-    }
-    public void setEvasionDecrease(int evasionDecrease) {
-        character.setEvasionDecrease(evasionDecrease);
-        notifyPropertyChanged(BR.evasionDecrease);
-    }
-    @Bindable
-    public int getBlockDecrease() {
-        return character.getBlockDecrease();
-    }
-    public void setBlockDecrease(int blockDecrease) {
-        character.setBlockDecrease(blockDecrease);
-        notifyPropertyChanged(BR.blockDecrease);
     }
 
     @Bindable
@@ -851,6 +863,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getStrength();
     }
     public void setStrength(int strength) {
+        updateAllStatChange.set(new TempStat(Effect.STR, strength - character.getStrength()));
         character.setStrength(strength);
         notifyPropertyChanged(BR.strength);
     }
@@ -859,6 +872,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getIntelligence();
     }
     public void setIntelligence(int intelligence) {
+        updateAllStatChange.set(new TempStat(Effect.INT, intelligence - character.getIntelligence()));
         character.setIntelligence(intelligence);
         notifyPropertyChanged(BR.intelligence);
     }
@@ -867,6 +881,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getConstitution();
     }
     public void setConstitution(int constitution) {
+        updateAllStatChange.set(new TempStat(Effect.CON, constitution - character.getConstitution()));
         character.setConstitution(constitution);
         notifyPropertyChanged(BR.constitution);
     }
@@ -875,6 +890,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getSpeed();
     }
     public void setSpeed(int speed) {
+        updateAllStatChange.set(new TempStat(Effect.SPD, speed - character.getSpeed()));
         character.setSpeed(speed);
         notifyPropertyChanged(BR.speed);
     }
@@ -883,6 +899,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getEvasion();
     }
     public void setEvasion(int evasion) {
+        updateAllStatChange.set(new TempStat(Effect.EVASION, evasion - character.getEvasion()));
         character.setEvasion(evasion);
         notifyPropertyChanged(BR.evasion);
     }
@@ -891,6 +908,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getBlock();
     }
     public void setBlock(int block) {
+        updateAllStatChange.set(new TempStat(Effect.BLOCK, block - character.getBlock()));
         character.setBlock(block);
         notifyPropertyChanged(BR.block);
     }

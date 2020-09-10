@@ -1,19 +1,11 @@
 package com.habbybolan.textadventure.model.characterentity;
 
-import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
-import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 public class Enemy extends CharacterEntity {
 
@@ -95,7 +87,12 @@ public class Enemy extends CharacterEntity {
     private int aliveVector;
     private int deadVector;
 
+    @Override
+    public void decrCooldowns() {
 
+    }
+
+    /*
     public Enemy(int numStatPoints, Context context, DatabaseAdapter mDbHelper, String enemyString, String type) throws ExecutionException, InterruptedException {
         this.numStatPoints = (int) Math.rint(numStatPoints * percentOfStats);
         this.enemyString = enemyString;
@@ -124,11 +121,6 @@ public class Enemy extends CharacterEntity {
 
         // choose MAX_ABILITIES random abilities
         abilities = mDbHelper.getRandomAbilities(MAX_ABILITIES);
-        /*for (int i = 0; i < MAX_ABILITIES; i++) {
-            int abilityColID = cursor.getColumnIndex("ability_id");
-            abilities.add(new Ability(cursor.getInt(abilityColID), context));
-            cursor.moveToNext();
-        }*/
         mDbHelper.close();
 
 
@@ -263,20 +255,20 @@ public class Enemy extends CharacterEntity {
         removeZeroStatList(statDecreaseList);
     }
     // helper for removeZeroStatDecreaseList and removeZeroStatIncreaseList
-    private void removeZeroStatList(List<ArrayList<Object>> statList) {
+    private void removeZeroStatList(List<TempStat> statList) {
         int index = 0;
         while (index < statList.size()) {
-            if ((int)statList.get(index).get(1) == 0) statList.remove(index);
+            if (statList.get(index).getDuration() == 0) statList.remove(index);
             else break;
         }
     }
 
     @Override
-    public void addStatIncreaseList(ArrayList<Object> statIncrease) {
+    public void addStatIncreaseList(TempStat statIncrease) {
         addStatList(statIncrease, statIncreaseList);
     }
     @Override
-    public void addStatDecreaseList(ArrayList<Object> statDecrease) {
+    public void addStatDecreaseList(TempStat statDecrease) {
         addStatList(statDecrease, statDecreaseList);
     }
     // helper for addStatIncreaseList and addStatDecreaseList
@@ -669,5 +661,5 @@ public class Enemy extends CharacterEntity {
     @Override
     public boolean getIsFrostBurn() {
         return isFrostBurn;
-    }
+    }*/
 }

@@ -3,7 +3,10 @@ package com.habbybolan.textadventure.model.characterentity;
 import android.graphics.Bitmap;
 
 import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
+import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
@@ -88,7 +91,6 @@ public abstract class CharacterEntity {
     protected ArrayList<Weapon> weapons = new ArrayList<>();
     protected ArrayList<Item> items = new ArrayList<>();
 
-
     // decrement all ability cooldowns
     public abstract void decrCooldowns();
 
@@ -119,103 +121,39 @@ public abstract class CharacterEntity {
         return damageRoll + min + getStrength();
     }
 
-    // heals a target for a specific amount
+    // returns amount to heal entity by
     public int changeHealth(int amount) {
-        setHealth(getHealth()+amount);
-        if (getHealth() > getMaxHealth()) setHealth(getMaxHealth());
-        if (getHealth() < 0) setHealth(0);
-        return getHealth();
+        if (amount + health >= maxHealth) return maxHealth;
+        else if (amount + health <= 0) return 0;
+        else return health+amount;
     }
 
-    // regenerates mana for a specific amount
+    // returns amount to recover mana of entity for
     public int changeMana(int amount) {
-        setMana(getMana()+amount);
-        if (getMana() > getMaxMana()) setMana(getMaxMana());
-
-        if (getMana() < 0) setMana(0);
-        return getMana();
+        if (amount + mana > maxMana) return maxMana;
+        else if (amount + mana < 0) return 0;
+        else return mana+amount;
     }
 
 
     // *** STATS ***
 
+    public static final String STR = "STR";
+    public static final String INT = "INT";
+    public static final String CON = "CON";
+    public static final String SPD = "SPD";
+    public static final String EVASION = "Evasion";
+    public static final String BLOCK = "Block";
+
     // keep track of stat increases - list<ArrayList<stat, duration, amount>> sorted by duration
-    protected List<ArrayList<Object>> statIncreaseList = new ArrayList<>();
-    public void removeZeroStatIncreaseList() {
-        removeZeroStatList(statIncreaseList);
-    }
-    public void addStatIncreaseList(ArrayList<Object> statIncrease) {
-        addStatList(statIncrease, statIncreaseList);
-    }
+    List<TempStat> statIncreaseList = new ArrayList<>();
 
     // keep track of stat decreases - list<ArrayList<stat, duration, amount>> sorted by duration
-    List<ArrayList<Object>> statDecreaseList = new ArrayList<>();
-    public void removeZeroStatDecreaseList() {
-        removeZeroStatList(statDecreaseList);
-    }
-    public void addStatDecreaseList(ArrayList<Object> statDecrease) {
-        addStatList(statDecrease, statDecreaseList);
-    }
-    // helper for removeZeroStatDecreaseList and removeZeroStatIncreaseList
-    private void removeZeroStatList(List<ArrayList<Object>> statList) {
-        int index = 0;
-        while (index < statList.size()) {
-            if ((int)statList.get(index).get(1) == 0) statList.remove(index);
-            else break;
-        }
-    }
-
-    // helper for addStatIncreaseList and addStatDecreaseList
-    private void addStatList(ArrayList<Object> statInput, List<ArrayList<Object>> statList) {
-        if (!(statInput.get(0) instanceof String) || !(statInput.get(1) instanceof Integer) || !(statInput.get(2) instanceof Integer) || statInput.size() > 3) throw new IllegalArgumentException();
-        for (int i = 0; i < statInput.size(); i++) {
-            if ((int)statInput.get(1) < (int)statList.get(i).get(1)) {
-                statList.add(i, statInput);
-                break;
-            }
-        }
-    }
-
-    // keep track of temp health increase - list<ArrayList<duration, amount>> sorted by duration
-    List<ArrayList<Integer>> tempHealthList = new ArrayList<>();
-    public void removeZeroTempHealthList() {
-        removeZeroTempList(tempHealthList);
-    }
-    public void addTempHealthList(ArrayList<Integer> tempExtraHealth) {
-        addTempList(tempExtraHealth, tempHealthList);
-    }
-
-    // keep track of temp mana increase - list<ArrayList<duration, amount>> sorted by duration
-    List<ArrayList<Integer>> tempManaList = new ArrayList<>();
-    public void removeZeroTempManaList() {
-        removeZeroTempList(tempManaList);
-    }
-    public void addTempManaList(ArrayList<Integer> tempExtraMana) {
-        addTempList(tempExtraMana, tempManaList);
-    }
-
-    // helper for addTempManaList and addTempHealthList
-    private void addTempList(ArrayList<Integer> tempExtra, List<ArrayList<Integer>> tempList) {
-        if (tempExtra.size() > 2) throw new IllegalArgumentException();
-        for (int i = 0; i < tempList.size(); i++) {
-            if ((int)tempExtra.get(0) < (int)tempList.get(i).get(0)) {
-                tempList.add(i, tempExtra);
-                break;
-            }
-        }
-    }
-    // helper for removeZeroTempManaList and removeZeroTempHealthList
-    private void removeZeroTempList(List<ArrayList<Integer>> tempList) {
-        int index = 0;
-        while (index < tempList.size()) {
-            if ((int)tempList.get(index).get(0) == 0) tempList.remove(index);
-            else break;
-        }
-    }
-
+    List<TempStat> statDecreaseList = new ArrayList<>();
 
     // updates all the stat's main value, given its new baseStat, statIncrease, and statDecrease
-    public void updateStats() {
+        // helper for when statIncrease/statDecrease changes
+    private void updateStats() {
         // update STR
         setStrength(getStrIncrease() + getStrDecrease() + getStrBase());
         if (getStrength() < 0) setStrength(0);
@@ -237,19 +175,17 @@ public abstract class CharacterEntity {
     }
 
     // add a new stat increase - can stack these, each stat increase represented as the list inside a list
-    public void addNewStatIncrease(String stat, int duration, int amount) {
-        ArrayList<Object> statValues = new ArrayList<>();
-        statValues.add(stat);
-        statValues.add(duration);
-        statValues.add(amount);
-        statIncreaseList.add(statValues);
-        findStatToIncrease((String)statValues.get(0), (int)statValues.get(2));
+    public void addNewStatIncrease(TempStat tempStat) {
+        statIncreaseList.add(tempStat);
+        findStatToIncrease(tempStat);
         updateStats();
     }
 
     // apply the stat increase to statIncrease and stat values
-    private void findStatToIncrease(String stat, int amount) {
-        switch (stat) {
+        // helper for addNewStatIncrease
+    private void findStatToIncrease(TempStat tempStat) {
+        final int amount = tempStat.getAmount();
+        switch (tempStat.getType()) {
             case STR:
                 setStrIncrease(getStrIncrease() + amount);
                 break;
@@ -269,49 +205,21 @@ public abstract class CharacterEntity {
                 setBlockIncrease(getBlockIncrease() + amount);
                 break;
         }
-        findStatToAlter(stat);
-    }
-
-    // undo a stat increase
-    private void undoStatIncrease(String stat, int amount) {
-        switch (stat) {
-            case STR:
-                setStrIncrease(getStrIncrease() - amount);
-                break;
-            case INT:
-                setIntIncrease(getIntIncrease() - amount);
-                break;
-            case CON:
-                setConIncrease(getConIncrease() - amount);
-                break;
-            case SPD:
-                setSpdIncrease(getSpdIncrease() - amount);
-                break;
-            case EVASION:
-                setEvasionIncrease(getEvasionIncrease() - amount);
-                break;
-            case BLOCK:
-                setBlockIncrease(getBlockIncrease() - amount);
-                break;
-        }
-        findStatToAlter(stat);
+        findStatToAlter(tempStat);
     }
 
     // add a new stat decrease - can stack these, each stat decrease represented as the list inside a list
     // if the decrease goes less than 0 of a stat, then reduce the amount that the stat is decreased
-    public void addNewStatDecrease(String stat, int duration, int amount) {
-        ArrayList<Object> statValues = new ArrayList<>();
-        statValues.add(stat);
-        statValues.add(duration);
-        statValues.add(amount);
-        statDecreaseList.add(statValues);
-        findStatToDecrease((String)statValues.get(0), (int)statValues.get(2));
+    public void addNewStatDecrease(TempStat tempStat) {
+        statDecreaseList.add(tempStat);
+        findStatToDecrease(tempStat);
         updateStats();
     }
 
     // apply the stat decrease to statDecrease and stat values
-    private void findStatToDecrease(String stat, int amount) {
-        switch (stat) {
+    private void findStatToDecrease(TempStat tempStat) {
+        final int amount = tempStat.getAmount();
+        switch (tempStat.getType()) {
             case STR:
                 setStrDecrease(getStrDecrease() + amount);
                 break;
@@ -331,37 +239,13 @@ public abstract class CharacterEntity {
                 setBlockDecrease(getBlockDecrease() + amount);
                 break;
         }
-        findStatToAlter(stat);
-    }
-
-    // undo a stat decrease
-    private void undoStatDecrease(String stat, int amount) {
-        switch (stat) {
-            case STR:
-                setStrDecrease(getStrDecrease() - amount);
-                break;
-            case INT:
-                setIntDecrease(getIntDecrease() - amount);
-                break;
-            case CON:
-                setConDecrease(getConDecrease() - amount);
-                break;
-            case SPD:
-                setSpdDecrease(getSpdDecrease() - amount);
-                break;
-            case EVASION:
-                setEvasionDecrease(getEvasionDecrease() - amount);
-                break;
-            case BLOCK:
-                setBlockDecrease(getBlockDecrease() - amount);
-                break;
-        }
-        findStatToAlter(stat);
+        findStatToAlter(tempStat);
     }
 
     // alter the stat amount, given it's new statIncrease or statDecrease
-    private void findStatToAlter(String stat) {
-        switch (stat) {
+        // helper for changes stat field value
+    private void findStatToAlter(TempStat tempStat) {
+        switch (tempStat.getType()) {
             case STR:
                 setStrength((getStrBase() + getStrIncrease()) - getStrDecrease());
                 if (getStrength() < 0) setStrength(0);
@@ -392,73 +276,153 @@ public abstract class CharacterEntity {
     // decrement the time remaining for the stat change
         // if the duration reaches 0 after decrement, reverse the change and remove from appropriate statChange list
     public void decrementStatChangeDuration() {
-        List<ArrayList<Object>> statIncreaseList = getStatIncreaseList();
         for (int i = 0; i < statIncreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
-            int duration = (int)statIncreaseList.get(i).get(1);
-            statIncreaseList.get(i).set(1, duration-1);
+            int duration = statIncreaseList.get(i).getDuration();
+            statIncreaseList.get(i).decrementDuration();
             // if duration is 0 after decrement, remove the stat change
             if (duration-1 == 0) {
-                String stat = (String)statIncreaseList.get(i).get(0);
-                int amount = (int)statIncreaseList.get(i).get(2);
+                TempStat tempStat = statIncreaseList.get(i);
                 statIncreaseList.remove(i);
                 i--;
-                undoStatIncrease(stat, amount);
+                undoStatIncrease(tempStat);
             }
         }
         for (int i = 0; i < statDecreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
-            int duration = (int)statDecreaseList.get(i).get(1);
-            statDecreaseList.get(i).set(1, duration-1);
+            int duration = statDecreaseList.get(i).getDuration();
+            statDecreaseList.get(i).decrementDuration();
             // if duration is 0 after decrement, remove the stat change
             if (duration-1 == 0) {
-                String stat = (String)statDecreaseList.get(i).get(0);
-                int amount = (int)statDecreaseList.get(i).get(2);
+                TempStat tempStat = statDecreaseList.get(i);
                 statDecreaseList.remove(i);
                 i--;
-                undoStatDecrease(stat, amount);
+                undoStatDecrease(tempStat);
             }
         }
         updateStats();
     }
 
-    public static final String STR = "STR";
-    public static final String INT = "INT";
-    public static final String CON = "CON";
-    public static final String SPD = "SPD";
-    public static final String EVASION = "Evasion";
-    public static final String BLOCK = "Block";
+    // undo a stat increase
+        // helper for decrementStatChangeDuration()
+    private void undoStatIncrease(TempStat tempStat) {
+        final int amount = tempStat.getAmount();
+        switch (tempStat.getType()) {
+            case STR:
+                setStrIncrease(getStrIncrease() - amount);
+                break;
+            case INT:
+                setIntIncrease(getIntIncrease() - amount);
+                break;
+            case CON:
+                setConIncrease(getConIncrease() - amount);
+                break;
+            case SPD:
+                setSpdIncrease(getSpdIncrease() - amount);
+                break;
+            case EVASION:
+                setEvasionIncrease(getEvasionIncrease() - amount);
+                break;
+            case BLOCK:
+                setBlockIncrease(getBlockIncrease() - amount);
+                break;
+        }
+        findStatToAlter(tempStat);
+    }
+
+    // undo a stat decrease
+        // helper for decrementStatChangeDuration()
+    private void undoStatDecrease(TempStat tempStat) {
+        final int amount = tempStat.getAmount();
+        switch (tempStat.getType()) {
+            case STR:
+                setStrDecrease(getStrDecrease() - amount);
+                break;
+            case INT:
+                setIntDecrease(getIntDecrease() - amount);
+                break;
+            case CON:
+                setConDecrease(getConDecrease() - amount);
+                break;
+            case SPD:
+                setSpdDecrease(getSpdDecrease() - amount);
+                break;
+            case EVASION:
+                setEvasionDecrease(getEvasionDecrease() - amount);
+                break;
+            case BLOCK:
+                setBlockDecrease(getBlockDecrease() - amount);
+                break;
+        }
+        findStatToAlter(tempStat);
+    }
+
+    // BARS
+
     public static final String TEMP_HEALTH = "Temporary health";
     public static final String TEMP_MANA = "Temporary mana";
 
+    // keep track of temp health increase - list<ArrayList<duration, amount>> sorted by duration
+    List<TempBar> tempHealthList = new ArrayList<>();
+    public void removeZeroTempHealthList() {
+        removeZeroTempBarList(tempHealthList);
+    }
+    public void addTempHealthList(TempBar tempExtraHealth) {
+        tempHealthList.add(tempExtraHealth);
+        // update the changes to tempHealthList
+        health = health + tempExtraHealth.getAmount();
+        maxHealth = maxHealth + tempExtraHealth.getAmount();
+    }
+
+
+    // keep track of temp mana increase - list<ArrayList<duration, amount>> sorted by duration
+    List<TempBar> tempManaList = new ArrayList<>();
+    public void removeZeroTempManaList() {
+        removeZeroTempBarList(tempManaList);
+    }
+    public void addTempManaList(TempBar tempExtraMana) {
+        tempManaList.add(tempExtraMana);
+        // apply changes to tempManaList
+        mana = mana + tempExtraMana.getAmount();
+        maxMana = maxMana + tempExtraMana.getAmount();
+    }
+
+    // helper for removeZeroTempManaList and removeZeroTempHealthList
+    private void removeZeroTempBarList(List<TempBar> tempList) {
+        int index = 0;
+        while (index < tempList.size()) {
+            if (tempList.get(index).getDuration() == 0) {
+                tempList.remove(index);
+                resetTempBar(tempList.get(index));
+            }
+            else break;
+        }
+    }
+
+    // resets the temporary increases of tempHealth and tempMana
+    private void resetTempBar(TempBar tempBar) {
+        if (tempBar.getType().equals(Effect.TEMP_HEALTH)) {
+            // reset the temp health
+            maxHealth = maxHealth - tempBar.getAmount();
+            // only change health if maxHealth drops below health value
+            if (maxHealth < health) health = maxHealth;
+        } else {
+            // otherwise reset the temp mana
+            maxMana = maxMana - tempBar.getAmount();
+            // only change mana if maxMana drops below mana value
+            if (maxMana < mana) mana = maxMana;
+        }
+    }
 
     // adds a new tempExtraHealth/tempExtraMana, in duration order, where smallest duration left at index 0 to array
     // update tempExtraHealth/Mana value
-    public void addNewTempExtraHealthMana(String type, int duration, int tempExtra) {
-        List<ArrayList<Integer>> list;
-        if (type.equals(TEMP_HEALTH)) {
-            list = tempHealthList; // TODO; is this a deep or shallow copy?
-            setTempExtraHealth(getTempExtraHealth() + tempExtra);
-            updateTempListWithNewExtra(duration, tempExtra, tempHealthList);
+    public void addNewTempExtraHealthMana(TempBar tempBar) {
+        if (tempBar.getType().equals(TEMP_HEALTH)) {
+            setTempExtraHealth(getTempExtraHealth() + tempBar.getAmount());
+            tempHealthList.add(tempBar);
         } else {
-            list = tempManaList;
-            setTempExtraMana(getTempExtraMana() + tempExtra);
-            updateTempListWithNewExtra(duration, tempExtra, tempManaList);
-        }
-    }
-    // Helper for addNewTempExtraHealthMana for adding new tempExtraHealth/Mana to lists
-
-    private void updateTempListWithNewExtra(int duration, int tempExtra, List<ArrayList<Integer>> list) {
-        ArrayList<Integer> newTemp = new ArrayList<>();
-        newTemp.add(duration);
-        newTemp.add(tempExtra);
-        int i = 0; // index of tempHealthList
-        for (ArrayList listTemp : list) {
-            if (newTemp.get(0) < (int) listTemp.get(0)) {
-                insertTempAtPosition(newTemp, i, list);
-                break; // new element added, break from loop
-            }
-            i++;
+            setTempExtraMana(getTempExtraMana() + tempBar.getAmount());
+            tempManaList.add(tempBar);
         }
     }
 
@@ -473,34 +437,21 @@ public abstract class CharacterEntity {
     }
 
     // helper for depleteTempExtraHealth/Mana to deplete and/or remove extra amount from array indices
-    private void depleteTempExtra(int amount, List<ArrayList<Integer>> list) {
+    private void depleteTempExtra(int amount, List<TempBar> list) {
         // loop through all indices of list and remove element if more amount to deplete than amount left over
-        // start from index 0 as the list is sorted from from smallest duration left to largest - remove smallest first
-        int index = 0;
+        // looking at index 0 as the list is sorted from from smallest duration left to largest
+        final int index = 0;
         while (amount > 0 && index < list.size()) {
-            ArrayList<Integer> element = list.get(index);
-            int eleAmount = element.get(1);
-            element.set(1, eleAmount-amount);
+            int eleAmount = list.get(index).getAmount();
             // remove the element from list if completely depleted, and alter amount by amount applied
-            if (element.get(1) < 0) {
+            if (eleAmount <= amount) {
                 list.remove(index);
                 amount -= eleAmount;
+            } else {
+                list.get(index).decrementAmount(amount);
+                amount = 0;
             }
-            index++;
         }
-    }
-
-    // insert the newTempHealth buff at index i and push all indices i+ to the right\
-    // helper for addNewTempExtraHealth
-    private void insertTempAtPosition(ArrayList<Integer> newTemp, int i, List<ArrayList<Integer>> list) {
-        ArrayList<Integer> prev = list.get(i);
-        list.add(i, newTemp);
-
-        for (int index = i+1; i < list.size(); index++) {
-            list.add(index, prev);
-            prev = list.get(index);
-        }
-        list.add(prev); // added to end to avoid outOfBounds exception
     }
 
     // decrements the duration of each tempExtraHealth in tempHealthList
@@ -511,14 +462,12 @@ public abstract class CharacterEntity {
     }
 
     // decrement the duration of an arrayList, removing it if it reaches duration 0
-    private void decrementTemp(List<ArrayList<Integer>> list) {
+    private void decrementTemp(List<TempBar> list) {
         int index = 0;
         // iterate over all tempHealthList elements, decrementing the duration value, removing if duration = 0;
         while (index < list.size()) {
-            ArrayList<Integer> listTemp = list.get(index);
-            int duration = listTemp.get(0);
-            if (duration-1 > 0) {
-                listTemp.set(index, duration - 1);
+            list.get(index).decrementDuration();
+            if (list.get(index).getDuration() > 0) {
                 index++;
             } else {
                 list.remove(index);
@@ -559,21 +508,21 @@ public abstract class CharacterEntity {
         if (ability.getHealMin() != 0) changeHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
         if (ability.getManaMin() != 0) changeMana(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
         // stat increases
-        if (ability.getStrIncrease() != 0) addNewStatIncrease(STR, ability.getDuration(), ability.getStrIncrease());
-        if (ability.getIntIncrease() != 0) addNewStatIncrease(INT, ability.getDuration(), ability.getIntIncrease());
-        if (ability.getConIncrease() != 0) addNewStatIncrease(CON, ability.getDuration(), ability.getConIncrease());
-        if (ability.getSpdIncrease() != 0) addNewStatIncrease(SPD, ability.getDuration(), ability.getSpdIncrease());
-        if (ability.getEvadeIncrease() != 0) addNewStatIncrease(EVASION, ability.getDuration(), ability.getEvadeIncrease());
-        if (ability.getBlockIncrease() != 0) addNewStatIncrease(BLOCK, ability.getDuration(), ability.getBlockIncrease());
+        if (ability.getStrIncrease() != 0) addNewStatIncrease(new TempStat(STR, ability.getDuration(), ability.getStrIncrease()));
+        if (ability.getIntIncrease() != 0) addNewStatIncrease(new TempStat(INT, ability.getDuration(), ability.getIntIncrease()));
+        if (ability.getConIncrease() != 0) addNewStatIncrease(new TempStat(CON, ability.getDuration(), ability.getConIncrease()));
+        if (ability.getSpdIncrease() != 0) addNewStatIncrease(new TempStat(SPD, ability.getDuration(), ability.getSpdIncrease()));
+        if (ability.getEvadeIncrease() != 0) addNewStatIncrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeIncrease()));
+        if (ability.getBlockIncrease() != 0) addNewStatIncrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockIncrease()));
         // stat decreases
-        if (ability.getStrDecrease() != 0) addNewStatDecrease(STR, ability.getDuration(), ability.getStrDecrease());
-        if (ability.getIntDecrease() != 0) addNewStatDecrease(INT, ability.getDuration(), ability.getIntDecrease());
-        if (ability.getConDecrease() != 0) addNewStatDecrease(CON, ability.getDuration(), ability.getConDecrease());
-        if (ability.getSpdDecrease() != 0) addNewStatDecrease(SPD, ability.getDuration(), ability.getSpdDecrease());
-        if (ability.getEvadeDecrease() != 0) addNewStatDecrease(EVASION, ability.getDuration(), ability.getEvadeDecrease());
-        if (ability.getBlockDecrease() != 0) addNewStatDecrease(BLOCK, ability.getDuration(), ability.getBlockDecrease());
+        if (ability.getStrDecrease() != 0) addNewStatDecrease(new TempStat(STR, ability.getDuration(), ability.getStrDecrease()));
+        if (ability.getIntDecrease() != 0) addNewStatDecrease(new TempStat(INT, ability.getDuration(), ability.getIntDecrease()));
+        if (ability.getConDecrease() != 0) addNewStatDecrease(new TempStat(CON, ability.getDuration(), ability.getConDecrease()));
+        if (ability.getSpdDecrease() != 0) addNewStatDecrease(new TempStat(SPD, ability.getDuration(), ability.getSpdDecrease()));
+        if (ability.getEvadeDecrease() != 0) addNewStatDecrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeDecrease()));
+        if (ability.getBlockDecrease() != 0) addNewStatDecrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockDecrease()));
         // temp extra health- part of stat
-        if (ability.getTempExtraHealth() != 0) addNewTempExtraHealthMana(TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth());
+        if (ability.getTempExtraHealth() != 0) addNewTempExtraHealthMana(new TempBar(TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth()));
     }
 
     // ** Special Effects **
@@ -607,7 +556,7 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialList.contains(new SpecialEffect(SpecialEffect.CONFUSE, false))) stillConfused = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.CONFUSE))) stillConfused = true;
         setIsConfuse(stillConfused);
         return stillConfused;
     }
@@ -620,7 +569,7 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialList.contains(new SpecialEffect(SpecialEffect.STUN, false))) stillStunned = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.STUN))) stillStunned = true;
         setIsStun(stillStunned);
         return stillStunned;
     }
@@ -633,7 +582,7 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialList.contains(new SpecialEffect(SpecialEffect.SILENCE, false))) stillSilenced = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.SILENCE))) stillSilenced = true;
         setIsSilence(stillSilenced);
         return stillSilenced;
     }
@@ -646,7 +595,7 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialList.contains(new SpecialEffect(SpecialEffect.INVISIBILITY, false)))stillInvisible = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.INVISIBILITY)))stillInvisible = true;
         setIsInvisible(stillInvisible);
         return stillInvisible;
     }
@@ -659,13 +608,13 @@ public abstract class CharacterEntity {
                 break;
             }
         }
-        if (specialList.contains(new SpecialEffect(SpecialEffect.INVINCIBILITY, false))) stillInvincible = true;
+        if (specialList.contains(new SpecialEffect(SpecialEffect.INVINCIBILITY))) stillInvincible = true;
         setIsInvincible(stillInvincible);
         return stillInvincible;
     }
 
     public boolean removeInputSpecial(SpecialEffect special) {
-        if (special.getIsInfinite()) {
+        if (special.getIsIndefinite()) {
             // key may not be in specialList if isInfinite
             return isStillSpecialEffect(special);
         }
@@ -701,7 +650,7 @@ public abstract class CharacterEntity {
                 setIsInvincible(true);
                 break;
         }
-        if (!special.getIsInfinite()) {
+        if (!special.getIsIndefinite()) {
             // if the duration is not infinite, add to the specialList /
             if (specialList.contains(special)) {
                 for (SpecialEffect appliedSpecial : specialList) {
@@ -874,7 +823,7 @@ public abstract class CharacterEntity {
 
     // remove a dot from the dotList and return true if isDot is still true
     public boolean removeInputDot(Dot dot) {
-        if (dot.getIsInfinite()) {
+        if (dot.getIsIndefinite()) {
             // key may not be in dotList if isInfinite
             return (isStillDotEffect(dot));
         }
@@ -917,7 +866,7 @@ public abstract class CharacterEntity {
             default: // shouldn't reach this
                 break;
         }
-        if (!dot.getIsInfinite()) {
+        if (!dot.getIsIndefinite()) {
             // if the duration is not infinite, add to the dotList /
             if (dotList.contains(dot)) {
                 for (Dot appliedDot : dotList) {
@@ -1343,16 +1292,16 @@ public abstract class CharacterEntity {
     public ArrayList<SpecialEffect> getSpecialList() {
         return specialList;
     }
-    public List<ArrayList<Integer>> getTempHealthList() {
+    public List<TempBar> getTempHealthList() {
         return tempHealthList;
     }
-    public List<ArrayList<Integer>> getTempManaList() {
+    public List<TempBar> getTempManaList() {
         return tempManaList;
     }
-    public List<ArrayList<Object>> getStatIncreaseList() {
+    public List<TempStat> getStatIncreaseList() {
         return statIncreaseList;
     }
-    public List<ArrayList<Object>> getStatDecreaseList() {
+    public List<TempStat> getStatDecreaseList() {
         return statDecreaseList;
     }
 

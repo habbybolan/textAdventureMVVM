@@ -5,7 +5,7 @@ import com.habbybolan.textadventure.R;
 
 /*
 Dialogue object to display added effects to player character
-  including Dot and Special effects
+  including Dot and Special effects, and temp stat/bar increases
 */
 
 public class EffectDialogue implements DialogueTypes {

@@ -45,7 +45,7 @@
             android:layout_width="120dp"
             android:layout_height="40dp"
             android:layout_marginStart="60dp"
-            android:layout_marginTop="76dp"
+            android:layout_marginTop="50dp"
             android:background="@drawable/top_button"
             android:onClick="@{()-> mainGameViewModel.gotoCharacterFragment()}"
             android:text="Character"
