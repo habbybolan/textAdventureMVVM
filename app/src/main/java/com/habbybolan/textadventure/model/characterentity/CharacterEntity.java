@@ -1,7 +1,5 @@
 package com.habbybolan.textadventure.model.characterentity;
 
-import android.graphics.Bitmap;
-
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
@@ -83,8 +81,7 @@ public abstract class CharacterEntity {
     protected int level;
 
     protected boolean isAlive;
-    protected Bitmap bitmapAlive;
-    protected Bitmap bitmapDead;
+    protected int drawableResID;
 
     // Inventory
     protected ArrayList<Ability> abilities = new ArrayList<>();
@@ -121,18 +118,22 @@ public abstract class CharacterEntity {
         return damageRoll + min + getStrength();
     }
 
-    // returns amount to heal entity by
+    // returns amount to change heal entity by and change
     public int changeHealth(int amount) {
-        if (amount + health >= maxHealth) return maxHealth;
-        else if (amount + health <= 0) return 0;
-        else return health+amount;
+        int prevHealth = health;
+        if (amount + health >= maxHealth) health = maxHealth;
+        else if (amount + health <= 0) health = 0;
+        else health = health+amount;
+        return health-prevHealth;
     }
 
     // returns amount to recover mana of entity for
     public int changeMana(int amount) {
-        if (amount + mana > maxMana) return maxMana;
-        else if (amount + mana < 0) return 0;
-        else return mana+amount;
+        int prevMana = mana;
+        if (amount + mana > maxMana) mana = maxMana;
+        else if (amount + mana < 0) mana = 0;
+        else mana = mana+amount;
+        return mana - prevMana;
     }
 
 
@@ -1279,11 +1280,8 @@ public abstract class CharacterEntity {
         this.isAlive = isAlive;
     }
 
-    public Bitmap getAliveVector() {
-        return bitmapAlive;
-    }
-    public Bitmap getDeadVector() {
-        return bitmapDead;
+    public int getDrawableResID() {
+        return drawableResID;
     }
 
     public ArrayList<Dot> getDotList() {

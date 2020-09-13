@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
@@ -17,7 +18,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+        // remove toolbar
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) getSupportActionBar().hide();
         ActivityMainBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         dataBinding.setViewModel(new MainActivityViewModel());
 
@@ -27,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
     // starts a new game, sending user to choose their character
     public void newGame(View v) {
         Intent intent = new Intent(getApplicationContext(), CharacterChoiceActivity.class);
+        startActivity(intent);
+    }
+
+    //
+    public void continueGame(View v) {
+        Intent intent = new Intent(getApplicationContext(), MainGameActivity.class);
         startActivity(intent);
     }
 }

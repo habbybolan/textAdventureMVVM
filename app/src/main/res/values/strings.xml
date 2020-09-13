@@ -3,7 +3,7 @@
 
 
     <string name="fileCharacter">characterData</string>
-    <string name="filePrevEncounters">prevEncounters</string>
+    <string name="fileEncounter">fileEncounters</string>
 
     <string name="Starting_Gold">10</string>
     <string name="Starting_Item">1</string>

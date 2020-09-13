@@ -101,6 +101,7 @@ public class RandomBenefitFragment extends Fragment implements EncounterFragment
         switch(state) {
             // first state
             case RandomBenefitViewModel.firstState:
+                benefitBinding.layoutBtnOptions.removeAllViews();
                 try {
                     dialogueState();
                 } catch (JSONException e) {
@@ -109,42 +110,15 @@ public class RandomBenefitFragment extends Fragment implements EncounterFragment
                 break;
             // second state
             case RandomBenefitViewModel.secondState:
+                benefitBinding.layoutBtnOptions.removeAllViews();
                 checkBenefitState();
                 break;
             // last state
             case RandomBenefitViewModel.thirdState:
+                benefitBinding.layoutBtnOptions.removeAllViews();
                 endState();
                 break;
         }
-    }
-
-    private void checkBenefitState() {
-        benefitBinding.layoutBtnOptions.removeAllViews();
-        Button btnCheck = new Button(getContext());
-        String check = "Check";
-        btnCheck.setText(check);
-        btnCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // remove check button and add inventorySnippet layout to FrameLayout
-                benefitBinding.layoutBtnOptions.removeAllViews();
-                Inventory inventoryToRetrieve = benefitVM.checkState();
-                setUpInventorySnippet(inventoryToRetrieve);
-            }
-        });
-        benefitBinding.layoutBtnOptions.addView(btnCheck);
-    }
-
-    // inventory snippet of new Inventory object to retrieve
-    private void setUpInventorySnippet(Inventory inventoryToRetrieve) {
-        this.inventoryToRetrieve = inventoryToRetrieve;
-        View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
-        InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
-
-        snippetBinding.setInventoryName(inventoryToRetrieve.getName());
-        snippetBinding.setInventoryPic(inventoryToRetrieve.getPictureResource());
-        benefitBinding.frameInventorySnippet.addView(view);
-        benefitVM.incrementStateIndex();
     }
 
 
@@ -175,11 +149,35 @@ public class RandomBenefitFragment extends Fragment implements EncounterFragment
         }
     }
 
+    // second state entered
+    private void checkBenefitState() {
+        Button btnCheck = new Button(getContext());
+        String check = "Check";
+        btnCheck.setText(check);
+        btnCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                inventoryToRetrieve = benefitVM.checkState();
+                benefitVM.incrementStateIndex();
+            }
+        });
+        benefitBinding.layoutBtnOptions.addView(btnCheck);
+    }
+
+    // inventory snippet of new Inventory object to retrieve
+    private void setUpInventorySnippet(Inventory inventoryToRetrieve) {
+        View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
+        InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
+
+        snippetBinding.setInventoryName(inventoryToRetrieve.getName());
+        snippetBinding.setInventoryPic(inventoryToRetrieve.getPictureResource());
+        benefitBinding.frameInventorySnippet.addView(view);
+    }
+
     // third and final state
         // set up the button to leave the encounter and to pick up item
     @Override
     public void endState() {
-        benefitBinding.layoutBtnOptions.removeAllViews();
         Button leaveButton = new Button(getContext());
         leaveButton.setText(getResources().getString(R.string.leave_encounter));
         leaveButton.setOnClickListener(new View.OnClickListener() {
@@ -190,6 +188,7 @@ public class RandomBenefitFragment extends Fragment implements EncounterFragment
         });
         benefitBinding.layoutBtnOptions.addView(leaveButton);
 
+        setUpInventorySnippet(inventoryToRetrieve);
         final Button btnPickUp = new Button(getContext());
         btnPickUp.setText(getResources().getString(R.string.pick_up_inventory));
         btnPickUp.setOnClickListener(new View.OnClickListener() {

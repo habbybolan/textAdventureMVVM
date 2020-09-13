@@ -32,12 +32,33 @@ holds current character data used to tie the data to necessary views
 public class CharacterViewModel extends BaseObservable {
 
     private Character character;
+    private Context context;
 
-    // retrieve a character from memory
-    // todo: this dependency may be confusing? - inject dependency from somewhere else preferably
-    public CharacterViewModel(Context context) {
+    private static CharacterViewModel instance = null;
+
+    // returns true if viewModel is initiated
+    public static boolean isInitiated() {
+        return instance != null;
+    }
+
+    // uses singleton pattern to access in all encounter fragments
+    public static CharacterViewModel getInstance() {
+        if (instance == null) throw new AssertionError("Have to call init first");
+        return instance;
+    }
+
+    // must be initialized before getting the instance
+    public static CharacterViewModel init(Context context) {
+        if (instance != null) throw new AssertionError("Already Initialized");
+        instance = new CharacterViewModel(context);
+        return instance;
+    }
+
+    // private constructor only accessed from initiation
+    private CharacterViewModel(Context context) {
+        this.context = context;
         SaveDataLocally save = new SaveDataLocally(context);
-        String characterData = save.readCharacterData(context);
+        String characterData = save.readCharacterData();
         DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
         character = new Character(characterData, mDbHelper, context);
     }
@@ -52,6 +73,13 @@ public class CharacterViewModel extends BaseObservable {
     public void setStateInventoryObserver(boolean isDropConsume) {
         stateInventoryObserver.set(isDropConsume);
     }
+
+    // save character
+    public void saveCharacter() {
+        SaveDataLocally save = new SaveDataLocally(context);
+        save.saveCharacterLocally(character);
+    }
+
 
     // ** Inventory **
 
@@ -155,11 +183,15 @@ public class CharacterViewModel extends BaseObservable {
             // bar changes
             if (item.getHealthChange() != 0) {
                 setMaxHealth(character.getMaxHealth() - item.getHealthChange());
-                setHealth(character.changeHealth(-item.getHealthChange()));
+                character.changeHealth(-item.getHealthChange());
+                // max health is altered
+                notifyChangeHealth(-item.getHealthChange());
             }
             if (item.getManaChange() != 0) {
                 setMaxMana(character.getMaxMana() - item.getManaChange());
-                setMana(character.changeMana(-item.getManaChange()));
+                character.changeMana(-item.getManaChange());
+                // max mana altered
+                notifyChangeMana(-item.getManaChange());
             }
             // special changes
             SpecialEffect special;
@@ -242,11 +274,15 @@ public class CharacterViewModel extends BaseObservable {
             // bar changes
             if (item.getHealthChange() != 0) {
                 setMaxHealth(character.getMaxHealth() + item.getHealthChange());
-                setHealth(character.changeHealth(item.getHealthChange()));
+                character.changeHealth(item.getHealthChange());
+                // max health is altered
+                notifyChangeHealth(item.getHealthChange());
             }
             if (item.getManaChange() != 0) {
                 setMaxMana(character.getMaxMana() + item.getManaChange());
-                setMana(character.changeMana(item.getManaChange()));
+                character.changeMana(item.getManaChange());
+                // max mana altered
+                notifyChangeMana(item.getManaChange());
             }
             // special changes
             SpecialEffect special;
@@ -353,8 +389,16 @@ public class CharacterViewModel extends BaseObservable {
             notifyPropertyChanged(BR.evasion);
         }
         // health/mana
-        if (item.getHealthChange() != 0) setHealth(character.changeHealth(item.getHealthChange()));
-        if (item.getManaChange() != 0) setMana(character.changeMana(item.getManaChange()));
+        if (item.getHealthChange() != 0) {
+            int healthChange = character.changeHealth(item.getHealthChange());
+            // only health altered
+            notifyChangeHealth(healthChange);
+        }
+        if (item.getManaChange() != 0) {
+            character.changeMana(item.getManaChange());
+            // only mana altered
+            notifyChangeMana(item.getManaChange());
+        }
         // specials
         if (item.getIsConfuse()) character.addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, item.getDuration()));
         if (item.getIsStun()) character.addNewSpecial(new SpecialEffect(SpecialEffect.STUN, item.getDuration()));
@@ -655,13 +699,17 @@ public class CharacterViewModel extends BaseObservable {
     // set a permanent health increase
     private void setPermHealthIncr(TempBar tempBar) {
         setMaxHealth(getMaxHealth() + tempBar.getAmount());
-        setHealth(Integer.parseInt(getHealth()) + tempBar.getAmount());
+        character.changeHealth(tempBar.getAmount());
+        // max health changed
+        notifyChangeHealth(tempBar.getAmount());
     }
 
     // set a permanent mana increase
     private void setPermManaIncr(TempBar tempBar) {
         setMaxMana(getMaxMana() + tempBar.getAmount());
-        setMana(Integer.parseInt(getMana()) + tempBar.getAmount());
+        character.changeMana(tempBar.getAmount());
+        // max mana altered
+        notifyChangeMana(tempBar.getAmount());
     }
 
 
@@ -675,10 +723,15 @@ public class CharacterViewModel extends BaseObservable {
     public String getHealth() {
         return String.valueOf(character.getHealth());
     }
-    // change the health by healthChange amount
+    // set the new health
     public void setHealth(int health) {
-        healthObserve.set(new HealthDialogue(health-character.getHealth()));
+        notifyChangeHealth(health - Integer.parseInt(getHealth()));
         character.setHealth(health);
+        notifyPropertyChanged(BR.health);
+    }
+    // notify healthChange to changeHealth
+    public void notifyChangeHealth(int changeHealth) {
+        healthObserve.set(new HealthDialogue(changeHealth));
         notifyPropertyChanged(BR.health);
     }
     @Bindable
@@ -687,7 +740,6 @@ public class CharacterViewModel extends BaseObservable {
     }
     public void setMaxHealth(int maxHealth) {
         character.setMaxHealth(character.getHealth() + maxHealth);
-        notifyPropertyChanged(BR.maxHealth);
     }
 
     private ObservableField<ManaDialogue> manaObserve = new ObservableField<>();
@@ -699,8 +751,12 @@ public class CharacterViewModel extends BaseObservable {
         return String.valueOf(character.getMana());
     }
     public void setMana(int mana) {
-        manaObserve.set(new ManaDialogue(mana));
         character.setMana(mana - character.getMana());
+        notifyPropertyChanged(BR.mana);
+    }
+    // // notify manaChange to changeMana
+    public void notifyChangeMana(int changeMana) {
+        manaObserve.set(new ManaDialogue(changeMana));
         notifyPropertyChanged(BR.mana);
     }
     @Bindable
@@ -709,7 +765,6 @@ public class CharacterViewModel extends BaseObservable {
     }
     public void setMaxMana(int maxMana) {
         character.setMaxMana(maxMana);
-        notifyPropertyChanged(BR.maxMana);
     }
 
         // misc

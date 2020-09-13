@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.DialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.EffectDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.HealthDialogueBinding;
@@ -19,7 +19,8 @@ import java.util.ArrayList;
 
 public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private ArrayList<DialogueTypes> dialogueList;
+    private ArrayList<DialogueType> dialogueList;
+
     private DialogueBinding dialogueBinding;
     private EffectDialogueBinding effectDialogueBinding;
     private HealthDialogueBinding healthDialogueBinding;
@@ -37,6 +38,18 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         inventoryDialogueBinding = new InventoryDialogueBinding(this);
         statDialogueBinding = new StatDialogueBinding(this);
         tempStatDialogueBinding = new TempStatDialogueBinding(this);
+    }
+
+    public DialogueAdapter(ArrayList<DialogueType> dialogueList) {
+        this.dialogueList = dialogueList;
+        dialogueBinding = new DialogueBinding(this);
+        effectDialogueBinding = new EffectDialogueBinding(this);
+        healthDialogueBinding = new HealthDialogueBinding(this);
+        manaDialogueBinding = new ManaDialogueBinding(this);
+        inventoryDialogueBinding = new InventoryDialogueBinding(this);
+        statDialogueBinding = new StatDialogueBinding(this);
+        tempStatDialogueBinding = new TempStatDialogueBinding(this);
+        notifyDataSetChanged();
     }
 
     // Return the total item count of DataBinders
@@ -89,8 +102,12 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     // add a new normal dialogue
-    void addNewDialogue(DialogueTypes dialogue) {
+    void addNewDialogue(DialogueType dialogue) {
         dialogueList.add(0, dialogue);
         notifyItemInserted(0);
+    }
+
+    public ArrayList<DialogueType> getDialogueList() {
+        return dialogueList;
     }
 }

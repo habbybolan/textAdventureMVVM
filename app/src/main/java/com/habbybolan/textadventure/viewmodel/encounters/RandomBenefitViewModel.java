@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.ObservableField;
 
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
@@ -15,6 +16,8 @@ import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
 public class RandomBenefitViewModel extends BaseObservable implements EncounterViewModel {
@@ -65,6 +68,11 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
         }
     }
 
+    @Override
+    public void saveEncounter(ArrayList<DialogueType> dialogueList) {
+        // TODO: Save random Benefit encounter
+    }
+
     // updates when a new bit of dialogue needs to be shown
     @Override
     public ObservableField<String> getNewDialogue() {
@@ -79,6 +87,8 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
     public void setNewDialogue(String newDialogue) {
         this.newDialogue.set(newDialogue);
     }
+
+
 
     // show the next dialogue snippet in the first state, called whenever dynamic button clicked
     @Override

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueStatDetailsBinding;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.StatDialogue;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
@@ -58,7 +58,7 @@ static class ViewHolder extends RecyclerView.ViewHolder {
 
 
     @Override
-    public void addDialogue(DialogueTypes dialogue) {
+    public void addDialogue(DialogueType dialogue) {
         if (dialogue.getClass() != StatDialogue.class) throw new IllegalArgumentException();
         StatDialogue addDialogue = (StatDialogue) dialogue;
         statDialogue.add(addDialogue);

@@ -1,10 +1,10 @@
 package com.habbybolan.textadventure.model.characterentity;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
@@ -62,12 +62,20 @@ public class Character extends CharacterEntity {
             // stats
             strength = characterObject.getInt("str");
             strBase = characterObject.getInt("strBase");
+            strIncrease = characterObject.getInt("strIncrease");
+            strDecrease = characterObject.getInt("strDecrease");
             intelligence = characterObject.getInt("int");
             intBase = characterObject.getInt("intBase");
+            intIncrease = characterObject.getInt("intIncrease");
+            intDecrease = characterObject.getInt("intDecrease");
             constitution = characterObject.getInt("con");
             conBase = characterObject.getInt("conBase");
+            conIncrease = characterObject.getInt("conIncrease");
+            conDecrease = characterObject.getInt("conDecrease");
             speed = characterObject.getInt("spd");
             spdBase = characterObject.getInt("spdBase");
+            spdIncrease = characterObject.getInt("spdIncrease");
+            spdDecrease = characterObject.getInt("spdDecrease");
             numStatPoints = strBase + intBase + conBase + spdBase;
             // misc
             level = characterObject.getInt("level");
@@ -97,7 +105,8 @@ public class Character extends CharacterEntity {
                     numWeapons++;
                 }
             }
-            equippedWeapon = weapons.get(0); // todo: allow change of equipped weapon
+            // todo: allow change of equipped weapon
+            //equippedWeapon = weapons.get(0);
             // items
             numItems = 0;
             JSONArray itemsArray = characterObject.getJSONArray("items");
@@ -110,13 +119,24 @@ public class Character extends CharacterEntity {
             }
 
             // DOTS
+            isFire = characterObject.getBoolean(Effect.FIRE);
+            isBleed = characterObject.getBoolean(Effect.BLEED);
+            isPoison = characterObject.getBoolean(Effect.POISON);
+            isFrostBurn = characterObject.getBoolean(Effect.FROSTBURN);
+            isHealDot = characterObject.getBoolean(Effect.HEALTH_DOT);
+            isManaDot = characterObject.getBoolean(Effect.MANA_DOT);
             JSONArray dotList = characterObject.getJSONArray("dotList");
             for (int i = 0; i < dotList.length(); i++) {
                 JSONArray dot = (JSONArray) dotList.get(i);
                 this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
             }
             // SPECIAL
-            JSONArray specialList = characterObject.getJSONArray("specialMap");
+            isStun = characterObject.getBoolean(Effect.STUN);
+            isConfuse = characterObject.getBoolean(Effect.CONFUSE);
+            isSilence = characterObject.getBoolean(Effect.SILENCE);
+            isInvincible = characterObject.getBoolean(Effect.INVINCIBILITY);
+            isInvisible = characterObject.getBoolean(Effect.INVISIBILITY);
+            JSONArray specialList = characterObject.getJSONArray("specialList");
             for (int i = 0; i < specialList.length(); i++) {
                 JSONArray special = (JSONArray) specialList.get(i);
                 this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
@@ -167,9 +187,7 @@ public class Character extends CharacterEntity {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-        bitmapAlive = BitmapFactory.decodeResource(context.getResources(), R.drawable.paladin);
-        bitmapDead = BitmapFactory.decodeResource(context.getResources(), R.drawable.paladin);
+        drawableResID = R.drawable.archer;
     }
 
 

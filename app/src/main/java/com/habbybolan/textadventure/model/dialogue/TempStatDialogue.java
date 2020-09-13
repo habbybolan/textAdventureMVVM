@@ -2,7 +2,10 @@ package com.habbybolan.textadventure.model.dialogue;
 
 import com.habbybolan.textadventure.R;
 
-public class TempStatDialogue implements DialogueTypes {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class TempStatDialogue implements DialogueType {
 
 
     private String type;
@@ -30,5 +33,15 @@ public class TempStatDialogue implements DialogueTypes {
     @Override
     public int getViewType() {
         return R.layout.dialogue_temp_stat_details;
+    }
+
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(DIALOGUE_TYPE, TYPE_TEMP_STAT);
+        jsonObject.put(TYPE, type);
+        jsonObject.put(AMOUNT, amount);
+        jsonObject.put(DURATION, duration);
+        return jsonObject;
     }
 }

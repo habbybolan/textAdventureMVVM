@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.ObservableField;
 
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.encounter.TrapModel;
@@ -16,6 +17,8 @@ import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class TrapEncounterViewModel extends BaseObservable implements EncounterViewModel {
     public static final int firstState = 1;
@@ -59,6 +62,7 @@ public class TrapEncounterViewModel extends BaseObservable implements EncounterV
         if (stateIndex != null) return stateIndex;
         throw new NullPointerException();
     }
+
     // increment the state index to next state
     @Override
     public void incrementStateIndex() {
@@ -67,6 +71,11 @@ public class TrapEncounterViewModel extends BaseObservable implements EncounterV
             int newState = ++state;
             stateIndex.set(newState);
         }
+    }
+
+    @Override
+    public void saveEncounter(ArrayList<DialogueType> dialogueList) {
+        // todo: save trap encounter
     }
 
     // updates when a new bit of dialogue needs to be shown

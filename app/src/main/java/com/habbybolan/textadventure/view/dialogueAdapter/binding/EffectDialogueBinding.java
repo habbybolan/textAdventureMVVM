@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueEffectDetailsBinding;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.EffectDialogue;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
@@ -59,7 +59,7 @@ public class EffectDialogueBinding extends DataBinder<EffectDialogueBinding.View
 
 
     @Override
-    public void addDialogue(DialogueTypes dialogue) {
+    public void addDialogue(DialogueType dialogue) {
         if (dialogue.getClass() != EffectDialogue.class) throw new IllegalArgumentException();
         EffectDialogue addDialogue = (EffectDialogue) dialogue;
         effectDialogue.add(addDialogue);

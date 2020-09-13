@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +22,8 @@ public class CharacterChoiceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) getSupportActionBar().hide();
         // todo: ability to read context from CharacterChoiceViewModel
         //CharacterChoiceResourceProvider resourceProvider = new CharacterChoiceResourceProvider(getApplicationContext());
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_character_choice);
@@ -47,4 +49,8 @@ public class CharacterChoiceActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainGameActivity.class);
         startActivity(intent);
     }
+
+    // disable the back button
+    @Override
+    public void onBackPressed() {}
 }

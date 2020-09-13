@@ -84,6 +84,7 @@ public class TrapFragment extends Fragment implements EncounterFragment{
         switch(state) {
             // first state
             case TrapEncounterViewModel.firstState:
+                trapBinder.layoutBtnOptions.removeAllViews();
                 try {
                     dialogueState();
                 } catch (JSONException e) {
@@ -92,10 +93,12 @@ public class TrapFragment extends Fragment implements EncounterFragment{
                 break;
                 // second state
             case TrapEncounterViewModel.secondState:
+                trapBinder.layoutBtnOptions.removeAllViews();
                 beforeTrapState();
                 break;
                 // last state
             case TrapEncounterViewModel.thirdState:
+                trapBinder.layoutBtnOptions.removeAllViews();
                 endState();
                 break;
         }
@@ -104,7 +107,6 @@ public class TrapFragment extends Fragment implements EncounterFragment{
 
     // set up Recycler viewer and Observable data for when further dialogue is added
     public void setUpDialogueRV() {
-        trapBinder.layoutBtnOptions.removeAllViews();
         final DialogueRecyclerView rv = new DialogueRecyclerView(getContext(), trapBinder.rvDialogue, characterVM);
 
         // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
@@ -148,8 +150,8 @@ public class TrapFragment extends Fragment implements EncounterFragment{
     // second state
         // set up buttons to either attempt to dodge trap, or use escape item
     private void beforeTrapState() {
+        // remove ability to drop/consume Inventory Objects
         characterVM.setStateInventoryObserver(false);
-        trapBinder.layoutBtnOptions.removeAllViews();
         Button btnDodgeTrap = new Button(getContext());
         String dodge = "Dodge Trap";
         btnDodgeTrap.setText(dodge);
@@ -181,8 +183,8 @@ public class TrapFragment extends Fragment implements EncounterFragment{
         // set up the button to leave the encounter and goto next
     @Override
     public void endState() {
+        // restore ability to drop/consume Inventory objects
         characterVM.setStateInventoryObserver(true);
-        trapBinder.layoutBtnOptions.removeAllViews();
         Button leaveButton = new Button(getContext());
         leaveButton.setText(getResources().getString(R.string.leave_encounter));
         leaveButton.setOnClickListener(new View.OnClickListener() {

@@ -2,6 +2,7 @@ package com.habbybolan.textadventure.view;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
@@ -14,6 +15,8 @@ import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.TrapFragment;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+
+import org.json.JSONException;
 
 /*
 The activity that holds the majority of the game, including the CharacterFragment and all included encounter fragments
@@ -28,12 +31,19 @@ public class MainGameActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
-        characterViewModel = new CharacterViewModel(getApplicationContext());
-        mainGameViewModel = new MainGameViewModel(getApplicationContext(), characterViewModel);
+        super.onCreate(null);
+        // remove toolbar
+        ActionBar actionbar = getSupportActionBar();
+        if (actionbar != null) getSupportActionBar().hide();
+        // if viewModels not yet initiated, so initiate them
+        if (!CharacterViewModel.isInitiated()) {
+            characterViewModel = CharacterViewModel.init(getApplicationContext());
+            mainGameViewModel = MainGameViewModel.init(getApplicationContext(), characterViewModel);
+        } else {
+            characterViewModel = CharacterViewModel.getInstance();
+            mainGameViewModel = MainGameViewModel.getInstance();
+        }
         mainGameBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_game);
-        mainGameBinding.setLifecycleOwner(this);
         mainGameBinding.setMainGameViewModel(mainGameViewModel);
         mainGameBinding.setCharacterViewModel(characterViewModel);
 
@@ -45,8 +55,14 @@ public class MainGameActivity extends AppCompatActivity {
                 .commit();
 
         observeEncounterChange();
-        mainGameViewModel.getEncounterType().notifyChange();
+        // opens a game encounter, new one is none saved, otherwise open saved one
+        try {
+            mainGameViewModel.openGameEncounter();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
 
     // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
     private void observeEncounterChange() {
@@ -67,7 +83,7 @@ public class MainGameActivity extends AppCompatActivity {
                 isDungeon = true;
                 DungeonEncounter dungeonEncounter = new DungeonEncounter(getContext(), character, damage);
                 dungeonEncounter.setInitialChoice(encounter);
-                break; !g
+                break;
             case MULTI_LEVEL_TYPE:
                 isMultiLevel = true;
                 MultiLevelEncounter multiLevelEncounter = new MultiLevelEncounter(getContext(), character, damage, view, this, model);
@@ -93,12 +109,12 @@ public class MainGameActivity extends AppCompatActivity {
                 enterLeaveShop(encounter);
                 break;*/
             case MainGameViewModel.CHOICE_BENEFIT_TYPE:
-                ChoiceBenefitFragment choiceBenefitFragment = new ChoiceBenefitFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
+                ChoiceBenefitFragment choiceBenefitFragment = ChoiceBenefitFragment.newInstance();
                 getSupportFragmentManager()
                         .beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
                         .replace(R.id.fragment_container_game, choiceBenefitFragment)
-                        .commit();
+                        .commitAllowingStateLoss();
                 break;
             case MainGameViewModel.RANDOM_BENEFIT_TYPE:
                 RandomBenefitFragment randomBenefitFragment = new RandomBenefitFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
@@ -116,5 +132,9 @@ public class MainGameActivity extends AppCompatActivity {
                 throw new IllegalArgumentException();
         }
     }
+
+    // disable the back button
+    @Override
+    public void onBackPressed() {}
 
 }

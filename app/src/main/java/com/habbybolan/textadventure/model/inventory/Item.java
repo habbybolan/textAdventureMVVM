@@ -5,6 +5,9 @@ import android.database.Cursor;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.concurrent.ExecutionException;
 
 // create an item object that is copies from db.sqlite
@@ -382,6 +385,21 @@ public class Item implements Inventory{
         return turnToDeliver;
     }
 
+    @Override
+    public JSONObject toJSON() {
+        JSONObject toJSON = new JSONObject();
+        try {
+            toJSON.put("type", "item");
+            toJSON.put("id", getID());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return toJSON;
+    }
+    @Override
+    public int getID() {
+        return itemID;
+    }
     @Override
     public String getType() {
         return Inventory.TYPE_ITEM;

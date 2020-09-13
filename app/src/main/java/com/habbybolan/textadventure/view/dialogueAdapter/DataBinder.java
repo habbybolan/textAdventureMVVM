@@ -4,7 +4,7 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 
 public abstract class DataBinder <T extends RecyclerView.ViewHolder> {
 
@@ -20,5 +20,5 @@ public abstract class DataBinder <T extends RecyclerView.ViewHolder> {
 
     abstract public int getItemCount();
 
-    abstract public void addDialogue(DialogueTypes dialogue);
+    abstract public void addDialogue(DialogueType dialogue);
 }

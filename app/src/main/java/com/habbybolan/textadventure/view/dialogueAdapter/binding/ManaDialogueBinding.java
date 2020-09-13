@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueManaDetailsBinding;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
@@ -45,7 +45,7 @@ public class ManaDialogueBinding extends DataBinder<ManaDialogueBinding.ViewHold
         }
 
         void bind(ManaDialogue manaDialogue) {
-            binding.setManaChange(String.valueOf(manaDialogue.getManaChange()));
+            binding.setManaChange(String.valueOf(manaDialogue.getAmount()));
             binding.setManaPicture(manaDialogue.getIcon());
             binding.executePendingBindings();
         }
@@ -58,7 +58,7 @@ public class ManaDialogueBinding extends DataBinder<ManaDialogueBinding.ViewHold
 
 
     @Override
-    public void addDialogue(DialogueTypes dialogue) {
+    public void addDialogue(DialogueType dialogue) {
         if (dialogue.getClass() != ManaDialogue.class) throw new IllegalArgumentException();
         ManaDialogue addDialogue = (ManaDialogue) dialogue;
         manaDialogue.add(addDialogue);

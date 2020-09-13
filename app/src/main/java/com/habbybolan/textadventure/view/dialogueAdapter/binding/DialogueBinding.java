@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueDetailsBinding;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
 
@@ -65,7 +65,7 @@ public class DialogueBinding extends DataBinder<DialogueBinding.ViewHolder> {
     }
 
     @Override
-    public void addDialogue(DialogueTypes dialogue) {
+    public void addDialogue(DialogueType dialogue) {
         if (dialogue.getClass() != Dialogue.class) throw new IllegalArgumentException();
         Dialogue addDialogue = (Dialogue) dialogue;
         this.dialogue.add(addDialogue.getDialogue());

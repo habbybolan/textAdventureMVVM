@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueHealthDetailsBinding;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
@@ -45,7 +45,7 @@ public class HealthDialogueBinding extends DataBinder<HealthDialogueBinding.View
         }
 
         void bind(HealthDialogue healthDialogue) {
-            binding.setHealthChange(String.valueOf(healthDialogue.getHealthChange()));
+            binding.setHealthChange(String.valueOf(healthDialogue.getAmount()));
             binding.setHealthPicture(healthDialogue.getIcon());
             binding.executePendingBindings();
         }
@@ -58,7 +58,7 @@ public class HealthDialogueBinding extends DataBinder<HealthDialogueBinding.View
 
 
     @Override
-    public void addDialogue(DialogueTypes dialogue) {
+    public void addDialogue(DialogueType dialogue) {
         if (dialogue.getClass() != HealthDialogue.class) throw new IllegalArgumentException();
         HealthDialogue addDialogue = (HealthDialogue) dialogue;
         healthDialogue.add(addDialogue);

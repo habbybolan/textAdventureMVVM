@@ -63,18 +63,17 @@ public class MainActivityViewModel extends BaseObservable {
         return (file.exists());
     }
 
-    // deletes a character and the stored previous encounters from local storage
+    // deletes a character and the stored saved encounters from local storage
     public void deleteCharacter(Context context) {
         File fileCharacter = new File(context.getFilesDir(), context.getResources().getString(R.string.fileCharacter));
         if (fileExists(fileCharacter)) {
             boolean deleted = fileCharacter.delete();
         }
-        File filePrevEncounters = new File(context.getFilesDir(), context.getResources().getString(R.string.filePrevEncounters));
-        if (fileExists(filePrevEncounters)) {
-            boolean deleted = filePrevEncounters.delete();
+        File fileEncounter = new File(context.getFilesDir(), context.getResources().getString(R.string.fileEncounter));
+        if (fileExists(fileEncounter)) {
+            boolean deleted = fileEncounter.delete();
         }
         setNewGameVisibility(View.VISIBLE);
         setExistingGameVisibility(View.GONE);
     }
-
 }

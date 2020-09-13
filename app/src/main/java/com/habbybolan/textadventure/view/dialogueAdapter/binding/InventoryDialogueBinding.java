@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueInventoryDetailsBinding;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
@@ -63,7 +63,7 @@ public class InventoryDialogueBinding extends DataBinder<InventoryDialogueBindin
 
 
     @Override
-    public void addDialogue(DialogueTypes dialogue) {
+    public void addDialogue(DialogueType dialogue) {
         if (dialogue.getClass() != InventoryDialogue.class) throw new IllegalArgumentException();
         InventoryDialogue addDialogue = (InventoryDialogue) dialogue;
         inventoryDialogue.add(addDialogue);

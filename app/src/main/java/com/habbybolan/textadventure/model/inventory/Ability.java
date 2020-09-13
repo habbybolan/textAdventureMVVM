@@ -5,6 +5,9 @@ import android.database.Cursor;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.concurrent.ExecutionException;
 
 public class Ability implements Inventory{
@@ -537,6 +540,21 @@ public class Ability implements Inventory{
         return tier;
     }
 
+    @Override
+    public JSONObject toJSON() {
+        JSONObject toJSON = new JSONObject();
+        try {
+            toJSON.put("type", "ability");
+            toJSON.put("id", getID());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return toJSON;
+    }
+    @Override
+    public int getID() {
+        return abilityID;
+    }
     @Override
     public String getType() {
         return Inventory.TYPE_ABILITY;

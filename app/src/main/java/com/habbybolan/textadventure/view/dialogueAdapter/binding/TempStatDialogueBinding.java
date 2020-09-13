@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueTempStatDetailsBinding;
-import com.habbybolan.textadventure.model.dialogue.DialogueTypes;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.TempStatDialogue;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
@@ -59,7 +59,7 @@ public class TempStatDialogueBinding extends DataBinder<TempStatDialogueBinding.
 
 
     @Override
-    public void addDialogue(DialogueTypes dialogue) {
+    public void addDialogue(DialogueType dialogue) {
         if (dialogue.getClass() != TempStatDialogue.class) throw new IllegalArgumentException();
         TempStatDialogue addDialogue = (TempStatDialogue) dialogue;
         tempStatDialogue.add(addDialogue);

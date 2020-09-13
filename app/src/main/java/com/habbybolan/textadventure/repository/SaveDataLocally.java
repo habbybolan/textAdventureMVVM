@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.viewmodel.CharacterChoiceViewModel;
 
@@ -20,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 
 public class SaveDataLocally {
@@ -311,11 +313,11 @@ public class SaveDataLocally {
                 }
                 jsonClassObject.put("items", itemsArray);
                 // specials
-                jsonClassObject.put("isStun", character.getIsStun());
-                jsonClassObject.put("isConfuse", character.getIsConfuse());
-                jsonClassObject.put("isInvincibility", character.getIsInvincible());
-                jsonClassObject.put("isSilence", character.getIsSilence());
-                jsonClassObject.put("invisibility", character.getIsInvisible());
+                jsonClassObject.put(Effect.STUN, character.getIsStun());
+                jsonClassObject.put(Effect.CONFUSE, character.getIsConfuse());
+                jsonClassObject.put(Effect.INVINCIBILITY, character.getIsInvincible());
+                jsonClassObject.put(Effect.SILENCE, character.getIsSilence());
+                jsonClassObject.put(Effect.INVISIBILITY, character.getIsInvisible());
                 JSONArray specialArray = new JSONArray();
                 for (SpecialEffect appliedSpecial: character.getSpecialList()) {
                     JSONArray special = new JSONArray();
@@ -323,7 +325,7 @@ public class SaveDataLocally {
                     special.put(appliedSpecial.getDuration());
                     specialArray.put(special);
                 }
-                jsonClassObject.put("specialMap", specialArray);
+                jsonClassObject.put("specialList", specialArray);
                 // temp health
                 jsonClassObject.put("tempExtraHealth", character.getTempExtraHealth());
                 JSONArray tempHealthArray = new JSONArray(); // <key, value>
@@ -365,6 +367,12 @@ public class SaveDataLocally {
                 }
                 jsonClassObject.put("statDecreaseList", statDecreaseArray);
                 // DOT
+                jsonClassObject.put(Effect.BLEED, character.getIsBleed());
+                jsonClassObject.put(Effect.POISON, character.getIsPoison());
+                jsonClassObject.put(Effect.FIRE, character.getIsFire());
+                jsonClassObject.put(Effect.FROSTBURN, character.getIsFrostBurn());
+                jsonClassObject.put(Effect.HEALTH_DOT, character.getIsHealDot());
+                jsonClassObject.put(Effect.MANA_DOT, character.getIsManaDot());
                 JSONArray dotArray = new JSONArray(); // <key, value>
                 for (Dot appliedDot: character.getDotList()) {
                     JSONArray dot = new JSONArray();
@@ -397,25 +405,59 @@ public class SaveDataLocally {
     }
 
 
-    // return the string of the character data saved locally
-    public String readCharacterData(Context ctx) {
-        String fileName = ctx.getResources().getString(R.string.fileCharacter);
-        return readJSON(ctx, fileName);
+    // return the string of the character data saved locally, null if no character exists
+    public String readCharacterData() {
+        return readStringFomFile(context.getResources().getString(R.string.fileCharacter));
     }
 
-    public String readPrevEncounter(Context ctx) throws JSONException {
-        String fileName = ctx.getResources().getString(R.string.filePrevEncounters);
-        JSONObject jsonObject = new JSONObject(readJSON(ctx, fileName));
-        JSONArray jsonArray = jsonObject.getJSONArray("encounters");
-        int length = jsonArray.length();
-        if (length == 0) // no previous encounters saved before
-            return "";
-        return jsonArray.getString(length-1);
+    // returns the JSON of encounter object, or null if none exists
+    public JSONObject readSavedEncounter() {
+        String encounterString = readStringFomFile(context.getResources().getString(R.string.fileEncounter));
+        try {
+            if (encounterString != null) return new JSONObject(encounterString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    private String readAllEncounters(Context ctx) {
-        String fileName = ctx.getResources().getString(R.string.filePrevEncounters);
-        return readJSON(ctx, fileName);
+    public void saveEncounter(JSONObject objectToSave) {
+        String fileName = context.getResources().getString(R.string.fileEncounter);
+        String jsonString = objectToSave.toString();
+        try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
+            fos.write(jsonString.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    // helper to read a String from local storage
+    private String readStringFomFile(String fileName) {
+        try {
+            File file = new File(context.getFilesDir(), fileName);
+            if (file.exists()) {
+                FileInputStream fis = context.openFileInput(fileName);
+                InputStreamReader inputStreamReader = new InputStreamReader(fis, StandardCharsets.UTF_8);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                BufferedReader reader = new BufferedReader(inputStreamReader);
+                String line = reader.readLine();
+                while (line != null) {
+                    stringBuilder.append(line);
+                    line = reader.readLine();
+                }
+                return stringBuilder.toString();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String readAllEncounters() {
+        String fileName = context.getResources().getString(R.string.fileEncounter);
+        return readJSON(context, fileName);
     }
 
     // read the local JSON data, given a fileName
@@ -452,7 +494,7 @@ public class SaveDataLocally {
 
     // deletes the previous encounters from local storage
     private void deletePreviousEncounters() {
-        File file = new File(context.getResources().getString(R.string.filePrevEncounters));
+        File file = new File(context.getResources().getString(R.string.fileEncounter));
         if (file.delete())
             System.out.println("Previous encounters deleted");
     }
@@ -461,13 +503,13 @@ public class SaveDataLocally {
 
 
     // todo: saves incorrectly - fix this
-    public void saveEncounter(Context ctx, String encounter) throws JSONException {
-        String filename = ctx.getResources().getString(R.string.filePrevEncounters);
+    public void saveEncounter(String encounter) throws JSONException {
+        /*String filename = context.getResources().getString(R.string.fileEncounter);
         FileOutputStream fOut;
         JSONObject jsonObject;
         JSONArray jsonArray;
-        if (!readPrevEncounter(ctx).equals("")) {
-            jsonObject = new JSONObject(readAllEncounters(ctx));
+        if (!readSavedEncounter(context).equals("")) {
+            jsonObject = new JSONObject(readAllEncounters(context));
             jsonArray = jsonObject.getJSONArray("encounters");
             jsonArray.put(encounter);
             jsonObject.remove("encounters");
@@ -481,13 +523,13 @@ public class SaveDataLocally {
         jsonArray.put(encounter);
 
         try {
-            fOut = ctx.openFileOutput(filename, Context.MODE_PRIVATE);
+            fOut = context.openFileOutput(filename, Context.MODE_PRIVATE);
             fOut.write(jsonObject.toString().getBytes());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }
 

@@ -8,8 +8,9 @@ import androidx.databinding.Bindable;
 import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.BR;
-import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.repository.JsonAssetFileReader;
+import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,14 +25,13 @@ public class MainGameViewModel extends BaseObservable {
 
     // number of encounters the user has played
     private int encounterNumber = 0;
-    private Context context;
     private int turnCounter; // keeps track of the number of encounters/distance travelled
 
     private int gameFragmentVisible = View.VISIBLE; // visibility of the game fragment
     private int characterFragmentVisible = View.GONE; // visibility of the character fragment
 
     private static final String outdoorJSONFilename = "outdoor_encounters";
-    public JSONObject JSONEncounter;
+    private JSONObject JSONEncounter;
 
     // keeps track of the location
     private int location = FOREST;
@@ -71,27 +71,65 @@ public class MainGameViewModel extends BaseObservable {
     final public static int QUEST = 8; // temporary leave the "area" to finish a specific task for a reward
     final public static String QUEST_TYPE = "quest";
 
-    CharacterViewModel characterVM;
-    public MainGameViewModel(Context context, CharacterViewModel characterVM) {
+    private CharacterViewModel characterVM;
+    private Context context;
+
+    private JSONObject savedEncounter;
+
+    private static MainGameViewModel instance = null;
+
+    // returns true if viewModel is initiated
+    public static boolean isInitiated() {
+        return instance != null;
+    }
+
+    // uses singleton pattern to access in all encounter fragments
+    public static MainGameViewModel getInstance() {
+        if (instance == null) throw new AssertionError("Have to call init first");
+        return instance;
+    }
+
+    // private constructor only accessed from initiation
+    private MainGameViewModel(Context context, CharacterViewModel characterVM) {
         this.characterVM = characterVM;
         this.context = context;
-        gotoNextEncounter();
+    }
+
+    // must be initialized before getting the instance
+    public static MainGameViewModel init(Context context, CharacterViewModel characterVM) {
+        if (instance != null) throw new AssertionError("Already Initialized");
+        instance = new MainGameViewModel(context, characterVM);
+        return instance;
     }
 
     // observer for when the encounter changes, starting a new one
     private ObservableField<String> encounterType = new ObservableField<>();
-    @Bindable
     public ObservableField<String> getEncounterType() {
         return encounterType;
     }
     public void setEncounterType(String encounterType) {
         this.encounterType.set(encounterType);
-        notifyPropertyChanged(BR.encounterType);
+    }
+
+    public void openGameEncounter() throws JSONException {
+        SaveDataLocally save = new SaveDataLocally(context);
+        JSONObject prevSave = save.readSavedEncounter();
+        if (prevSave != null) {
+            // if a saved encounter exists, then go into it
+            savedEncounter = prevSave;
+            JSONEncounter = prevSave.getJSONObject(EncounterViewModel.ENCOUNTER);
+            setEncounterType(prevSave.getString(EncounterViewModel.ENCOUNTER_TYPE));
+        } else {
+            // otherwise, create a new encounter
+            gotoNextEncounter();
+        }
     }
 
     // called by outside this viewModel to start a new encounter
     public void gotoNextEncounter() {
         characterVM.applyDots();
+        savedEncounter = null;
+        // todo: decrement stat and bar durations
         //characterVM.decrementStatChangeDuration();
         //characterVM.decrementTempExtraDuration();
         characterVM.decrSpecialDuration();
@@ -121,50 +159,6 @@ public class MainGameViewModel extends BaseObservable {
         */
         String type = JSONEncounter.getString("type");
         setEncounterType(type);
-    }
-
-    // set up the encounter given the JSON string
-    public void setEncounter(String type) throws JSONException {
-        //String type = encounter.getString("type");
-        switch (type) {
-            /*case DUNGEON_TYPE:
-                isDungeon = true;
-                DungeonEncounter dungeonEncounter = new DungeonEncounter(getContext(), character, damage);
-                dungeonEncounter.setInitialChoice(encounter);
-                break;
-            case MULTI_LEVEL_TYPE:
-                isMultiLevel = true;
-                MultiLevelEncounter multiLevelEncounter = new MultiLevelEncounter(getContext(), character, damage, view, this, model);
-                multiLevelEncounter.setInitialMultiLevel(encounter);
-                break;
-            case CHOICE_TYPE:
-                ChoiceEncounter choiceEncounter = new ChoiceEncounter(getContext(), character, damage, view, this, model);
-                choiceEncounter.setInitialChoice(encounter);
-                break;
-            case COMBAT_TYPE:
-                CombatEncounter combatObject = new CombatEncounter(getContext(), character, damage, view, this);
-                combatObject.setInitialCombat(encounter, view);
-                break;*/
-            case TRAP_TYPE:
-                encounterLayout = R.layout.fragment_trap;
-                break;
-            /*case SHOP_TYPE:
-                enterLeaveShop(encounter);
-                break;
-            case BENEFIT_TYPE:
-                BenefitEncounter benefitObject = new BenefitEncounter(getContext(), character, model, view, this);
-                benefitObject.setInitialBenefit(encounter.getString("dialogue"));
-                break;*/
-            case RANDOM_BENEFIT_TYPE:
-                encounterLayout = R.layout.fragment_random_benefit;
-                break;
-           /* case QUEST_TYPE:
-                QuestEncounter questEncounter = new QuestEncounter(getContext(), character, damage, view, this, model);
-                questEncounter.setInitialQuest(encounter.getJSONObject("encounter"));
-                break;*/
-            default: //  shouldn't reach here
-                throw new IllegalArgumentException();
-        }
     }
 
     @Bindable
@@ -217,6 +211,10 @@ public class MainGameViewModel extends BaseObservable {
 
     public int getEncounterLayout() {
         return encounterLayout;
+    }
+
+    public JSONObject getSavedEncounter() {
+        return savedEncounter;
     }
 
 }

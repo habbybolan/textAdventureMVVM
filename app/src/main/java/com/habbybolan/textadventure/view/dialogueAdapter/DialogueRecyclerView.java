@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
+import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.EffectDialogue;
 import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
 import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
@@ -22,6 +23,8 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+
+import java.util.ArrayList;
 
 /*
 creates the dialogue recyclerView, updating on each character action
@@ -53,6 +56,31 @@ public class DialogueRecyclerView {
         setWeaponListener();
         setItemListener();
             // stat
+        setTempStatListener();
+        setStatListener();
+    }
+
+    public DialogueRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, ArrayList<DialogueType> dialogueList) {
+
+        // set the layout manager to position the items
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        this.adapter = new DialogueAdapter(dialogueList);
+        recyclerView.setAdapter(adapter);
+        this.characterVM = characterVM;
+
+        // set up OnCLickListeners for changes in player Character
+        // Effect listeners
+        setDotListener();
+        setSpecialListener();
+        // bar listeners
+        setHealthListener();
+        setManaListener();
+        setBarListener();
+        // inventory listeners
+        setAbilityListener();
+        setWeaponListener();
+        setItemListener();
+        // stat
         setTempStatListener();
         setStatListener();
     }
@@ -263,6 +291,10 @@ public class DialogueRecyclerView {
             }
         };
         characterVM.getUpdateAllStatChange().addOnPropertyChangedCallback(callBackDecr);
+    }
+
+    public ArrayList<DialogueType> getDialogueList() {
+        return adapter.getDialogueList();
     }
 
 

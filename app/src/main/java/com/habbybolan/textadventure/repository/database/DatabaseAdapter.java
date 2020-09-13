@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.MergeCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -47,29 +46,24 @@ public class DatabaseAdapter {
         open();
     }
 
-    public DatabaseAdapter createDatabase() throws SQLException {
+    private void createDatabase() throws SQLException {
         try {
             mDbHelper.createDataBase();
         } catch (IOException mIOException) {
             Log.e(TAG, mIOException.toString() + "  UnableToCreateDatabase");
             throw new Error("UnableToCreateDatabase");
         }
-        return this;
     }
 
-    public DatabaseAdapter open() throws SQLException {
+    private void open() throws SQLException {
         try {
             mDbHelper.openDataBase();
             mDbHelper.close();
             mDb = mDbHelper.getReadableDatabase();
-        } catch (SQLiteException mSQLException) {
-            Log.e(TAG, "open >>"+ mSQLException.toString());
-            throw mSQLException;
         } catch (SQLException mSQLException) {
             Log.e(TAG, "open >>"+ mSQLException.toString());
             throw mSQLException;
         }
-        return this;
     }
 
     public void close() {
@@ -92,7 +86,7 @@ public class DatabaseAdapter {
                 }
                 return mCur;
             } catch (SQLException mSQLException) {
-                Log.e(TAG, "getTestData >>"+ mSQLException.toString());
+                Log.e(TAG, "sql database access fail >>"+ mSQLException.toString());
                 throw mSQLException;
             }
         }
@@ -115,6 +109,7 @@ public class DatabaseAdapter {
     public ArrayList<Weapon> getRandomWeapons(int numWeapons) throws ExecutionException, InterruptedException {
         open();
         // create a loot pool of 10 items, where numWeapons Weapons will be picked from it
+
         // get some tier 1 weapon, specified by WEAPON_TIER_1
         double numTier1D = LOOT_POOL_SIZE*WEAPON_TIER_1;
         int numTier1 = (int)numTier1D;

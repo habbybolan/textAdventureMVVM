@@ -2,21 +2,32 @@ package com.habbybolan.textadventure.model.dialogue;
 
 import com.habbybolan.textadventure.R;
 
-public class ManaDialogue implements DialogueTypes {
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    private int manaChange;
+public class ManaDialogue implements DialogueType {
 
-    public ManaDialogue(int manaChange) {
-        this.manaChange = manaChange;
+    private int amount;
+
+    public ManaDialogue(int amount) {
+        this.amount = amount;
     }
 
-    public int getManaChange() {
-        return manaChange;
+    public int getAmount() {
+        return amount;
     }
 
     @Override
     public int getViewType() {
         return R.layout.dialogue_mana_details;
+    }
+
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(DIALOGUE_TYPE, TYPE_MANA);
+        jsonObject.put(AMOUNT, amount);
+        return jsonObject;
     }
 
     public int getIcon() {

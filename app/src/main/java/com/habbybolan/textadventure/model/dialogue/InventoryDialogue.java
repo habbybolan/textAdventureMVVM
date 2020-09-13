@@ -2,7 +2,10 @@ package com.habbybolan.textadventure.model.dialogue;
 
 import com.habbybolan.textadventure.R;
 
-public class InventoryDialogue implements DialogueTypes {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class InventoryDialogue implements DialogueType {
 
     // image resource of inventory object
     private int imageResource;
@@ -31,6 +34,17 @@ public class InventoryDialogue implements DialogueTypes {
     @Override
     public int getViewType() {
         return R.layout.dialogue_inventory_details;
+    }
+
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(DIALOGUE_TYPE, TYPE_INVENTORY);
+        jsonObject.put(TYPE, type);
+        jsonObject.put(NAME, name);
+        jsonObject.put(IMAGE_RESOURCE, imageResource);
+        jsonObject.put(IS_ADDED, isAdded);
+        return jsonObject;
     }
 
     public int getIcon() {
