@@ -8,12 +8,9 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.Observable;
-import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentTrapBinding;
-import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
@@ -22,7 +19,9 @@ import com.habbybolan.textadventure.viewmodel.encounters.TrapEncounterViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TrapFragment extends Fragment implements EncounterFragment{
+import java.util.concurrent.ExecutionException;
+
+public class TrapFragment extends EncounterDialogueFragment implements EncounterFragment{
 
     private JSONObject encounter;
     private FragmentTrapBinding trapBinder;
@@ -30,7 +29,7 @@ public class TrapFragment extends Fragment implements EncounterFragment{
 
     private MainGameViewModel mainGameVM;
     private CharacterViewModel characterVM;
-    private int state = 0;
+    private DialogueRecyclerView rv;
 
 
     public TrapFragment(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter) {
@@ -42,6 +41,11 @@ public class TrapFragment extends Fragment implements EncounterFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            trapEncounterVM = new TrapEncounterViewModel(mainGameVM, characterVM, encounter, getActivity());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -49,47 +53,34 @@ public class TrapFragment extends Fragment implements EncounterFragment{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         trapBinder = DataBindingUtil.inflate(inflater, R.layout.fragment_trap, container,false);
+
         try {
-            trapEncounterVM = new TrapEncounterViewModel(mainGameVM, characterVM, encounter, getActivity());
-        } catch (JSONException e) {
+            setUpEncounterBeginning();
+        } catch (JSONException | ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        setUpDialogueRV();
-        // create state listener and go into first state
-        stateListener();
-
         return trapBinder.getRoot();
     }
 
-    // listens to when the trap state changes
-    @Override
-    public void stateListener() {
-        final Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                //Integer stateInteger = trapEncounterVM.getStateIndex().get();
-                state = trapEncounterVM.getStateIndexValue();
-                checkState();
-            }
-        };
-        trapEncounterVM.getStateIndex().addOnPropertyChangedCallback(callback);
-        Integer state = trapEncounterVM.getStateIndex().get();
-        if (state != null) this.state = state;
-        checkState();
+    // sets up the RV dialogue adapter and the encounter state to enter
+    private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
+        trapEncounterVM.setSavedData();
+        // set up Recycler Viewer that holds all dialogue
+        rv = new DialogueRecyclerView(getContext(), trapBinder.rvDialogue, characterVM, trapEncounterVM.getDialogueList());
+        setUpDialogueRV(rv, trapEncounterVM);
+        stateListener(trapEncounterVM.getStateIndex(), trapEncounterVM, this);
+        // called after stateLister set up, signalling first state to enter
+        trapEncounterVM.gotoBeginningState(mainGameVM);
     }
 
     // checks which state the trap encounter is in and starts that new state
     @Override
-    public void checkState() {
+    public void checkState(int state) {
         switch(state) {
             // first state
             case TrapEncounterViewModel.firstState:
                 trapBinder.layoutBtnOptions.removeAllViews();
-                try {
-                    dialogueState();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                dialogueState(trapEncounterVM, trapBinder.layoutBtnOptions);
                 break;
                 // second state
             case TrapEncounterViewModel.secondState:
@@ -101,49 +92,6 @@ public class TrapFragment extends Fragment implements EncounterFragment{
                 trapBinder.layoutBtnOptions.removeAllViews();
                 endState();
                 break;
-        }
-    }
-
-
-    // set up Recycler viewer and Observable data for when further dialogue is added
-    public void setUpDialogueRV() {
-        final DialogueRecyclerView rv = new DialogueRecyclerView(getContext(), trapBinder.rvDialogue, characterVM);
-
-        // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
-        Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                Dialogue dialogue = new Dialogue(trapEncounterVM.getNewDialogue().get());
-                rv.addDialogue(dialogue);
-            }
-        };
-        trapEncounterVM.getNewDialogue().addOnPropertyChangedCallback(callback);
-    }
-
-    // first state
-        // set up the dialogue with recyclerView
-    @Override
-    public void dialogueState() throws JSONException {
-        JSONObject dialogue = encounter.getJSONObject("dialogue");
-        // if there is only 1 dialogue snippet, then don't create a 'continue' button
-        if (!dialogue.has("next")) {
-            trapEncounterVM.firstDialogueState();
-        } else {
-            // otherwise, multiple dialogue snippets
-            trapEncounterVM.firstDialogueState();
-            Button btnContinue = new Button(getContext());
-            btnContinue.setText(getResources().getString(R.string.continue_dialogue));
-            btnContinue.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        trapEncounterVM.firstDialogueState();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            trapBinder.layoutBtnOptions.addView(btnContinue);
         }
     }
 
@@ -183,16 +131,13 @@ public class TrapFragment extends Fragment implements EncounterFragment{
         // set up the button to leave the encounter and goto next
     @Override
     public void endState() {
-        // restore ability to drop/consume Inventory objects
-        characterVM.setStateInventoryObserver(true);
-        Button leaveButton = new Button(getContext());
-        leaveButton.setText(getResources().getString(R.string.leave_encounter));
-        leaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainGameVM.gotoNextEncounter();
-            }
-        });
-        trapBinder.layoutBtnOptions.addView(leaveButton);
+        setLeaveButton(mainGameVM, trapBinder.layoutBtnOptions);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        characterVM.saveCharacter();
+        trapEncounterVM.saveEncounter(rv.getDialogueList());
     }
 }

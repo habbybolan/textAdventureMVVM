@@ -2,108 +2,109 @@ package com.habbybolan.textadventure.viewmodel.encounters;
 
 import android.content.Context;
 
-import androidx.databinding.BaseObservable;
-import androidx.databinding.ObservableField;
-
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 
-public class RandomBenefitViewModel extends BaseObservable implements EncounterViewModel {
+public class RandomBenefitViewModel extends EncounterViewModel {
 
 
     private MainGameViewModel mainGameVM;
     private CharacterViewModel characterVM;
     private JSONObject encounter;
     private Context context;
-    private JSONObject firstStateJSON;
     private RandomBenefitModel randomBenefitModel;
 
     public static final int firstState = 1;
     public static final int secondState = 2;
     public static final int thirdState = 3;
 
-    private ObservableField<Integer> stateIndex;
-    private ObservableField<String> newDialogue;
+    private Inventory inventoryToRetrieve = null;
 
     public RandomBenefitViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
+        setDialogueRemainingInDialogueState(mainGameVM, encounter);
         this.mainGameVM = mainGameVM;
         this.characterVM = characterVM;
         this.encounter = encounter;
         this.context = context;
-        // holds dialogue object to be iterated through
-        firstStateJSON = encounter.getJSONObject("dialogue");
-        stateIndex = new ObservableField<>(1);
-        newDialogue = new ObservableField<>();
         randomBenefitModel = new RandomBenefitModel(context);
     }
 
     @Override
-    public ObservableField<Integer> getStateIndex() {
-        return stateIndex;
-    }
-    public int getStateIndexValue() {
-        Integer stateIndex = getStateIndex().get();
-        if (stateIndex != null) return stateIndex;
-        throw new NullPointerException();
-    }
-    // increment the state index to next state
-    @Override
-    public void incrementStateIndex() {
-        Integer state = stateIndex.get();
-        if (state != null) {
-            int newState = ++state;
-            stateIndex.set(newState);
-        }
-    }
-
-    @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        // TODO: Save random Benefit encounter
-    }
-
-    // updates when a new bit of dialogue needs to be shown
-    @Override
-    public ObservableField<String> getNewDialogue() {
-        return newDialogue;
-    }
-    public String getNewDialogueValue() {
-        String newDialogue = getNewDialogue().get();
-        if (newDialogue != null) return newDialogue;
-        throw new NullPointerException();
-    }
-    @Override
-    public void setNewDialogue(String newDialogue) {
-        this.newDialogue.set(newDialogue);
-    }
-
-
-
-    // show the next dialogue snippet in the first state, called whenever dynamic button clicked
-    @Override
-    public void firstDialogueState() throws JSONException {
-        setNewDialogue(firstStateJSON.getString("dialogue"));
-        if (firstStateJSON.has("next")) {
-            firstStateJSON = firstStateJSON.getJSONObject("next");
-        } else {
-            incrementStateIndex();
+        SaveDataLocally save = new SaveDataLocally(context);
+        JSONObject encounterData = new JSONObject();
+        try {
+            encounterData.put(ENCOUNTER_TYPE, TYPE_RANDOM_BENEFIT);
+            encounterData.put(ENCOUNTER, encounter);
+            encounterData.put(STATE, stateIndex.get());
+            if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
+            // convert the inventory to JSON and store if one exists
+            if (inventoryToRetrieve != null) encounterData.put(INVENTORY, inventoryToRetrieve.toJSON());
+            // store all DialogueTypes converted to JSON
+            JSONArray JSONDialogue = new JSONArray();
+            for (DialogueType dialogueType : dialogueList) {
+                JSONObject dialogueObject = dialogueType.toJSON();
+                JSONDialogue.put(dialogueObject);
+            }
+            encounterData.put(DIALOGUE_ADDED, JSONDialogue);
+            save.saveEncounter(encounterData);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
+
+    @Override
+    public void setSavedData() throws JSONException, ExecutionException, InterruptedException {
+        if (getIsSaved()) {
+            setDialogueList(mainGameVM);
+            setSavedInventory();
+        }
+    }
+
+    // get the saved Inventory Object from the json
+    private void setSavedInventory() throws JSONException, ExecutionException, InterruptedException {
+        // check if an inventory value has been stored
+        if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
+            JSONObject inventory = mainGameVM.getSavedEncounter().getJSONObject(INVENTORY);
+            // retrieve id of the Inventory Object
+            int id = inventory.getInt("id");
+            DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
+
+            if (inventory.getString("type").equals("ability")) {
+                // saved Inventory object is an Ability
+                inventoryToRetrieve = new Ability(id, mDbHelper);
+
+            } else if (inventory.getString("type").equals("item")) {
+                // saved Inventory object is an Item
+                inventoryToRetrieve = new Item(String.valueOf(id), mDbHelper);
+
+            } else {
+                // otherwise, saved Inventory object is a Weapon
+                inventoryToRetrieve = new Weapon(id, mDbHelper);
+            }
+        }
+    }
+
 
     // finds a random Inventory loot
-    public Inventory checkState() {
-        return randomBenefitModel.getRandomInventory();
+    public void setTangible() {
+        inventoryToRetrieve = randomBenefitModel.getRandomInventory();
     }
 
     // if space in inventory, return true and add inventory object to inventory, otherwise return false
@@ -132,4 +133,14 @@ public class RandomBenefitViewModel extends BaseObservable implements EncounterV
             return "You are full on Weapons";
         }
     }
+
+    public Inventory getInventoryToRetrieve() {
+        return inventoryToRetrieve;
+    }
+
+    // removes inventoryToRetrieve once it is taken
+    public void removeInventoryToRetrieve() {
+        inventoryToRetrieve = null;
+    }
+
 }

@@ -4,19 +4,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.Observable;
-import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentChoiceBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
-import com.habbybolan.textadventure.model.dialogue.Dialogue;
-import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
@@ -26,7 +22,6 @@ import com.habbybolan.textadventure.viewmodel.encounters.ChoiceBenefitViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /*
@@ -37,17 +32,13 @@ deals with a choice benefit encounter
      - chooseBenefitTypeState
      - endState
  */
-public class ChoiceBenefitFragment extends Fragment implements EncounterFragment {
+public class ChoiceBenefitFragment extends EncounterDialogueFragment implements EncounterFragment {
 
     private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
     private CharacterViewModel characterVM = CharacterViewModel.getInstance();
     private JSONObject encounter = mainGameVM.getJSONEncounter();
     private FragmentChoiceBenefitBinding benefitBinding;
     private ChoiceBenefitViewModel benefitVM;
-    private int state = 0;
-
-    private ArrayList<DialogueType> dialogueList;
-
     private DialogueRecyclerView rv;
 
     public ChoiceBenefitFragment() {}
@@ -55,7 +46,6 @@ public class ChoiceBenefitFragment extends Fragment implements EncounterFragment
     public static ChoiceBenefitFragment newInstance() {
         return new ChoiceBenefitFragment();
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,11 +55,10 @@ public class ChoiceBenefitFragment extends Fragment implements EncounterFragment
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        dialogueList = new ArrayList<>();;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         benefitBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_choice_benefit, container, false);
@@ -85,53 +74,22 @@ public class ChoiceBenefitFragment extends Fragment implements EncounterFragment
 
     // sets up the RV dialogue adapter and the encounter state to enter
     private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
-        if (benefitVM.getIsSaved()) {
-            dialogueList = benefitVM.getDialogueList();
-            benefitVM.setSavedInventory();
-        }
+        benefitVM.setSavedData();
         // set up Recycler Viewer that holds all dialogue
-        setUpDialogueRV();
-        stateListener();
+        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, characterVM, benefitVM.getDialogueList());
+        setUpDialogueRV(rv, benefitVM);
+        stateListener(benefitVM.getStateIndex(), benefitVM, this);
         // called after stateLister set up, signalling first state to enter
-        benefitVM.gotoState();
+        benefitVM.gotoBeginningState(mainGameVM);
     }
 
     @Override
-    public void setUpDialogueRV() {
-        // if there is a saved game, then retrieve the dialogueList that was previously added
-        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, characterVM, dialogueList);
-
-        // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
-        Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                Dialogue dialogue = new Dialogue(benefitVM.getNewDialogue().get());
-                rv.addDialogue(dialogue);
-            }
-        };
-        benefitVM.getNewDialogue().addOnPropertyChangedCallback(callback);
-    }
-
-    @Override
-    public void stateListener() {
-        final Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                //Integer stateInteger = trapEncounterVM.getStateIndex().get();
-                state = benefitVM.getStateIndexValue();
-                checkState();
-            }
-        };
-        benefitVM.getStateIndex().addOnPropertyChangedCallback(callback);
-    }
-
-    @Override
-    public void checkState() {
+    public void checkState(int state) {
         switch(state) {
             // first state
             case ChoiceBenefitViewModel.firstState:
                 benefitBinding.layoutBtnOptions.removeAllViews();
-                dialogueState();
+                dialogueState(benefitVM, benefitBinding.layoutBtnOptions);
                 break;
             // second stateW
             case ChoiceBenefitViewModel.secondState:
@@ -145,40 +103,12 @@ public class ChoiceBenefitFragment extends Fragment implements EncounterFragment
                 break;
         }
         // set the isSaved to false to signal that the save has been retrieved
-        benefitVM.setSaveRecovered();
-    }
-
-    @Override
-    public void dialogueState() {
-        try {
-            JSONObject dialogue = benefitVM.getFirstStateJSON();
-            // if there is only 1 dialogue snippet, then don't create a 'continue' button
-            if (!dialogue.has("next")) {
-                benefitVM.firstDialogueState();
-            } else {
-                // otherwise, multiple dialogue snippets
-                benefitVM.firstDialogueState();
-                Button btnContinue = new Button(getContext());
-                btnContinue.setText(getResources().getString(R.string.continue_dialogue));
-                btnContinue.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            benefitVM.firstDialogueState();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                benefitBinding.layoutBtnOptions.addView(btnContinue);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        benefitVM.setIsSaved(false);
     }
 
     // state to choose the dialogue
     private void chooseBenefitTypeState() {
+
         // temp. stat increase button
         View viewTemp = getLayoutInflater().inflate(R.layout.default_button_details, null);
         DefaultButtonDetailsBinding defaultBindingTemp = DataBindingUtil.bind(viewTemp);
@@ -193,7 +123,7 @@ public class ChoiceBenefitFragment extends Fragment implements EncounterFragment
         });
 
         // perm. stat increase button
-        View viewPerm = getLayoutInflater().inflate(R.layout.default_button_details, null);
+        View viewPerm = getLayoutInflater().inflate(R.layout.default_button_details,null);
         DefaultButtonDetailsBinding defaultBindingPerm = DataBindingUtil.bind(viewPerm);
         String permText = "Perm. Increase";
         defaultBindingPerm.setTitle(permText);
@@ -236,31 +166,14 @@ public class ChoiceBenefitFragment extends Fragment implements EncounterFragment
     @Override
     public void endState() {
         // set up button to leave
-        setLeaveButton();
+        setLeaveButton(mainGameVM, benefitBinding.layoutBtnOptions);
         // set up button to receive reward if one exists
         setReceiveInventory();
-    }
-
-    // helper for endState to set up the button to leave encounter
-    private void setLeaveButton() {
-        final View viewLeave = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingLeave = DataBindingUtil.bind(viewLeave);
-        String leaveText = getResources().getString(R.string.leave_encounter);
-        defaultBindingLeave.setTitle(leaveText);
-        defaultBindingLeave.btnDefault.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainGameVM.gotoNextEncounter();
-            }
-        });
-        benefitBinding.layoutBtnOptions.addView(viewLeave);
     }
 
     // helper for create button to receive Inventory reward if one exists
     private void setReceiveInventory() {
         // if an inventory reward exists, then create button for it
-
-
         if (benefitVM.getInventoryToRetrieve() != null) {
             setUpInventorySnippet(benefitVM.getInventoryToRetrieve());
             final View viewPickUp = getLayoutInflater().inflate(R.layout.default_button_details, null);

@@ -395,9 +395,9 @@ public class CharacterViewModel extends BaseObservable {
             notifyChangeHealth(healthChange);
         }
         if (item.getManaChange() != 0) {
-            character.changeMana(item.getManaChange());
+            int manaChange = character.changeMana(item.getManaChange());
             // only mana altered
-            notifyChangeMana(item.getManaChange());
+            notifyChangeMana(manaChange);
         }
         // specials
         if (item.getIsConfuse()) character.addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, item.getDuration()));
@@ -712,8 +712,6 @@ public class CharacterViewModel extends BaseObservable {
         notifyChangeMana(tempBar.getAmount());
     }
 
-
-
     @Bindable
     private ObservableField<HealthDialogue> healthObserve = new ObservableField<>();
     public ObservableField<HealthDialogue> getHealthObserve() {
@@ -739,7 +737,7 @@ public class CharacterViewModel extends BaseObservable {
         return character.getMaxHealth();
     }
     public void setMaxHealth(int maxHealth) {
-        character.setMaxHealth(character.getHealth() + maxHealth);
+        character.setMaxHealth(maxHealth);
     }
 
     private ObservableField<ManaDialogue> manaObserve = new ObservableField<>();
@@ -754,7 +752,7 @@ public class CharacterViewModel extends BaseObservable {
         character.setMana(mana - character.getMana());
         notifyPropertyChanged(BR.mana);
     }
-    // // notify manaChange to changeMana
+    // notify manaChange to changeMana
     public void notifyChangeMana(int changeMana) {
         manaObserve.set(new ManaDialogue(changeMana));
         notifyPropertyChanged(BR.mana);

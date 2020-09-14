@@ -35,31 +35,6 @@ public class DialogueRecyclerView {
     private DialogueAdapter adapter;
     private CharacterViewModel characterVM;
 
-    public DialogueRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM) {
-
-        // set the layout manager to position the items
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        this.adapter = new DialogueAdapter();
-        recyclerView.setAdapter(adapter);
-        this.characterVM = characterVM;
-
-        // set up OnCLickListeners for changes in player Character
-            // Effect listeners
-        setDotListener();
-        setSpecialListener();
-            // bar listeners
-        setHealthListener();
-        setManaListener();
-        setBarListener();
-            // inventory listeners
-        setAbilityListener();
-        setWeaponListener();
-        setItemListener();
-            // stat
-        setTempStatListener();
-        setStatListener();
-    }
-
     public DialogueRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, ArrayList<DialogueType> dialogueList) {
 
         // set the layout manager to position the items
@@ -296,6 +271,5 @@ public class DialogueRecyclerView {
     public ArrayList<DialogueType> getDialogueList() {
         return adapter.getDialogueList();
     }
-
 
 }

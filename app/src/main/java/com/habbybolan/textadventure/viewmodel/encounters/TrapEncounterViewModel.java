@@ -1,16 +1,13 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
 import android.content.Context;
-import android.view.View;
 import android.widget.Toast;
-
-import androidx.databinding.BaseObservable;
-import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.encounter.TrapModel;
+import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
@@ -20,7 +17,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class TrapEncounterViewModel extends BaseObservable implements EncounterViewModel {
+public class TrapEncounterViewModel extends EncounterViewModel {
     public static final int firstState = 1;
     public static final int secondState = 2;
     public static final int thirdState = 3;
@@ -30,82 +27,49 @@ public class TrapEncounterViewModel extends BaseObservable implements EncounterV
     private TrapModel trapModel;
 
     private JSONObject encounter;
-    private JSONObject firstStateJSON;
     private Context context;
-
-    private ObservableField<Integer> stateIndex;
-    private ObservableField<String> newDialogue;
 
     public TrapEncounterViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter,
                                   Context context) throws JSONException {
-        this.characterVM = characterVM;
+        setDialogueRemainingInDialogueState(mainGameVM, encounter);
         this.mainGameVM = mainGameVM;
-        trapModel = new TrapModel(characterVM);
+        this.characterVM = characterVM;
         this.encounter = encounter;
-        firstStateJSON = encounter.getJSONObject("dialogue");
         this.context = context;
-        stateIndex = new ObservableField<>(1);
-        newDialogue = new ObservableField<>();
+        trapModel = new TrapModel(characterVM);
     }
 
     public CharacterViewModel getCharacterVM() {
         return characterVM;
     }
 
-    @Override
-    public ObservableField<Integer> getStateIndex() {
-        return stateIndex;
-    }
-    @Override
-    public int getStateIndexValue() {
-        Integer stateIndex = getStateIndex().get();
-        if (stateIndex != null) return stateIndex;
-        throw new NullPointerException();
-    }
 
-    // increment the state index to next state
     @Override
-    public void incrementStateIndex() {
-        Integer state = stateIndex.get();
-        if (state != null) {
-            int newState = ++state;
-            stateIndex.set(newState);
+    public void saveEncounter(ArrayList<DialogueType> dialogueList) {
+        SaveDataLocally save = new SaveDataLocally(context);
+        JSONObject encounterData = new JSONObject();
+        try {
+            encounterData.put(ENCOUNTER_TYPE, TYPE_TRAP);
+            encounterData.put(ENCOUNTER, encounter);
+            encounterData.put(STATE, stateIndex.get());
+            if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
+            // store all DialogueTypes converted to JSON
+            JSONArray JSONDialogue = new JSONArray();
+            for (DialogueType dialogueType : dialogueList) {
+                JSONObject dialogueObject = dialogueType.toJSON();
+                JSONDialogue.put(dialogueObject);
+            }
+            encounterData.put(DIALOGUE_ADDED, JSONDialogue);
+            save.saveEncounter(encounterData);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        // todo: save trap encounter
-    }
-
-    // updates when a new bit of dialogue needs to be shown
-    @Override
-    public ObservableField<String> getNewDialogue() {
-        return newDialogue;
-    }
-    @Override
-    public void setNewDialogue(String newDialogue) {
-        this.newDialogue.set(newDialogue);
-    }
-    @Override
-    public String getNewDialogueValue() {
-        String newDialogue = getNewDialogue().get();
-        if (newDialogue != null) return newDialogue;
-        throw new NullPointerException();
-    }
-
-    public void gotoNextEncounter(View v) {
-        mainGameVM.gotoNextEncounter();
-    }
-
-    // show the next dialogue snippet in the first state, called whenever dynamic button clicked
-    @Override
-    public void firstDialogueState() throws JSONException {
-        setNewDialogue(firstStateJSON.getString("dialogue"));
-        if (firstStateJSON.has("next")) {
-            firstStateJSON = firstStateJSON.getJSONObject("next");
-        } else {
-            incrementStateIndex();
+    public void setSavedData() throws JSONException {
+        if (getIsSaved()) {
+            setDialogueList(mainGameVM);
         }
     }
 

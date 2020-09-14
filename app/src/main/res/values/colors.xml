@@ -11,4 +11,6 @@
     <color name="colorHealthDialogue">#B30707</color>
     <color name="colorManaDialogue">#3A89CD</color>
     <color name="colorInventoryDialogue">#2E7517</color>
+
+    <color name="behind_scroll">#2E2C2A</color>
 </resources>

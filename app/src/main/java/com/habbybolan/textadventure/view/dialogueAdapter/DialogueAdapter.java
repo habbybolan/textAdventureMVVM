@@ -29,17 +29,6 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private StatDialogueBinding statDialogueBinding;
     private TempStatDialogueBinding tempStatDialogueBinding;
 
-    public DialogueAdapter() {
-        dialogueList = new ArrayList<>();
-        dialogueBinding = new DialogueBinding(this);
-        effectDialogueBinding = new EffectDialogueBinding(this);
-        healthDialogueBinding = new HealthDialogueBinding(this);
-        manaDialogueBinding = new ManaDialogueBinding(this);
-        inventoryDialogueBinding = new InventoryDialogueBinding(this);
-        statDialogueBinding = new StatDialogueBinding(this);
-        tempStatDialogueBinding = new TempStatDialogueBinding(this);
-    }
-
     public DialogueAdapter(ArrayList<DialogueType> dialogueList) {
         this.dialogueList = dialogueList;
         dialogueBinding = new DialogueBinding(this);
@@ -65,7 +54,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     // Return the DataBinder instance based on the view type
-    public DataBinder getDataBinder(int viewType) {
+    private DataBinder getDataBinder(int viewType) {
         if (viewType == R.layout.dialogue_details) return dialogueBinding;
         else if (viewType == R.layout.dialogue_effect_details) return effectDialogueBinding;
         else if (viewType == R.layout.dialogue_health_details) return healthDialogueBinding;
@@ -81,7 +70,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }*/
 
     // Define convert logic to the position in the DataBinder from the adapter position
-    public int getBinderPosition(DataBinder binder) {
+    private int getBinderPosition(DataBinder binder) {
         return binder.getItemCount()-1;
     }
 
@@ -107,7 +96,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyItemInserted(0);
     }
 
-    public ArrayList<DialogueType> getDialogueList() {
+    ArrayList<DialogueType> getDialogueList() {
         return dialogueList;
     }
 }

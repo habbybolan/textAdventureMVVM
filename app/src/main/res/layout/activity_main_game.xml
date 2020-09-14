@@ -18,11 +18,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#2E2C2A"
-            app:layout_constraintBottom_toBottomOf="@+id/scroll_bottom"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:background="@color/behind_scroll">
 
         </FrameLayout>
 
