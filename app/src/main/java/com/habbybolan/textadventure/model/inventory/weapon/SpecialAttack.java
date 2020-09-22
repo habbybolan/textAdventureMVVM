@@ -52,8 +52,9 @@ public class SpecialAttack {
         setSpecialAttackName(cursor.getString(specialAttackNameColID));
         // set ability id - NULL if none
         int abilityColID = cursor.getColumnIndex("ability_id");
+        int abilityID = cursor.getInt(abilityColID);
         if (cursor.getInt(abilityColID) != 0) {
-            setAbility(new Ability(cursor.getInt(abilityColID), mDbHelper));
+            setAbility(new Ability(abilityID, mDbHelper));
         }
         // set up ranged boolean
         int isRangedColID = cursor.getColumnIndex("is_ranged");

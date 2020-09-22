@@ -3,6 +3,7 @@ package com.habbybolan.textadventure.viewmodel.encounters;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
@@ -29,11 +30,10 @@ public class TrapEncounterViewModel extends EncounterViewModel {
     private JSONObject encounter;
     private Context context;
 
-    public TrapEncounterViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter,
-                                  Context context) throws JSONException {
-        setDialogueRemainingInDialogueState(mainGameVM, encounter);
-        this.mainGameVM = mainGameVM;
-        this.characterVM = characterVM;
+    public TrapEncounterViewModel(JSONObject encounter, Context context) throws JSONException {
+        setDialogueRemainingInDialogueState(encounter);
+        mainGameVM = MainGameViewModel.getInstance();
+        characterVM = CharacterViewModel.getInstance();
         this.encounter = encounter;
         this.context = context;
         trapModel = new TrapModel(characterVM);
@@ -77,10 +77,10 @@ public class TrapEncounterViewModel extends EncounterViewModel {
     public void secondStateEscapeTrap() throws JSONException {
         if (trapModel.isSuccessfulEscape()) {
             String success = encounter.getString("success");
-            setNewDialogue(success);
+            setNewDialogue(new Dialogue(success));
         } else {
             String fail = encounter.getJSONObject("fail").getString("dialogue");
-            setNewDialogue(fail);
+            setNewDialogue(new Dialogue(fail));
             failDebuffs();
         }
         incrementStateIndex();
@@ -110,7 +110,7 @@ public class TrapEncounterViewModel extends EncounterViewModel {
     public void secondStateUseItem() {
         if (characterVM.checkInventoryForTrapItem()) {
             String dialogue = "You throw the escape orb to the ground, the black smoke releasing and engulfing you in an instant. Once the smoke dissipates, Everything around you has changed. A feeling of relief washes over you as you wonder what would have happened if you did not possess that item.";
-            setNewDialogue(dialogue);
+            setNewDialogue(new Dialogue(dialogue));
             incrementStateIndex();
         } else {
             Toast.makeText(context, "You don't possess any item to escape.", Toast.LENGTH_SHORT).show();

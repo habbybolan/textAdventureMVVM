@@ -49,7 +49,6 @@ public class DialogueBinding extends DataBinder<DialogueBinding.ViewHolder> {
         dialogue.addAll(dataSet);
     }
 
-
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         DialogueDetailsBinding binding;

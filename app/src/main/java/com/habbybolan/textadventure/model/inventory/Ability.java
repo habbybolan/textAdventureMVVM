@@ -95,7 +95,15 @@ public class Ability implements Inventory{
     // constructor to read database for ability
     public Ability(int abilityID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         this.abilityID = abilityID;
-        setVariables(mDbHelper, abilityID);
+        Cursor cursor = mDbHelper.getAbilityCursorFromID(abilityID);
+        setVariables(cursor);
+        setPictureResource();
+    }
+
+    // constructor to read database for ability
+    public Ability(Cursor cursor, int abilityID) throws ExecutionException, InterruptedException {
+        this.abilityID = abilityID;
+        setVariables(cursor);
         setPictureResource();
     }
 
@@ -124,9 +132,7 @@ public class Ability implements Inventory{
         return ability.getName().equals(getName());
     }
 
-    private void setVariables(DatabaseAdapter mDbHelper, int abilityID) throws ExecutionException, InterruptedException {
-        Cursor cursor = mDbHelper.getData(table);
-        cursor.moveToPosition(abilityID - 1);
+    private void setVariables(Cursor cursor) throws ExecutionException, InterruptedException {
         // set ability name
         int nameOfAbilityColIndex = cursor.getColumnIndex("ability_name");
         setAbilityName(cursor.getString(nameOfAbilityColIndex));
@@ -225,7 +231,6 @@ public class Ability implements Inventory{
         // tier
         int tierColIndex = cursor.getColumnIndex("tier");
         setTier(cursor.getInt(tierColIndex));
-        cursor.close();
     }
 
 

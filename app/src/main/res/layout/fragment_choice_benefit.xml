@@ -12,7 +12,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".view.encounter.RandomBenefitFragment">
+        tools:context=".view.encounter.ChoiceBenefitFragment">
 
         <LinearLayout
             android:id="@+id/trap_container"

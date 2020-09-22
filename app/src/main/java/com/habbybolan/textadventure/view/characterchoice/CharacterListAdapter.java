@@ -22,7 +22,7 @@ public class CharacterListAdapter extends RecyclerView.Adapter<CharacterListAdap
     private String[] characters;
     private CharacterChoiceViewModel model;
 
-    public CharacterListAdapter(CharacterChoiceViewModel model) {
+    CharacterListAdapter(CharacterChoiceViewModel model) {
         // initialize characters from CharacterSelectViewModel
         characters = new String[4];
         characters[0] = CharacterChoiceViewModel.wizard;
@@ -43,7 +43,7 @@ public class CharacterListAdapter extends RecyclerView.Adapter<CharacterListAdap
     }
 
     // Provide a direct reference to each of the views within a data item
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView nameTextView;
 
         ViewHolder(View characterView) {

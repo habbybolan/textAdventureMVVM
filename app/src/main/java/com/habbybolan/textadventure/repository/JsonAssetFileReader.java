@@ -114,7 +114,7 @@ public class JsonAssetFileReader {
                 // todo: used for testing specific encounters
                 //Random rand = new Random();
                 //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.TRAP);
+                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.COMBAT);
                 // ***
 
                 // put type into encounter

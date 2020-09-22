@@ -27,10 +27,9 @@ import java.util.concurrent.ExecutionException;
 /*
 deals with a choice benefit encounter
   - gives the character a choice of a random permanent state increase, temporary stat increase, or Inventory reward
-  - 3 main UI states
-     - dialogueState
-     - chooseBenefitTypeState
-     - endState
+  - state 1: dialogue state
+  - state 2: choose benefit type
+  - state 3: end state
  */
 public class ChoiceBenefitFragment extends EncounterDialogueFragment implements EncounterFragment {
 
@@ -76,7 +75,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
         benefitVM.setSavedData();
         // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, characterVM, benefitVM.getDialogueList());
+        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, benefitVM.getDialogueList());
         setUpDialogueRV(rv, benefitVM);
         stateListener(benefitVM.getStateIndex(), benefitVM, this);
         // called after stateLister set up, signalling first state to enter
@@ -108,7 +107,6 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
 
     // state to choose the dialogue
     private void chooseBenefitTypeState() {
-
         // temp. stat increase button
         View viewTemp = getLayoutInflater().inflate(R.layout.default_button_details, null);
         DefaultButtonDetailsBinding defaultBindingTemp = DataBindingUtil.bind(viewTemp);

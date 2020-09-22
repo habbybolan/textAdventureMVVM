@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
-import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
@@ -29,8 +28,7 @@ class EncounterDialogueFragment extends Fragment {
         Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                Dialogue dialogue = new Dialogue(vm.getNewDialogueValue());
-                rv.addDialogue(dialogue);
+                rv.addDialogue(vm.getNewDialogueValue());
             }
         };
         vm.getNewDialogue().addOnPropertyChangedCallback(callback);

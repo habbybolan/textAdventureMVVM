@@ -12,6 +12,7 @@ import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,12 @@ public class Character extends CharacterEntity {
 
     final static int evasionMultiplier = 1;
     final static int blockMultiplier = 1;
+
+    public static final String PALADIN_CLASS_TYPE = "Paladin";
+    public static final String WARRIOR_CLASS_TYPE = "Warrior";
+    public static final String WIZARD_CLASS_TYPE = "Wizard";
+    public static final String ARCHER_CLASS_TYPE = "Archer";
+
 
 
     // all MAX values for a character
@@ -55,6 +62,7 @@ public class Character extends CharacterEntity {
 
     public Character(String characterData, DatabaseAdapter mDbHelper, Context context) {
         JSONObject characterObject;
+        isCharacter = true;
         classType = "";
         try {
             characterObject = new JSONObject(characterData);
@@ -113,7 +121,7 @@ public class Character extends CharacterEntity {
             for (int i = 0; i < MAX_ITEMS; i++) {
                 int indItem = Integer.parseInt(itemsArray.getString(i));
                 if (indItem != 0) {
-                    items.add(new Item(itemsArray.getString(i), mDbHelper));
+                    items.add(new Item(itemsArray.getInt(i), mDbHelper));
                     numItems++;
                 }
             }
@@ -180,17 +188,25 @@ public class Character extends CharacterEntity {
                 statDecreaseList.add(tempStat);
             }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (JSONException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        drawableResID = R.drawable.archer;
+
+        switch(classType) {
+            case PALADIN_CLASS_TYPE:
+                drawableResID = R.drawable.paladin_icon;
+                drawableDeadResID = R.drawable.paladin_icon;
+            case WIZARD_CLASS_TYPE:
+                drawableResID = R.drawable.wizard_icon;
+                drawableDeadResID = R.drawable.wizard_icon;
+            case WARRIOR_CLASS_TYPE:
+                drawableResID = R.drawable.warrior_icon;
+                drawableDeadResID = R.drawable.warrior_icon;
+            case ARCHER_CLASS_TYPE:
+                drawableResID = R.drawable.archer_icon;
+                drawableDeadResID = R.drawable.archer_icon;
+        }
     }
-
-
 
     // decrement the cooldown on all abilities w/ cooldown > 0
     public void decrCooldowns() {
@@ -258,6 +274,52 @@ public class Character extends CharacterEntity {
         }
     }
 
+    // apply an ability to character
+    // todo: damage not observed as damageTarget returns value, doesn't set it
+    public void applyAbilityToCharacter(Ability ability) {
+        CharacterViewModel characterVM = CharacterViewModel.getInstance();
+        // todo: scale with Intelligence
+        if (ability.getMinDamage() != 0) damageTarget(getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));
+        if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
+        // specials
+        SpecialEffect special;
+        if (ability.getIsConfuse()) {
+            special = new SpecialEffect(SpecialEffect.CONFUSE);
+            if (addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration())))
+                characterVM.updateAllSpecialAdd.set(special);
+        }
+        if (ability.getIsStun()) addNewSpecial(new SpecialEffect(SpecialEffect.STUN, ability.getDuration()));
+        if (ability.getIsInvincibility()) addNewSpecial(new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration()));
+        if (ability.getIsSilence()) addNewSpecial(new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration()));
+        if (ability.getIsInvisible()) addNewSpecial(new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration()));
+        // DOT
+        if (ability.getIsFire()) addNewDot(new Dot(Dot.FIRE, false));
+        if (ability.getIsPoison()) addNewDot(new Dot(Dot.POISON, false));
+        if (ability.getIsBleed()) addNewDot(new Dot(Dot.BLEED, false));
+        if (ability.getIsFrostBurn()) addNewDot(new Dot(Dot.FROSTBURN, false));
+        if (ability.getIsHealDot()) addNewDot(new Dot(Dot.HEALTH_DOT, false));
+        if (ability.getIsManaDot()) addNewDot(new Dot(Dot.MANA_DOT, false));
+        // direct heal/mana
+        if (ability.getHealMin() != 0) changeHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
+        if (ability.getManaMin() != 0) changeMana(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
+        // stat increases
+        if (ability.getStrIncrease() != 0) addNewStatIncrease(new TempStat(STR, ability.getDuration(), ability.getStrIncrease()));
+        if (ability.getIntIncrease() != 0) addNewStatIncrease(new TempStat(INT, ability.getDuration(), ability.getIntIncrease()));
+        if (ability.getConIncrease() != 0) addNewStatIncrease(new TempStat(CON, ability.getDuration(), ability.getConIncrease()));
+        if (ability.getSpdIncrease() != 0) addNewStatIncrease(new TempStat(SPD, ability.getDuration(), ability.getSpdIncrease()));
+        if (ability.getEvadeIncrease() != 0) addNewStatIncrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeIncrease()));
+        if (ability.getBlockIncrease() != 0) addNewStatIncrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockIncrease()));
+        // stat decreases
+        if (ability.getStrDecrease() != 0) addNewStatDecrease(new TempStat(STR, ability.getDuration(), ability.getStrDecrease()));
+        if (ability.getIntDecrease() != 0) addNewStatDecrease(new TempStat(INT, ability.getDuration(), ability.getIntDecrease()));
+        if (ability.getConDecrease() != 0) addNewStatDecrease(new TempStat(CON, ability.getDuration(), ability.getConDecrease()));
+        if (ability.getSpdDecrease() != 0) addNewStatDecrease(new TempStat(SPD, ability.getDuration(), ability.getSpdDecrease()));
+        if (ability.getEvadeDecrease() != 0) addNewStatDecrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeDecrease()));
+        if (ability.getBlockDecrease() != 0) addNewStatDecrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockDecrease()));
+        // temp extra health- part of stat
+        if (ability.getTempExtraHealth() != 0) addNewTempExtraHealthMana(new TempBar(TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth()));
+    }
+
         // Items
     // remove an item - if not a consumable, remove the effects it had
     public void removeItem(Item item) {
@@ -303,6 +365,7 @@ public class Character extends CharacterEntity {
             return health;
         }
     }
+
     // get the new mana after removing item
     public int getManaAfterItemRemoval(int manaChange) {
         setMaxMana(getMaxHealth() - manaChange);
@@ -344,5 +407,9 @@ public class Character extends CharacterEntity {
     }
     public int getGoldIncrease() {
         return goldIncrease;
+    }
+
+    public int getNumStatPoints() {
+        return strBase + intBase + conBase + spdBase;
     }
 }

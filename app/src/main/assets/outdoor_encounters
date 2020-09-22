@@ -106,15 +106,15 @@
 
 		{"type":"combat",
 			"encounters":[
-			{"dialogue":["spiders descend from its web, landing in front of you.",
-						"Spiders crawl down from the tree with the ferocity of a creature that hasn't eaten for days."
+			{"dialogue":[{"dialogue":"spiders descend from its web, landing in front of you."},
+						{"dialogue":"Spiders crawl down from the tree with the ferocity of a creature that hasn't eaten for days."}
 						],
-			"fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]}},
+			"fight":{"type":["spider", "spider"], "difficulty":["1","1"]}},
 
-			{"dialogue":["A bony hand breaks through the ground and grabs you by the ankle.",
-						"Multiple bony arms reach out through a pile of leaves on the ground."
+			{"dialogue":[{"dialogue":"A bony hand breaks through the ground and grabs you by the ankle."},
+						{"dialogue":"Multiple bony arms reach out through a pile of leaves on the ground."}
 						],
-			"fight":{"enemyType":["skeleton", "skeleton", "skeleton"], "type":["normal","normal","normal"]}}
+			"fight":{"type":["skeleton", "skeleton", "skeleton"], "difficulty":["1","1","1"]}}
 			]
 		},
 

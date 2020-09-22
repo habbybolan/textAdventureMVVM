@@ -11,6 +11,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityMainGameBinding;
 import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
+import com.habbybolan.textadventure.view.encounter.CombatFragment;
 import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.TrapFragment;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
@@ -92,13 +93,17 @@ public class MainGameActivity extends AppCompatActivity {
             case CHOICE_TYPE:
                 ChoiceEncounter choiceEncounter = new ChoiceEncounter(getContext(), character, damage, view, this, model);
                 choiceEncounter.setInitialChoice(encounter);
-                break;
-            case COMBAT_TYPE:
-                CombatEncounter combatObject = new CombatEncounter(getContext(), character, damage, view, this);
-                combatObject.setInitialCombat(encounter, view);
                 break;*/
+            case MainGameViewModel.COMBAT_TYPE:
+                CombatFragment combatFragment = CombatFragment.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, combatFragment)
+                        .commit();
+                break;
             case MainGameViewModel.TRAP_TYPE:
-                TrapFragment trapFragment = new TrapFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
+                TrapFragment trapFragment = TrapFragment.newInstance();
                 getSupportFragmentManager()
                         .beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
@@ -117,7 +122,7 @@ public class MainGameActivity extends AppCompatActivity {
                         .commitAllowingStateLoss();
                 break;
             case MainGameViewModel.RANDOM_BENEFIT_TYPE:
-                RandomBenefitFragment randomBenefitFragment = new RandomBenefitFragment(mainGameViewModel, characterViewModel, mainGameViewModel.getJSONEncounter());
+                RandomBenefitFragment randomBenefitFragment = RandomBenefitFragment.newInstance();
                 getSupportFragmentManager()
                         .beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)

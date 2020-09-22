@@ -39,7 +39,7 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
     private Inventory inventoryToRetrieve = null;
     
     public ChoiceBenefitViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
-        setDialogueRemainingInDialogueState(mainGameVM, encounter);
+        setDialogueRemainingInDialogueState(encounter);
         this.mainGameVM = mainGameVM;
         this.characterVM = characterVM;
         this.encounter = encounter;
@@ -95,7 +95,7 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
 
             } else if (inventory.getString("type").equals("item")) {
                 // saved Inventory object is an Item
-                inventoryToRetrieve = new Item(String.valueOf(id), mDbHelper);
+                inventoryToRetrieve = new Item(id, mDbHelper);
 
             } else {
                 // otherwise, saved Inventory object is a Weapon

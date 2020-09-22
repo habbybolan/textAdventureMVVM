@@ -28,17 +28,18 @@ import java.util.concurrent.ExecutionException;
 public class RandomBenefitFragment extends EncounterDialogueFragment implements EncounterFragment{
 
 
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
-    private JSONObject encounter;
+    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
+    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
+    private JSONObject encounter = mainGameVM.getJSONEncounter();
+
     private FragmentRandomBenefitBinding benefitBinding;
     private RandomBenefitViewModel benefitVM;
     private DialogueRecyclerView rv;
 
-    public RandomBenefitFragment(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter) {
-        this.mainGameVM = mainGameVM;
-        this.characterVM = characterVM;
-        this.encounter = encounter;
+    public RandomBenefitFragment() {}
+
+    public static RandomBenefitFragment newInstance() {
+        return new RandomBenefitFragment();
     }
 
     @Override
@@ -70,7 +71,7 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
     private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
         benefitVM.setSavedData();
         // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, characterVM, benefitVM.getDialogueList());
+        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, benefitVM.getDialogueList());
         setUpDialogueRV(rv, benefitVM);
         stateListener(benefitVM.getStateIndex(), benefitVM, this);
         // called after stateLister set up, signalling first state to enter

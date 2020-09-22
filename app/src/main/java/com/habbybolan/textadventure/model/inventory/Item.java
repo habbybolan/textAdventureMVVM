@@ -72,17 +72,17 @@ public class Item implements Inventory{
 
 
     // constructor where database opened and closed elsewhere
-    public Item(String itemIDString, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
-        if (isInteger(itemIDString)) {
-            // check if the ID is an integer
-            int itemID = Integer.parseInt(itemIDString);
-            this.itemID = itemID;
-            setVariables(mDbHelper, itemID);
-        } else {
-            // otherwise, itemID is a name and it's a generic item (no database, used for deliver QuestEncounter)
-            isGeneric = true;
-            itemName = itemIDString;
-        }
+    public Item(int itemID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
+        this.itemID = itemID;
+        Cursor cursor = mDbHelper.getItemCursorFromID(itemID);
+        setVariables(mDbHelper, cursor);
+        setPictureResource();
+    }
+
+    // constructor where database opened and closed elsewhere
+    public Item(Cursor cursor, DatabaseAdapter mDbHelper, int itemID) throws ExecutionException, InterruptedException {
+        this.itemID = itemID;
+        setVariables(mDbHelper, cursor);
         setPictureResource();
     }
 
@@ -134,16 +134,15 @@ public class Item implements Inventory{
     }
 
     // sets all the variables that describe the weapon
-    private void setVariables(DatabaseAdapter mDbHelper , int itemID) throws ExecutionException, InterruptedException {
-        Cursor cursor = mDbHelper.getData(table);
-        cursor.moveToPosition(itemID-1);
+    private void setVariables(DatabaseAdapter mDbHelper , Cursor cursor) throws ExecutionException, InterruptedException {
         // set up the item name
         int nameOfItemColIndex = cursor.getColumnIndex("item_name");
         setItemName(cursor.getString(nameOfItemColIndex));
         // set ability
         int abilityColID = cursor.getColumnIndex("ability_id");
+        int abilityID = cursor.getInt(abilityColID);
         if (cursor.getInt(abilityColID) != 0) {
-            Ability ability = new Ability(cursor.getInt(abilityColID), mDbHelper);
+            Ability ability = new Ability(abilityID, mDbHelper);
             setAbility(ability);
         }
 
@@ -203,7 +202,6 @@ public class Item implements Inventory{
         // duration
         int durationColIndex = cursor.getColumnIndex("duration");
         setDuration(cursor.getInt(durationColIndex));
-        cursor.close();
     }
 
     // setters

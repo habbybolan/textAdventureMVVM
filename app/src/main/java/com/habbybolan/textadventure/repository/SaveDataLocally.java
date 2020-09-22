@@ -43,7 +43,7 @@ public class SaveDataLocally {
 
             if ((CharacterChoiceViewModel.wizard).equals(character[0])) {
                 try {
-                    jsonClassObject.put("class", "Wizard");
+                    jsonClassObject.put("class", Character.WIZARD_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Wizard_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Wizard_Start_Str)); // base str
                     jsonClassObject.put("int", context.getString(R.string.Wizard_Start_Int)); // int
@@ -76,7 +76,7 @@ public class SaveDataLocally {
                 }
             } else if ((CharacterChoiceViewModel.paladin).equals(character[0])) {
                 try {
-                    jsonClassObject.put("class", "Paladin");
+                    jsonClassObject.put("class", Character.PALADIN_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Paladin_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Paladin_Start_Str)); // base str
                     jsonClassObject.put("int", context.getString(R.string.Paladin_Start_Int)); // int
@@ -109,7 +109,7 @@ public class SaveDataLocally {
                 }
             } else if ((CharacterChoiceViewModel.archer).equals(character[0])) {
                 try {
-                    jsonClassObject.put("class", "Archer");
+                    jsonClassObject.put("class", Character.ARCHER_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Archer_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Archer_Start_Str)); // base str
                     jsonClassObject.put("int", context.getString(R.string.Archer_Start_Int)); // int
@@ -142,7 +142,7 @@ public class SaveDataLocally {
                 }
             } else if ((CharacterChoiceViewModel.warrior).equals(character[0])) {
                 try {
-                    jsonClassObject.put("class", "Warrior");
+                    jsonClassObject.put("class", Character.WARRIOR_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Warrior_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Warrior_Start_Str)); // base str
                     jsonClassObject.put("int", context.getString(R.string.Warrior_Start_Int)); // int

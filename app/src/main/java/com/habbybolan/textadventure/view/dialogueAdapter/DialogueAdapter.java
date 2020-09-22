@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
+import com.habbybolan.textadventure.view.dialogueAdapter.binding.CombatActionDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.DialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.EffectDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.HealthDialogueBinding;
@@ -28,6 +29,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private InventoryDialogueBinding inventoryDialogueBinding;
     private StatDialogueBinding statDialogueBinding;
     private TempStatDialogueBinding tempStatDialogueBinding;
+    private CombatActionDialogueBinding combatActionDialogueBinding;
 
     public DialogueAdapter(ArrayList<DialogueType> dialogueList) {
         this.dialogueList = dialogueList;
@@ -38,6 +40,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         inventoryDialogueBinding = new InventoryDialogueBinding(this);
         statDialogueBinding = new StatDialogueBinding(this);
         tempStatDialogueBinding = new TempStatDialogueBinding(this);
+        combatActionDialogueBinding = new CombatActionDialogueBinding(this);
         notifyDataSetChanged();
     }
 
@@ -61,13 +64,9 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         else if (viewType == R.layout.dialogue_mana_details) return manaDialogueBinding;
         else if (viewType == R.layout.dialogue_stat_details) return statDialogueBinding;
         else if (viewType == R.layout.dialogue_temp_stat_details) return tempStatDialogueBinding;
+        else if (viewType == R.layout.dialogue_combat_action_details) return combatActionDialogueBinding;
         else return inventoryDialogueBinding;
     }
-
-    /*// Define convert logic to the adapter position from the position in the specified DataBinder
-    public int getPosition(DataBinder binder, int binderPosition) {
-        return 0;
-    }*/
 
     // Define convert logic to the position in the DataBinder from the adapter position
     private int getBinderPosition(DataBinder binder) {

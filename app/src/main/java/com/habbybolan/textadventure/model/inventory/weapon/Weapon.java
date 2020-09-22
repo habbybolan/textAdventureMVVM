@@ -30,7 +30,15 @@ public class Weapon implements Inventory {
     // Constructor where database opened and closed elsewhere
     public Weapon(int weaponID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         this.weaponID = weaponID;
-        setVariables(mDbHelper, weaponID);
+        Cursor cursor = mDbHelper.getWeaponCursorFromID(weaponID);
+        setVariables(mDbHelper, cursor);
+        setPictureResource();
+    }
+
+    // Constructor where database opened and closed elsewhere
+    public Weapon(Cursor cursor, DatabaseAdapter mDbHelper, int weaponID) throws ExecutionException, InterruptedException {
+        this.weaponID = weaponID;
+        setVariables(mDbHelper, cursor);
         setPictureResource();
     }
 
@@ -60,12 +68,10 @@ public class Weapon implements Inventory {
     }
 
     // sets all the variables that describe the weapon
-    private void setVariables(DatabaseAdapter mDbHelper, int weaponID) throws ExecutionException, InterruptedException {
-        Cursor cursor = mDbHelper.getData(table);
-        cursor.moveToPosition(weaponID-1);
+    private void setVariables(DatabaseAdapter mDbHelper, Cursor cursor) throws ExecutionException, InterruptedException {
         // set up the weapon name
-        int nameOfWeaponColIndex = cursor.getColumnIndex("weapon_name");
-        setWeaponName(cursor.getString(nameOfWeaponColIndex));
+        int weaponNameColIndex = cursor.getColumnIndex("weapon_name");
+        setWeaponName(cursor.getString(weaponNameColIndex));
         // set up the attack id
         int attackColID = cursor.getColumnIndex("attack_id");
         Attack attack = new Attack(cursor.getInt(attackColID), mDbHelper);
@@ -76,8 +82,7 @@ public class Weapon implements Inventory {
         setSpecialAttack(specialAttack);
         // set up the weapon tier (weapon rarity)
         int tierColID = cursor.getColumnIndex("tier");
-        setTier(cursor.getInt(4));
-        cursor.close();
+        setTier(cursor.getInt(tierColID));
     }
 
 

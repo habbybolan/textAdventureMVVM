@@ -19,7 +19,6 @@
             android:layout_marginEnd="@dimen/dialogue_distance_sides"
             android:textColor="@color/colorNormalDialogue"
             android:textSize="@dimen/txt_size_medium"
-            android:fontFamily="@font/press_start_2p"
             android:text="@{newDialogue}" />
     </RelativeLayout>
 </layout>

@@ -182,7 +182,7 @@ public class CharacterChoiceViewModel extends BaseObservable {
         setIntValue(R.string.Wizard_Start_Int);
         setConValue(R.string.Wizard_Start_Con);
         setSpdValue(R.string.Wizard_Start_Spd);
-        setCharacterPortrait(R.drawable.wizard_background_select);
+        setCharacterPortrait(R.drawable.wizard);
         int conValue = Integer.parseInt(context.getResources().getString(R.string.Wizard_Start_Con));
         setHealthValue(String.valueOf(conValue * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH));
         int intValue = Integer.parseInt(context.getResources().getString(R.string.Wizard_Start_Int));

@@ -15,6 +15,9 @@ public interface DialogueType {
     String IS_INDEFINITE = "is_indefinite";
     String DURATION = "duration";
     String AMOUNT = "amount";
+    String ATTACKER = "attacker";
+    String TARGET = "target";
+    String ACTION = "action";
 
     // types of dialogue as value for key DIALOGUE_TYPE
     String TYPE_DIALOGUE = "dialogue_type";
@@ -24,6 +27,7 @@ public interface DialogueType {
     String TYPE_INVENTORY = "inventory_dialogue_type";
     String TYPE_STAT = "stat_dialogue_type";
     String TYPE_TEMP_STAT = "temp_stat_dialogue_type";
+    String TYPE_COMBAT_ACTION = "combat_action_dialogue_type";
 
     int getViewType();
     JSONObject toJSON() throws JSONException;

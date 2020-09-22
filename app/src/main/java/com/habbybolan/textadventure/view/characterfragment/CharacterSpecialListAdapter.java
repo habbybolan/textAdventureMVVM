@@ -60,22 +60,4 @@ public class CharacterSpecialListAdapter extends RecyclerView.Adapter<CharacterS
         return specialList != null ? specialList.size() : 0;
     }
 
-    /*
-    // adds new dot effect to the list if it doesn't already exist
-    public void addNewSpecial(SpecialEffect special) {
-        specialList.add(special);
-        notifyItemInserted(specialList.size() - 1);
-
-    }
-    // deleted a dot effect from the list
-    public void removeSpecial(SpecialEffect deleteSpecial) {
-        for (int i = 0; i < specialList.size(); i++) {
-            // check if the dot exists in the list
-            if (deleteSpecial.equals(specialList.get(i))) {
-                specialList.remove(i);
-                notifyItemRemoved(i);
-                break;
-            }
-        }
-    }*/
 }

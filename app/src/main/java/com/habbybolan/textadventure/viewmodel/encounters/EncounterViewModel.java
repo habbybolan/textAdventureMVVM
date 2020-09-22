@@ -19,6 +19,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+/*
+View Model that all encounter view models extend
+ - implements all of the shared functionality between the encounter view models,
+    including dialogue shown (and first dialogue state), state changes, and saving methods to implement
+ */
 public abstract class EncounterViewModel {
 
     // key values for JSON to save encounter
@@ -64,18 +69,18 @@ public abstract class EncounterViewModel {
 
     // dialogue
 
-    ObservableField<String> newDialogue = new ObservableField<>();
+    private ObservableField<Dialogue> newDialogue = new ObservableField<>();
     // observed for changes to add to RecyclerViewer
-    public ObservableField<String> getNewDialogue() {
+    public ObservableField<Dialogue> getNewDialogue() {
         return newDialogue;
     }
     // sets the new dialogue value inside dialogue RV
-    void setNewDialogue(String newDialogue) {
+    void setNewDialogue(Dialogue newDialogue) {
         this.newDialogue.set(newDialogue);
     }
     // get the observable NewDialogue
-    public String getNewDialogueValue() {
-        String newDialogue = getNewDialogue().get();
+    public Dialogue getNewDialogueValue() {
+        Dialogue newDialogue = getNewDialogue().get();
         if (newDialogue != null) return newDialogue;
         throw new NullPointerException();
     }
@@ -84,7 +89,7 @@ public abstract class EncounterViewModel {
         this.firstStateJSON = firstStateJSON;
     }
     public void firstDialogueState() throws JSONException {
-        if (firstStateJSON.has("dialogue")) setNewDialogue(firstStateJSON.getString("dialogue"));
+        if (firstStateJSON.has("dialogue")) setNewDialogue(new Dialogue(firstStateJSON.getString("dialogue")));
         if (firstStateJSON.has("next")) {
             firstStateJSON = firstStateJSON.getJSONObject("next");
         } else {
@@ -95,7 +100,8 @@ public abstract class EncounterViewModel {
     public JSONObject getFirstStateJSON() {
         return firstStateJSON;
     }
-    public void setDialogueRemainingInDialogueState(MainGameViewModel mainGameVM, JSONObject encounter) throws JSONException {
+    public void setDialogueRemainingInDialogueState(JSONObject encounter) throws JSONException {
+        MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         if (mainGameVM.getSavedEncounter() != null) {
             setIsSaved(true);
             // first state dialogue to be iterated over
@@ -111,7 +117,7 @@ public abstract class EncounterViewModel {
 
     protected ArrayList<DialogueType> dialogueList = new ArrayList<>();
     // set the saved dialogue list of previously added dialogue to RV
-    public void setDialogueList(MainGameViewModel mainGameVM) throws JSONException {
+    void setDialogueList(MainGameViewModel mainGameVM) throws JSONException {
         JSONArray dialogue = mainGameVM.getSavedEncounter().getJSONArray(DIALOGUE_ADDED);
         dialogueList = JSONArrayIntoDialogueTypesList(dialogue);
     }

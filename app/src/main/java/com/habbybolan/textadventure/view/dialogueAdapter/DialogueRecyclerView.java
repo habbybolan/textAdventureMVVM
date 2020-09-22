@@ -6,6 +6,7 @@ import androidx.databinding.Observable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.habbybolan.textadventure.model.dialogue.CombatActionDialogue;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.EffectDialogue;
@@ -35,13 +36,13 @@ public class DialogueRecyclerView {
     private DialogueAdapter adapter;
     private CharacterViewModel characterVM;
 
-    public DialogueRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, ArrayList<DialogueType> dialogueList) {
+    public DialogueRecyclerView(Context context, RecyclerView recyclerView, ArrayList<DialogueType> dialogueList) {
 
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         this.adapter = new DialogueAdapter(dialogueList);
         recyclerView.setAdapter(adapter);
-        this.characterVM = characterVM;
+        characterVM = CharacterViewModel.getInstance();
 
         // set up OnCLickListeners for changes in player Character
         // Effect listeners
@@ -58,6 +59,15 @@ public class DialogueRecyclerView {
         // stat
         setTempStatListener();
         setStatListener();
+    }
+    // Dialogue for adding basic String text
+    public void addDialogue(Dialogue dialogue) {
+        adapter.addNewDialogue(dialogue);
+    }
+
+    // Dialogue for adding combat actions from enemies and character
+    public void addNewCombatDialogue(CombatActionDialogue dialogue) {
+        adapter.addNewDialogue(dialogue);
     }
 
     // Dialogue for adding new Item
@@ -171,10 +181,7 @@ public class DialogueRecyclerView {
         characterVM.getManaObserve().addOnPropertyChangedCallback(callBack);
     }
 
-    // Dialogue for adding basic String text
-    public void addDialogue(Dialogue dialogue) {
-        adapter.addNewDialogue(dialogue);
-    }
+
 
     // dialogue for adding Dot Effects
     private void setDotListener() {

@@ -98,11 +98,17 @@ public class DatabaseAdapter {
         }
     }
     // get a weapon of a specific tier
-    public Cursor getRandomWeaponOfTier(int tier) throws ExecutionException, InterruptedException {
+    public Weapon getRandomWeaponOfTier(int tier) throws ExecutionException, InterruptedException {
         open();
         String table = Weapon.table;
-        String sql ="SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT 1";
-        return new queryDatabase().execute(sql).get();
+        int limit = 1;
+        String sql = "SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT " + limit;
+        Cursor weaponCursor = new queryDatabase().execute(sql).get();
+        int weaponColID = weaponCursor.getColumnIndex("weapon_id");
+        int weaponID = weaponCursor.getInt(weaponColID);
+        Weapon weapon =  new Weapon(weaponCursor, this, weaponID);
+        close();
+        return weapon;
     }
 
     // get numWeapons random weapon of weighted-random tier
@@ -136,18 +142,32 @@ public class DatabaseAdapter {
         for (int i = 0; i < numWeapons; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
             int weaponColID = cursor.getColumnIndex("weapon_id");
-            weapons.add(new Weapon(cursor.getInt(weaponColID), this));
+            int weaponID = cursor.getInt(weaponColID);
+            weapons.add(new Weapon(cursor, this, weaponID));
         }
         close();
         return weapons;
     }
 
+    // return the cursor of a weapon id
+    public Cursor getWeaponCursorFromID(int id) throws ExecutionException, InterruptedException {
+        String table = Weapon.table;
+        String sql = "SELECT * FROM " + table + " WHERE " + "weapon_id" + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        return new queryDatabase().execute(sql).get();
+    }
+
     // retrieve an ability of specific tier
-    public Cursor getRandomAbilityOfTier(int tier) throws ExecutionException, InterruptedException {
+    public Ability getRandomAbilityOfTier(int tier) throws ExecutionException, InterruptedException {
         open();
         String table = Ability.table;
         String sql ="SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT 1";
-        return new queryDatabase().execute(sql).get();
+        Cursor abilityCursor = new queryDatabase().execute(sql).get();
+        int abilityColID = abilityCursor.getColumnIndex("weapon_id");
+        int abilityID = abilityCursor.getInt(abilityColID);
+        Ability ability =  new Ability(abilityCursor, abilityID);
+        abilityCursor.close();
+        close();
+        return ability;
     }
 
     // retrieve numAbilities random abilities
@@ -180,12 +200,20 @@ public class DatabaseAdapter {
         for (int i = 0; i < numAbilities; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
             int abilityColID = cursor.getColumnIndex("ability_id");
-            abilities.add(new Ability(cursor.getInt(abilityColID), this));
+            int abilityID = cursor.getInt(abilityColID);
+            abilities.add(new Ability(cursor, abilityID));
         }
+        cursor.close();
         close();
         return abilities;
     }
 
+    // return the cursor of an ability id
+    public Cursor getAbilityCursorFromID(int id) throws ExecutionException, InterruptedException {
+        String table = Ability.table;
+        String sql = "SELECT * FROM " + table + " WHERE " + "ability_id" + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        return new queryDatabase().execute(sql).get();
+    }
 
     private Cursor getDataMultipleRandom(String table, int limit, int tier) throws ExecutionException, InterruptedException {
         open();
@@ -194,11 +222,17 @@ public class DatabaseAdapter {
     }
 
     // retrieve a random item of specific tier
-    public Cursor getRandomItemOfTier(int tier) throws ExecutionException, InterruptedException {
+    public Item getRandomItemOfTier(int tier) throws ExecutionException, InterruptedException {
         open();
         String table = Item.table;
         String sql ="SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT 1";
-        return new queryDatabase().execute(sql).get();
+        Cursor itemCursor = new queryDatabase().execute(sql).get();
+        int itemColID = itemCursor.getColumnIndex("item_id");
+        int itemID = itemCursor.getInt(itemColID);
+        Item item =  new Item(itemCursor, this, itemID);
+        itemCursor.close();
+        close();
+        return item;
     }
     // retrieve numItems random items
     public ArrayList<Item> getRandomItems(int numItems) throws ExecutionException, InterruptedException {
@@ -230,9 +264,19 @@ public class DatabaseAdapter {
         for (int i = 0; i < numItems; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
             int itemColID = cursor.getColumnIndex("item_id");
-            items.add(new Item(cursor.getString(itemColID), this));
+            int itemID = cursor.getInt(itemColID);
+            items.add(new Item(cursor, this, itemID));
         }
+        cursor.close();
         close();
         return items;
     }
+
+    // return the cursor of an item id
+    public Cursor getItemCursorFromID(int id) throws ExecutionException, InterruptedException {
+        String table = Item.table;
+        String sql = "SELECT * FROM " + table + " WHERE " + "item_id" + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        return new queryDatabase().execute(sql).get();
+    }
+
 }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class CharacterEntity {
+public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     protected int strIncrease;
     protected int intIncrease;
@@ -43,7 +43,8 @@ public abstract class CharacterEntity {
     protected int evasion;
     protected int block;
 
-    protected int numStatPoints;
+    int numStatPoints;
+    boolean isCharacter;
 
     private String strDescription = "Increases the damage of attack based moves.";
     private String intDescription = "Increases the damage of ability based moves and increases your mana pool.";
@@ -80,8 +81,11 @@ public abstract class CharacterEntity {
 
     protected int level;
 
-    protected boolean isAlive;
+    protected boolean isAlive = true;
     protected int drawableResID;
+    protected int drawableDeadResID;
+    protected int drawableIconResID;
+    protected int drawableIconDeadResID;
 
     // Inventory
     protected ArrayList<Ability> abilities = new ArrayList<>();
@@ -90,6 +94,14 @@ public abstract class CharacterEntity {
 
     // decrement all ability cooldowns
     public abstract void decrCooldowns();
+
+
+    // ** comparing CharacterEntities **
+
+    @Override
+    public int compareTo(CharacterEntity entity) {
+        return Integer.compare(entity.getSpeed(), speed);
+    }
 
     // *** Damage ***
 
@@ -485,46 +497,6 @@ public abstract class CharacterEntity {
 
 
     // ***ABILITIES***
-
-    // adds a new ability and applies its effects - stat increases, specials, and dots
-    // todo: damage not observed as damageTarget returns value, doesn't set it
-    public void addNewAbilityEffects(Ability ability) {
-        // todo: scale with Intelligence
-        if (ability.getMinDamage() != 0) damageTarget(getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));
-        if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
-        // specials
-        if (ability.getIsConfuse()) addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration()));
-        if (ability.getIsStun()) addNewSpecial(new SpecialEffect(SpecialEffect.STUN, ability.getDuration()));
-        if (ability.getIsInvincibility()) addNewSpecial(new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration()));
-        if (ability.getIsSilence()) addNewSpecial(new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration()));
-        if (ability.getIsInvisible()) addNewSpecial(new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration()));
-        // DOT
-        if (ability.getIsFire()) addNewDot(new Dot(Dot.FIRE, false));
-        if (ability.getIsPoison()) addNewDot(new Dot(Dot.POISON, false));
-        if (ability.getIsBleed()) addNewDot(new Dot(Dot.BLEED, false));
-        if (ability.getIsFrostBurn()) addNewDot(new Dot(Dot.FROSTBURN, false));
-        if (ability.getIsHealDot()) addNewDot(new Dot(Dot.HEALTH_DOT, false));
-        if (ability.getIsManaDot()) addNewDot(new Dot(Dot.MANA_DOT, false));
-        // direct heal/mana
-        if (ability.getHealMin() != 0) changeHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
-        if (ability.getManaMin() != 0) changeMana(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
-        // stat increases
-        if (ability.getStrIncrease() != 0) addNewStatIncrease(new TempStat(STR, ability.getDuration(), ability.getStrIncrease()));
-        if (ability.getIntIncrease() != 0) addNewStatIncrease(new TempStat(INT, ability.getDuration(), ability.getIntIncrease()));
-        if (ability.getConIncrease() != 0) addNewStatIncrease(new TempStat(CON, ability.getDuration(), ability.getConIncrease()));
-        if (ability.getSpdIncrease() != 0) addNewStatIncrease(new TempStat(SPD, ability.getDuration(), ability.getSpdIncrease()));
-        if (ability.getEvadeIncrease() != 0) addNewStatIncrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeIncrease()));
-        if (ability.getBlockIncrease() != 0) addNewStatIncrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockIncrease()));
-        // stat decreases
-        if (ability.getStrDecrease() != 0) addNewStatDecrease(new TempStat(STR, ability.getDuration(), ability.getStrDecrease()));
-        if (ability.getIntDecrease() != 0) addNewStatDecrease(new TempStat(INT, ability.getDuration(), ability.getIntDecrease()));
-        if (ability.getConDecrease() != 0) addNewStatDecrease(new TempStat(CON, ability.getDuration(), ability.getConDecrease()));
-        if (ability.getSpdDecrease() != 0) addNewStatDecrease(new TempStat(SPD, ability.getDuration(), ability.getSpdDecrease()));
-        if (ability.getEvadeDecrease() != 0) addNewStatDecrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeDecrease()));
-        if (ability.getBlockDecrease() != 0) addNewStatDecrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockDecrease()));
-        // temp extra health- part of stat
-        if (ability.getTempExtraHealth() != 0) addNewTempExtraHealthMana(new TempBar(TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth()));
-    }
 
     // ** Special Effects **
 
@@ -1283,6 +1255,15 @@ public abstract class CharacterEntity {
     public int getDrawableResID() {
         return drawableResID;
     }
+    public int getDrawableDeadResID() {
+        return drawableDeadResID;
+    }
+    public int getDrawableIconResID() {
+        return drawableIconResID;
+    }
+    public int getDrawableIconDeadResID() {
+        return drawableIconDeadResID;
+    }
 
     public ArrayList<Dot> getDotList() {
         return dotList;
@@ -1308,5 +1289,9 @@ public abstract class CharacterEntity {
     }
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public boolean getIsCharacter() {
+        return isCharacter;
     }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="iconResID"
+            type="Integer" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="@dimen/combat_order_icon_size"
+            android:layout_height="@dimen/combat_order_icon_size"
+            app:imageResource="@{iconResID}" />
+
+    </RelativeLayout>
+
+</layout>

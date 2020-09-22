@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    //
+    // button to continue the saved game
     public void continueGame(View v) {
         Intent intent = new Intent(getApplicationContext(), MainGameActivity.class);
         startActivity(intent);

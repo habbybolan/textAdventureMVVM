@@ -477,11 +477,11 @@ public class CharacterViewModel extends BaseObservable {
 
     // ** Special Effects **
 
-    private ObservableField<SpecialEffect> updateAllSpecialAdd = new ObservableField<>();
+    public ObservableField<SpecialEffect> updateAllSpecialAdd = new ObservableField<>();
     public ObservableField<SpecialEffect>  getUpdateAllSpecialAdd() {
         return updateAllSpecialAdd;
     }
-    private ObservableField<Void> updateAllSpecialRemove = new ObservableField<>();
+    public ObservableField<Void> updateAllSpecialRemove = new ObservableField<>();
     public ObservableField<Void>  getUpdateAllSpecialRemove() {
         return updateAllSpecialRemove;
     }
@@ -773,6 +773,14 @@ public class CharacterViewModel extends BaseObservable {
     public void setGold(int gold) {
         character.setGold(gold);
         notifyPropertyChanged(BR.gold);
+    }
+    @Bindable
+    public int getDrawableResID() {
+        return character.getDrawableResID();
+    }
+    @Bindable
+    public int getDrawableDeadResID() {
+        return character.getDrawableDeadResID();
     }
 
         // Dots

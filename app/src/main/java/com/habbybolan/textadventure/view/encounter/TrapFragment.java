@@ -23,26 +23,26 @@ import java.util.concurrent.ExecutionException;
 
 public class TrapFragment extends EncounterDialogueFragment implements EncounterFragment{
 
-    private JSONObject encounter;
     private FragmentTrapBinding trapBinder;
     private TrapEncounterViewModel trapEncounterVM;
 
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
+    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
+    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
+    private JSONObject encounter = mainGameVM.getJSONEncounter();
     private DialogueRecyclerView rv;
 
 
-    public TrapFragment(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter) {
-        this.mainGameVM = mainGameVM;
-        this.characterVM = characterVM;
-        this.encounter = encounter;
+    public TrapFragment() {}
+
+    public static TrapFragment newInstance() {
+        return new TrapFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            trapEncounterVM = new TrapEncounterViewModel(mainGameVM, characterVM, encounter, getActivity());
+            trapEncounterVM = new TrapEncounterViewModel(encounter, getActivity());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -66,7 +66,7 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
     private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
         trapEncounterVM.setSavedData();
         // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), trapBinder.rvDialogue, characterVM, trapEncounterVM.getDialogueList());
+        rv = new DialogueRecyclerView(getContext(), trapBinder.rvDialogue, trapEncounterVM.getDialogueList());
         setUpDialogueRV(rv, trapEncounterVM);
         stateListener(trapEncounterVM.getStateIndex(), trapEncounterVM, this);
         // called after stateLister set up, signalling first state to enter
@@ -131,6 +131,7 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
         // set up the button to leave the encounter and goto next
     @Override
     public void endState() {
+        characterVM.setStateInventoryObserver(true);
         setLeaveButton(mainGameVM, trapBinder.layoutBtnOptions);
     }
 

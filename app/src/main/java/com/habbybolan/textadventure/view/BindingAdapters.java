@@ -20,4 +20,16 @@ public class BindingAdapters {
         String text = "You found a " + name;
         view.setText(text);
     }
+
+    @BindingAdapter(value = {"attacker", "target", "action", "amount"})
+    public static void combatDialogue(TextView view,  String attacker, String target, String action, int amount) {
+        String builder = attacker +
+                " uses " +
+                action +
+                " on " +
+                target +
+                " for " +
+                amount;
+        view.setText(builder);
+    }
 }

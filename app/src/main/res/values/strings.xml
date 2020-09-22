@@ -88,6 +88,14 @@
 
     <string name='continue_dialogue'>Continue</string>
 
+    <string name='category_weapons_option'>Weapons</string>
+    <string name='category_abilities_option'>Abilities</string>
+    <string name='category_items_option'>items</string>
+
+    <string name="btn_run">Run</string>
+    <string name="btn_continue">Continue</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
