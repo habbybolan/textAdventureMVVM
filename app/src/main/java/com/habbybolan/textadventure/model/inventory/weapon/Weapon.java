@@ -122,8 +122,8 @@ public class Weapon implements Inventory {
     public JSONObject toJSON() {
         JSONObject toJSON = new JSONObject();
         try {
-            toJSON.put("type", "weapon");
-            toJSON.put("id", getID());
+            toJSON.put(INVENTORY_TYPE, TYPE_WEAPON);
+            toJSON.put(ID, getID());
         } catch (JSONException e) {
             e.printStackTrace();
         }

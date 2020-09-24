@@ -6,18 +6,21 @@ import androidx.databinding.Observable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
 
 public class WeaponListRecyclerView implements InventoryListRecyclerView {
 
-    private InventoryListAdapter adapter;
+    private WeaponListAdapter adapter;
     private CharacterViewModel characterVM;
+    CombatViewModel combatVM;
 
-    public WeaponListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, InventoryClickListener inventoryClickListener) {
+    public WeaponListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, InventoryClickListener inventoryClickListener) {
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        adapter = new InventoryListAdapter(characterVM.getWeapons(), inventoryClickListener);
+        this.combatVM = combatVM;
+        adapter = new WeaponListAdapter(characterVM.getWeapons(), inventoryClickListener);
         recyclerView.setAdapter(adapter);
         this.characterVM = characterVM;
         setInventoryListeners();
@@ -37,13 +40,17 @@ public class WeaponListRecyclerView implements InventoryListRecyclerView {
         Observable.OnPropertyChangedCallback callbackRemove = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                adapter.updateChange();
+                Weapon weapon = characterVM.getWeaponObserverRemove().get();
+                if (weapon != null) {
+                    combatVM.checkIfRemovedInventoryIsSelected(weapon);
+                    adapter.updateChange();
+                }
             }
         };
         characterVM.getWeaponObserverRemove().addOnPropertyChangedCallback(callbackRemove);
     }
 
-    // if there is a selected index stored, then remove and update all elements
+    // if there is a selected index stored, then remove and update all elements and collapses list
     @Override
     public void unSelectIfOneSelected() {
         adapter.unSelectIfOneSelected();

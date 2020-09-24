@@ -2,8 +2,13 @@ package com.habbybolan.textadventure.model.inventory.weapon;
 
 import android.database.Cursor;
 
+import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 
@@ -12,7 +17,7 @@ A special attack that represents one of two uses for a weapon
     // attacks can be abilities, or similar to attacks with a bit more effects, but has a cool down
     // each weapon is guaranteed to have one special attack
  */
-public class SpecialAttack {
+public class SpecialAttack implements Inventory {
 
     private String specialAttackName = "";
     private String specialAttackDescription = "";
@@ -28,7 +33,9 @@ public class SpecialAttack {
 
     private int specialAttackID;
 
-    static private final String table = "s_attacks";
+    public static final String table = "s_attacks";
+
+    private int pictureResource;
 
     // damage with attack
     private int attackDamage = 0;
@@ -40,13 +47,12 @@ public class SpecialAttack {
     // constructor where database opened and closed elsewhere
     public SpecialAttack(int specialAttackID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         this.specialAttackID = specialAttackID;
-        setVariables(mDbHelper, specialAttackID);
+        Cursor cursor = mDbHelper.getSpecialAttackCursorFromID(specialAttackID);
+        setVariables(cursor, mDbHelper);
+        setPictureResource();
     }
 
-    // todo: getColumnIndex getting the wrong column or return -1???
-    private void setVariables(DatabaseAdapter mDbHelper, int specialAttackID) throws ExecutionException, InterruptedException {
-        Cursor cursor = mDbHelper.getData(table);
-        cursor.moveToPosition(specialAttackID-1);
+    private void setVariables(Cursor cursor, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         // set up special attack name
         int specialAttackNameColID = cursor.getColumnIndex("s_attack_name");
         setSpecialAttackName(cursor.getString(specialAttackNameColID));
@@ -154,5 +160,42 @@ public class SpecialAttack {
 
     public int getSpecialAttackID() {
         return specialAttackID;
+    }
+
+    @Override
+    public String getType() {
+        return TYPE_S_ATTACK;
+    }
+
+    @Override
+    public String getName() {
+        return specialAttackName;
+    }
+
+    @Override
+    public int getID() {
+        return specialAttackID;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject toJSON = new JSONObject();
+        try {
+            toJSON.put(INVENTORY_TYPE, TYPE_S_ATTACK);
+            toJSON.put(ID, getID());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return toJSON;
+    }
+
+    @Override
+    public void setPictureResource() {
+        pictureResource = R.drawable.sword;
+    }
+
+    @Override
+    public int getPictureResource() {
+        return pictureResource;
     }
 }

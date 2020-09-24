@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Attack;
+import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
 import java.io.IOException;
@@ -23,6 +25,12 @@ public class DatabaseAdapter {
     private final Context mContext;
     private SQLiteDatabase mDb;
     private DataBaseHelper mDbHelper;
+
+    private String WEAPON_ID = "weapon_id";
+    private String ATTACK_ID = "attack_id";
+    private String S_ATTACK_ID = "s_attack_id";
+    private String ABILITY_ID = "ability_id";
+    private String ITEM_ID = "item_id";
 
     // TODO: establish the number of tiers weapons/abilities/items have
     private double WEAPON_TIER_1 = 0.70;
@@ -104,7 +112,7 @@ public class DatabaseAdapter {
         int limit = 1;
         String sql = "SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT " + limit;
         Cursor weaponCursor = new queryDatabase().execute(sql).get();
-        int weaponColID = weaponCursor.getColumnIndex("weapon_id");
+        int weaponColID = weaponCursor.getColumnIndex(WEAPON_ID);
         int weaponID = weaponCursor.getInt(weaponColID);
         Weapon weapon =  new Weapon(weaponCursor, this, weaponID);
         close();
@@ -141,7 +149,7 @@ public class DatabaseAdapter {
         Collections.shuffle(possibleCursorIndices); // randomize the ArrayList<Weapon>
         for (int i = 0; i < numWeapons; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
-            int weaponColID = cursor.getColumnIndex("weapon_id");
+            int weaponColID = cursor.getColumnIndex(WEAPON_ID);
             int weaponID = cursor.getInt(weaponColID);
             weapons.add(new Weapon(cursor, this, weaponID));
         }
@@ -152,7 +160,19 @@ public class DatabaseAdapter {
     // return the cursor of a weapon id
     public Cursor getWeaponCursorFromID(int id) throws ExecutionException, InterruptedException {
         String table = Weapon.table;
-        String sql = "SELECT * FROM " + table + " WHERE " + "weapon_id" + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        String sql = "SELECT * FROM " + table + " WHERE " + WEAPON_ID + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        return new queryDatabase().execute(sql).get();
+    }
+
+    public Cursor getAttackCursorFromID(int id) throws ExecutionException, InterruptedException {
+        String table = Attack.table;
+        String sql = "SELECT * FROM " + table + " WHERE " + ATTACK_ID + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        return new queryDatabase().execute(sql).get();
+    }
+
+    public Cursor getSpecialAttackCursorFromID(int id) throws ExecutionException, InterruptedException {
+        String table = SpecialAttack.table;
+        String sql = "SELECT * FROM " + table + " WHERE " + S_ATTACK_ID + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
         return new queryDatabase().execute(sql).get();
     }
 
@@ -162,7 +182,7 @@ public class DatabaseAdapter {
         String table = Ability.table;
         String sql ="SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT 1";
         Cursor abilityCursor = new queryDatabase().execute(sql).get();
-        int abilityColID = abilityCursor.getColumnIndex("weapon_id");
+        int abilityColID = abilityCursor.getColumnIndex(WEAPON_ID);
         int abilityID = abilityCursor.getInt(abilityColID);
         Ability ability =  new Ability(abilityCursor, abilityID);
         abilityCursor.close();
@@ -199,7 +219,7 @@ public class DatabaseAdapter {
         Collections.shuffle(possibleCursorIndices); // randomize the ArrayList<Ability>
         for (int i = 0; i < numAbilities; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
-            int abilityColID = cursor.getColumnIndex("ability_id");
+            int abilityColID = cursor.getColumnIndex(ABILITY_ID);
             int abilityID = cursor.getInt(abilityColID);
             abilities.add(new Ability(cursor, abilityID));
         }
@@ -211,7 +231,7 @@ public class DatabaseAdapter {
     // return the cursor of an ability id
     public Cursor getAbilityCursorFromID(int id) throws ExecutionException, InterruptedException {
         String table = Ability.table;
-        String sql = "SELECT * FROM " + table + " WHERE " + "ability_id" + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        String sql = "SELECT * FROM " + table + " WHERE " + ABILITY_ID + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
         return new queryDatabase().execute(sql).get();
     }
 
@@ -227,7 +247,7 @@ public class DatabaseAdapter {
         String table = Item.table;
         String sql ="SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT 1";
         Cursor itemCursor = new queryDatabase().execute(sql).get();
-        int itemColID = itemCursor.getColumnIndex("item_id");
+        int itemColID = itemCursor.getColumnIndex(ITEM_ID);
         int itemID = itemCursor.getInt(itemColID);
         Item item =  new Item(itemCursor, this, itemID);
         itemCursor.close();
@@ -263,7 +283,7 @@ public class DatabaseAdapter {
         Collections.shuffle(possibleCursorIndices); // randomize the ArrayList<Item>
         for (int i = 0; i < numItems; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
-            int itemColID = cursor.getColumnIndex("item_id");
+            int itemColID = cursor.getColumnIndex(ITEM_ID);
             int itemID = cursor.getInt(itemColID);
             items.add(new Item(cursor, this, itemID));
         }
@@ -275,7 +295,7 @@ public class DatabaseAdapter {
     // return the cursor of an item id
     public Cursor getItemCursorFromID(int id) throws ExecutionException, InterruptedException {
         String table = Item.table;
-        String sql = "SELECT * FROM " + table + " WHERE " + "item_id" + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        String sql = "SELECT * FROM " + table + " WHERE " + ITEM_ID + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
         return new queryDatabase().execute(sql).get();
     }
 

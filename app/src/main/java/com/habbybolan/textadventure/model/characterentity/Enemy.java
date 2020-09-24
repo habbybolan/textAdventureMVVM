@@ -8,6 +8,9 @@ import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Attack;
+import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
@@ -95,10 +98,39 @@ public class Enemy extends CharacterEntity {
         }
     }
 
+    // ** ITEMS **
+
+    // use the ability attached to the item
+    public void applyItem(Item item, CharacterEntity attacker) {
+        if (item.getAbility() == null) throw new IllegalArgumentException();
+        applyAbility(item.getAbility(), attacker);
+    }
+
+    // ** WEAPONS **
+
+    // apply the attack from the attacker
+    public void applyAttack(Attack attack, CharacterEntity attacker) {
+        Random random = new Random();
+        int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
+        changeHealth(damage);
+    }
+    // apply the special attack from the attacker
+    public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
+        if (specialAttack.getAbility() != null) {
+            applyAbility(specialAttack.getAbility(), attacker);
+        }
+        if (specialAttack.getAoe() > 0) {
+            doAoeStuff(); // todo: aoe
+        }
+        if (specialAttack.getDamageMin() != 0) {
+            damageTarget(getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax()));
+        }
+    }
+
     // ***ABILITIES**
 
-    // apply ability to enemy
-    public void applyAbilityToEnemy(Ability ability) {
+    // apply ability to enemy from attacker
+    public void applyAbility(Ability ability, CharacterEntity attacker) {
         CharacterViewModel characterVM = CharacterViewModel.getInstance();
         // todo: scale with Intelligence
         if (ability.getMinDamage() != 0) damageTarget(getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));
@@ -133,7 +165,7 @@ public class Enemy extends CharacterEntity {
         if (ability.getSpdDecrease() != 0) addNewStatDecrease(new TempStat(SPD, ability.getDuration(), ability.getSpdDecrease()));
         if (ability.getEvadeDecrease() != 0) addNewStatDecrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeDecrease()));
         if (ability.getBlockDecrease() != 0) addNewStatDecrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockDecrease()));
-        // temp extra health- part of stat
+        // temp extra health
         if (ability.getTempExtraHealth() != 0) addNewTempExtraHealthMana(new TempBar(TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth()));
     }
 

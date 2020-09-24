@@ -6,19 +6,22 @@ import androidx.databinding.Observable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
 
 public class AbilityListRecyclerView implements InventoryListRecyclerView{
 
-    private InventoryListAdapter adapter;
+    private AbilityItemListAdapter adapter;
     private CharacterViewModel characterVM;
+    private CombatViewModel combatVM;
 
 
-    public AbilityListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, InventoryClickListener inventoryClickListener) {
+    public AbilityListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, InventoryClickListener inventoryClickListener) {
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        adapter = new InventoryListAdapter(characterVM.getAbilities(), inventoryClickListener);
+        this.combatVM = combatVM;
+        adapter = new AbilityItemListAdapter(characterVM.getAbilities(), inventoryClickListener);
         recyclerView.setAdapter(adapter);
         this.characterVM = characterVM;
         setInventoryListeners();
@@ -38,7 +41,11 @@ public class AbilityListRecyclerView implements InventoryListRecyclerView{
         Observable.OnPropertyChangedCallback callbackRemove = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                adapter.updateChange();
+                Ability ability = characterVM.getAbilityObserverRemove().get();
+                if (ability != null) {
+                    combatVM.checkIfRemovedInventoryIsSelected(ability);
+                    adapter.updateChange();
+                }
             }
         };
         characterVM.getAbilityObserverRemove().addOnPropertyChangedCallback(callbackRemove);

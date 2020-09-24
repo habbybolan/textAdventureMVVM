@@ -387,8 +387,8 @@ public class Item implements Inventory{
     public JSONObject toJSON() {
         JSONObject toJSON = new JSONObject();
         try {
-            toJSON.put("type", "item");
-            toJSON.put("id", getID());
+            toJSON.put(INVENTORY_TYPE, TYPE_ITEM);
+            toJSON.put(ID, getID());
         } catch (JSONException e) {
             e.printStackTrace();
         }

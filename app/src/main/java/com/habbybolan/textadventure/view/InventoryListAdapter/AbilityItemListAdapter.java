@@ -10,14 +10,14 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.databinding.InventoryListDetailsBinding;
+import com.habbybolan.textadventure.databinding.AbilityItemListDetailsBinding;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 
 import java.util.ArrayList;
 /*
 adapter for Inventory objects inside list of combat encounter
  */
-public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdapter.ViewHolder> {
+public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemListAdapter.ViewHolder> {
 
     private ArrayList<? extends Inventory> inventoryObjects;
     private InventoryClickListener inventoryClickListener;
@@ -25,7 +25,7 @@ public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdap
     // index of selected item, -1 if nothing selected
     private int selectedIndex = -1;
 
-    InventoryListAdapter(ArrayList<? extends Inventory> inventoryObjects, InventoryClickListener inventoryClickListener) {
+    AbilityItemListAdapter(ArrayList<? extends Inventory> inventoryObjects, InventoryClickListener inventoryClickListener) {
         this.inventoryObjects = inventoryObjects;
         this.inventoryClickListener = inventoryClickListener;
     }
@@ -34,8 +34,8 @@ public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdap
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        InventoryListDetailsBinding bindingDialogue = DataBindingUtil.inflate(layoutInflater, R.layout.inventory_list_details, parent, false);
-        return new InventoryListAdapter.ViewHolder(bindingDialogue, inventoryClickListener, this);
+        AbilityItemListDetailsBinding bindingDialogue = DataBindingUtil.inflate(layoutInflater, R.layout.ability_item_list_details, parent, false);
+        return new AbilityItemListAdapter.ViewHolder(bindingDialogue, inventoryClickListener, this);
     }
 
     @Override
@@ -50,10 +50,10 @@ public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdap
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        InventoryListDetailsBinding binding;
+        AbilityItemListDetailsBinding binding;
         InventoryClickListener inventoryClickListener;
 
-        ViewHolder(final InventoryListDetailsBinding binding, final InventoryClickListener inventoryClickListener, final InventoryListAdapter adapter) {
+        ViewHolder(final AbilityItemListDetailsBinding binding, final InventoryClickListener inventoryClickListener, final AbilityItemListAdapter adapter) {
             super(binding.getRoot());
             this.binding = binding;
             this.inventoryClickListener = inventoryClickListener;
@@ -64,7 +64,7 @@ public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdap
                     adapter.notifyItemChanged(adapter.selectedIndex);
                     adapter.selectedIndex = getAdapterPosition();
                     adapter.notifyItemChanged(adapter.selectedIndex);
-                    inventoryClickListener.onClicked(getAdapterPosition());
+                    inventoryClickListener.onClicked(adapter.inventoryObjects.get(getAdapterPosition()));
                 }
             });
         }
@@ -90,8 +90,9 @@ public class InventoryListAdapter extends RecyclerView.Adapter<InventoryListAdap
     // if there is a selected index stored, then remove and update all elements
     public void unSelectIfOneSelected() {
         if (selectedIndex >= 0) {
+            int selectedPrev = selectedIndex;
             selectedIndex = -1;
-            notifyDataSetChanged();
+            notifyItemChanged(selectedPrev);
         }
     }
 }

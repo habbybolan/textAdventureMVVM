@@ -18,6 +18,7 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentCombatBinding;
 import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.characterentity.Enemy;
+import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.InventoryClickListener;
@@ -247,17 +248,8 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 @Override
                 public void onClick(View v) {
                     v.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.icon_action_target));
-                    if (combatVM.isSelectedAction()) {
-                        // todo: check if the action is valid on the target
-                        // todo: ex: can't use a consumable health potion on enemy? - or allow to use anything and change text
-                        // todo: ex: you throw the health potion liquid onto the skeleton and watch the bones melt away...
-                        //if (combatVM.isValidAction()) {
-                        combatVM.applyCharacterAction((CharacterEntity) v.getTag());
-                        notifyCombatOrderNextTurn();
-                        //}
-                    } else {
-                        Toast.makeText(getContext(), "Select an action", Toast.LENGTH_SHORT).show();
-                    }
+                    // perform action
+                    characterActionOnClick((CharacterEntity) v.getTag());
                 }
             });
             combatBinding.enemyActionIcons.addView(enemyIconSelectable);
@@ -266,14 +258,22 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             @Override
             public void onClick(View v) {
                 v.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.icon_action_target));
-                if (combatVM.isSelectedAction()) {
-                    combatVM.applyCharacterAction(characterVM.getCharacter());
-                    notifyCombatOrderNextTurn();
-                } else {
-                    Toast.makeText(getContext(), "Select an action", Toast.LENGTH_SHORT).show();
-                }
+                // perform action
+                characterActionOnClick(characterVM.getCharacter());
             }
         });
+    }
+
+    // helper for performing character action on icon click, or displaying action error message
+    private void characterActionOnClick(CharacterEntity target) {
+        if (combatVM.characterAction(target)) {
+            // action is valid and performed, so update the combat ordering
+            notifyCombatOrderNextTurn();
+        } else {
+            // otherwise the action failed, get the error message from combatVM and display with Toast
+            String error = combatVM.getActionError(target);
+            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+        }
     }
 
     // UI for combat state
@@ -288,42 +288,55 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         setContinueButtonClick();
         setActionSelect();
 
-        // clickers for saving selected inventory action and un-select others
-        abilityRV = new AbilityListRecyclerView(getContext(), combatBinding.rvAbilities, characterVM, new InventoryClickListener() {
-            @Override
-            public void onClicked(int index) {
-                // set selected action the selected Ability action
-                combatVM.setSelectedInventoryAction(characterVM.getAbilities().get(index));
-                weaponRV.unSelectIfOneSelected();
-                itemRV.unSelectIfOneSelected();
-            }
-        });
-
-        weaponRV = new WeaponListRecyclerView(getContext(), combatBinding.rvWeapons, characterVM, new InventoryClickListener() {
-            @Override
-            public void onClicked(int index) {
-                // set selected action the selected Weapon action
-                combatVM.setSelectedInventoryAction(characterVM.getWeapons().get(index));
-                abilityRV.unSelectIfOneSelected();
-                itemRV.unSelectIfOneSelected();
-            }
-        });
-
-        itemRV = new ItemListRecyclerView(getContext(), combatBinding.rvItems, characterVM, new InventoryClickListener() {
-            @Override
-            public void onClicked(int index) {
-                // set selected action the selected Item action
-                combatVM.setSelectedInventoryAction(characterVM.getItems().get(index));
-                abilityRV.unSelectIfOneSelected();
-                weaponRV.unSelectIfOneSelected();
-            }
-        });
+        setInventoryRecyclerViewers();
         combatVM.setFirstTurn();
+    }
+
+    // creates the inventory recycler viewers that hold all the character actions
+    private void setInventoryRecyclerViewers() {
+        // clickers for saving selected inventory action and un-select others
+        abilityRV = new AbilityListRecyclerView(getContext(), combatBinding.rvAbilities, characterVM, combatVM, new InventoryClickListener() {
+            @Override
+            public void onClicked(Inventory object) {
+                // set selected action the selected Ability action
+                combatVM.setSelectedInventoryAction(object);
+                weaponRV.unSelectIfOneSelected();
+                itemRV.unSelectIfOneSelected();
+            }
+        });
+
+        weaponRV = new WeaponListRecyclerView(getContext(), combatBinding.rvWeapons, characterVM, combatVM, new InventoryClickListener() {
+            @Override
+            public void onClicked(Inventory object) {
+                // set selected action the selected Weapon action
+                combatVM.setSelectedInventoryAction(object);
+                abilityRV.unSelectIfOneSelected();
+                itemRV.unSelectIfOneSelected();
+            }
+        });
+
+        itemRV = new ItemListRecyclerView(getContext(), combatBinding.rvItems, characterVM, combatVM, new InventoryClickListener() {
+            @Override
+            public void onClicked(Inventory object) {
+                // set selected action the selected Item action
+                combatVM.setSelectedInventoryAction(object);
+                abilityRV.unSelectIfOneSelected();
+                weaponRV.unSelectIfOneSelected();
+            }
+        });
+
+    }
+
+    // un-select all items in the inventory RVs
+    private void unSelectAll() {
+        abilityRV.unSelectIfOneSelected();
+        itemRV.unSelectIfOneSelected();
+        weaponRV.unSelectIfOneSelected();
     }
 
     // listener that adds the combat dialogue showing the attacker, target, and the action used on target
     private void setCombatDialogueListener() {
-        androidx.databinding.Observable.OnPropertyChangedCallback callback = new androidx.databinding.Observable.OnPropertyChangedCallback() {
+        Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
                 rv.addNewCombatDialogue(combatVM.getNewCombatActionDialogueValue());
@@ -334,6 +347,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
 
     // deals with the character action UI in combat
     private void characterTurnState() {
+        unSelectAll();
         isCharacterViewsEnabled(true);
         combatBinding.btnContinue.setVisibility(View.GONE);
         combatBinding.btnRun.setVisibility(View.VISIBLE);
@@ -351,6 +365,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
 
     // deals with the enemy action UI in combat
     private void enemyTurnState() {
+        unSelectAll();
         isCharacterViewsEnabled(false);
         combatBinding.btnContinue.setVisibility(View.VISIBLE);
         combatBinding.btnRun.setVisibility(View.GONE);

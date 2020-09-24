@@ -19,12 +19,15 @@ import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Attack;
+import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /*
 holds current character data used to tie the data to necessary views
@@ -123,6 +126,164 @@ public class CharacterViewModel extends BaseObservable {
     public ArrayList<Ability> getAbilities() {
         return character.getAbilities();
     }
+    // applies the ability from the attacker
+    public void applyAbility(Ability ability, CharacterEntity attacker) {
+        // todo: use attacker stats to alter ability effectiveness
+        Random rand = new Random();
+        if (ability.getMinDamage() != 0) {
+            int damageAmount = character.damageTarget(character.getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));
+            notifyChangeHealth(damageAmount);
+            healthObserve.set(new HealthDialogue(damageAmount));
+        }
+        if (ability.getDamageAoe() != 0) character.doAoeStuff(); // todo: aoe
+        // specials
+        SpecialEffect special;
+        if (ability.getIsConfuse()) {
+            special = new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration());
+            if (character.addNewSpecial(special))
+                updateAllSpecialAdd.set(special);
+        }
+        if (ability.getIsStun()) {
+            special = new SpecialEffect(SpecialEffect.STUN, ability.getDuration());
+            if (character.addNewSpecial(special))
+                updateAllSpecialAdd.set(special);
+        }
+        if (ability.getIsInvincibility()) {
+            special = new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration());
+            if (character.addNewSpecial(special))
+                updateAllSpecialAdd.set(special);
+        }
+        if (ability.getIsSilence()) {
+            special = new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration());
+            if (character.addNewSpecial(special))
+                updateAllSpecialAdd.set(special);
+        }
+        if (ability.getIsInvisible()) {
+            special = new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration());
+            if (character.addNewSpecial(special))
+                updateAllSpecialAdd.set(special);
+        }
+        // DOT
+        Dot dot;
+        if (ability.getIsFire()) {
+            dot = new Dot(Dot.FIRE, false);
+            if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
+        }
+        if (ability.getIsPoison()) {
+            dot = new Dot(Dot.POISON, false);
+            if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
+        }
+        if (ability.getIsBleed()) {
+            dot = new Dot(Dot.BLEED, false);
+            if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
+        }
+        if (ability.getIsFrostBurn()) {
+            dot = new Dot(Dot.FROSTBURN, false);
+            if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
+        }
+        if (ability.getIsHealDot()) {
+            dot = new Dot(Dot.HEALTH_DOT, false);
+            if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
+        }
+        if (ability.getIsManaDot()) {
+            dot = new Dot(Dot.MANA_DOT, false);
+            if (character.addNewDot(dot)) updateAllDotAdd.set(dot);
+        }
+        // direct heal/mana
+        if (ability.getHealMin() != 0) {
+            int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
+            int healthChanged = character.changeHealth(randHealthChange);
+            notifyChangeHealth(healthChanged);
+            healthObserve.set(new HealthDialogue(healthChanged));
+        }
+        if (ability.getManaMin() != 0) {
+            int randManaChange = rand.nextInt(ability.getManaMax() - ability.getManaMin()) + ability.getManaMin();
+            int manaChanged = character.changeMana(randManaChange);
+            notifyChangeMana(manaChanged);
+            manaObserve.set(new ManaDialogue(manaChanged));
+        }
+        // stat increases
+        TempStat tempStat;
+        if (ability.getStrIncrease() != 0) {
+            tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrIncrease());
+            character.addNewStatIncrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatIncrAdd.set(tempStat);
+        }
+        if (ability.getIntIncrease() != 0) {
+            tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntIncrease());
+            character.addNewStatIncrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatIncrAdd.set(tempStat);
+        }
+        if (ability.getConIncrease() != 0) {
+            tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConIncrease());
+            character.addNewStatIncrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatIncrAdd.set(tempStat);
+        }
+        if (ability.getSpdIncrease() != 0) {
+            tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdIncrease());
+            character.addNewStatIncrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatIncrAdd.set(tempStat);
+        }
+        if (ability.getEvadeIncrease() != 0) {
+            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeIncrease());
+            character.addNewStatIncrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatIncrAdd.set(tempStat);
+        }
+        if (ability.getBlockIncrease() != 0) {
+            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockIncrease());
+            character.addNewStatIncrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatIncrAdd.set(tempStat);
+        }
+        // stat decreases
+        if (ability.getStrDecrease() != 0) {
+            tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrDecrease());
+            character.addNewStatDecrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatDecrAdd.set(tempStat);
+        }
+        if (ability.getIntDecrease() != 0) {
+            tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntDecrease());
+            character.addNewStatDecrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatDecrAdd.set(tempStat);
+        }
+        if (ability.getConDecrease() != 0) {
+            tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConDecrease());
+            character.addNewStatDecrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatDecrAdd.set(tempStat);
+        }
+        if (ability.getSpdDecrease() != 0) {
+            tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdDecrease());
+            character.addNewStatDecrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatDecrAdd.set(tempStat);
+        }
+        if (ability.getEvadeDecrease() != 0) {
+            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeDecrease());
+            character.addNewStatDecrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatDecrAdd.set(tempStat);
+        }
+        if (ability.getBlockDecrease() != 0) {
+            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockDecrease());
+            character.addNewStatDecrease(tempStat);
+            notifyStatChange(tempStat);
+            updateAllStatDecrAdd.set(tempStat);
+        }
+        // temp extra health
+        TempBar tempBar;
+        if (ability.getTempExtraHealth() != 0) {
+            tempBar = new TempBar(TempBar.TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth());
+            updateAllBarAdd.set(tempBar);
+        }
+    }
 
         // Weapons
 
@@ -150,6 +311,28 @@ public class CharacterViewModel extends BaseObservable {
     }
     public void removeWeaponAtIndex(int index) {
         weaponObserverRemove.set(character.removeWeaponAtIndex(index));
+    }
+    // apply the attack from the attacker
+    public void applyAttack(Attack attack, CharacterEntity attacker) {
+        Random random = new Random();
+        int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
+        int healthChanged = character.changeHealth(damage);
+        notifyChangeHealth(healthChanged);
+        healthObserve.set(new HealthDialogue(healthChanged));
+    }
+    // apply the special attack from the attacker
+    public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
+        if (specialAttack.getAbility() != null) {
+            applyAbility(specialAttack.getAbility(), attacker);
+        }
+        if (specialAttack.getAoe() > 0) {
+            character.doAoeStuff(); // todo: aoe
+        }
+        if (specialAttack.getDamageMin() != 0) {
+            int damageAmount = character.damageTarget(character.getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax()));
+            notifyChangeHealth(damageAmount);
+            healthObserve.set(new HealthDialogue(damageAmount));
+        }
     }
 
         // Items

@@ -12,7 +12,10 @@ import com.habbybolan.textadventure.model.dialogue.CombatActionDialogue;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.CombatModel;
+import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
@@ -89,6 +92,11 @@ public class CombatViewModel extends EncounterViewModel {
         this.selectedAction = selectedAction;
     }
 
+    // set selectedAction to null if the selected action associated to the inventory object is removed
+    public void checkIfRemovedInventoryIsSelected(Inventory removed) {
+        selectedAction = removed.equals(selectedAction) ? null : selectedAction;
+    }
+
     // creates the enemies and sets up the data for entering combat
     public void createCombat() throws JSONException, ExecutionException, InterruptedException {
         // create the enemies
@@ -143,7 +151,6 @@ public class CombatViewModel extends EncounterViewModel {
         stateIndex.set(seventhState);
     }
 
-
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
         // todo:
@@ -155,25 +162,92 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // apply the character action to a CharacterEntity that was chosen
-    public void applyCharacterAction(CharacterEntity entity) {
-        String attacker = "you";
+    public void applyCharacterAction(CharacterEntity target) {
+        String attackerString = "you";
         int amount = 0;
         String action = selectedAction.getName();
-        if (selectedAction.getType().equals(Inventory.TYPE_ABILITY)) {
-            // todo: apply ability\
-        } else if (selectedAction.getType().equals(Inventory.TYPE_WEAPON)) {
-            // todo: apply weapon
-        } else if (selectedAction.getType().equals(Inventory.TYPE_ITEM)) {
-            // todo: apply item
+        // apply the selection action
+        switch (selectedAction.getType()) {
+            case Inventory.TYPE_ABILITY:
+                applyAbilityCharacterAction((Ability) selectedAction, target);
+                break;
+            case Inventory.TYPE_WEAPON:
+                applyWeaponCharacterAction((Weapon) selectedAction, target);
+                break;
+            case Inventory.TYPE_ITEM:
+                applyItemCharacterAction((Item) selectedAction, target);
+                break;
         }
+
         // add the combat dialogue to the RecyclerView
-        if (entity.getIsCharacter()) {
-            setNewCombatActionDialogue(new CombatActionDialogue(attacker, "yourself", action, amount));
+        if (target.getIsCharacter()) {
+            setNewCombatActionDialogue(new CombatActionDialogue(attackerString, "yourself", action, amount));
         } else {
-            Enemy enemy = (Enemy) entity;
-            setNewCombatActionDialogue(new CombatActionDialogue(attacker, enemy.getType(), action, amount));
+            Enemy enemy = (Enemy) target;
+            setNewCombatActionDialogue(new CombatActionDialogue(attackerString, enemy.getType(), action, amount));
         }
+        // un-select the selected action
+        selectedAction = null;
         nextTurn();
+    }
+
+    // apply the character action selected if valid, otherwise return false
+    public boolean characterAction(CharacterEntity entity) {
+        if (isSelectedAction()) {
+            // cannot use a consumable item on an enemy, only action on self
+            if (isValidItemAction(entity)) {
+                applyCharacterAction(entity);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // returns an error message for when action not selected or an action is invalid on a certain target
+    public String getActionError(CharacterEntity entity) {
+        if (!isSelectedAction())
+            return "Select an action";
+        else if (!isValidItemAction(entity))
+            return "Action not possible";
+        // method should not have been called if no problem exists
+        else throw new IllegalStateException();
+    }
+
+    // helper for applyCharacterAction to use selected ability action
+    private void applyAbilityCharacterAction(Ability ability, CharacterEntity target) {
+
+        CharacterEntity attacker = characterVM.getCharacter();
+        if (target.getIsCharacter()) characterVM.applyAbility(ability, attacker);
+        else {
+            Enemy enemy = (Enemy) target;
+            enemy.applyAbility(ability, attacker);
+        }
+    }
+    // helper for applyCharacterAction to use selected weapon attack or special attack action
+    private void applyWeaponCharacterAction(Weapon weapon, CharacterEntity target) {
+        CharacterEntity attacker = characterVM.getCharacter();
+        // todo:
+    }
+    // helper for applyCharacterAction to use selected Item action
+    private void applyItemCharacterAction(Item item, CharacterEntity target) {
+        CharacterEntity attacker = characterVM.getCharacter();
+        if (target.getIsCharacter()) {
+            if (item.getIsConsumable()) characterVM.consumeItem(item);
+            else characterVM.applyAbility(item.getAbility(), attacker);
+        } else {
+            Enemy enemy = (Enemy) target;
+            enemy.applyAbility(item.getAbility(), attacker);
+        }
+    }
+
+    // returns false if the item doesn't have an ability associated with it and it's being used on an enemy
+    public boolean isValidItemAction(CharacterEntity target) {
+        if (selectedAction.getType().equals(Inventory.TYPE_ITEM)) {
+            Item item = (Item) selectedAction;
+            // can't use an item on an enemy that has no ability
+            return target.getIsCharacter() || item.getAbility() != null;
+        }
+        return true;
     }
 
     // create and apply the enemy action
@@ -202,19 +276,30 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // moves the entity at front of combatOrderCurr list to back of combatOrderLast list
-        // applies all necessary effects on entity, checks if combat still going, and calls the state
+        // applies all necessary effects on entity, checks if combat still going, and calls the next UI state
     public void nextTurn() {
-        // todo: apply dots
-        // todo: check specials
-        // todo: check if combat should still be going
-        combatModel.moveEntityToBackOfCombatOrder(combatOrderCurr, combatOrderNext, combatOrderLast);
-        if (combatOrderCurr.get(0).getIsCharacter()) {
-            // state 4 corresponds to character turn
-            stateIndex.set(fourthState);
+        combatOrderCurr.get(0).applyDots();
+        // check if still in combat before action
+        if (!isCombatInProgress()) {
+            stateIndex.set(sixthState);
         } else {
-            // state 5 corresponds to enemy turn
-            stateIndex.set(fifthState);
+            combatModel.moveEntityToBackOfCombatOrder(combatOrderCurr, combatOrderNext, combatOrderLast);
+            if (combatOrderCurr.get(0).getIsCharacter()) {
+                // state 4 corresponds to character turn
+                stateIndex.set(fourthState);
+            } else {
+                // state 5 corresponds to enemy turn
+                stateIndex.set(fifthState);
+            }
         }
+    }
+
+    // returns true if all of the enemies are alive, otherwise return false
+    private boolean isCombatInProgress() {
+        for (Enemy enemy : enemies) {
+            if (!enemy.getIsAlive()) return false;
+        }
+        return true;
     }
 
     public ArrayList<CharacterEntity> getCombatOrderCurr() {

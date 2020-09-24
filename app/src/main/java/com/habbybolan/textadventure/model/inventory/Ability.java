@@ -138,7 +138,7 @@ public class Ability implements Inventory{
         setAbilityName(cursor.getString(nameOfAbilityColIndex));
         // set cooldown
         int cooldownColIndex = cursor.getColumnIndex("cooldown");
-        setcooldownMax(cursor.getInt(cooldownColIndex));
+        setCooldownMax(cursor.getInt(cooldownColIndex));
         setCooldownCurr(0);
         // set direct damage
         int damageMinColIndex = cursor.getColumnIndex("damage_min");
@@ -234,19 +234,13 @@ public class Ability implements Inventory{
     }
 
 
-    /*
-    static public int getRandAbility() {
-        Random rand = new Random();
-        return rand.nextInt(numAbilities);
-    }*/
-
 
     // setters
     public void setAbilityName(String abilityName) {
         this.abilityName = abilityName;
     }
 
-    public void setcooldownMax(int cooldownMax) {
+    public void setCooldownMax(int cooldownMax) {
         this.cooldownMax = cooldownMax;
     }
 
@@ -549,8 +543,8 @@ public class Ability implements Inventory{
     public JSONObject toJSON() {
         JSONObject toJSON = new JSONObject();
         try {
-            toJSON.put("type", "ability");
-            toJSON.put("id", getID());
+            toJSON.put(INVENTORY_TYPE, TYPE_ABILITY);
+            toJSON.put(ID, getID());
         } catch (JSONException e) {
             e.printStackTrace();
         }

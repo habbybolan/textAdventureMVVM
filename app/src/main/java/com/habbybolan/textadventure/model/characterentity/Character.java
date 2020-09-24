@@ -12,7 +12,6 @@ import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -274,53 +273,8 @@ public class Character extends CharacterEntity {
         }
     }
 
-    // apply an ability to character
-    // todo: damage not observed as damageTarget returns value, doesn't set it
-    public void applyAbilityToCharacter(Ability ability) {
-        CharacterViewModel characterVM = CharacterViewModel.getInstance();
-        // todo: scale with Intelligence
-        if (ability.getMinDamage() != 0) damageTarget(getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));
-        if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
-        // specials
-        SpecialEffect special;
-        if (ability.getIsConfuse()) {
-            special = new SpecialEffect(SpecialEffect.CONFUSE);
-            if (addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration())))
-                characterVM.updateAllSpecialAdd.set(special);
-        }
-        if (ability.getIsStun()) addNewSpecial(new SpecialEffect(SpecialEffect.STUN, ability.getDuration()));
-        if (ability.getIsInvincibility()) addNewSpecial(new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration()));
-        if (ability.getIsSilence()) addNewSpecial(new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration()));
-        if (ability.getIsInvisible()) addNewSpecial(new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration()));
-        // DOT
-        if (ability.getIsFire()) addNewDot(new Dot(Dot.FIRE, false));
-        if (ability.getIsPoison()) addNewDot(new Dot(Dot.POISON, false));
-        if (ability.getIsBleed()) addNewDot(new Dot(Dot.BLEED, false));
-        if (ability.getIsFrostBurn()) addNewDot(new Dot(Dot.FROSTBURN, false));
-        if (ability.getIsHealDot()) addNewDot(new Dot(Dot.HEALTH_DOT, false));
-        if (ability.getIsManaDot()) addNewDot(new Dot(Dot.MANA_DOT, false));
-        // direct heal/mana
-        if (ability.getHealMin() != 0) changeHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
-        if (ability.getManaMin() != 0) changeMana(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
-        // stat increases
-        if (ability.getStrIncrease() != 0) addNewStatIncrease(new TempStat(STR, ability.getDuration(), ability.getStrIncrease()));
-        if (ability.getIntIncrease() != 0) addNewStatIncrease(new TempStat(INT, ability.getDuration(), ability.getIntIncrease()));
-        if (ability.getConIncrease() != 0) addNewStatIncrease(new TempStat(CON, ability.getDuration(), ability.getConIncrease()));
-        if (ability.getSpdIncrease() != 0) addNewStatIncrease(new TempStat(SPD, ability.getDuration(), ability.getSpdIncrease()));
-        if (ability.getEvadeIncrease() != 0) addNewStatIncrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeIncrease()));
-        if (ability.getBlockIncrease() != 0) addNewStatIncrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockIncrease()));
-        // stat decreases
-        if (ability.getStrDecrease() != 0) addNewStatDecrease(new TempStat(STR, ability.getDuration(), ability.getStrDecrease()));
-        if (ability.getIntDecrease() != 0) addNewStatDecrease(new TempStat(INT, ability.getDuration(), ability.getIntDecrease()));
-        if (ability.getConDecrease() != 0) addNewStatDecrease(new TempStat(CON, ability.getDuration(), ability.getConDecrease()));
-        if (ability.getSpdDecrease() != 0) addNewStatDecrease(new TempStat(SPD, ability.getDuration(), ability.getSpdDecrease()));
-        if (ability.getEvadeDecrease() != 0) addNewStatDecrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeDecrease()));
-        if (ability.getBlockDecrease() != 0) addNewStatDecrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockDecrease()));
-        // temp extra health- part of stat
-        if (ability.getTempExtraHealth() != 0) addNewTempExtraHealthMana(new TempBar(TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth()));
-    }
-
         // Items
+
     // remove an item - if not a consumable, remove the effects it had
     public void removeItem(Item item) {
         if (!items.remove(item)) throw new IllegalArgumentException();

@@ -2,7 +2,12 @@ package com.habbybolan.textadventure.model.inventory.weapon;
 
 import android.database.Cursor;
 
+import com.habbybolan.textadventure.R;
+import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 /*
@@ -11,7 +16,7 @@ An attack that represents one of the two uses for a weapon
     // each weapon is guaranteed to have one attack
  */
 
-public class Attack {
+public class Attack implements Inventory {
     private String attackName = "";
     private String attackDescription = "";
     private int damageMin;
@@ -20,7 +25,9 @@ public class Attack {
 
     private int attackID;
 
-    static private final String table = "attacks";
+    public static final String table = "attacks";
+
+    private int pictureResource;
 
 
     // todo: add weight and possible dot to attacks - maybe aoe?
@@ -28,13 +35,13 @@ public class Attack {
 
     // constructor to read database for attack
     public Attack(int attackID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
-        Cursor cursor = mDbHelper.getData(table);
         this.attackID = attackID;
-        setVariables(cursor, attackID);
+        Cursor cursor = mDbHelper.getAttackCursorFromID(attackID);
+        setVariables(cursor);
+        setPictureResource();
     }
 
-    private void setVariables(Cursor cursor, int attackID) {
-        cursor.moveToPosition(attackID-1);
+    private void setVariables(Cursor cursor) {
         // set up attack name
         int attackNameColID = cursor.getColumnIndex("attack_name");
         setAttackName(cursor.getString(attackNameColID));
@@ -86,5 +93,42 @@ public class Attack {
 
     public int getAttackID() {
         return attackID;
+    }
+
+    @Override
+    public String getType() {
+        return TYPE_ATTACK;
+    }
+
+    @Override
+    public String getName() {
+        return getAttackName();
+    }
+
+    @Override
+    public int getID() {
+        return attackID;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject toJSON = new JSONObject();
+        try {
+            toJSON.put(INVENTORY_TYPE, TYPE_ATTACK);
+            toJSON.put(ID, getID());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return toJSON;
+    }
+
+    @Override
+    public void setPictureResource() {
+        pictureResource = R.drawable.sword;
+    }
+
+    @Override
+    public int getPictureResource() {
+        return pictureResource;
     }
 }
