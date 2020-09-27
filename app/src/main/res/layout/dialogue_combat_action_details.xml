@@ -31,8 +31,7 @@
             android:textSize="@dimen/txt_size_medium"
             app:attacker="@{attackerName}"
             app:target="@{targetName}"
-            app:action="@{actionName}"
-            app:amount="@{amount}"/>
+            app:action="@{actionName}" />
 
     </RelativeLayout>
 </layout>

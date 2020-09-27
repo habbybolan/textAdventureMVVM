@@ -12,7 +12,7 @@ import androidx.databinding.DataBindingUtil;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentTrapBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.TrapEncounterViewModel;
 

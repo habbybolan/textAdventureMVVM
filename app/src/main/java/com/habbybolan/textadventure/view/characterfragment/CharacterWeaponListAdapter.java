@@ -14,7 +14,7 @@ import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.CharacterWeaponListDetailsBinding;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import java.util.ArrayList;
 

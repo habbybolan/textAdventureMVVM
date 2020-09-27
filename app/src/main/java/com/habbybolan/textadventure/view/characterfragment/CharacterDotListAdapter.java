@@ -57,7 +57,7 @@ public class CharacterDotListAdapter extends RecyclerView.Adapter<CharacterDotLi
 
     @Override
     public int getItemCount() {
-        return dotList != null? dotList.size() : 0;
+        return dotList != null ? dotList.size() : 0;
     }
 
     /*

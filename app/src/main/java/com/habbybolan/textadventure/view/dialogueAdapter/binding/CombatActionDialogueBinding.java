@@ -55,7 +55,6 @@ public class CombatActionDialogueBinding extends DataBinder<CombatActionDialogue
             binding.setActionName(dialogue.getActionName());
             binding.setAttackerName(dialogue.getAttackerName());
             binding.setTargetName(dialogue.getTargetName());
-            binding.setAmount(dialogue.getAmount());
             binding.executePendingBindings();
         }
     }

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
 
 public class WeaponListRecyclerView implements InventoryListRecyclerView {

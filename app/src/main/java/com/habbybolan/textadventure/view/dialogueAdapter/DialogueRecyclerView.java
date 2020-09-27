@@ -3,6 +3,7 @@ package com.habbybolan.textadventure.view.dialogueAdapter;
 import android.content.Context;
 
 import androidx.databinding.Observable;
+import androidx.databinding.ObservableList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,7 +24,8 @@ import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 
 import java.util.ArrayList;
 
@@ -64,12 +66,10 @@ public class DialogueRecyclerView {
     public void addDialogue(Dialogue dialogue) {
         adapter.addNewDialogue(dialogue);
     }
-
     // Dialogue for adding combat actions from enemies and character
     public void addNewCombatDialogue(CombatActionDialogue dialogue) {
         adapter.addNewDialogue(dialogue);
     }
-
     // Dialogue for adding new Item
     private void setItemListener() {
         Observable.OnPropertyChangedCallback callBackItemAdd = new Observable.OnPropertyChangedCallback() {
@@ -96,7 +96,6 @@ public class DialogueRecyclerView {
         };
         characterVM.getItemObserverRemove().addOnPropertyChangedCallback(callBackItemRemove);
     }
-
     // Dialogue for adding new Weapon
     private void setWeaponListener() {
         Observable.OnPropertyChangedCallback callBackWeaponAdd = new Observable.OnPropertyChangedCallback() {
@@ -123,7 +122,6 @@ public class DialogueRecyclerView {
         };
         characterVM.getWeaponObserverRemove().addOnPropertyChangedCallback(callBackWeaponRemove);
     }
-
     // Dialogue for adding new Ability scroll
     private void setAbilityListener() {
         Observable.OnPropertyChangedCallback callBackAbilityAdd = new Observable.OnPropertyChangedCallback() {
@@ -152,7 +150,6 @@ public class DialogueRecyclerView {
 
 
     }
-
     // listener for change in health
     private void setHealthListener() {
         Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
@@ -166,7 +163,6 @@ public class DialogueRecyclerView {
         };
         characterVM.getHealthObserve().addOnPropertyChangedCallback(callBack);
     }
-
     // listener for change in health
     private void setManaListener() {
         Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
@@ -180,86 +176,115 @@ public class DialogueRecyclerView {
         };
         characterVM.getManaObserve().addOnPropertyChangedCallback(callBack);
     }
-
-
-
     // dialogue for adding Dot Effects
     private void setDotListener() {
         // observed whenever CharacterViewModel observes change in dotList
-        Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
+        characterVM.getDotObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                Dot dot = characterVM.getUpdateAllDotAdd().get();
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
+                Dot dot = characterVM.getDotObserver().get(positionStart);
                 if (dot != null) {
                     EffectDialogue effectDialogue = new EffectDialogue(dot.getType(), dot.getDuration(), dot.getIcon(), dot.getIsIndefinite());
                     adapter.addNewDialogue(effectDialogue);
                 }
             }
-        };
-        characterVM.getUpdateAllDotAdd().addOnPropertyChangedCallback(callBack);
+            @Override
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
+        });
     }
-
     // dialogue for adding Special Effects
     private void setSpecialListener() {
         // observed whenever CharacterViewModel observes change in dotList
-        Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
+        characterVM.getSpecialObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                SpecialEffect special = characterVM.getUpdateAllSpecialAdd().get();
-                if (special != null) {
-                    EffectDialogue effectDialogue = new EffectDialogue(special.getType(), special.getDuration(), special.getIcon(), special.getIsIndefinite());
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
+                SpecialEffect specialEffect = characterVM.getSpecialObserver().get(positionStart);
+                if (specialEffect != null) {
+                    EffectDialogue effectDialogue = new EffectDialogue(specialEffect.getType(), specialEffect.getDuration(), specialEffect.getIcon(), specialEffect.getIsIndefinite());
                     adapter.addNewDialogue(effectDialogue);
                 }
             }
-        };
-        characterVM.getUpdateAllSpecialAdd().addOnPropertyChangedCallback(callBack);
+            @Override
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
+        });
     }
-
     // Dialogue for adding new stats
     private void setTempStatListener() {
-        // observer for when stat is increased
-        Observable.OnPropertyChangedCallback callBackIncr = new Observable.OnPropertyChangedCallback() {
+        // observed whenever CharacterViewModel observes change in statIncrList
+        characterVM.getTempStatIncrObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                TempStat tempStat = characterVM.getUpdateAllStatIncrAdd().get();
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
+                TempStat tempStat = characterVM.getTempStatIncrObserver().get(positionStart);
                 if (tempStat != null) {
                     TempStatDialogue statDialogue = new TempStatDialogue(tempStat.getType(), tempStat.getAmount(), tempStat.getDuration());
                     adapter.addNewDialogue(statDialogue);
                 }
             }
-        };
-        characterVM.getUpdateAllStatIncrAdd().addOnPropertyChangedCallback(callBackIncr);
-
-        // observer for when stat is decreased
-        Observable.OnPropertyChangedCallback callBackDecr = new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                TempStat tempStat = characterVM.getUpdateAllStatDecrAdd().get();
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
+        });
+
+        // observed whenever CharacterViewModel observes change in statDecrList
+        characterVM.getTempStatDecrObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+            @Override
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
+                TempStat tempStat = characterVM.getTempStatDecrObserver().get(positionStart);
                 if (tempStat != null) {
-                    EffectDialogue effectDialogue = new EffectDialogue(tempStat.getType(), tempStat.getDuration(), tempStat.getIcon(), tempStat.getIsIndefinite());
-                    adapter.addNewDialogue(effectDialogue);
+                    TempStatDialogue statDialogue = new TempStatDialogue(tempStat.getType(), tempStat.getAmount(), tempStat.getDuration());
+                    adapter.addNewDialogue(statDialogue);
                 }
             }
-        };
-        characterVM.getUpdateAllStatDecrAdd().addOnPropertyChangedCallback(callBackDecr);
+            @Override
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
+        });
     }
-
     // Dialogue for adding temp Mana/health increases
     private void setBarListener() {
-        // observer for when temp health is added
-        Observable.OnPropertyChangedCallback callBackIncr = new Observable.OnPropertyChangedCallback() {
+        // observed whenever CharacterViewModel observes change in dotList
+        characterVM.getBarObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                TempBar tempBar = characterVM.getUpdateAllBarAdd().get();
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
+                TempBar tempBar = characterVM.getBarObserver().get(positionStart);
                 if (tempBar != null) {
                     TempStatDialogue tempStatDialogue = new TempStatDialogue(tempBar.getType(), tempBar.getAmount(), tempBar.getDuration());
                     adapter.addNewDialogue(tempStatDialogue);
                 }
             }
-        };
-        characterVM.getUpdateAllBarAdd().addOnPropertyChangedCallback(callBackIncr);
+            @Override
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
+        });
     }
-
+    // Dialogue for changing stat
     private void setStatListener() {
         // observer for when stat is decreased
         Observable.OnPropertyChangedCallback callBackDecr = new Observable.OnPropertyChangedCallback() {
@@ -279,4 +304,11 @@ public class DialogueRecyclerView {
         return adapter.getDialogueList();
     }
 
+
+    private ArrayList<EnemyViewModel> enemyViewModels;
+    public void addEnemyDialogue(ArrayList<EnemyViewModel> enemyViewModels) {
+        this.enemyViewModels = enemyViewModels;
+        // todo: listeners for enemy changes
+            // todo: offset the enemy changes to show on right side of dialogue
+    }
 }

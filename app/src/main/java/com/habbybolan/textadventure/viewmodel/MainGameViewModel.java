@@ -10,6 +10,7 @@ import androidx.databinding.ObservableField;
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.repository.JsonAssetFileReader;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
 
 import org.json.JSONException;

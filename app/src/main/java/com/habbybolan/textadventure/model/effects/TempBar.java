@@ -66,10 +66,10 @@ public class TempBar extends Effect {
     public int getIcon() {
         switch (type) {
             case Effect.TEMP_HEALTH:
-                return R.drawable.sword;
+                return R.drawable.heart_icon;
             default:
                 // otherwise, temp mana
-                return R.drawable.sword;
+                return R.drawable.mana_icon;
         }
     }
 }

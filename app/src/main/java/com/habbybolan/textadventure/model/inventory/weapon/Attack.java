@@ -24,11 +24,9 @@ public class Attack implements Inventory {
     private boolean isRanged;
 
     private int attackID;
-
     public static final String table = "attacks";
 
     private int pictureResource;
-
 
     // todo: add weight and possible dot to attacks - maybe aoe?
     private int weaponWeight = 0; // affects the overall speed stat

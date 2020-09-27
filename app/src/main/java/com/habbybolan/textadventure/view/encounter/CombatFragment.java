@@ -17,7 +17,6 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentCombatBinding;
 import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
-import com.habbybolan.textadventure.model.characterentity.Enemy;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
@@ -25,8 +24,9 @@ import com.habbybolan.textadventure.view.InventoryListAdapter.InventoryClickList
 import com.habbybolan.textadventure.view.InventoryListAdapter.ItemListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.WeaponListRecyclerView;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
 
 import org.json.JSONException;
@@ -183,7 +183,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         combatBinding.btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                combatVM.applyEnemyAction();
+                combatVM.enemyAction();
                 notifyCombatOrderNextTurn();
             }
         });
@@ -235,14 +235,14 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     // creates the icons for the enemies that will be selected for applying the character action
     private void setActionSelect() {
         final int sizeDP = getResources().getDimensionPixelSize(R.dimen.combat_enemy_action_icon_size);
-        for (Enemy enemy : combatVM.getEnemies()) {
+        for (EnemyViewModel enemyVM : combatVM.getEnemies()) {
             ImageView enemyIconSelectable = new ImageView(getContext());
             // converted value from dp to int for layoutParam
             ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(sizeDP, sizeDP);
             enemyIconSelectable.setLayoutParams(params);
-            enemyIconSelectable.setTag(enemy);
+            enemyIconSelectable.setTag(enemyVM.getEnemy());
 
-            enemyIconSelectable.setImageResource(enemy.getDrawableResID());
+            enemyIconSelectable.setImageResource(enemyVM.getEnemy().getDrawableResID());
             // on click, use the selected action
             enemyIconSelectable.setOnClickListener(new View.OnClickListener() {
                 @Override

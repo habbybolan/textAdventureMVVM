@@ -9,7 +9,7 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.encounter.TrapModel;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
 import org.json.JSONArray;
@@ -102,7 +102,7 @@ public class TrapEncounterViewModel extends EncounterViewModel {
                 characterVM.addInputSpecial(new SpecialEffect(debuffType, debuff.getInt("duration")));
             } else {
                 // otherwise, debuff is direct damage
-                characterVM.damageCharacter(debuff.getInt("damage"));
+                characterVM.damageCharacterEntity(debuff.getInt("damage"));
             }
         }
     }

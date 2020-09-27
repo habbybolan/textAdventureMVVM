@@ -287,8 +287,16 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // decrement the time remaining for the stat change
-        // if the duration reaches 0 after decrement, reverse the change and remove from appropriate statChange list
-    public void decrementStatChangeDuration() {
+    // if the duration reaches 0 after decrement, reverse the change and remove from appropriate statChange list
+    public void decrementTempStatDuration() {
+        decrementTempStatIncrDuration();
+        decrementTempStatDecrDuration();
+        updateStats();
+    }
+
+    // decrement the duration of all temp incr stat durations
+    public ArrayList<TempStat> decrementTempStatIncrDuration() {
+        ArrayList<TempStat> tempStats = new ArrayList<>();
         for (int i = 0; i < statIncreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
             int duration = statIncreaseList.get(i).getDuration();
@@ -296,11 +304,17 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             // if duration is 0 after decrement, remove the stat change
             if (duration-1 == 0) {
                 TempStat tempStat = statIncreaseList.get(i);
+                tempStats.remove(tempStat);
                 statIncreaseList.remove(i);
                 i--;
                 undoStatIncrease(tempStat);
             }
         }
+        return tempStats;
+    }
+    // decrement the duration of all temp decr stat durations
+    public ArrayList<TempStat> decrementTempStatDecrDuration() {
+        ArrayList<TempStat> tempStats = new ArrayList<>();
         for (int i = 0; i < statDecreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
             int duration = statDecreaseList.get(i).getDuration();
@@ -308,12 +322,13 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             // if duration is 0 after decrement, remove the stat change
             if (duration-1 == 0) {
                 TempStat tempStat = statDecreaseList.get(i);
+                tempStats.remove(tempStat);
                 statDecreaseList.remove(i);
                 i--;
                 undoStatDecrease(tempStat);
             }
         }
-        updateStats();
+        return tempStats;
     }
 
     // undo a stat increase
@@ -377,8 +392,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     // keep track of temp health increase - list<ArrayList<duration, amount>> sorted by duration
     List<TempBar> tempHealthList = new ArrayList<>();
-    public void removeZeroTempHealthList() {
-        removeZeroTempBarList(tempHealthList);
+    public ArrayList<TempBar> removeZeroTempHealthList() {
+        return removeZeroTempBarList(tempHealthList);
     }
     public void addTempHealthList(TempBar tempExtraHealth) {
         tempHealthList.add(tempExtraHealth);
@@ -401,15 +416,18 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // helper for removeZeroTempManaList and removeZeroTempHealthList
-    private void removeZeroTempBarList(List<TempBar> tempList) {
+    private ArrayList<TempBar> removeZeroTempBarList(List<TempBar> tempList) {
         int index = 0;
+        ArrayList<TempBar> tempBars = new ArrayList<>();
         while (index < tempList.size()) {
             if (tempList.get(index).getDuration() == 0) {
+                tempBars.add(tempList.get(index));
                 tempList.remove(index);
                 resetTempBar(tempList.get(index));
             }
             else break;
         }
+        return tempBars;
     }
 
     // resets the temporary increases of tempHealth and tempMana
@@ -470,12 +488,20 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // decrements the duration of each tempExtraHealth in tempHealthList
     // if the duration reaches 0, then remove the extra health from the list
     public void decrementTempExtraDuration() {
-        decrementTemp(tempHealthList);
-        decrementTemp(tempManaList);
+        decrementTempExtraHealthDuration();
+        decrementTempExtraManaDuration();
+    }
+
+    public ArrayList<TempBar> decrementTempExtraHealthDuration() {
+        return decrementTemp(tempHealthList);
+    }
+    public ArrayList<TempBar> decrementTempExtraManaDuration() {
+        return decrementTemp(tempManaList);
     }
 
     // decrement the duration of an arrayList, removing it if it reaches duration 0
-    private void decrementTemp(List<TempBar> list) {
+    private ArrayList<TempBar> decrementTemp(List<TempBar> list) {
+        ArrayList<TempBar> tempBarsRemoved = new ArrayList<>();
         int index = 0;
         // iterate over all tempHealthList elements, decrementing the duration value, removing if duration = 0;
         while (index < list.size()) {
@@ -483,9 +509,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             if (list.get(index).getDuration() > 0) {
                 index++;
             } else {
+                tempBarsRemoved.add(list.get(index));
                 list.remove(index);
             }
         }
+        return tempBarsRemoved;
     }
 
     // ***AOE***
@@ -504,7 +532,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     ArrayList<SpecialEffect> specialList = new ArrayList<>();
 
     // returns true if still effected by status effect from other items or applied special effect
-    public boolean isStillSpecialEffect(SpecialEffect special) {
+    private boolean isStillSpecialEffect(SpecialEffect special) {
         switch (special.getType()) {
             case SpecialEffect.CONFUSE:
                 return isStillConfuse();
@@ -660,13 +688,16 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // decrements the special duration left
     // if the duration is 0 after decrement, then set isSpecial value to 0
     // if the value < 0, do nothing, permanent special
-    public void decrSpecialDuration() {
+    public ArrayList<SpecialEffect> decrSpecialDuration() {
+        ArrayList<SpecialEffect> removedSpecials = new ArrayList<>();
         for (SpecialEffect special : specialList) {
             special.decrementDuration();
             if (special.getDuration() == 0) {
                 removeInputSpecial(special);
+                removedSpecials.add(special);
             }
         }
+        return removedSpecials;
     }
 
     // change the value of isSpecial boolean value
@@ -882,14 +913,17 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // applies the effect of the DOT and decrements the time remaining in DotMap
         // if duration == 0, then remove from the dotMap
         // returns true if any dots applied are removed
-    public void applyDots() {
+    public ArrayList<Dot> applyDots() {
+        ArrayList<Dot> dotsRemoved = new ArrayList<>();
         for (Dot dot : dotList) {
             findDotToApply(dot.getType());
             dot.decrementDuration();
             if (dot.getDuration() == 0) {
                 removeInputDot(dot);
+                dotsRemoved.add(dot);
             }
         }
+        return dotsRemoved;
     }
 
     // helper for applyDots

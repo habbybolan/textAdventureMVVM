@@ -8,7 +8,7 @@
             type="com.habbybolan.textadventure.viewmodel.MainGameViewModel" />
         <variable
             name="characterViewModel"
-            type="com.habbybolan.textadventure.viewmodel.CharacterViewModel" />
+            type="com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

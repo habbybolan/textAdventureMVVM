@@ -10,13 +10,11 @@ public class CombatActionDialogue implements DialogueType {
     private String attackerName;
     private String targetName;
     private String actionName;
-    private int amount;
 
-    public CombatActionDialogue(String attackerName, String targetName, String actionName, int amount) {
+    public CombatActionDialogue(String attackerName, String targetName, String actionName) {
         this.attackerName = attackerName;
         this.targetName = targetName;
         this.actionName = actionName;
-        this.amount = amount;
     }
 
     public String getAttackerName() {
@@ -27,9 +25,6 @@ public class CombatActionDialogue implements DialogueType {
     }
     public String getActionName() {
         return actionName;
-    }
-    public int getAmount() {
-        return amount;
     }
 
     @Override
@@ -44,7 +39,6 @@ public class CombatActionDialogue implements DialogueType {
         jsonObject.put(TARGET, targetName);
         jsonObject.put(ATTACKER, attackerName);
         jsonObject.put(ACTION, actionName);
-        jsonObject.put(AMOUNT, amount);
         return jsonObject;
     }
 }

@@ -15,15 +15,18 @@ import com.habbybolan.textadventure.model.encounter.CombatModel;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
-import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.model.inventory.weapon.Attack;
+import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 /*
 View model to hold data of the combat encounter
@@ -57,7 +60,7 @@ public class CombatViewModel extends EncounterViewModel {
     private ArrayList<CharacterEntity> combatOrderLast = new ArrayList<>();
 
 
-    private ArrayList<Enemy> enemies = new ArrayList<>();
+    private ArrayList<EnemyViewModel> enemies = new ArrayList<>();
 
     private Inventory selectedAction;
 
@@ -104,7 +107,8 @@ public class CombatViewModel extends EncounterViewModel {
         JSONArray typeArray = fightObject.getJSONArray("type");
         JSONArray difficultyArray = fightObject.getJSONArray("difficulty");
         for (int i = 0; i < typeArray.length(); i++) {
-            enemies.add(new Enemy(characterVM.getCharacter().getNumStatPoints(), typeArray.getString(i), difficultyArray.getInt(i), context));
+            Enemy enemy = new Enemy(characterVM.getCharacter().getNumStatPoints(), typeArray.getString(i), difficultyArray.getInt(i), context);
+            enemies.add(new EnemyViewModel(enemy));
         }
         createCombatOrderLists();
     }
@@ -140,7 +144,9 @@ public class CombatViewModel extends EncounterViewModel {
     // set up the layouts
     public void createCombatOrderLists() {
         combatOrderCurr.add(characterVM.getCharacter());
-        combatOrderCurr.addAll(enemies);
+        for (EnemyViewModel enemyVM : enemies) {
+            combatOrderCurr.add(enemyVM.getEnemy());
+        }
         // order the curr combat list
         combatModel.sortCombatOrdering(0, combatOrderCurr);
         combatOrderNext.addAll(combatOrderCurr);
@@ -161,18 +167,20 @@ public class CombatViewModel extends EncounterViewModel {
         // todo:
     }
 
-    // apply the character action to a CharacterEntity that was chosen
-    public void applyCharacterAction(CharacterEntity target) {
+    // helper for applying the character action to a CharacterEntity that was chosen
+    private void applyCharacterAction(CharacterEntity target) {
         String attackerString = "you";
-        int amount = 0;
         String action = selectedAction.getName();
         // apply the selection action
         switch (selectedAction.getType()) {
             case Inventory.TYPE_ABILITY:
-                applyAbilityCharacterAction((Ability) selectedAction, target);
+                applyAbilityAction((Ability) selectedAction, target, characterVM.getCharacter());
                 break;
-            case Inventory.TYPE_WEAPON:
-                applyWeaponCharacterAction((Weapon) selectedAction, target);
+            case Inventory.TYPE_ATTACK:
+                applyAttackAction((Attack) selectedAction, target, characterVM.getCharacter());
+                break;
+            case Inventory.TYPE_S_ATTACK:
+                applySpecialAttackAction((SpecialAttack) selectedAction, target, characterVM.getCharacter());
                 break;
             case Inventory.TYPE_ITEM:
                 applyItemCharacterAction((Item) selectedAction, target);
@@ -181,10 +189,10 @@ public class CombatViewModel extends EncounterViewModel {
 
         // add the combat dialogue to the RecyclerView
         if (target.getIsCharacter()) {
-            setNewCombatActionDialogue(new CombatActionDialogue(attackerString, "yourself", action, amount));
+            setNewCombatActionDialogue(new CombatActionDialogue(attackerString, "yourself", action));
         } else {
             Enemy enemy = (Enemy) target;
-            setNewCombatActionDialogue(new CombatActionDialogue(attackerString, enemy.getType(), action, amount));
+            setNewCombatActionDialogue(new CombatActionDialogue(attackerString, enemy.getType(), action));
         }
         // un-select the selected action
         selectedAction = null;
@@ -214,19 +222,29 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // helper for applyCharacterAction to use selected ability action
-    private void applyAbilityCharacterAction(Ability ability, CharacterEntity target) {
-
-        CharacterEntity attacker = characterVM.getCharacter();
+    private void applyAbilityAction(Ability ability, CharacterEntity target, CharacterEntity attacker) {
         if (target.getIsCharacter()) characterVM.applyAbility(ability, attacker);
         else {
             Enemy enemy = (Enemy) target;
             enemy.applyAbility(ability, attacker);
         }
     }
-    // helper for applyCharacterAction to use selected weapon attack or special attack action
-    private void applyWeaponCharacterAction(Weapon weapon, CharacterEntity target) {
-        CharacterEntity attacker = characterVM.getCharacter();
-        // todo:
+
+    // helper for applyCharacterAction to use selected attack
+    private void applyAttackAction(Attack attack, CharacterEntity target, CharacterEntity attacker) {
+        if (target.getIsCharacter()) characterVM.applyAttack(attack, attacker);
+        else {
+            Enemy enemy = (Enemy) target;
+            enemy.applyAttack(attack, attacker);
+        }
+    }
+    // helper for applyCharacterAction to use selected special attack
+    private void applySpecialAttackAction(SpecialAttack specialAttack, CharacterEntity target, CharacterEntity attacker) {
+        if (target.getIsCharacter()) characterVM.applySpecialAttack(specialAttack, attacker);
+        else {
+            Enemy enemy = (Enemy) target;
+            enemy.applySpecialAttack(specialAttack, attacker);
+        }
     }
     // helper for applyCharacterAction to use selected Item action
     private void applyItemCharacterAction(Item item, CharacterEntity target) {
@@ -241,7 +259,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // returns false if the item doesn't have an ability associated with it and it's being used on an enemy
-    public boolean isValidItemAction(CharacterEntity target) {
+    private boolean isValidItemAction(CharacterEntity target) {
         if (selectedAction.getType().equals(Inventory.TYPE_ITEM)) {
             Item item = (Item) selectedAction;
             // can't use an item on an enemy that has no ability
@@ -251,13 +269,89 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // create and apply the enemy action
-    public void applyEnemyAction() {
-        int amount = 0;
-        String action = "action";
+    public void enemyAction() {
         Enemy enemy = (Enemy) combatOrderCurr.get(0);
-        String attacker = enemy.getType();
-        setNewCombatActionDialogue(new CombatActionDialogue(attacker, "somebody", action, amount));
+        randomEnemyAction(enemy);
         nextTurn();
+    }
+    // apply a random enemy action
+    private void randomEnemyAction(Enemy enemy) {
+        CharacterEntity target = getRandomTarget();
+        Inventory action = enemy.getRandomAction();
+        switch (action.getType()) {
+            case Inventory.TYPE_ABILITY:
+                // action is ability
+                applyAbilityAction((Ability) action, target, enemy);
+                break;
+            case Inventory.TYPE_ATTACK:
+                applyAttackAction((Attack) action, target, enemy);
+                // action is attack
+                break;
+            case Inventory.TYPE_S_ATTACK:
+                applySpecialAttackAction((SpecialAttack) action, target, enemy);
+                // action is special attack
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+        // dialogue showing the enemy action
+        String attackerString = enemy.getType();
+        String targetString;
+        if (target.getIsCharacter()) targetString = "you";
+        else {
+            Enemy enemyTarget = (Enemy) target;
+            targetString = enemyTarget.getType();
+        }
+        setNewCombatActionDialogue(new CombatActionDialogue(attackerString, targetString, action.getName()));
+    }
+    // gets a random target to attack
+    private CharacterEntity getRandomTarget() {
+        CharacterEntity target;
+        Random random = new Random();
+        int targetType = random.nextInt(2);
+        if (targetType == 0) target = characterVM.getCharacter();
+        else target = getRandomEnemyTarget();
+        return target;
+    }
+    // returns a random valid enemy target
+    private Enemy getRandomEnemyTarget() {
+        int numEnemyTargets = getNumEnemyTargets();
+        Random random = new Random();
+        // the nth alive enemy
+        int aliveEnemyTarget = random.nextInt(numEnemyTargets);
+        int index = 0;
+        for (EnemyViewModel enemyVM : enemies) {
+            if (enemyVM.getEnemy().getIsAlive()) {
+                // if the enemy is the correct nth alive enemy
+                if (index == aliveEnemyTarget) return enemyVM.getEnemy();
+                else index++;
+            }
+        }
+        // shouldn't reach here
+        throw new IllegalStateException();
+    }
+    // returns the number of alive enemies and character
+    private int getNumEnemyTargets() {
+        int numTargets = 0;
+        for (EnemyViewModel enemyVM : enemies) {
+            if (enemyVM.getEnemy().getIsAlive()) numTargets++;
+        }
+        return numTargets;
+    }
+
+    private void beforeActionApplication(CharacterEntity entity) {
+        if (entity.getIsCharacter()) {
+            characterVM.applyDots();
+            characterVM.decrSpecialDuration();
+            characterVM.decrementTempStatDuration();
+            characterVM.decrementTempExtraDuration();
+        } else {
+            entity.applyDots();
+            entity.decrSpecialDuration();
+            entity.decrementTempStatDuration();
+            entity.decrementTempExtraDuration();
+        }
+        // todo: decrement action cooldowns
     }
 
     // sets the first turn, calling the state that corresponds to it
@@ -277,13 +371,13 @@ public class CombatViewModel extends EncounterViewModel {
 
     // moves the entity at front of combatOrderCurr list to back of combatOrderLast list
         // applies all necessary effects on entity, checks if combat still going, and calls the next UI state
-    public void nextTurn() {
-        combatOrderCurr.get(0).applyDots();
+    private void nextTurn() {
         // check if still in combat before action
         if (!isCombatInProgress()) {
             stateIndex.set(sixthState);
         } else {
             combatModel.moveEntityToBackOfCombatOrder(combatOrderCurr, combatOrderNext, combatOrderLast);
+            beforeActionApplication(combatOrderCurr.get(0));
             if (combatOrderCurr.get(0).getIsCharacter()) {
                 // state 4 corresponds to character turn
                 stateIndex.set(fourthState);
@@ -296,8 +390,8 @@ public class CombatViewModel extends EncounterViewModel {
 
     // returns true if all of the enemies are alive, otherwise return false
     private boolean isCombatInProgress() {
-        for (Enemy enemy : enemies) {
-            if (!enemy.getIsAlive()) return false;
+        for (EnemyViewModel enemyVM : enemies) {
+            if (!enemyVM.getEnemy().getIsAlive()) return false;
         }
         return true;
     }
@@ -312,7 +406,7 @@ public class CombatViewModel extends EncounterViewModel {
         return combatOrderLast;
     }
 
-    public ArrayList<Enemy> getEnemies() {
+    public ArrayList<EnemyViewModel> getEnemies() {
         return enemies;
     }
 

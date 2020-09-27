@@ -1,6 +1,6 @@
 package com.habbybolan.textadventure.model.encounter;
 
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import java.util.Random;
 /*

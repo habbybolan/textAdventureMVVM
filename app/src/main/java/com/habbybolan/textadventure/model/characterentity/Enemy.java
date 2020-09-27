@@ -8,12 +8,13 @@ import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Enemy extends CharacterEntity {
 
+    public static final int MAX_WEAPONS = 1;
     public static final int MAX_ABILITIES = 2;
     public static final int MAX_TIER = 3;
 
@@ -58,8 +60,8 @@ public class Enemy extends CharacterEntity {
 
         // set enemy health
         // todo: how to decide health amount
-        setHealth(20);
-        maxHealth = 20;
+        health = 10;
+        maxHealth = 10;
 
         // choose a random weapon
         // todo: how to decide tier?
@@ -124,6 +126,30 @@ public class Enemy extends CharacterEntity {
         }
         if (specialAttack.getDamageMin() != 0) {
             damageTarget(getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax()));
+        }
+    }
+
+    // returns a random action for the enemy to perform
+    public Inventory getRandomAction() {
+        // action can be either attack, special attack, ability 1, or ability 2
+        Random random = new Random();
+        int actionNum = random.nextInt(4);
+        switch (actionNum) {
+            case 0:
+                // weapon attack
+                return weapon.getAttack();
+            case 1:
+                // weapon special attack
+                return weapon.getSpecialAttack();
+            case 2:
+                // ability 1
+                return abilities.get(0);
+            case 3:
+                // ability 2
+                return abilities.get(1);
+            default:
+                throw new IllegalStateException();
+
         }
     }
 

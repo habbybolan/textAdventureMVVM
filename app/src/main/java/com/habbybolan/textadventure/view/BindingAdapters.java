@@ -21,15 +21,13 @@ public class BindingAdapters {
         view.setText(text);
     }
 
-    @BindingAdapter(value = {"attacker", "target", "action", "amount"})
-    public static void combatDialogue(TextView view,  String attacker, String target, String action, int amount) {
+    @BindingAdapter(value = {"attacker", "target", "action"})
+    public static void combatDialogue(TextView view,  String attacker, String target, String action) {
         String builder = attacker +
                 " uses " +
                 action +
                 " on " +
-                target +
-                " for " +
-                amount;
+                target;
         view.setText(builder);
     }
 }

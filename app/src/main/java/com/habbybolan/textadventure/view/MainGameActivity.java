@@ -14,7 +14,7 @@ import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.CombatFragment;
 import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.TrapFragment;
-import com.habbybolan.textadventure.viewmodel.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
 import org.json.JSONException;
