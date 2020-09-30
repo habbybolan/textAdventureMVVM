@@ -141,4 +141,5 @@ public class Weapon implements Inventory {
     public String getName() {
         return weaponName;
     }
+
 }

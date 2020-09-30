@@ -3,7 +3,7 @@ package com.habbybolan.textadventure.model.inventory.weapon;
 import android.database.Cursor;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import org.json.JSONException;
@@ -16,7 +16,7 @@ An attack that represents one of the two uses for a weapon
     // each weapon is guaranteed to have one attack
  */
 
-public class Attack implements Inventory {
+public class Attack extends Action {
     private String attackName = "";
     private String attackDescription = "";
     private int damageMin;
@@ -129,4 +129,5 @@ public class Attack implements Inventory {
     public int getPictureResource() {
         return pictureResource;
     }
+
 }

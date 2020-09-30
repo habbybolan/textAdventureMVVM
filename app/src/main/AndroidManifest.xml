@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".view.InventoryInfoActivity"></activity>
         <activity android:name=".view.characterchoice.CharacterChoiceActivity" />
         <activity android:name=".view.MainGameActivity" />
         <activity android:name=".view.MainActivity">

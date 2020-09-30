@@ -7,8 +7,6 @@ import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
-import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
-import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
@@ -191,6 +189,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             tempBar = new TempBar(TempBar.TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth());
             barObserver.add(tempBar);
         }
+        ability.setActionUsed();
     }
 
     // ** Weapons **
@@ -215,6 +214,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             int damage = characterEntity.getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax());
             setHealth(characterEntity.damageTarget(damage));
         }
+        specialAttack.setActionUsed();
     }
 
     // ** Dot Effects **
@@ -244,7 +244,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             dotObserver.remove(dot);
         }
         for (Dot dot : dotObserver) {
-            dot.decrementDuration();
+            dotObserver.remove(dot);
+            dotObserver.add(dot);
         }
     }
 
@@ -270,7 +271,9 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             specialObserver.remove(specialEffect);
         }
         for (SpecialEffect specialEffect : specialObserver) {
-            specialEffect.decrementDuration();
+            specialObserver.remove(specialEffect);
+            specialObserver.add(specialEffect);
+
         }
     }
 
@@ -472,8 +475,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     // Health mana changes
 
     @Bindable
-    private ObservableField<HealthDialogue> healthObserve = new ObservableField<>();
-    public ObservableField<HealthDialogue> getHealthObserve() {
+    private ObservableField<Integer> healthObserve = new ObservableField<>();
+    public ObservableField<Integer> getHealthObserve() {
         return healthObserve;
     }
     @Bindable
@@ -482,15 +485,16 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     }
     // set the new health
     public void setHealth(int health) {
-        notifyChangeHealth(health - Integer.parseInt(getHealth()));
+        // observe the health change
+        healthObserve.set(health - characterEntity.getHealth());
+        // apply the change
         characterEntity.setHealth(health);
         notifyPropertyChanged(BR.health);
     }
     // notify healthChange to changeHealth
     public void notifyChangeHealth(int changeHealth) {
-        healthObserve.set(new HealthDialogue(changeHealth));
+        healthObserve.set(changeHealth);
         notifyPropertyChanged(BR.health);
-        notifyPropertyChanged(BR.maxHealth);
     }
     @Bindable
     public int getMaxHealth() {
@@ -500,8 +504,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         characterEntity.setMaxHealth(maxHealth);
     }
 
-    private ObservableField<ManaDialogue> manaObserve = new ObservableField<>();
-    public ObservableField<ManaDialogue> getManaObserve() {
+    private ObservableField<Integer> manaObserve = new ObservableField<>();
+    public ObservableField<Integer> getManaObserve() {
         return manaObserve;
     }
     @Bindable
@@ -509,14 +513,16 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         return String.valueOf(characterEntity.getMana());
     }
     public void setMana(int mana) {
-        characterEntity.setMana(mana - characterEntity.getMana());
+        // observe mana changes
+        manaObserve.set(mana - characterEntity.getMana());
+        // apply the change
+        characterEntity.setMana(mana);
         notifyPropertyChanged(BR.mana);
     }
     // notify manaChange to changeMana
     public void notifyChangeMana(int changeMana) {
-        manaObserve.set(new ManaDialogue(changeMana));
+        manaObserve.set(changeMana);
         notifyPropertyChanged(BR.mana);
-        notifyPropertyChanged(BR.maxMana);
     }
     @Bindable
     public int getMaxMana() {

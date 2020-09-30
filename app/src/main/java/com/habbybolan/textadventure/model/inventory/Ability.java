@@ -10,14 +10,11 @@ import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 
-public class Ability implements Inventory{
+public class Ability extends Action {
 
     // ability
     String abilityName;
     String abilityDescription;
-    // cooldowns
-    private int cooldownMax = 0;
-    private int cooldownLeft = 0;
 
     // direct damage
     private int minDamage = 0;
@@ -138,8 +135,8 @@ public class Ability implements Inventory{
         setAbilityName(cursor.getString(nameOfAbilityColIndex));
         // set cooldown
         int cooldownColIndex = cursor.getColumnIndex("cooldown");
-        setCooldownMax(cursor.getInt(cooldownColIndex));
-        setCooldownCurr(0);
+        cooldownMax = (cursor.getInt(cooldownColIndex));
+        cooldownCurr = 0;
         // set direct damage
         int damageMinColIndex = cursor.getColumnIndex("damage_min");
         setMinDamage(cursor.getInt(damageMinColIndex));
@@ -238,14 +235,6 @@ public class Ability implements Inventory{
     // setters
     public void setAbilityName(String abilityName) {
         this.abilityName = abilityName;
-    }
-
-    public void setCooldownMax(int cooldownMax) {
-        this.cooldownMax = cooldownMax;
-    }
-
-    public void setCooldownCurr(int cooldownLeft) {
-        this.cooldownLeft = cooldownLeft;
     }
 
     public void setMinDamage(int minDamage) {
@@ -408,12 +397,8 @@ public class Ability implements Inventory{
         this.tier = tier;
     }
 
-    // getters
-    public int getCooldownMax() {
-        return cooldownMax;
-    }
-    public int getCooldownLeft() {
-        return cooldownLeft;
+    public int getCooldownCurr() {
+        return cooldownCurr;
     }
     public int getMinDamage() {
         return minDamage;

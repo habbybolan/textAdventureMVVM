@@ -17,11 +17,16 @@
     <dimen name="dialogue_distance_sides">25sp</dimen>
     <dimen name="dialogue_distance_top">7sp</dimen>
 
+    <dimen name="action_margin_top">7sp</dimen>
+    <dimen name="button_margin_top">7sp</dimen>
+
     <dimen name="icon_size">15dp</dimen>
     <dimen name="text_from_icon">5dp</dimen>
     <dimen name="combat_order_icon_size">25dp</dimen>
     <dimen name="combat_enemy_action_icon_size">50dp</dimen>
     <dimen name="combat_character_action_icon_size">45dp</dimen>
+
+    <dimen name="icon_info_size">75dp</dimen>
 
     <dimen name="default_btn_height">42dp</dimen>
     <dimen name="default_btn_width">97dp</dimen>

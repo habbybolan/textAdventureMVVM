@@ -44,6 +44,7 @@ public class MainGameActivity extends AppCompatActivity {
             characterViewModel = CharacterViewModel.getInstance();
             mainGameViewModel = MainGameViewModel.getInstance();
         }
+        characterDeathListener();
         mainGameBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_game);
         mainGameBinding.setMainGameViewModel(mainGameViewModel);
         mainGameBinding.setCharacterViewModel(characterViewModel);
@@ -62,6 +63,19 @@ public class MainGameActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    // listener for when the character reaches 0 health
+    private void characterDeathListener() {
+        characterViewModel.getHealthObserve().addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Integer health = characterViewModel.getHealthObserve().get();
+                if (health != null && health <= 0) {
+                    // todo: death screen
+                }
+            }
+        });
     }
 
 

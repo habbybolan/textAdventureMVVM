@@ -4,7 +4,7 @@ import android.database.Cursor;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import org.json.JSONException;
@@ -17,7 +17,7 @@ A special attack that represents one of two uses for a weapon
     // attacks can be abilities, or similar to attacks with a bit more effects, but has a cool down
     // each weapon is guaranteed to have one special attack
  */
-public class SpecialAttack implements Inventory {
+public class SpecialAttack extends Action {
 
     private String specialAttackName = "";
     private String specialAttackDescription = "";
@@ -28,8 +28,6 @@ public class SpecialAttack implements Inventory {
     private int splashDamageMax;
     private int damageMin;
     private int damageMax;
-    private int cooldownMax;
-    private int cooldownCurr;
 
     private int specialAttackID;
 
@@ -80,8 +78,7 @@ public class SpecialAttack implements Inventory {
         setDamageMax(cursor.getInt(damageMaxColID));
         // set cooldowns
         int cooldownColID = cursor.getColumnIndex("cooldown");
-        setCooldownMax(cursor.getInt(cooldownColID));
-        setCooldownCurr(0);
+        cooldownMax = (cursor.getInt(cooldownColID)) ;
         cursor.close();
     }
 
@@ -116,13 +113,6 @@ public class SpecialAttack implements Inventory {
         this.damageMax = damageMax;
     }
 
-    private void setCooldownMax(int cooldownMax) {
-        this.cooldownMax = cooldownMax;
-    }
-    public void setCooldownCurr(int cooldownCurr) {
-        this.cooldownCurr = cooldownCurr;
-    }
-
     // getters
     public String getSpecialAttackName() {
         return specialAttackName;
@@ -150,12 +140,6 @@ public class SpecialAttack implements Inventory {
     }
     public int getDamageMax() {
         return damageMax;
-    }
-    public int getCooldownMax() {
-        return cooldownMax;
-    }
-    public int getCooldownCurr() {
-        return cooldownCurr;
     }
 
     public int getSpecialAttackID() {

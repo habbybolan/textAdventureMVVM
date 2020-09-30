@@ -43,7 +43,6 @@ public class Character extends CharacterEntity {
     public static final int MAX_ABILITIES = 4;
     public static final int MAX_WEAPONS = 2;
     public static final int MAX_ITEMS = 5;
-    public boolean isAlive = true;
     public final int NUM_ACTIONS = 2;
 
     // holds all the buff and debuff abilities applied to the player character
@@ -211,20 +210,16 @@ public class Character extends CharacterEntity {
     public void decrCooldowns() {
         // decrement special ability cooldown if >0 of all weapons
         for (int i = 0; i < weapons.size(); i++) {
-            if (weapons.get(i).getSpecialAttack().getCooldownCurr() > 0) {
-                weapons.get(i).getSpecialAttack().setCooldownCurr(weapons.get(i).getSpecialAttack().getCooldownCurr() - 1);
-            }
+            weapons.get(i).getSpecialAttack().decrementCooldownCurr();
         }
         // decrement ability cooldowns if >0
         for (int i = 0; i < abilities.size(); i++) {
-            if (abilities.get(i).getCooldownLeft() > 0) {
-                abilities.get(i).setCooldownCurr(abilities.get(i).getCooldownLeft()-1);
-            }
+            abilities.get(i).decrementCooldownCurr();
         }
         // decrement item ability cooldowns if >0
         for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).getAbility() != null && items.get(i).getAbility().getCooldownLeft() > 0) {
-                items.get(i).getAbility().setCooldownCurr(items.get(i).getAbility().getCooldownLeft()-1);
+            if (items.get(i).getAbility() != null) {
+                items.get(i).getAbility().decrementCooldownCurr();
             }
         }
     }

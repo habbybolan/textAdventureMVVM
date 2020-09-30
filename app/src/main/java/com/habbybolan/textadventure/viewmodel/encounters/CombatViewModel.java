@@ -13,6 +13,7 @@ import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.CombatModel;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
@@ -62,7 +63,7 @@ public class CombatViewModel extends EncounterViewModel {
 
     private ArrayList<EnemyViewModel> enemies = new ArrayList<>();
 
-    private Inventory selectedAction;
+    private Action selectedAction;
 
     // combat View Model constructor
     public CombatViewModel(JSONObject encounter, Context context) throws JSONException {
@@ -91,7 +92,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // save the selected inventory object to be used for attacking an enemy
-    public void setSelectedInventoryAction(Inventory selectedAction) {
+    public void setSelectedInventoryAction(Action selectedAction) {
         this.selectedAction = selectedAction;
     }
 
@@ -141,7 +142,7 @@ public class CombatViewModel extends EncounterViewModel {
     // ***COMBAT ORDERING***
 
     // set up the initial combat ordering and sort characterEntities by speed stat
-    // set up the layouts
+        // set up the layouts
     public void createCombatOrderLists() {
         combatOrderCurr.add(characterVM.getCharacter());
         for (EnemyViewModel enemyVM : enemies) {
@@ -202,6 +203,8 @@ public class CombatViewModel extends EncounterViewModel {
     // apply the character action selected if valid, otherwise return false
     public boolean characterAction(CharacterEntity entity) {
         if (isSelectedAction()) {
+            // if the action is not out of cooldown, don't apply action
+            if (!selectedAction.isActionReady()) return false;
             // cannot use a consumable item on an enemy, only action on self
             if (isValidItemAction(entity)) {
                 applyCharacterAction(entity);
@@ -217,6 +220,9 @@ public class CombatViewModel extends EncounterViewModel {
             return "Select an action";
         else if (!isValidItemAction(entity))
             return "Action not possible";
+        else if (!selectedAction.isActionReady()) {
+            return "Action in cooldown";
+        }
         // method should not have been called if no problem exists
         else throw new IllegalStateException();
     }
@@ -228,6 +234,7 @@ public class CombatViewModel extends EncounterViewModel {
             Enemy enemy = (Enemy) target;
             enemy.applyAbility(ability, attacker);
         }
+        ability.setActionUsed();
     }
 
     // helper for applyCharacterAction to use selected attack
@@ -245,6 +252,7 @@ public class CombatViewModel extends EncounterViewModel {
             Enemy enemy = (Enemy) target;
             enemy.applySpecialAttack(specialAttack, attacker);
         }
+        specialAttack.setActionUsed();
     }
     // helper for applyCharacterAction to use selected Item action
     private void applyItemCharacterAction(Item item, CharacterEntity target) {
@@ -256,6 +264,7 @@ public class CombatViewModel extends EncounterViewModel {
             Enemy enemy = (Enemy) target;
             enemy.applyAbility(item.getAbility(), attacker);
         }
+        item.setActionUsed();
     }
 
     // returns false if the item doesn't have an ability associated with it and it's being used on an enemy
@@ -339,7 +348,9 @@ public class CombatViewModel extends EncounterViewModel {
         return numTargets;
     }
 
-    private void beforeActionApplication(CharacterEntity entity) {
+    // helper for applying things at the beginning of entity's turn before action performed
+    private void beforeAction(CharacterEntity entity) {
+        entity.decrCooldowns();
         if (entity.getIsCharacter()) {
             characterVM.applyDots();
             characterVM.decrSpecialDuration();
@@ -351,7 +362,7 @@ public class CombatViewModel extends EncounterViewModel {
             entity.decrementTempStatDuration();
             entity.decrementTempExtraDuration();
         }
-        // todo: decrement action cooldowns
+
     }
 
     // sets the first turn, calling the state that corresponds to it
@@ -365,7 +376,8 @@ public class CombatViewModel extends EncounterViewModel {
         }
     }
 
-    public boolean isEnemyTurn() {
+    // return true if the next turn is an Enemy's turn
+    public boolean isCharacterTurn() {
         return combatOrderCurr.get(0).getIsCharacter();
     }
 
@@ -376,9 +388,14 @@ public class CombatViewModel extends EncounterViewModel {
         if (!isCombatInProgress()) {
             stateIndex.set(sixthState);
         } else {
-            combatModel.moveEntityToBackOfCombatOrder(combatOrderCurr, combatOrderNext, combatOrderLast);
-            beforeActionApplication(combatOrderCurr.get(0));
-            if (combatOrderCurr.get(0).getIsCharacter()) {
+            // in combat, find next characterEntity's turn
+            do {
+                // loop until you find a characterEntity in the combat ordering that is still alive
+                combatModel.moveEntityToBackOfCombatOrder(combatOrderCurr, combatOrderNext, combatOrderLast);
+                beforeAction(combatOrderCurr.get(0));
+            } while (!combatOrderCurr.get(0).getIsAlive());
+
+            if (isCharacterTurn()) {
                 // state 4 corresponds to character turn
                 stateIndex.set(fourthState);
             } else {

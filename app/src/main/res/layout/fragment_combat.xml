@@ -23,6 +23,7 @@
                 android:id="@+id/action_select_enemy_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/button_margin_top"
                 android:orientation="horizontal">
 
             </LinearLayout>
@@ -138,6 +139,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_marginTop="@dimen/button_margin_top"
                 android:layout_gravity="center">
 
                 <FrameLayout

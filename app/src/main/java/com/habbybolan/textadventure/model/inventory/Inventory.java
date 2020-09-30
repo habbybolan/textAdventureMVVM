@@ -12,8 +12,6 @@ public interface Inventory {
 
     String INVENTORY_TYPE = "inventory_type";
     String ID = "id";
-    
-    int pictureResource = 0;
 
     String getType();
     String getName();

@@ -155,9 +155,9 @@ public class DialogueRecyclerView {
         Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                HealthDialogue healthDialogue = characterVM.getHealthObserve().get();
-                if (healthDialogue != null) {
-                    adapter.addNewDialogue(healthDialogue);
+                Integer health = characterVM.getHealthObserve().get();
+                if (health != null) {
+                    adapter.addNewDialogue(new HealthDialogue(health));
                 }
             }
         };
@@ -168,9 +168,9 @@ public class DialogueRecyclerView {
         Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                ManaDialogue manaDialogue = characterVM.getManaObserve().get();
-                if (manaDialogue != null) {
-                    adapter.addNewDialogue(manaDialogue);
+                Integer mana = characterVM.getManaObserve().get();
+                if (mana != null) {
+                    adapter.addNewDialogue(new ManaDialogue(mana));
                 }
             }
         };

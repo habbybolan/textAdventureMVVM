@@ -198,13 +198,9 @@ public class Enemy extends CharacterEntity {
     // decrement the cooldown on all abilities w/ cooldown >0
     public void decrCooldowns() {
         // check the ability in special attack if it exists
-        if (weapon.getSpecialAttack().getAbility() != null && weapon.getSpecialAttack().getAbility().getCooldownLeft() > 0) {
-            weapon.getSpecialAttack().getAbility().setCooldownCurr(weapon.getSpecialAttack().getAbility().getCooldownLeft()-1);
-        }
+        weapon.getSpecialAttack().decrementCooldownCurr();
         for (int i = 0; i < MAX_ABILITIES; i++) {
-            if (abilities.get(i).getCooldownLeft() > 0) {
-                abilities.get(i).setCooldownCurr(abilities.get(i).getCooldownLeft()-1);
-            }
+            abilities.get(i).decrementCooldownCurr();
         }
     }
 

@@ -23,7 +23,7 @@ public abstract class Effect implements Comparable<Effect>{
 
     // Dots
     public static final String FIRE = "fire";
-    public static final int FIRE_DURATION = 1;
+    public static final int FIRE_DURATION = 2;
     public static final int FIRE_DAMAGE = 8;
     public static final String POISON = "poison";
     public static final int POISON_DURATION = 4;

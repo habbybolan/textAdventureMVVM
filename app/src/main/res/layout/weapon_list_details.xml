@@ -33,7 +33,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/action_margin_top"
+            android:background="@drawable/action_back">
 
             <ImageView
                 android:id="@+id/img_icon_weapon"
@@ -56,7 +58,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/weapon_container"
             android:layout_marginStart="30dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/action_margin_top"
+            android:background="@drawable/action_back">
 
             <ImageView
                 android:id="@+id/img_icon_attack"
@@ -80,7 +84,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/attack_container"
             android:layout_marginStart="30dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/action_margin_top"
+            android:background="@drawable/action_back">
 
             <ImageView
                 android:id="@+id/img_icon_s_attack"

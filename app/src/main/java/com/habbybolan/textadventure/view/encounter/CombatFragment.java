@@ -17,6 +17,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentCombatBinding;
 import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
+import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
@@ -266,6 +267,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
 
     // helper for performing character action on icon click, or displaying action error message
     private void characterActionOnClick(CharacterEntity target) {
+        // perform the character action if it is a valid action on the target
         if (combatVM.characterAction(target)) {
             // action is valid and performed, so update the combat ordering
             notifyCombatOrderNextTurn();
@@ -299,7 +301,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             @Override
             public void onClicked(Inventory object) {
                 // set selected action the selected Ability action
-                combatVM.setSelectedInventoryAction(object);
+                combatVM.setSelectedInventoryAction((Action) object);
                 weaponRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
             }
@@ -309,7 +311,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             @Override
             public void onClicked(Inventory object) {
                 // set selected action the selected Weapon action
-                combatVM.setSelectedInventoryAction(object);
+                combatVM.setSelectedInventoryAction((Action) object);
                 abilityRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
             }
@@ -319,7 +321,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             @Override
             public void onClicked(Inventory object) {
                 // set selected action the selected Item action
-                combatVM.setSelectedInventoryAction(object);
+                combatVM.setSelectedInventoryAction((Action) object);
                 abilityRV.unSelectIfOneSelected();
                 weaponRV.unSelectIfOneSelected();
             }
