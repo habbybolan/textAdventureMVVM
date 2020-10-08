@@ -14,135 +14,127 @@
     android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/trap_container"
+            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/action_select_enemy_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/button_margin_top"
-                android:orientation="horizontal">
-
-            </LinearLayout>
-
-            <LinearLayout
+                android:id="@+id/in_combat_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/combat_curr"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/combat_order"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/combat_next"
-                    android:layout_width="wrap_content"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/combat_curr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/combat_next"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/combat_last"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/enemy_action_icons"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/combat_last"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-            </LinearLayout>
+                </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/enemy_action_icons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/character_action_icon"
-                android:layout_width="@dimen/combat_character_action_icon_size"
-                android:layout_height="@dimen/combat_character_action_icon_size"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                app:imageResource="@{characterVM.drawableResID}"/>
-
-            <LinearLayout
-                android:id="@+id/rv_category_options"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <Button
-                    android:id="@+id/rv_category_weapons"
-                    style="@style/DefaultButton"
-                    android:layout_width="@dimen/default_btn_width"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="@string/category_weapons_option"
-                    android:textSize="@dimen/txt_size_medium" />
-
-                <Button
-                    android:id="@+id/rv_category_abilities"
-                    style="@style/DefaultButton"
-                    android:layout_width="@dimen/default_btn_width"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="@string/category_abilities_option"
-                    android:textSize="@dimen/txt_size_medium" />
-
-                <Button
-                    android:id="@+id/rv_category_items"
-                    style="@style/DefaultButton"
-                    android:layout_width="@dimen/default_btn_width"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="@string/category_items_option"
-                    android:textSize="@dimen/txt_size_medium" />
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_weapons"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/character_action_icon"
+                    android:layout_width="@dimen/combat_character_action_icon_size"
+                    android:layout_height="@dimen/combat_character_action_icon_size"
                     android:layout_gravity="center"
-                    android:visibility="visible" />
+                    android:visibility="gone"
+                    app:imageResource="@{characterVM.drawableResID}"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_abilities"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/rv_category_options"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="invisible"/>
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_items"
-                    android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/rv_category_weapons"
+                        style="@style/DefaultButton"
+                        android:layout_width="@dimen/default_btn_width"
+                        android:layout_height="@dimen/default_btn_height"
+                        android:text="@string/category_weapons_option"
+                        android:textSize="@dimen/txt_size_medium" />
+
+                    <Button
+                        android:id="@+id/rv_category_abilities"
+                        style="@style/DefaultButton"
+                        android:layout_width="@dimen/default_btn_width"
+                        android:layout_height="@dimen/default_btn_height"
+                        android:text="@string/category_abilities_option"
+                        android:textSize="@dimen/txt_size_medium" />
+
+                    <Button
+                        android:id="@+id/rv_category_items"
+                        style="@style/DefaultButton"
+                        android:layout_width="@dimen/default_btn_width"
+                        android:layout_height="@dimen/default_btn_height"
+                        android:text="@string/category_items_option"
+                        android:textSize="@dimen/txt_size_medium" />
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rv_actions"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="invisible"/>
+                    android:gravity="center">
 
-            </RelativeLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_weapons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="@dimen/button_margin_top"
-                android:layout_gravity="center">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_abilities"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:visibility="invisible"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_items"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:visibility="invisible"/>
+
+                </RelativeLayout>
 
                 <FrameLayout
+                    android:id="@+id/btn_run_continue_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center">
@@ -167,17 +159,18 @@
 
                 </FrameLayout>
 
-                <GridLayout
-                    android:id="@+id/layout_btn_options"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:rowCount="1"
-                    android:columnCount="3">
-
-                </GridLayout>
-
             </LinearLayout>
+
+            <GridLayout
+                android:id="@+id/layout_btn_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:rowCount="2"
+                android:columnCount="3">
+
+            </GridLayout>
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_dialogue"

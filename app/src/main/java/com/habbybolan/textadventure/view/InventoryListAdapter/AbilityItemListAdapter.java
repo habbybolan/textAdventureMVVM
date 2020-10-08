@@ -58,13 +58,20 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
             this.binding = binding;
             this.inventoryClickListener = inventoryClickListener;
 
-            binding.inventoryContainer.setOnClickListener(new View.OnClickListener() {
+            binding.txtName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     adapter.notifyItemChanged(adapter.selectedIndex);
                     adapter.selectedIndex = getAdapterPosition();
                     adapter.notifyItemChanged(adapter.selectedIndex);
                     inventoryClickListener.onClicked(adapter.inventoryObjects.get(getAdapterPosition()));
+                }
+            });
+
+            binding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    inventoryClickListener.onInfoClick(adapter.inventoryObjects.get(getAdapterPosition()));
                 }
             });
         }

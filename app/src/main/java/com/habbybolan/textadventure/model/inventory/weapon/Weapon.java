@@ -42,6 +42,22 @@ public class Weapon implements Inventory {
         setPictureResource();
     }
 
+    public Weapon(String stringWeapon) {
+        try {
+            JSONObject JSONWeapon = new JSONObject(stringWeapon);
+            weaponName = JSONWeapon.getString(WEAPON_NAME);
+            weaponID = JSONWeapon.getInt(WEAPON_ID);
+            attack = new Attack(JSONWeapon.getJSONObject(ATTACK).toString());
+            specialAttack = new SpecialAttack(JSONWeapon.getJSONObject(S_ATTACK).toString());
+            description = JSONWeapon.getString(DESCRIPTION);
+            tier  = JSONWeapon.getInt(TIER);
+            pictureResource = JSONWeapon.getInt(IMAGE_RESOURCE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     // sets the picture resource
     @Override
     public void setPictureResource() {
@@ -70,18 +86,18 @@ public class Weapon implements Inventory {
     // sets all the variables that describe the weapon
     private void setVariables(DatabaseAdapter mDbHelper, Cursor cursor) throws ExecutionException, InterruptedException {
         // set up the weapon name
-        int weaponNameColIndex = cursor.getColumnIndex("weapon_name");
+        int weaponNameColIndex = cursor.getColumnIndex(WEAPON_NAME);
         setWeaponName(cursor.getString(weaponNameColIndex));
         // set up the attack id
-        int attackColID = cursor.getColumnIndex("attack_id");
+        int attackColID = cursor.getColumnIndex(ATTACK_ID);
         Attack attack = new Attack(cursor.getInt(attackColID), mDbHelper);
         setAttack(attack);
         // set up the special attack id
-        int specialAttackColID = cursor.getColumnIndex("s_attack_id");
+        int specialAttackColID = cursor.getColumnIndex(S_ATTACK_ID);
         SpecialAttack specialAttack = new SpecialAttack(cursor.getInt(specialAttackColID), mDbHelper);
         setSpecialAttack(specialAttack);
         // set up the weapon tier (weapon rarity)
-        int tierColID = cursor.getColumnIndex("tier");
+        int tierColID = cursor.getColumnIndex(TIER);
         setTier(cursor.getInt(tierColID));
     }
 
@@ -129,6 +145,22 @@ public class Weapon implements Inventory {
         }
         return toJSON;
     }
+
+    @Override
+    public JSONObject serializeToJSON() throws JSONException {
+        JSONObject JSONInventory = new JSONObject();
+        JSONInventory.put(WEAPON_NAME, weaponName);
+        JSONInventory.put(WEAPON_ID, weaponID);
+        JSONObject JSONAttack = attack.serializeToJSON();
+        JSONInventory.put(ATTACK, JSONAttack);
+        JSONObject JSONSAttack = specialAttack.serializeToJSON();
+        JSONInventory.put(S_ATTACK, JSONSAttack);
+        JSONInventory.put(DESCRIPTION, description);
+        JSONInventory.put(TIER, tier);
+        JSONInventory.put(IMAGE_RESOURCE, pictureResource);
+        return JSONInventory;
+    }
+
     @Override
     public int getID() {
         return weaponID;
@@ -141,5 +173,16 @@ public class Weapon implements Inventory {
     public String getName() {
         return weaponName;
     }
+
+    public static final String WEAPON_NAME = "weapon_name";
+    public static final String WEAPON_ID = "weapon_id";
+    public static final String ATTACK_ID = "attack_id";
+    public static final String ATTACK = "attack";
+    public static final String S_ATTACK_ID = "s_attack_id";
+    public static final String S_ATTACK = "s_attack";
+    public static final String DESCRIPTION = "description";
+    public static final String TIER = "tier";
+    // image resource
+    public static final String IMAGE_RESOURCE = "image_resource";
 
 }

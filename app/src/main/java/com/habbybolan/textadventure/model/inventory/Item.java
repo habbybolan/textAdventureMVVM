@@ -86,6 +86,45 @@ public class Item extends Action {
         setPictureResource();
     }
 
+    public Item(String stringItem) {
+        try {
+            JSONObject JSONItem = new JSONObject(stringItem);
+            itemName = JSONItem.getString(ITEM_NAME);
+            itemID = JSONItem.getInt(ITEM_ID);
+            if (JSONItem.has(ABILITY))
+                ability = new Ability(JSONItem.getJSONObject(ABILITY).toString());
+            // stat
+            strChange = JSONItem.getInt(STR_CHANGE);
+            intChange = JSONItem.getInt(INT_CHANGE);
+            conChange = JSONItem.getInt(CON_CHANGE);
+            spdChange = JSONItem.getInt(SPD_CHANGE);
+            evasionChange = JSONItem.getInt(EVASION_CHANGE);
+            blockChange = JSONItem.getInt(BLOCK_CHANGE);
+            // bars
+            healthChange = JSONItem.getInt(HEALTH_CHANGE);
+            manaChange = JSONItem.getInt(MANA_CHANGE);
+            // gold
+            goldChange = JSONItem.getInt(GOLD_CHANGE);
+            // exp
+            expChange = JSONItem.getInt(EXP_CHANGE);
+            // misc
+            description = JSONItem.getString(DESCRIPTION);
+            isConsumable = JSONItem.getBoolean(IS_CONSUMABLE);
+            tier = JSONItem.getInt(TIER);
+            escapeTrap = JSONItem.getBoolean(ESCAPE_TRAP);
+            // dots
+            isFire = JSONItem.getBoolean(IS_FIRE);
+            isBleed = JSONItem.getBoolean(IS_BLEED);
+            isFrostBurn = JSONItem.getBoolean(IS_FROST_BURN);
+            isPoison = JSONItem.getBoolean(IS_POISON);
+            // duration
+            duration = JSONItem.getInt(DURATION);
+            pictureResource = JSONItem.getInt(IMAGE_RESOURCE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     // sets the picture resource
     @Override
     public void setPictureResource() {
@@ -136,10 +175,10 @@ public class Item extends Action {
     // sets all the variables that describe the weapon
     private void setVariables(DatabaseAdapter mDbHelper , Cursor cursor) throws ExecutionException, InterruptedException {
         // set up the item name
-        int nameOfItemColIndex = cursor.getColumnIndex("item_name");
+        int nameOfItemColIndex = cursor.getColumnIndex(ITEM_NAME);
         setItemName(cursor.getString(nameOfItemColIndex));
         // set ability
-        int abilityColID = cursor.getColumnIndex("ability_id");
+        int abilityColID = cursor.getColumnIndex(ABILITY_ID);
         int abilityID = cursor.getInt(abilityColID);
         if (cursor.getInt(abilityColID) != 0) {
             Ability ability = new Ability(abilityID, mDbHelper);
@@ -147,60 +186,60 @@ public class Item extends Action {
         }
 
         // set stat increases
-        int strChangeColIndex = cursor.getColumnIndex("str_change");
+        int strChangeColIndex = cursor.getColumnIndex(STR_CHANGE);
         setStrChange(cursor.getInt(strChangeColIndex));
-        int IntChange = cursor.getColumnIndex("int_change");
+        int IntChange = cursor.getColumnIndex(INT_CHANGE);
         setIntChange(cursor.getInt(IntChange));
-        int conChange = cursor.getColumnIndex("con_change");
+        int conChange = cursor.getColumnIndex(CON_CHANGE);
         setConChange(cursor.getInt(conChange));
-        int spdChange = cursor.getColumnIndex("spd_change");
+        int spdChange = cursor.getColumnIndex(SPD_CHANGE);
         setSpdChange(cursor.getInt(spdChange));
-        int blockChange = cursor.getColumnIndex("block_change");
+        int blockChange = cursor.getColumnIndex(BLOCK_CHANGE);
         setBlockChange(cursor.getInt(blockChange));
-        int evasionChange = cursor.getColumnIndex("evade_change");
+        int evasionChange = cursor.getColumnIndex(EVASION_CHANGE);
         setEvasionChange(cursor.getInt(evasionChange));
         // set bars
-        int healthChange = cursor.getColumnIndex("health_change");
+        int healthChange = cursor.getColumnIndex(HEALTH_CHANGE);
         setHealthChange(cursor.getInt(healthChange));
-        int manaChange = cursor.getColumnIndex("mana_change");
+        int manaChange = cursor.getColumnIndex(MANA_CHANGE);
         setManaChange(cursor.getInt(manaChange));
         // set gold
-        int goldChange = cursor.getColumnIndex("gold_change");
+        int goldChange = cursor.getColumnIndex(GOLD_CHANGE);
         setGoldChange(cursor.getInt(goldChange));
         // set exp
-        int expChange = cursor.getColumnIndex("exp_change");
+        int expChange = cursor.getColumnIndex(EXP_CHANGE);
         setExpChange(cursor.getInt(expChange));
         // specials
-        int confuse = cursor.getColumnIndex("confuse");
+        int confuse = cursor.getColumnIndex(IS_CONFUSE);
         setIsConfuse(cursor.getInt(confuse)==1);
-        int stun = cursor.getColumnIndex("stun");
+        int stun = cursor.getColumnIndex(IS_SILENCE);
         setIsStun(cursor.getInt(stun)==1);
-        int silence = cursor.getColumnIndex("silence");
+        int silence = cursor.getColumnIndex(IS_SILENCE);
         setIsSilence(cursor.getInt(silence)==1);
-        int invincible = cursor.getColumnIndex("invincible");
+        int invincible = cursor.getColumnIndex(IS_INVINCIBILITY);
         setIsInvincible(cursor.getInt(invincible)==1);
-        int invisible = cursor.getColumnIndex("invisible");
+        int invisible = cursor.getColumnIndex(IS_INVISIBLE);
         setIsInvisible(cursor.getInt(invisible)==1);
         // description
-        int description = cursor.getColumnIndex("description");
+        int description = cursor.getColumnIndex(DESCRIPTION);
         setDescription(cursor.getString(description));
-        int consumable = cursor.getColumnIndex("consumable");
+        int consumable = cursor.getColumnIndex(IS_CONSUMABLE);
         setIsConsumable(cursor.getInt(consumable)==1);
-        int tier = cursor.getColumnIndex("tier");
+        int tier = cursor.getColumnIndex(TIER);
         setTier(cursor.getInt(tier));
-        int escapeTrapColIndex = cursor.getColumnIndex("escape_trap");
+        int escapeTrapColIndex = cursor.getColumnIndex(ESCAPE_TRAP);
         setEscapeTrap(cursor.getInt(escapeTrapColIndex)==1);
         // DOTS
-        int fireColIndex = cursor.getColumnIndex("fire");
+        int fireColIndex = cursor.getColumnIndex(IS_FIRE);
         setIsFire(cursor.getInt(fireColIndex)==1);
-        int bleedColIndex = cursor.getColumnIndex("bleed");
+        int bleedColIndex = cursor.getColumnIndex(IS_BLEED);
         setIsBleed(cursor.getInt(bleedColIndex)==1);
-        int poisonColIndex = cursor.getColumnIndex("poison");
+        int poisonColIndex = cursor.getColumnIndex(IS_POISON);
         setIsPoison(cursor.getInt(poisonColIndex)==1);
-        int frostBurnColIndex = cursor.getColumnIndex("frostBurn");
+        int frostBurnColIndex = cursor.getColumnIndex(IS_FROST_BURN);
         setIsFrostBurn(cursor.getInt(frostBurnColIndex)==1);
         // duration
-        int durationColIndex = cursor.getColumnIndex("duration");
+        int durationColIndex = cursor.getColumnIndex(DURATION);
         setDuration(cursor.getInt(durationColIndex));
     }
 
@@ -394,6 +433,8 @@ public class Item extends Action {
         }
         return toJSON;
     }
+
+
     @Override
     public int getID() {
         return itemID;
@@ -408,7 +449,88 @@ public class Item extends Action {
     }
 
     @Override
+    public JSONObject serializeToJSON() throws JSONException {
+        JSONObject JSONInventory = new JSONObject();
+        JSONInventory.put(ITEM_NAME, itemName);
+        JSONInventory.put(ITEM_ID, itemID);
+        if (ability != null) {
+            JSONObject JSONAbility = ability.serializeToJSON();
+            JSONInventory.put(ABILITY, JSONAbility);
+        }
+        // stats
+        JSONInventory.put(STR_CHANGE, strChange);
+        JSONInventory.put(INT_CHANGE, intChange);
+        JSONInventory.put(CON_CHANGE, conChange);
+        JSONInventory.put(SPD_CHANGE, spdChange);
+        JSONInventory.put(EVASION_CHANGE, evasionChange);
+        JSONInventory.put(BLOCK_CHANGE, blockChange);
+        // bars
+        JSONInventory.put(HEALTH_CHANGE, healthChange);
+        JSONInventory.put(MANA_CHANGE, manaChange);
+        // gold
+        JSONInventory.put(GOLD_CHANGE, goldChange);
+        // exp
+        JSONInventory.put(EXP_CHANGE, expChange);
+        // misc
+        JSONInventory.put(DESCRIPTION, description);
+        JSONInventory.put(IS_CONSUMABLE, isConsumable);
+        JSONInventory.put(TIER, tier);
+        JSONInventory.put(ESCAPE_TRAP, escapeTrap);
+        // dots
+        JSONInventory.put(IS_FIRE, isFire);
+        JSONInventory.put(IS_BLEED, isBleed);
+        JSONInventory.put(IS_POISON, isPoison);
+        JSONInventory.put(IS_FROST_BURN, isFrostBurn);
+        // duration
+        JSONInventory.put(DURATION, duration);
+        JSONInventory.put(IMAGE_RESOURCE, pictureResource);
+        return JSONInventory;
+    }
+
+
+    @Override
     public void setActionUsed() {
         if (ability != null) ability.setActionUsed();
     }
+
+    public static final String ITEM_NAME = "item_name";
+    public static final String ITEM_ID = "item_id";
+    // ability
+    public static final String ABILITY = "ability";
+    public static final String ABILITY_ID = "ability_id";
+    // stats
+    public static final String STR_CHANGE = "str_change";
+    public static final String INT_CHANGE = "int_change";
+    public static final String CON_CHANGE = "con_change";
+    public static final String SPD_CHANGE = "spd_change";
+    public static final String BLOCK_CHANGE = "block_change";
+    public static final String EVASION_CHANGE = "evade_change";
+    // bars
+    public static final String HEALTH_CHANGE = "health_change";
+    public static final String MANA_CHANGE = "mana_change";
+    // gold
+    public static final String GOLD_CHANGE = "gold_change";
+    // exp
+    public static final String EXP_CHANGE = "exp_change";
+    // specials
+    public static final String IS_CONFUSE = "confuse";
+    public static final String IS_STUN = "stun";
+    public static final String IS_SILENCE = "silence";
+    public static final String IS_INVINCIBILITY = "invincible";
+    public static final String IS_INVISIBLE = "invisible";
+    // misc
+    public static final String DESCRIPTION = "description";
+    public static final String IS_CONSUMABLE = "consumable";
+    public static final String TIER = "tier";
+    public static final String ESCAPE_TRAP = "escape_trap";
+    // dots
+    public static final String IS_FIRE = "fire";
+    public static final String IS_BLEED = "bleed";
+    public static final String IS_POISON = "poison";
+    public static final String IS_FROST_BURN = "frostBurn";
+    // duration
+    public static final String DURATION = "duration";
+    // image resource
+    public static final String IMAGE_RESOURCE = "image_resource";
+
 }

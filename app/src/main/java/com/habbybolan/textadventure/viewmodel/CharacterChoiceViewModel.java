@@ -10,6 +10,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import java.util.concurrent.ExecutionException;
@@ -47,6 +48,12 @@ public class CharacterChoiceViewModel extends BaseObservable {
     public CharacterChoiceViewModel(Context context) {
         this.context = context;
         selectCharacter(wizard);
+    }
+
+    // create and saves a new character given the class name
+    public void saveNewCharacter() {
+        SaveDataLocally save = new SaveDataLocally(context);
+        save.saveNewCharacterLocally(className);
     }
 
     @Bindable

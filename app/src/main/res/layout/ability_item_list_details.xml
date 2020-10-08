@@ -9,6 +9,7 @@
             name="name"
             type="String" />
     </data>
+
     <LinearLayout
         android:id="@+id/inventory_container"
         android:layout_width="wrap_content"
@@ -23,15 +24,22 @@
             android:layout_height="35dp"
             app:imageResource="@{iconResource}"/>
 
-
         <TextView
             android:id="@+id/txt_name"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_marginStart="10dp"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:text="@{name}"/>
 
+        <ImageView
+            android:id="@+id/inventory_info"
+            android:layout_width="@dimen/inventory_info_icon_size"
+            android:layout_height="@dimen/inventory_info_icon_size"
+            android:layout_marginStart="@dimen/inventory_info_icon_margins"
+            android:layout_marginEnd="@dimen/inventory_info_icon_margins"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/inventory_info" />
     </LinearLayout>
 
 </layout>

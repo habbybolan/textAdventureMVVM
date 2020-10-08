@@ -23,22 +23,13 @@
             android:id="@+id/img_icon"
             android:layout_width="@dimen/icon_info_size"
             android:layout_height="@dimen/icon_info_size"
-            app:imageResource="@{imageIconResource}" />
+            app:imageResource="@{imageIconResource}"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{name}"
             android:textSize="@dimen/txt_size_large"/>
-
-        <ScrollView
-            android:id="@+id/inventory_info_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-
-
-        </ScrollView>
 
     </LinearLayout>
 </layout>

@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.view.encounter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
+import com.habbybolan.textadventure.view.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.InventoryClickListener;
 import com.habbybolan.textadventure.view.InventoryListAdapter.ItemListRecyclerView;
@@ -64,6 +66,8 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     private CombatOrderAdapter nextListAdapter;
     private CombatOrderAdapter lastListAdapter;
 
+    public static final String INVENTORY_SERIALIZED = "INVENTORY_SERIALIZED";
+    public static final String TYPE = "type";
 
     public CombatFragment() {
         // Required empty public constructor
@@ -136,8 +140,9 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                     enemyTurnState();
                     break;
                 case CombatViewModel.sixthState:
+                    combatBinding.inCombatContainer.removeAllViews();
                     combatBinding.layoutBtnOptions.removeAllViews();
-                    // todo: reward state
+                    endState(); // todo: temporarily end state - should be reward state
                     break;
                 // last state
                 case CombatViewModel.seventhState:
@@ -305,6 +310,11 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 weaponRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
             }
+
+            @Override
+            public void onInfoClick(Inventory object) {
+                InventoryActivity(object);
+            }
         });
 
         weaponRV = new WeaponListRecyclerView(getContext(), combatBinding.rvWeapons, characterVM, combatVM, new InventoryClickListener() {
@@ -314,6 +324,11 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 combatVM.setSelectedInventoryAction((Action) object);
                 abilityRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
+            }
+
+            @Override
+            public void onInfoClick(Inventory object) {
+                InventoryActivity(object);
             }
         });
 
@@ -325,8 +340,21 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 abilityRV.unSelectIfOneSelected();
                 weaponRV.unSelectIfOneSelected();
             }
+
+            @Override
+            public void onInfoClick(Inventory object) {
+                InventoryActivity(object);
+            }
         });
 
+    }
+
+    // creates the new information activity for the Inventory object clicked
+    private void InventoryActivity(Inventory object) {
+        Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
+        intent.putExtra(INVENTORY_SERIALIZED, combatVM.serializeInventory(object));
+        intent.putExtra(TYPE, object.getType());
+        startActivity(intent);
     }
 
     // un-select all items in the inventory RVs
@@ -400,6 +428,5 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     public void endState() {
         // set up button to leave
         setLeaveButton(mainGameVM, combatBinding.layoutBtnOptions);
-
     }
 }

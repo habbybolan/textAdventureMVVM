@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.model.inventory;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public interface Inventory {
@@ -20,6 +21,11 @@ public interface Inventory {
 
     // converts the Inventory object to a JSON
     JSONObject toJSON();
+
+    // serializes an entire Inventory object into a JSON string
+    JSONObject serializeToJSON() throws JSONException;
+
+
 
     void setPictureResource();
     int getPictureResource();

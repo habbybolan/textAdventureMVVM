@@ -205,8 +205,10 @@ public class CombatViewModel extends EncounterViewModel {
         if (isSelectedAction()) {
             // if the action is not out of cooldown, don't apply action
             if (!selectedAction.isActionReady()) return false;
+            // if target is not alive
+            if (!entity.getIsAlive()) return false;
             // cannot use a consumable item on an enemy, only action on self
-            if (isValidItemAction(entity)) {
+            if (isValidAction(entity)) {
                 applyCharacterAction(entity);
                 return true;
             }
@@ -218,7 +220,9 @@ public class CombatViewModel extends EncounterViewModel {
     public String getActionError(CharacterEntity entity) {
         if (!isSelectedAction())
             return "Select an action";
-        else if (!isValidItemAction(entity))
+        else if (!entity.getIsAlive())
+            return "selected target is dead";
+        else if (!isValidAction(entity))
             return "Action not possible";
         else if (!selectedAction.isActionReady()) {
             return "Action in cooldown";
@@ -268,7 +272,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // returns false if the item doesn't have an ability associated with it and it's being used on an enemy
-    private boolean isValidItemAction(CharacterEntity target) {
+    private boolean isValidAction(CharacterEntity target) {
         if (selectedAction.getType().equals(Inventory.TYPE_ITEM)) {
             Item item = (Item) selectedAction;
             // can't use an item on an enemy that has no ability
@@ -276,6 +280,9 @@ public class CombatViewModel extends EncounterViewModel {
         }
         return true;
     }
+
+    // Enemy
+
 
     // create and apply the enemy action
     public void enemyAction() {
@@ -327,7 +334,7 @@ public class CombatViewModel extends EncounterViewModel {
         int numEnemyTargets = getNumEnemyTargets();
         Random random = new Random();
         // the nth alive enemy
-        int aliveEnemyTarget = random.nextInt(numEnemyTargets);
+        int aliveEnemyTarget = random.nextInt(numEnemyTargets); // *** IllegalArgumentException
         int index = 0;
         for (EnemyViewModel enemyVM : enemies) {
             if (enemyVM.getEnemy().getIsAlive()) {
@@ -349,6 +356,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // helper for applying things at the beginning of entity's turn before action performed
+        // returns true if still in combat after applying effects
     private void beforeAction(CharacterEntity entity) {
         entity.decrCooldowns();
         if (entity.getIsCharacter()) {
@@ -362,7 +370,6 @@ public class CombatViewModel extends EncounterViewModel {
             entity.decrementTempStatDuration();
             entity.decrementTempExtraDuration();
         }
-
     }
 
     // sets the first turn, calling the state that corresponds to it
@@ -385,9 +392,7 @@ public class CombatViewModel extends EncounterViewModel {
         // applies all necessary effects on entity, checks if combat still going, and calls the next UI state
     private void nextTurn() {
         // check if still in combat before action
-        if (!isCombatInProgress()) {
-            stateIndex.set(sixthState);
-        } else {
+        if (isCombatInProgress()) {
             // in combat, find next characterEntity's turn
             do {
                 // loop until you find a characterEntity in the combat ordering that is still alive
@@ -395,22 +400,29 @@ public class CombatViewModel extends EncounterViewModel {
                 beforeAction(combatOrderCurr.get(0));
             } while (!combatOrderCurr.get(0).getIsAlive());
 
-            if (isCharacterTurn()) {
-                // state 4 corresponds to character turn
-                stateIndex.set(fourthState);
-            } else {
-                // state 5 corresponds to enemy turn
-                stateIndex.set(fifthState);
+            // run this only if the next character is alive, otherwise the combat encounter is over
+            if (isCombatInProgress()) {
+                if (isCharacterTurn()) {
+                    // state 4 corresponds to character turn
+                    stateIndex.set(fourthState);
+                } else {
+                    // state 5 corresponds to enemy turn
+                    stateIndex.set(fifthState);
+                }
             }
         }
     }
 
     // returns true if all of the enemies are alive, otherwise return false
+        // calls the end of combat state
     private boolean isCombatInProgress() {
         for (EnemyViewModel enemyVM : enemies) {
-            if (!enemyVM.getEnemy().getIsAlive()) return false;
+            if (enemyVM.getEnemy().getIsAlive()) {
+                return true;
+            }
         }
-        return true;
+        stateIndex.set(sixthState);
+        return false;
     }
 
     public ArrayList<CharacterEntity> getCombatOrderCurr() {
@@ -430,5 +442,15 @@ public class CombatViewModel extends EncounterViewModel {
     // return true if an action is selected
     public boolean isSelectedAction() {
         return selectedAction != null;
+    }
+
+    // serialized an inventory object into a JSON String
+    public String serializeInventory(Inventory object) {
+        try {
+            return object.serializeToJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        throw new IllegalArgumentException();
     }
 }

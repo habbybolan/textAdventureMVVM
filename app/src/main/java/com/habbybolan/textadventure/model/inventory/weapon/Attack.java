@@ -39,17 +39,32 @@ public class Attack extends Action {
         setPictureResource();
     }
 
+    // takes a serialized JSON string of Attack object
+    public Attack(String stringAttack) {
+        try {
+            JSONObject JSONAttack = new JSONObject(stringAttack);
+            attackName = JSONAttack.getString(ATTACK_NAME);
+            attackID = JSONAttack.getInt(ATTACK_ID);
+            damageMin = JSONAttack.getInt(DAMAGE_MIN);
+            damageMax = JSONAttack.getInt(DAMAGE_MAX);
+            isRanged = JSONAttack.getBoolean(IS_RANGED);
+            pictureResource = JSONAttack.getInt(IMAGE_RESOURCE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setVariables(Cursor cursor) {
         // set up attack name
-        int attackNameColID = cursor.getColumnIndex("attack_name");
+        int attackNameColID = cursor.getColumnIndex(ATTACK_NAME);
         setAttackName(cursor.getString(attackNameColID));
         // set up attack damage min/max
-        int damageMinColID = cursor.getColumnIndex("damage_min");
+        int damageMinColID = cursor.getColumnIndex(DAMAGE_MIN);
         setDamageMin(cursor.getInt(damageMinColID));
-        int damageMaxColID = cursor.getColumnIndex("damage_max");
+        int damageMaxColID = cursor.getColumnIndex(DAMAGE_MAX);
         setDamageMax(cursor.getInt(damageMaxColID));
         // set up ranged boolean
-        int isRangedColID = cursor.getColumnIndex("is_ranged");
+        int isRangedColID = cursor.getColumnIndex(IS_RANGED);
         setIsRanged(cursor.getInt(isRangedColID));
     }
 
@@ -121,6 +136,19 @@ public class Attack extends Action {
     }
 
     @Override
+    public JSONObject serializeToJSON() throws JSONException {
+        JSONObject JSONInventory = new JSONObject();
+        JSONInventory.put(ATTACK_NAME, attackName);
+        JSONInventory.put(ATTACK_ID, attackID);
+        JSONInventory.put(DAMAGE_MIN, damageMin);
+        JSONInventory.put(DAMAGE_MAX, damageMax);
+        JSONInventory.put(IS_RANGED, isRanged);
+        JSONInventory.put(DESCRIPTION, attackDescription);
+        JSONInventory.put(IMAGE_RESOURCE, pictureResource);
+        return JSONInventory;
+    }
+
+    @Override
     public void setPictureResource() {
         pictureResource = R.drawable.sword;
     }
@@ -129,5 +157,15 @@ public class Attack extends Action {
     public int getPictureResource() {
         return pictureResource;
     }
+
+    public static final String ATTACK_NAME = "attack_name";
+    public static final String ATTACK_ID = "attack_id";
+    public static final String DAMAGE_MIN = "damage_min";
+    public static final String DAMAGE_MAX = "damage_max";
+    public static final String IS_RANGED = "is_ranged";
+    public static final String DESCRIPTION = "description";
+    // image resource
+    public static final String IMAGE_RESOURCE = "image_resource";
+
 
 }

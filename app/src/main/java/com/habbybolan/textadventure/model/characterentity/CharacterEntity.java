@@ -109,6 +109,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // remove the damage amount from target health if no protection
     // or remove target's temporary extra health and direct health if any overflow of damage
     public int damageTarget(int damage) {
+        if (damage < 0) throw new IllegalArgumentException();
+        int prevHealth = health;
         int overFlow = 0; // keeps track of damage if it gets rid of all tempExtraHealth
         if ((getTempExtraHealth() - damage) < 0) {
             overFlow = Math.abs(getTempExtraHealth() - damage);
@@ -118,7 +120,12 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             depleteTempExtraHealth(damage);
         }
         // direct health takes damage if any overFlow from tempHealth
-        return getHealth() - overFlow;
+        health -= overFlow;
+        if (health < 0) {
+            health = 0;
+            isAlive = false;
+        }
+        return health - prevHealth;
     }
 
     // returns a random damage number between damageMin and damageMax
@@ -131,12 +138,28 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // returns amount to change heal entity by and change
-    public int changeHealth(int amount) {
+    public int increaseHealth(int amount) {
+        if (amount < 0) throw new IllegalArgumentException();
         int prevHealth = health;
         if (amount + health >= maxHealth) health = maxHealth;
-        else if (amount + health <= 0) health = 0;
         else health = health+amount;
         return health-prevHealth;
+    }
+
+    // changes the direct health and max health by a certain amount
+        // not used for taking damage or heals
+        // used for indefinite/permanent health changes
+        // returns health change if any
+    public int changeHealth(int amount) {
+        int tempHealth = health;
+        maxHealth += amount;
+        if (amount > 0)
+            health += amount;
+        else {
+            if (health > maxHealth)
+                health = maxHealth;
+        }
+        return health - tempHealth;
     }
 
     // returns amount to recover mana of entity for
@@ -968,7 +991,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         damageTarget(Dot.FROSTBURN_DAMAGE);
     }
     public void applyHealthDot() {
-        changeHealth(Dot.HEAL_DOT_AMOUNT);
+        increaseHealth(Dot.HEAL_DOT_AMOUNT);
     }
     public void applyManaDot() {
         changeMana(Dot.MANA_DOT_AMOUNT);
@@ -1067,6 +1090,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     public void setHealth(int health) {
         this.health = health;
+        if (health == 0) isAlive = false;
     }
     public void setMaxHealth(int maxHealth) {
         this.maxHealth = maxHealth;

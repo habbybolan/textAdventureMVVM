@@ -46,10 +46,12 @@ public class SaveDataLocally {
                     jsonClassObject.put("class", Character.WIZARD_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Wizard_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Wizard_Start_Str)); // base str
-                    jsonClassObject.put("int", context.getString(R.string.Wizard_Start_Int)); // int
-                    jsonClassObject.put("intBase", context.getString(R.string.Wizard_Start_Int)); // base int
-                    jsonClassObject.put("con", context.getString(R.string.Wizard_Start_Con)); // con
-                    jsonClassObject.put("conBase", context.getString(R.string.Wizard_Start_Con)); // base con
+                    int intelligence = Integer.parseInt(context.getString(R.string.Wizard_Start_Int));
+                    jsonClassObject.put("int", intelligence); // int
+                    jsonClassObject.put("intBase", intelligence); // base int
+                    int constitution = Integer.parseInt(context.getString(R.string.Wizard_Start_Con));
+                    jsonClassObject.put("con", constitution); // con
+                    jsonClassObject.put("conBase", constitution); // base con
                     jsonClassObject.put("spd", context.getString(R.string.Wizard_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Wizard_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
@@ -67,10 +69,10 @@ public class SaveDataLocally {
                     // equipped weapon
                     jsonClassObject.put("equipped", context.getString(R.string.Wizard_Start_Weapon));
                     // bars
-                    jsonClassObject.put("health", Integer.parseInt(context.getString(R.string.Wizard_Start_Con)) + 10); // health = 10 + Con
-                    jsonClassObject.put("maxHealth", Integer.parseInt(context.getString(R.string.Wizard_Start_Con)) + 10);
-                    jsonClassObject.put("mana", Integer.parseInt(context.getString(R.string.Wizard_Start_Int)) + 10); // mana = 10 + Int
-                    jsonClassObject.put("maxMana", Integer.parseInt(context.getString(R.string.Wizard_Start_Int)) + 10);
+                    jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("mana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
+                    jsonClassObject.put("maxMana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -79,10 +81,12 @@ public class SaveDataLocally {
                     jsonClassObject.put("class", Character.PALADIN_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Paladin_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Paladin_Start_Str)); // base str
-                    jsonClassObject.put("int", context.getString(R.string.Paladin_Start_Int)); // int
-                    jsonClassObject.put("intBase", context.getString(R.string.Paladin_Start_Int)); // base int
-                    jsonClassObject.put("con", context.getString(R.string.Paladin_Start_Con)); // con
-                    jsonClassObject.put("conBase", context.getString(R.string.Paladin_Start_Con)); // base con
+                    int intelligence = Integer.parseInt(context.getString(R.string.Paladin_Start_Int));
+                    jsonClassObject.put("int", intelligence); // int
+                    jsonClassObject.put("intBase", intelligence); // base int
+                    int constitution = Integer.parseInt(context.getString(R.string.Paladin_Start_Con));
+                    jsonClassObject.put("con", constitution); // con
+                    jsonClassObject.put("conBase", constitution); // base con
                     jsonClassObject.put("spd", context.getString(R.string.Paladin_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Paladin_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
@@ -100,10 +104,10 @@ public class SaveDataLocally {
                     // equipped weapon
                     jsonClassObject.put("equipped", context.getString(R.string.Paladin_Start_Weapon));
                     // bars
-                    jsonClassObject.put("health", Integer.parseInt(context.getString(R.string.Paladin_Start_Con)) + 10); // health = 10 + Con
-                    jsonClassObject.put("maxHealth", Integer.parseInt(context.getString(R.string.Paladin_Start_Con)) + 10);
-                    jsonClassObject.put("mana", Integer.parseInt(context.getString(R.string.Paladin_Start_Int)) + 10); // mana = 10 + Int
-                    jsonClassObject.put("maxMana", Integer.parseInt(context.getString(R.string.Paladin_Start_Int)) + 10);
+                    jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("mana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
+                    jsonClassObject.put("maxMana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -112,10 +116,12 @@ public class SaveDataLocally {
                     jsonClassObject.put("class", Character.ARCHER_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Archer_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Archer_Start_Str)); // base str
-                    jsonClassObject.put("int", context.getString(R.string.Archer_Start_Int)); // int
-                    jsonClassObject.put("intBase", context.getString(R.string.Archer_Start_Int)); // base int
-                    jsonClassObject.put("con", context.getString(R.string.Archer_Start_Con)); // con
-                    jsonClassObject.put("conBase", context.getString(R.string.Archer_Start_Con)); // base con
+                    int intelligence = Integer.parseInt(context.getString(R.string.Archer_Start_Int));
+                    jsonClassObject.put("int", intelligence); // int
+                    jsonClassObject.put("intBase", intelligence); // base int
+                    int constitution = Integer.parseInt(context.getString(R.string.Archer_Start_Con));
+                    jsonClassObject.put("con", constitution); // con
+                    jsonClassObject.put("conBase", constitution); // base con
                     jsonClassObject.put("spd", context.getString(R.string.Archer_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Archer_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
@@ -133,10 +139,10 @@ public class SaveDataLocally {
                     // equipped weapon
                     jsonClassObject.put("equipped", context.getString(R.string.Archer_Start_Weapon));
                     // bars
-                    jsonClassObject.put("health", Integer.parseInt(context.getString(R.string.Archer_Start_Con)) + 10); // health = 10 + Con
-                    jsonClassObject.put("maxHealth", Integer.parseInt(context.getString(R.string.Archer_Start_Con)) + 10);
-                    jsonClassObject.put("mana", Integer.parseInt(context.getString(R.string.Archer_Start_Int)) + 10); // mana = 10 + Int
-                    jsonClassObject.put("maxMana", Integer.parseInt(context.getString(R.string.Archer_Start_Int)) + 10);
+                    jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("mana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
+                    jsonClassObject.put("maxMana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -145,10 +151,12 @@ public class SaveDataLocally {
                     jsonClassObject.put("class", Character.WARRIOR_CLASS_TYPE);
                     jsonClassObject.put("str", context.getString(R.string.Warrior_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Warrior_Start_Str)); // base str
-                    jsonClassObject.put("int", context.getString(R.string.Warrior_Start_Int)); // int
-                    jsonClassObject.put("intBase", context.getString(R.string.Warrior_Start_Int)); // base int
-                    jsonClassObject.put("con", context.getString(R.string.Warrior_Start_Con)); // con
-                    jsonClassObject.put("conBase", context.getString(R.string.Warrior_Start_Con)); // base con
+                    int intelligence = Integer.parseInt(context.getString(R.string.Warrior_Start_Int));
+                    jsonClassObject.put("int", intelligence); // int
+                    jsonClassObject.put("intBase", intelligence); // base int
+                    int constitution = Integer.parseInt(context.getString(R.string.Warrior_Start_Con));
+                    jsonClassObject.put("con", constitution); // con
+                    jsonClassObject.put("conBase", constitution); // base con
                     jsonClassObject.put("spd", context.getString(R.string.Warrior_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Warrior_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
@@ -166,10 +174,10 @@ public class SaveDataLocally {
                     // equipped weapon
                     jsonClassObject.put("equipped", context.getString(R.string.Warrior_Start_Weapon));
                     // bars
-                    jsonClassObject.put("health", Integer.parseInt(context.getString(R.string.Warrior_Start_Con)) + 10); // health = 10 + Con
-                    jsonClassObject.put("maxHealth", Integer.parseInt(context.getString(R.string.Warrior_Start_Con)) + 10);
-                    jsonClassObject.put("mana", Integer.parseInt(context.getString(R.string.Warrior_Start_Int)) + 10); // mana = 10 + Int
-                    jsonClassObject.put("maxMana", Integer.parseInt(context.getString(R.string.Warrior_Start_Int)) + 10);
+                    jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
+                    jsonClassObject.put("mana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
+                    jsonClassObject.put("maxMana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

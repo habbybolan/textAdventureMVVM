@@ -40,7 +40,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         // todo: use attacker stats to alter ability effectiveness
         Random rand = new Random();
         if (ability.getMinDamage() != 0) {
-            setHealth(characterEntity.damageTarget(characterEntity.getRandomAmount(ability.getMinDamage(), ability.getMaxDamage())));
+            notifyChangeHealth(characterEntity.damageTarget(characterEntity.getRandomAmount(ability.getMinDamage(), ability.getMaxDamage())));
         }
         if (ability.getDamageAoe() != 0) characterEntity.doAoeStuff(); // todo: aoe
         // specials
@@ -100,7 +100,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         // direct heal/mana
         if (ability.getHealMin() != 0) {
             int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
-            int healthChanged = characterEntity.changeHealth(randHealthChange);
+            int healthChanged = characterEntity.increaseHealth(randHealthChange);
             notifyChangeHealth(healthChanged);
         }
         if (ability.getManaMin() != 0) {
@@ -199,7 +199,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         Random random = new Random();
         // get a random amount of damage given a range
         int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
-        setHealth(characterEntity.damageTarget(damage));
+        notifyChangeHealth(characterEntity.damageTarget(damage));
     }
     // apply the special attack from the attacker
     public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
@@ -212,7 +212,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         if (specialAttack.getDamageMin() != 0) {
             // get a random amount of damage given a range
             int damage = characterEntity.getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax());
-            setHealth(characterEntity.damageTarget(damage));
+            notifyChangeHealth(characterEntity.damageTarget(damage));
         }
         specialAttack.setActionUsed();
     }
@@ -237,7 +237,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         if (characterEntity.addNewDot(dot))
             dotObserver.add(dot);;
     }
-    // apply dots and observe all removed if duration reaches 0
+
+    // apply dots and observe all removed if duration reaches 0 and effects applied
     public void applyDots() {
         ArrayList<Dot> removedDots = characterEntity.applyDots();
         for (Dot dot : removedDots) {
@@ -387,7 +388,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
 
     // direct damage applied to player character
     public void damageCharacterEntity(int damageAmount) {
-        setHealth(characterEntity.damageTarget(damageAmount));
+        notifyChangeHealth(characterEntity.damageTarget(damageAmount));
     }
 
     private ObservableArrayList<TempBar> barObserver = new ObservableArrayList<>();
@@ -475,7 +476,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     // Health mana changes
 
     @Bindable
-    private ObservableField<Integer> healthObserve = new ObservableField<>();
+    ObservableField<Integer> healthObserve = new ObservableField<>();
     public ObservableField<Integer> getHealthObserve() {
         return healthObserve;
     }
@@ -495,6 +496,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     public void notifyChangeHealth(int changeHealth) {
         healthObserve.set(changeHealth);
         notifyPropertyChanged(BR.health);
+        notifyPropertyChanged(BR.maxHealth);
     }
     @Bindable
     public int getMaxHealth() {
@@ -523,6 +525,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     public void notifyChangeMana(int changeMana) {
         manaObserve.set(changeMana);
         notifyPropertyChanged(BR.mana);
+        notifyPropertyChanged(BR.maxMana);
     }
     @Bindable
     public int getMaxMana() {

@@ -12,22 +12,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityCharacterChoiceBinding;
-import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.view.MainGameActivity;
 import com.habbybolan.textadventure.viewmodel.CharacterChoiceViewModel;
 
 public class CharacterChoiceActivity extends AppCompatActivity {
     ActivityCharacterChoiceBinding dataBinding;
+    CharacterChoiceViewModel characterChoiceVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // remove action bar
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) getSupportActionBar().hide();
-        // todo: ability to read context from CharacterChoiceViewModel
-        //CharacterChoiceResourceProvider resourceProvider = new CharacterChoiceResourceProvider(getApplicationContext());
+
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_character_choice);
-        dataBinding.setCharacterChoiceViewModel(new CharacterChoiceViewModel(getApplicationContext()));
+        characterChoiceVM = new CharacterChoiceViewModel(getApplicationContext());
+        dataBinding.setCharacterChoiceViewModel(characterChoiceVM);
         setUpRecyclerViewer();
     }
 
@@ -41,10 +42,7 @@ public class CharacterChoiceActivity extends AppCompatActivity {
     }
 
     public void selectCharacter(View v) {
-        String className = dataBinding.getCharacterChoiceViewModel().getClassName();
-
-        SaveDataLocally save = new SaveDataLocally(getApplicationContext());
-        save.saveNewCharacterLocally(className);
+        characterChoiceVM.saveNewCharacter();
 
         Intent intent = new Intent(this, MainGameActivity.class);
         startActivity(intent);

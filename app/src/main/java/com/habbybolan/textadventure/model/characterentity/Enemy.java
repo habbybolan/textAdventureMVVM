@@ -60,8 +60,8 @@ public class Enemy extends CharacterEntity {
 
         // set enemy health
         // todo: how to decide health amount
-        health = 10;
-        maxHealth = 10;
+        health = 1;
+        maxHealth = 1;
 
         // choose a random weapon
         // todo: how to decide tier?
@@ -114,7 +114,7 @@ public class Enemy extends CharacterEntity {
     public void applyAttack(Attack attack, CharacterEntity attacker) {
         Random random = new Random();
         int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
-        changeHealth(damage);
+        damageTarget(damage);
     }
     // apply the special attack from the attacker
     public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
@@ -175,7 +175,7 @@ public class Enemy extends CharacterEntity {
         if (ability.getIsHealDot()) addNewDot(new Dot(Dot.HEALTH_DOT, false));
         if (ability.getIsManaDot()) addNewDot(new Dot(Dot.MANA_DOT, false));
         // direct heal/mana
-        if (ability.getHealMin() != 0) changeHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
+        if (ability.getHealMin() != 0) increaseHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
         if (ability.getManaMin() != 0) changeMana(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
         // stat increases
         if (ability.getStrIncrease() != 0) addNewStatIncrease(new TempStat(STR, ability.getDuration(), ability.getStrIncrease()));

@@ -28,6 +28,9 @@
 
     <dimen name="icon_info_size">75dp</dimen>
 
+    <dimen name="inventory_info_icon_size">20dp</dimen>
+    <dimen name="inventory_info_icon_margins">7sp</dimen>
+
     <dimen name="default_btn_height">42dp</dimen>
     <dimen name="default_btn_width">97dp</dimen>
 

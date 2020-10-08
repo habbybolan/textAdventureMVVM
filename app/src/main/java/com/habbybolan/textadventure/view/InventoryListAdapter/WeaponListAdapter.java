@@ -91,8 +91,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
             this.binding = binding;
             this.inventoryClickListener = inventoryClickListener;
 
-
-            binding.attackContainer.setOnClickListener(new View.OnClickListener() {
+            binding.txtNameAttack.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     adapter.selectedPosition = 0;
@@ -101,13 +100,27 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
                 }
             });
 
-            binding.sAttackContainer.setOnClickListener(new View.OnClickListener() {
+            binding.inventoryInfoAttack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    inventoryClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getAttack());
+                }
+            });
+
+            binding.txtNameSAttack.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     adapter.notifyItemChanged(adapter.selectedPosition);
                     adapter.selectedPosition = 1;
                     inventoryClickListener.onClicked(adapter.weapons.get(getAdapterPosition()).getSpecialAttack());
                     adapter.notifyItemChanged(getAdapterPosition());
+                }
+            });
+
+            binding.inventoryInfoSAttack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    inventoryClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getSpecialAttack());
                 }
             });
         }
