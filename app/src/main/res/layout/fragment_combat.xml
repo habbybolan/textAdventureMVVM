@@ -23,7 +23,8 @@
                 android:id="@+id/in_combat_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/combat_order"
@@ -68,7 +69,6 @@
                     android:layout_width="@dimen/combat_character_action_icon_size"
                     android:layout_height="@dimen/combat_character_action_icon_size"
                     android:layout_gravity="center"
-                    android:visibility="gone"
                     app:imageResource="@{characterVM.drawableResID}"/>
 
                 <LinearLayout
@@ -76,8 +76,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
+                    android:orientation="horizontal">
 
                     <Button
                         android:id="@+id/rv_category_weapons"

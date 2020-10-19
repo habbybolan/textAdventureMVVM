@@ -89,37 +89,43 @@ public class Item extends Action {
     public Item(String stringItem) {
         try {
             JSONObject JSONItem = new JSONObject(stringItem);
-            itemName = JSONItem.getString(ITEM_NAME);
-            itemID = JSONItem.getInt(ITEM_ID);
-            if (JSONItem.has(ABILITY))
-                ability = new Ability(JSONItem.getJSONObject(ABILITY).toString());
-            // stat
-            strChange = JSONItem.getInt(STR_CHANGE);
-            intChange = JSONItem.getInt(INT_CHANGE);
-            conChange = JSONItem.getInt(CON_CHANGE);
-            spdChange = JSONItem.getInt(SPD_CHANGE);
-            evasionChange = JSONItem.getInt(EVASION_CHANGE);
-            blockChange = JSONItem.getInt(BLOCK_CHANGE);
-            // bars
-            healthChange = JSONItem.getInt(HEALTH_CHANGE);
-            manaChange = JSONItem.getInt(MANA_CHANGE);
-            // gold
-            goldChange = JSONItem.getInt(GOLD_CHANGE);
-            // exp
-            expChange = JSONItem.getInt(EXP_CHANGE);
-            // misc
-            description = JSONItem.getString(DESCRIPTION);
-            isConsumable = JSONItem.getBoolean(IS_CONSUMABLE);
-            tier = JSONItem.getInt(TIER);
-            escapeTrap = JSONItem.getBoolean(ESCAPE_TRAP);
-            // dots
-            isFire = JSONItem.getBoolean(IS_FIRE);
-            isBleed = JSONItem.getBoolean(IS_BLEED);
-            isFrostBurn = JSONItem.getBoolean(IS_FROST_BURN);
-            isPoison = JSONItem.getBoolean(IS_POISON);
-            // duration
-            duration = JSONItem.getInt(DURATION);
-            pictureResource = JSONItem.getInt(IMAGE_RESOURCE);
+            if (!JSONItem.getBoolean(IS_GENERIC)) {
+                isGeneric = false;
+                itemName = JSONItem.getString(ITEM_NAME);
+                itemID = JSONItem.getInt(ITEM_ID);
+                if (JSONItem.has(ABILITY))
+                    ability = new Ability(JSONItem.getJSONObject(ABILITY).toString());
+                // stat
+                strChange = JSONItem.getInt(STR_CHANGE);
+                intChange = JSONItem.getInt(INT_CHANGE);
+                conChange = JSONItem.getInt(CON_CHANGE);
+                spdChange = JSONItem.getInt(SPD_CHANGE);
+                evasionChange = JSONItem.getInt(EVASION_CHANGE);
+                blockChange = JSONItem.getInt(BLOCK_CHANGE);
+                // bars
+                healthChange = JSONItem.getInt(HEALTH_CHANGE);
+                manaChange = JSONItem.getInt(MANA_CHANGE);
+                // gold
+                goldChange = JSONItem.getInt(GOLD_CHANGE);
+                // exp
+                expChange = JSONItem.getInt(EXP_CHANGE);
+                // misc
+                description = JSONItem.getString(DESCRIPTION);
+                isConsumable = JSONItem.getBoolean(IS_CONSUMABLE);
+                tier = JSONItem.getInt(TIER);
+                escapeTrap = JSONItem.getBoolean(ESCAPE_TRAP);
+                // dots
+                isFire = JSONItem.getBoolean(IS_FIRE);
+                isBleed = JSONItem.getBoolean(IS_BLEED);
+                isFrostBurn = JSONItem.getBoolean(IS_FROST_BURN);
+                isPoison = JSONItem.getBoolean(IS_POISON);
+                // duration
+                duration = JSONItem.getInt(DURATION);
+                pictureResource = JSONItem.getInt(IMAGE_RESOURCE);
+            } else {
+                isGeneric = true;
+                itemName = JSONItem.getString(ITEM_NAME);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -422,17 +428,6 @@ public class Item extends Action {
         return turnToDeliver;
     }
 
-    @Override
-    public JSONObject toJSON() {
-        JSONObject toJSON = new JSONObject();
-        try {
-            toJSON.put(INVENTORY_TYPE, TYPE_ITEM);
-            toJSON.put(ID, getID());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return toJSON;
-    }
 
 
     @Override
@@ -451,39 +446,45 @@ public class Item extends Action {
     @Override
     public JSONObject serializeToJSON() throws JSONException {
         JSONObject JSONInventory = new JSONObject();
-        JSONInventory.put(ITEM_NAME, itemName);
-        JSONInventory.put(ITEM_ID, itemID);
-        if (ability != null) {
-            JSONObject JSONAbility = ability.serializeToJSON();
-            JSONInventory.put(ABILITY, JSONAbility);
+        if (!isGeneric) {
+            JSONInventory.put(ITEM_NAME, itemName);
+            JSONInventory.put(ITEM_ID, itemID);
+            JSONInventory.put(IS_GENERIC, isGeneric);
+            if (ability != null) {
+                JSONObject JSONAbility = ability.serializeToJSON();
+                JSONInventory.put(ABILITY, JSONAbility);
+            }
+            // stats
+            JSONInventory.put(STR_CHANGE, strChange);
+            JSONInventory.put(INT_CHANGE, intChange);
+            JSONInventory.put(CON_CHANGE, conChange);
+            JSONInventory.put(SPD_CHANGE, spdChange);
+            JSONInventory.put(EVASION_CHANGE, evasionChange);
+            JSONInventory.put(BLOCK_CHANGE, blockChange);
+            // bars
+            JSONInventory.put(HEALTH_CHANGE, healthChange);
+            JSONInventory.put(MANA_CHANGE, manaChange);
+            // gold
+            JSONInventory.put(GOLD_CHANGE, goldChange);
+            // exp
+            JSONInventory.put(EXP_CHANGE, expChange);
+            // misc
+            JSONInventory.put(DESCRIPTION, description);
+            JSONInventory.put(IS_CONSUMABLE, isConsumable);
+            JSONInventory.put(TIER, tier);
+            JSONInventory.put(ESCAPE_TRAP, escapeTrap);
+            // dots
+            JSONInventory.put(IS_FIRE, isFire);
+            JSONInventory.put(IS_BLEED, isBleed);
+            JSONInventory.put(IS_POISON, isPoison);
+            JSONInventory.put(IS_FROST_BURN, isFrostBurn);
+            // duration
+            JSONInventory.put(DURATION, duration);
+            JSONInventory.put(IMAGE_RESOURCE, pictureResource);
+        } else {
+            JSONInventory.put(ITEM_NAME, itemName);
+            JSONInventory.put(IS_GENERIC, isGeneric);
         }
-        // stats
-        JSONInventory.put(STR_CHANGE, strChange);
-        JSONInventory.put(INT_CHANGE, intChange);
-        JSONInventory.put(CON_CHANGE, conChange);
-        JSONInventory.put(SPD_CHANGE, spdChange);
-        JSONInventory.put(EVASION_CHANGE, evasionChange);
-        JSONInventory.put(BLOCK_CHANGE, blockChange);
-        // bars
-        JSONInventory.put(HEALTH_CHANGE, healthChange);
-        JSONInventory.put(MANA_CHANGE, manaChange);
-        // gold
-        JSONInventory.put(GOLD_CHANGE, goldChange);
-        // exp
-        JSONInventory.put(EXP_CHANGE, expChange);
-        // misc
-        JSONInventory.put(DESCRIPTION, description);
-        JSONInventory.put(IS_CONSUMABLE, isConsumable);
-        JSONInventory.put(TIER, tier);
-        JSONInventory.put(ESCAPE_TRAP, escapeTrap);
-        // dots
-        JSONInventory.put(IS_FIRE, isFire);
-        JSONInventory.put(IS_BLEED, isBleed);
-        JSONInventory.put(IS_POISON, isPoison);
-        JSONInventory.put(IS_FROST_BURN, isFrostBurn);
-        // duration
-        JSONInventory.put(DURATION, duration);
-        JSONInventory.put(IMAGE_RESOURCE, pictureResource);
         return JSONInventory;
     }
 
@@ -532,5 +533,6 @@ public class Item extends Action {
     public static final String DURATION = "duration";
     // image resource
     public static final String IMAGE_RESOURCE = "image_resource";
+    public static final String IS_GENERIC = "is_generic";
 
 }

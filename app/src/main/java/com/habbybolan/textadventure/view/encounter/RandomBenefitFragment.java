@@ -175,10 +175,4 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
         benefitBinding.layoutBtnOptions.addView(viewPickUp);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        characterVM.saveCharacter();
-        benefitVM.saveEncounter(rv.getDialogueList());
-    }
 }

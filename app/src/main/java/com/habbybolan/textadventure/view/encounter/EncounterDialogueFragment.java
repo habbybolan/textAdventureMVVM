@@ -23,6 +23,11 @@ deals with the functionality and UI of the dialogue and state switching of a fra
  */
 class EncounterDialogueFragment extends Fragment {
 
+    /**
+     * deals with adding dialogue to the dialogue recycler viewer, calling the necessary method through a callback
+     * @param rv    The recycler Viewer model used to call the adding dialogue method
+     * @param vm    View model of the current encounter the dialogue is being added from
+     */
     void setUpDialogueRV(final DialogueRecyclerView rv, final EncounterViewModel vm) {
         // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
         Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
@@ -34,6 +39,13 @@ class EncounterDialogueFragment extends Fragment {
         vm.getNewDialogue().addOnPropertyChangedCallback(callback);
     }
 
+    /**
+     * Creates the buttons and goes through the dialogue lines if more exist. Beginning of encounters
+     * start with either one dialogue line, or multiple. For the multiple, a continue button is created to go through
+     * each line, calling firstDialogueState to deal with the actual text and moving on if no more lines left.
+     * @param vm            The view model that deals with the current encounter
+     * @param gridLayout    The button layout to add the continue button to
+     */
     void dialogueState(final EncounterViewModel vm, GridLayout gridLayout) {
         try {
             JSONObject dialogue = vm.getFirstStateJSON();
@@ -62,12 +74,19 @@ class EncounterDialogueFragment extends Fragment {
         }
     }
 
-    // helper for endState to set up the button to leave encounter
-    void setLeaveButton(final MainGameViewModel vm, GridLayout gridLayout) {
+    /**
+     * Helper for endState to set up the button to leave encounter. Pressing the leave button leaves the current encounter and signals to go to next
+     * through the MainGameViewModel
+     * @param gridLayout    The Grid layout to place the leave button inside.
+     */
+    void setLeaveButton(GridLayout gridLayout) {
+        final MainGameViewModel vm = MainGameViewModel.getInstance();
         final View viewLeave = getLayoutInflater().inflate(R.layout.default_button_details, null);
         DefaultButtonDetailsBinding defaultBindingLeave = DataBindingUtil.bind(viewLeave);
         String leaveText = getResources().getString(R.string.leave_encounter);
+        assert defaultBindingLeave != null;
         defaultBindingLeave.setTitle(leaveText);
+
         defaultBindingLeave.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +96,12 @@ class EncounterDialogueFragment extends Fragment {
         gridLayout.addView(viewLeave);
     }
 
+    /**
+     * A listener that calls checkState method of the current encounter to go to the proper View state when the state index value is changed
+     * @param stateIndex    The index of the View state that is next to display
+     * @param vm            View Model of the current encounter
+     * @param fragment      The fragment of the current encounter, associated with the vm
+     */
     void stateListener(ObservableField<Integer> stateIndex, final EncounterViewModel vm, final EncounterFragment fragment) {
         final Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
             @Override

@@ -2,7 +2,6 @@ package com.habbybolan.textadventure.viewmodel.encounters;
 
 import android.content.Context;
 import android.os.Handler;
-import android.view.View;
 
 import androidx.databinding.ObservableField;
 
@@ -18,8 +17,10 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
+import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 
 import org.json.JSONArray;
@@ -45,14 +46,10 @@ public class CombatViewModel extends EncounterViewModel {
     public static final int fourthState = 4;
     public static final int fifthState = 5;
     public static final int sixthState = 6;
-    public static final int seventhState = 7;
 
 
+    // inventory reward able to retrieve at the end of the encounter
     private Inventory inventoryToRetrieve = null;
-
-    private int weaponListVisibility = View.VISIBLE;
-    private int abilityListVisibility = View.GONE;
-    private int itemListVisibility = View.GONE;
 
     // if not empty, then holds the current combat ordering - order of who to attack next based
     //      on the stat speed for player character and enemies
@@ -107,9 +104,12 @@ public class CombatViewModel extends EncounterViewModel {
         JSONObject fightObject = encounter.getJSONObject("fight");
         JSONArray typeArray = fightObject.getJSONArray("type");
         JSONArray difficultyArray = fightObject.getJSONArray("difficulty");
+        // ID associated with the enemy
+        int ID = 2;
         for (int i = 0; i < typeArray.length(); i++) {
-            Enemy enemy = new Enemy(characterVM.getCharacter().getNumStatPoints(), typeArray.getString(i), difficultyArray.getInt(i), context);
+            Enemy enemy = new Enemy(characterVM.getCharacter().getNumStatPoints(), typeArray.getString(i), difficultyArray.getInt(i), ID, context);
             enemies.add(new EnemyViewModel(enemy));
+            ID++;
         }
         createCombatOrderLists();
     }
@@ -155,17 +155,158 @@ public class CombatViewModel extends EncounterViewModel {
 
     // go directly to the end state
     public void gotoEndState() {
-        stateIndex.set(seventhState);
+        stateIndex.set(sixthState);
     }
 
+    /**
+     * saves the encounter into a JSON String. Saved the encounter type, encounter JSON, state, dialogue, inventory reward, and enemies
+     * @param dialogueList  All dialogue objects currently displayed in the dialogue recyclerViewer
+     */
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        // todo:
+        SaveDataLocally save = new SaveDataLocally(context);
+        JSONObject encounterData = new JSONObject();
+        try {
+            encounterData.put(ENCOUNTER_TYPE, TYPE_COMBAT);
+            encounterData.put(ENCOUNTER, encounter);
+            encounterData.put(STATE, stateIndex.get());
+            if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
+            // convert the inventory to JSON and store if one exists
+            if (inventoryToRetrieve != null) encounterData.put(INVENTORY, inventoryToRetrieve.serializeToJSON());
+            // store all DialogueTypes converted to JSON
+            JSONArray JSONDialogue = new JSONArray();
+            for (DialogueType dialogueType : dialogueList) {
+                JSONObject dialogueObject = dialogueType.toJSON();
+                JSONDialogue.put(dialogueObject);
+            }
+            encounterData.put(DIALOGUE_ADDED, JSONDialogue);
+            JSONArray JSONEnemies = new JSONArray();
+            for (EnemyViewModel enemyVM : enemies) {
+                JSONEnemies.put(enemyVM.getEnemy().serializeToJSON());
+            }
+            encounterData.put(ENEMIES, JSONEnemies);
+            JSONArray combatOrderArray = saveCombatOrdering();
+            encounterData.put(COMBAT_ORDER, combatOrderArray);
+
+            save.saveEncounter(encounterData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * creates an ArrayList of 3 ArrayLists that hold the data for the combat ordering, related to combatOrderCurr,
+     * combatOrderNext, combatOrderLast. Each enemy is set with an ID 2+ incrementally, and the player character
+     * is represented with ID 1.
+     * @return  the ArrayList holding the converted JSON data of the combat ordering lists
+     */
+    private JSONArray saveCombatOrdering() {
+        JSONArray jsonArray = new JSONArray();
+        storeEntityFromCombatOrdering(jsonArray, combatOrderCurr);
+        storeEntityFromCombatOrdering(jsonArray, combatOrderNext);
+        storeEntityFromCombatOrdering(jsonArray, combatOrderLast);
+        return jsonArray;
+    }
+
+    /**
+     * Helper for saveCombatOrdering that Creates a JSONArray of an individual combatOrderingList and stores into jsonArray
+     * @param jsonArray     The array to store the newly created JSONArray for the combatOrderList
+     */
+    private void storeEntityFromCombatOrdering(JSONArray jsonArray, ArrayList<CharacterEntity> combatOrderList) {
+        JSONArray array = new JSONArray();
+        for (CharacterEntity entity : combatOrderList) {
+            // store the ID of the CharacterEntity
+            array.put(entity.getID());
+        }
+        jsonArray.put(array);
+    }
+
+    /**
+     * set up the saved dialogue, inventory reward if one exists, and the combat ordering
+     * @throws JSONException    problem reading saved JSON
+     */
     @Override
-    public void setSavedData() throws JSONException, ExecutionException, InterruptedException {
-        // todo:
+    public void setSavedData() throws JSONException {
+        if (getIsSaved()) {
+            setDialogueList(mainGameVM);
+            setSavedInventory();
+            retrieveEnemies();
+            retrieveCombatOrdering();
+        }
+    }
+
+    /**
+     * Called if there is a saved game. Recovers the saved Enemy objects inside JSON and places them inside enemies ArrayList.
+     * Must be called before retrieveCombatOrdering as that method uses the retrieved enemies to order them into the combat order arrays
+     */
+    public void retrieveEnemies() throws JSONException {
+        JSONArray enemiesArray = mainGameVM.getSavedEncounter().getJSONArray(ENEMIES);
+        for (int i = 0; i < enemiesArray.length(); i++) {
+            Enemy enemy = new Enemy(enemiesArray.getString(i));
+            enemies.add(new EnemyViewModel(enemy));
+        }
+    }
+
+    /**
+     * Called if there is a saved game. Retrieves the combat ordering from the JSON file, filling in the arrays of CharacterEntities
+     * combatOrderCurr, combatOrderNext and combatOrderLast that deals with the combat Ordering.
+     * Only call this after retrieveEnemies.
+     */
+    public void retrieveCombatOrdering() throws JSONException {
+        if (enemies.isEmpty()) throw new IllegalStateException("Call retrieveEnemies() before this");
+        JSONArray combatOrderArrays = mainGameVM.getSavedEncounter().getJSONArray(COMBAT_ORDER);
+        JSONArray combatArrayCurr = combatOrderArrays.getJSONArray(0);
+        for (int i = 0; i < combatArrayCurr.length(); i++) {
+            addToCombatArray(combatOrderCurr, combatArrayCurr.getInt(i));
+        }
+        JSONArray combatArrayNext = combatOrderArrays.getJSONArray(1);
+        for (int i = 0; i < combatArrayNext.length(); i++) {
+            addToCombatArray(combatOrderNext, combatArrayNext.getInt(i));
+        }
+        JSONArray combatArrayLast = combatOrderArrays.getJSONArray(2);
+        for (int i = 0; i < combatArrayLast.length(); i++) {
+            addToCombatArray(combatOrderLast, combatArrayLast.getInt(i));
+        }
+    }
+
+    /**
+     * Find the correct CharacterEntity given the ID to add to the end of the combatList.
+     * @param combatList    One of the three combatOrderLists to put entity in. combatOrderCurr, combatOrderNext or combatOrderLast
+     * @param ID            The ID associated with the CharacterEntity to put into the
+     */
+    private void addToCombatArray(ArrayList<CharacterEntity> combatList, int ID) {
+        if (ID == 1)
+            // if the ID is 1, then it must be player Character
+            combatList.add(characterVM.getCharacter());
+        else {
+            // otherwise, find the enemy from the enemies arrayList with the respective ID
+            for (EnemyViewModel enemyVM : enemies) {
+                if (enemyVM.getEnemy().getID() == ID)
+                    combatList.add(enemyVM.getEnemy());
+            }
+        }
+    }
+
+
+    // get the saved Inventory Object from the json
+    private void setSavedInventory() throws JSONException {
+        // check if an inventory value has been stored
+        if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
+            JSONObject inventory = mainGameVM.getSavedEncounter().getJSONObject(INVENTORY);
+
+            if (inventory.getString("type").equals("ability")) {
+                // saved Inventory object is an Ability
+                inventoryToRetrieve = new Ability(inventory.toString());
+
+            } else if (inventory.getString("type").equals("item")) {
+                // saved Inventory object is an Item
+                inventoryToRetrieve = new Item(inventory.toString());
+
+            } else {
+                // otherwise, saved Inventory object is a Weapon
+                inventoryToRetrieve = new Weapon(inventory.toString());
+            }
+        }
     }
 
     // helper for applying the character action to a CharacterEntity that was chosen
@@ -453,4 +594,26 @@ public class CombatViewModel extends EncounterViewModel {
         }
         throw new IllegalArgumentException();
     }
+
+
+    // rewards
+
+    // exp reward
+    public void getExpReward() {
+        int expReward = combatModel.getExpReward(encounter);
+        characterVM.addExp(expReward);
+    }
+    // gold reward
+    public void getGoldReward() {
+        int goldReward = combatModel.getGoldReward(encounter);
+        characterVM.goldChange(goldReward);
+    }
+    // Weapon/Ability/Item reward
+    public Inventory getInventoryReward(Context context) {
+        Inventory inventoryRewards = combatModel.getInventoryReward(encounter, context);
+        // todo: apply the Inventory rewards to character
+        return inventoryRewards;
+    }
+
+
 }

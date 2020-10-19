@@ -20,8 +20,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-/*
-character object that the user creates and plays
+/**
+ * Character object for the user's character they play. Only one created at any given time.
  */
 public class Character extends CharacterEntity {
     public final static int HEALTH_CON_MULTIPLIER = 10;
@@ -29,15 +29,10 @@ public class Character extends CharacterEntity {
     public final static int BASE_HEALTH = 20;
     public final static int BASE_MANA = 20;
 
-    final static int evasionMultiplier = 1;
-    final static int blockMultiplier = 1;
-
     public static final String PALADIN_CLASS_TYPE = "Paladin";
     public static final String WARRIOR_CLASS_TYPE = "Warrior";
     public static final String WIZARD_CLASS_TYPE = "Wizard";
     public static final String ARCHER_CLASS_TYPE = "Archer";
-
-
 
     // all MAX values for a character
     public static final int MAX_ABILITIES = 4;
@@ -48,20 +43,17 @@ public class Character extends CharacterEntity {
     // holds all the buff and debuff abilities applied to the player character
     private ArrayList<Ability> appliedAbilities = new ArrayList<>();
 
-    // todo: turn stat variables from String to int
     // Character info
     private String classType;
-    private int expIncrease;
+    private int exp;
     private int gold;
     private int goldIncrease;
 
-    private Weapon equippedWeapon;
 
-
-    public Character(String characterData, DatabaseAdapter mDbHelper, Context context) {
+    public Character(String characterData, Context context) {
         JSONObject characterObject;
+        ID = 1;
         isCharacter = true;
-        classType = "";
         try {
             characterObject = new JSONObject(characterData);
             classType = characterObject.getString("class");
@@ -91,37 +83,41 @@ public class Character extends CharacterEntity {
             maxHealth = characterObject.getInt("maxHealth");
             mana = characterObject.getInt("mana");
             maxMana = characterObject.getInt("maxMana");
+            DatabaseAdapter db = new DatabaseAdapter(context);
             // abilities
             numAbilities = 0;
             JSONArray abilitiesArray = characterObject.getJSONArray("abilities");
-            for (int i= 0; i < MAX_ABILITIES; i++) {
-                int indAbility = Integer.parseInt(abilitiesArray.getString(i));
-                if (indAbility != 0) {
-                    abilities.add(new Ability(indAbility, mDbHelper));
-                    numAbilities++;
-                }
+            for (int i= 0; i < abilitiesArray.length(); i++) {
+                String abilityString = abilitiesArray.getString(i);
+                if (isInventoryID(abilityString))
+                    abilities.add(new Ability(abilitiesArray.getInt(i), db));
+                 else
+                    abilities.add(new Ability(abilityString));
+                 numAbilities++;
+
             }
             // weapons
             JSONArray weaponsArray = characterObject.getJSONArray("weapons");
             numWeapons = 0;
-            for (int i = 0; i < MAX_WEAPONS; i++) {
-                int indWeapon = Integer.parseInt(weaponsArray.getString(i));
-                if (indWeapon != 0) {
-                    weapons.add(new Weapon(indWeapon, mDbHelper));
-                    numWeapons++;
-                }
+            for (int i = 0; i < weaponsArray.length(); i++) {
+                String weaponString = weaponsArray.getString(i);
+                if (isInventoryID(weaponString))
+                    weapons.add(new Weapon(weaponsArray.getInt(i), db));
+                else
+                    weapons.add(new Weapon(weaponString));
+                numWeapons++;
+
             }
-            // todo: allow change of equipped weapon
-            //equippedWeapon = weapons.get(0);
             // items
             numItems = 0;
             JSONArray itemsArray = characterObject.getJSONArray("items");
-            for (int i = 0; i < MAX_ITEMS; i++) {
-                int indItem = Integer.parseInt(itemsArray.getString(i));
-                if (indItem != 0) {
-                    items.add(new Item(itemsArray.getInt(i), mDbHelper));
-                    numItems++;
-                }
+            for (int i = 0; i < itemsArray.length(); i++) {
+                String itemString = itemsArray.getString(i);
+                if (isInventoryID(itemString))
+                    items.add(new Item(itemsArray.getInt(i), db));
+                else
+                    items.add(new Item(itemsArray.getJSONObject(i).toString()));
+                numItems++;
             }
 
             // DOTS
@@ -206,6 +202,27 @@ public class Character extends CharacterEntity {
         }
     }
 
+    /**
+     * returns true if the string is an ID for an inventory object
+     * @param s     The String of the inventory object stored
+     * @return      true if s is an inventory ID
+     */
+    private boolean isInventoryID(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (!isInteger(s.charAt(i))) return false;
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param c     single character from the ID String
+     * @return      true if the character is an integer
+     */
+    private boolean isInteger(char c) {
+        return c=='0'|| c=='1'||c=='2'||c=='3'||c=='4'||c=='5'||c=='6'||c=='7'||c=='8'||c=='9';
+    }
+
     // decrement the cooldown on all abilities w/ cooldown > 0
     public void decrCooldowns() {
         // decrement special ability cooldown if >0 of all weapons
@@ -224,22 +241,154 @@ public class Character extends CharacterEntity {
         }
     }
 
-    // ** Inventory **
+    @Override
+    public JSONObject serializeToJSON() throws JSONException {
+        // JSON object holding all character information
+        JSONObject JSONCharacter = new JSONObject();
 
-        // Weapons
-    // remove a weapon
+        JSONCharacter.put("class", classType);
+
+        JSONCharacter.put("str", strength); // str
+        JSONCharacter.put("strBase", strBase); // base str
+        JSONCharacter.put("strIncrease", strIncrease);
+        JSONCharacter.put("strDecrease", strDecrease);
+        JSONCharacter.put("int", intelligence); // int
+        JSONCharacter.put("intBase", intBase); // base int
+        JSONCharacter.put("intIncrease", intIncrease);
+        JSONCharacter.put("intDecrease", intDecrease);
+        JSONCharacter.put("con", constitution); // con
+        JSONCharacter.put("conBase", conBase); // base con
+        JSONCharacter.put("conIncrease", conIncrease);
+        JSONCharacter.put("conDecrease", conDecrease);
+        JSONCharacter.put("spd", speed); // spd
+        JSONCharacter.put("spdBase", spdBase); // base spd
+        JSONCharacter.put("spdIncrease", spdIncrease);
+        JSONCharacter.put("spdDecrease", spdDecrease);
+        // abilities
+        JSONArray abilitiesArray = new JSONArray();
+        for (int i = 0; i < abilities.size(); i++) {
+            abilitiesArray.put(abilities.get(i).serializeToJSON());
+        }
+        JSONCharacter.put("abilities", abilitiesArray);
+        // weapons
+        JSONArray weaponsArray = new JSONArray();
+        for (int i = 0; i < weapons.size(); i++) {
+            weaponsArray.put(weapons.get(i).serializeToJSON());
+        }
+        JSONCharacter.put("weapons", weaponsArray);
+        // bars
+        JSONCharacter.put("health", health);
+        JSONCharacter.put("maxHealth", maxHealth);
+        JSONCharacter.put("mana", mana);
+        JSONCharacter.put("maxMana", maxMana);
+        // misc
+        JSONCharacter.put("level", level);
+        JSONCharacter.put("gold", gold);
+        JSONCharacter.put("exp", exp);
+        // Items
+        JSONArray itemsArray = new JSONArray();
+        for (int i = 0; i < items.size(); i++) {
+            itemsArray.put(items.get(i).serializeToJSON());
+        }
+        JSONCharacter.put("items", itemsArray);
+        // specials
+        JSONCharacter.put(Effect.STUN, isStun);
+        JSONCharacter.put(Effect.CONFUSE, isConfuse);
+        JSONCharacter.put(Effect.INVINCIBILITY, isInvincible);
+        JSONCharacter.put(Effect.SILENCE, isSilence);
+        JSONCharacter.put(Effect.INVISIBILITY, isInvisible);
+        JSONArray specialArray = new JSONArray();
+        for (SpecialEffect appliedSpecial: specialList) {
+            JSONArray special = new JSONArray();
+            special.put(appliedSpecial.getType());
+            special.put(appliedSpecial.getDuration());
+            specialArray.put(special);
+        }
+        JSONCharacter.put("specialList", specialArray);
+        // temp health
+        JSONCharacter.put("tempExtraHealth", tempExtraHealth);
+        JSONArray tempHealthArray = new JSONArray(); // <key, value>
+        for (int i = 0; i < tempHealthList.size(); i++) {
+            JSONArray tempHealth = new JSONArray(); // <duration, amount>
+            tempHealth.put(tempHealthList.get(i).getDuration());
+            tempHealth.put(tempHealthList.get(i).getAmount());
+            tempHealthArray.put(tempHealth);
+        }
+        JSONCharacter.put("tempHealthList", tempHealthArray);
+        // temp mana
+        JSONCharacter.put("tempExtraMana", tempExtraMana);
+        JSONArray tempManaArray = new JSONArray(); // <key, value>
+        for (int i = 0; i < tempManaList.size(); i++) {
+            JSONArray tempMana = new JSONArray(); // <duration, amount>
+            tempMana.put(tempManaList.get(i).getDuration());
+            tempMana.put(tempManaList.get(i).getAmount());
+            tempManaArray.put(tempMana);
+        }
+        JSONCharacter.put("tempManaList", tempManaArray);
+        // stat increase
+        JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
+        for (int i = 0; i < statIncreaseList.size(); i++) {
+            JSONArray statIncrease = new JSONArray();
+            statIncrease.put(statIncreaseList.get(i).getType());
+            statIncrease.put(statIncreaseList.get(i).getDuration());
+            statIncrease.put(statIncreaseList.get(i).getAmount());
+            statIncreaseArray.put(statIncrease);
+        }
+        JSONCharacter.put("statIncreaseList", statIncreaseArray);
+        // stat decrease
+        JSONArray statDecreaseArray = new JSONArray(); // <stat, duration, amount>
+        for (int i = 0; i < statDecreaseList.size(); i++) {
+            JSONArray statDecrease = new JSONArray();
+            statDecrease.put(statDecreaseList.get(i).getType());
+            statDecrease.put(statDecreaseList.get(i).getDuration());
+            statDecrease.put(statDecreaseList.get(i).getAmount());
+            statDecreaseArray.put(statDecrease);
+        }
+        JSONCharacter.put("statDecreaseList", statDecreaseArray);
+        // DOT
+        JSONCharacter.put(Effect.BLEED, isBleed);
+        JSONCharacter.put(Effect.POISON, isPoison);
+        JSONCharacter.put(Effect.FIRE, isFire);
+        JSONCharacter.put(Effect.FROSTBURN, isFrostBurn);
+        JSONCharacter.put(Effect.HEALTH_DOT, isHealDot);
+        JSONCharacter.put(Effect.MANA_DOT, isManaDot);
+        JSONArray dotArray = new JSONArray(); // <key, value>
+        for (Dot appliedDot: dotList) {
+            JSONArray dot = new JSONArray();
+            dot.put(appliedDot.getType());
+            dot.put(appliedDot.getDuration());
+            dotArray.put(dot);
+        }
+        JSONCharacter.put("dotList", dotArray);
+
+        return JSONCharacter;
+    }
+
+    // Weapons
+
+    /**
+     * remove a specific weapon from weapons array
+     * @param weapon    the weapon object
+     */
     public void removeWeapon(Weapon weapon) {
         if (!weapons.remove(weapon)) throw new IllegalArgumentException();
         else numWeapons--;
     }
-    // add new weapon - check if weapon list is full before calling this
+    /**
+     * add a new weapon to weapons array
+     * @param weapon    the weapon object
+     */
     public void addWeapon (Weapon weapon) {
         if (weapons.size() != MAX_WEAPONS) {
             numWeapons++;
             weapons.add(weapon);
         }
     }
-    // remove a weapon at index
+    /**
+     * remove a weapon from a specific index in weapons
+     * @param index     the index of weapons array to remove
+     * @return          the weapon removed from weapons
+     */
     public Weapon removeWeaponAtIndex(int index) {
         numWeapons--;
         Weapon weapon = weapons.get(index);
@@ -247,20 +396,31 @@ public class Character extends CharacterEntity {
         return weapon;
     }
 
-        // Abilities
-    // remove an ability, returning the index removed
+    // Abilities
+
+    /**
+     * remove an ability from abilities array
+     * @param ability   the Ability object
+     */
     public void removeAbility(Ability ability) {
         if (!abilities.remove(ability)) throw new IllegalArgumentException();
         else numAbilities--;
     }
-    // remove an ability at index
+    /**
+     * remove an ability at index from abilities array
+     * @param index     the index in abilities array
+     * @return          the Ability object removed from abilities array
+     */
     public Ability removeAbilityAtIndex(int index) {
         numAbilities--;
         Ability ability = abilities.get(index);
         abilities.remove(index);
         return ability;
     }
-    // add new Ability - check if ability list is full before calling this
+    /**
+     *  add new ability to abilities array
+     * @param ability   the Ability object
+     */
     public void addAbility(Ability ability) {
         if (abilities.size() != MAX_ABILITIES) {
             numAbilities++;
@@ -268,14 +428,21 @@ public class Character extends CharacterEntity {
         }
     }
 
-        // Items
+    // Items
 
-    // remove an item - if not a consumable, remove the effects it had
+    /**
+     * remove item from items array and removing any of its effects
+     * @param item      the Item object
+     */
     public void removeItem(Item item) {
         if (!items.remove(item)) throw new IllegalArgumentException();
         else numItems--;
     }
-    // finds index of an item
+    /**
+     * get the index of an item from items array
+     * @param item      the item object
+     * @return          the index of the item inside items
+     */
     public int getItemIndex(Item item) {
         for (int i = 0; i < items.size(); i++) {
             if (item.equals(items.get(i))) {
@@ -284,44 +451,33 @@ public class Character extends CharacterEntity {
         }
         throw new IllegalArgumentException();
     }
-    // find item at index
+    /**
+     * get the item at specific index of items array
+     * @param index     the index in items array
+     * @return          the item at index 'index' from items
+     */
     public Item getItemAtIndex(int index) {
         return items.get(index);
     }
-    // remove an item at index and return it
+    /**
+     * remove item at index from items array
+     * @param index     the index of items array
+     * @return          the item removed from index 'index'
+     */
     public Item removeItemAtIndex(int index) {
         numItems--;
         Item item = items.get(index);
         items.remove(index);
         return item;
     }
-    // add item, returning index of newest
+    /**
+     * add an item to items and add any indefinite effects that it causes
+     * @param item      Item object
+     */
     public void addItem(Item item) {
         if (items.size() != MAX_ITEMS) {
             items.add(item);
             numItems++;
-        }
-    }
-
-    // ** bars **
-
-    // get the new health after removing item
-    public int getHealthAfterItemRemoval(int healthChange) {
-        setMaxHealth(getMaxHealth() - healthChange);
-        if (getHealth() > getMaxHealth()) {
-            return maxHealth;
-        } else {
-            return health;
-        }
-    }
-
-    // get the new mana after removing item
-    public int getManaAfterItemRemoval(int manaChange) {
-        setMaxMana(getMaxHealth() - manaChange);
-        if (getMana() > getMaxMana()) {
-            return maxMana;
-        } else {
-            return mana;
         }
     }
 
@@ -333,23 +489,39 @@ public class Character extends CharacterEntity {
     public void setGold(int gold) {
         this.gold = gold;
     }
-    public void setExpIncrease(int expIncrease) {
-        this.expIncrease = expIncrease;
+
+    /**
+     * change the gold by amount and return the changed amount
+     * @param amount    the amount for gold change
+     * @return          the changed amount of gold
+     */
+    public int goldChange(int amount) {
+        int goldTemp = gold;
+        gold += amount;
+        if (gold < 0) gold = 0;
+        return gold - goldTemp;
+    }
+    public void setExp(int expIncrease) {
+        this.exp = expIncrease;
     }
 
-
-    // getter methods
-    public Weapon getEquippedWeapon() {
-        return equippedWeapon;
+    /**
+     * add xp to player character
+     * @param amount    amount to add to character xp
+     */
+    public void addExp(int amount) {
+        exp += amount;
+        // todo: level up from xp
     }
+
     public String getClassType() {
         return classType;
     }
     public int getLevel() {
         return level;
     }
-    public int getExpIncrease() {
-        return expIncrease;
+    public int getExp() {
+        return exp;
     }
     public int getGold() {
         return gold;

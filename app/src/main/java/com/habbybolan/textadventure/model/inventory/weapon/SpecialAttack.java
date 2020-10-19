@@ -188,18 +188,6 @@ public class SpecialAttack extends Action {
     }
 
     @Override
-    public JSONObject toJSON() {
-        JSONObject toJSON = new JSONObject();
-        try {
-            toJSON.put(INVENTORY_TYPE, TYPE_S_ATTACK);
-            toJSON.put(ID, getID());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return toJSON;
-    }
-
-    @Override
     public JSONObject serializeToJSON() throws JSONException {
         JSONObject JSONInventory = new JSONObject();
         JSONInventory.put(S_ATTACK_NAME, specialAttackName);

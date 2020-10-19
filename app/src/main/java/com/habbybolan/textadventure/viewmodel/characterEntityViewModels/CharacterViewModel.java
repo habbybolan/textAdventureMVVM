@@ -16,7 +16,6 @@ import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import java.util.ArrayList;
 
@@ -53,8 +52,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         this.context = context;
         SaveDataLocally save = new SaveDataLocally(context);
         String characterData = save.readCharacterData();
-        DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
-        character = new Character(characterData, mDbHelper, context);
+        character = new Character(characterData, context);
         this.characterEntity = character;
     }
 
@@ -74,23 +72,6 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         SaveDataLocally save = new SaveDataLocally(context);
         save.saveCharacterLocally(character);
     }
-
-    // ** Inventory **
-
-    /*
-    // Inventory object to be added to inventory if user decides to
-    private Inventory inventoryToRetrieve;
-    private Inventory getInventoryToRetrieve() {
-        return inventoryToRetrieve;
-    }
-    public void setInventoryToRetrieve(Inventory inventory) {
-        this.inventoryToRetrieve = inventory;
-    }
-    // set field to null to notify it's already retrieved
-    public void removeInventoryToRetrieve() {
-        inventoryToRetrieve = null;
-    }
-    */
 
         // Abilities
 
@@ -447,6 +428,10 @@ public class CharacterViewModel extends CharacterEntityViewModel {
 
 
         // misc
+    private ObservableField<Integer> goldObserve = new ObservableField<>();
+    public ObservableField<Integer> getGoldObserve() {
+        return goldObserve;
+    }
     @Bindable
     public String getGold() {
         return String.valueOf(character.getGold());
@@ -455,6 +440,31 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         character.setGold(gold);
         notifyPropertyChanged(BR.gold);
     }
+    /**
+     * change the gold by amount and update it with observable fields and databinding
+     * @param amount    amount to change gold by
+     */
+    public void goldChange(int amount) {
+        int goldChange  = character.goldChange(amount);
+        notifyPropertyChanged(BR.gold);
+        goldObserve.set(new Integer(goldChange));
+    }
+
+    private ObservableField<Integer> expObserve = new ObservableField<>();
+    public ObservableField<Integer> getExpObserve() {
+        return expObserve;
+    }
+    @Bindable
+    public String getExp() {
+        return String.valueOf(character.getExp());
+    }
+    public void addExp(int amount) {
+        character.addExp(amount);
+        notifyPropertyChanged(BR.exp);
+        expObserve.set(new Integer(amount));
+    }
+
+
     @Bindable
     public int getDrawableResID() {
         return character.getDrawableResID();

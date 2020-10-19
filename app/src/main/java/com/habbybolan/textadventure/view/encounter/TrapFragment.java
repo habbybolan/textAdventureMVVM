@@ -132,7 +132,7 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
     @Override
     public void endState() {
         characterVM.setStateInventoryObserver(true);
-        setLeaveButton(mainGameVM, trapBinder.layoutBtnOptions);
+        setLeaveButton(trapBinder.layoutBtnOptions);
     }
 
     @Override

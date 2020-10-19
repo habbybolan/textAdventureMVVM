@@ -10,6 +10,8 @@ import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.CombatActionDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.DialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.EffectDialogueBinding;
+import com.habbybolan.textadventure.view.dialogueAdapter.binding.ExpDialogueBinding;
+import com.habbybolan.textadventure.view.dialogueAdapter.binding.GoldDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.HealthDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.InventoryDialogueBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.binding.ManaDialogueBinding;
@@ -30,6 +32,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private StatDialogueBinding statDialogueBinding;
     private TempStatDialogueBinding tempStatDialogueBinding;
     private CombatActionDialogueBinding combatActionDialogueBinding;
+    private GoldDialogueBinding goldDialogueBinding;
+    private ExpDialogueBinding expDialogueBinding;
 
     public DialogueAdapter(ArrayList<DialogueType> dialogueList) {
         this.dialogueList = dialogueList;
@@ -41,6 +45,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         statDialogueBinding = new StatDialogueBinding(this);
         tempStatDialogueBinding = new TempStatDialogueBinding(this);
         combatActionDialogueBinding = new CombatActionDialogueBinding(this);
+        goldDialogueBinding = new GoldDialogueBinding(this);
+        expDialogueBinding = new ExpDialogueBinding(this);
         notifyDataSetChanged();
     }
 
@@ -65,6 +71,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         else if (viewType == R.layout.dialogue_stat_details) return statDialogueBinding;
         else if (viewType == R.layout.dialogue_temp_stat_details) return tempStatDialogueBinding;
         else if (viewType == R.layout.dialogue_combat_action_details) return combatActionDialogueBinding;
+        else if (viewType == R.layout.dialogue_gold_details) return goldDialogueBinding;
+        else if (viewType == R.layout.dialogue_exp_details) return expDialogueBinding;
         else return inventoryDialogueBinding;
     }
 

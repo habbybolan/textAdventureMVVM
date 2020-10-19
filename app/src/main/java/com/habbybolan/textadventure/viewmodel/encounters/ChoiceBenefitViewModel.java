@@ -66,7 +66,7 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
             encounterData.put(STATE, stateIndex.get());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // convert the inventory to JSON and store if one exists
-            if (inventoryToRetrieve != null) encounterData.put(INVENTORY, inventoryToRetrieve.toJSON());
+            if (inventoryToRetrieve != null) encounterData.put(INVENTORY, inventoryToRetrieve.serializeToJSON());
             // store all DialogueTypes converted to JSON
             JSONArray JSONDialogue = new JSONArray();
             for (DialogueType dialogueType : dialogueList) {

@@ -9,6 +9,9 @@ import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -80,6 +83,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     protected int numItems;
 
     protected int level;
+    int ID;
 
     protected boolean isAlive = true;
     protected int drawableResID;
@@ -949,6 +953,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return dotsRemoved;
     }
 
+    abstract JSONObject serializeToJSON() throws JSONException;
+
     // helper for applyDots
         // find the proper method to call for using a specific dot
     private void findDotToApply(String dot) {
@@ -1000,6 +1006,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
 
     // GETTERS AND SETTERS *****
+
+    public int getID() {
+        return ID;
+    }
 
     // ** Dot Effects **
     public boolean getIsFire() {

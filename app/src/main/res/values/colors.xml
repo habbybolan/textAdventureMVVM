@@ -11,6 +11,8 @@
     <color name="colorHealthDialogue">#B30707</color>
     <color name="colorManaDialogue">#3A89CD</color>
     <color name="colorInventoryDialogue">#2E7517</color>
+    <color name="colorGoldDialogue">#AAA50D</color>
+    <color name="colorExpDialogue">#09275E</color>
 
     <color name="colorAttackerDialogue">#CD0E0E</color>
     <color name="colorTargetDialogue">#FFFFFF</color>

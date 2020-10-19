@@ -580,17 +580,6 @@ public class Ability extends Action {
         return tier;
     }
 
-    @Override
-    public JSONObject toJSON() {
-        JSONObject toJSON = new JSONObject();
-        try {
-            toJSON.put(INVENTORY_TYPE, TYPE_ABILITY);
-            toJSON.put(ID, getID());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return toJSON;
-    }
 
     @Override
     public JSONObject serializeToJSON() throws JSONException {

@@ -5,9 +5,6 @@ import android.os.AsyncTask;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.characterentity.Character;
-import com.habbybolan.textadventure.model.effects.Dot;
-import com.habbybolan.textadventure.model.effects.Effect;
-import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.viewmodel.CharacterChoiceViewModel;
 
 import org.json.JSONArray;
@@ -56,18 +53,10 @@ public class SaveDataLocally {
                     jsonClassObject.put("spdBase", context.getString(R.string.Wizard_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
                     abilitiesArray.put(context.getString(R.string.Wizard_Start_Ability)); // starts with one ability
-                    for (int i = 0; i < Character.MAX_ABILITIES - 1; i++) {
-                        abilitiesArray.put(0); // empty ability slots
-                    }
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
                     weaponsArray.put(context.getString(R.string.Wizard_Start_Weapon)); // starts with one weapon
-                    for (int i = 0; i < Character.MAX_WEAPONS - 1; i++) {
-                        weaponsArray.put(0); // empty weapon slots
-                    }
                     jsonClassObject.put("weapons", weaponsArray);
-                    // equipped weapon
-                    jsonClassObject.put("equipped", context.getString(R.string.Wizard_Start_Weapon));
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -91,18 +80,10 @@ public class SaveDataLocally {
                     jsonClassObject.put("spdBase", context.getString(R.string.Paladin_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
                     abilitiesArray.put(context.getString(R.string.Paladin_Start_Ability)); // starts with one ability
-                    for (int i = 0; i < Character.MAX_ABILITIES - 1; i++) {
-                        abilitiesArray.put(0); // empty ability slots
-                    }
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
                     weaponsArray.put(context.getString(R.string.Paladin_Start_Weapon)); // starts with one weapon
-                    for (int i = 0; i < Character.MAX_WEAPONS - 1; i++) {
-                        weaponsArray.put(0); // empty weapon slots
-                    }
                     jsonClassObject.put("weapons", weaponsArray);
-                    // equipped weapon
-                    jsonClassObject.put("equipped", context.getString(R.string.Paladin_Start_Weapon));
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -126,18 +107,10 @@ public class SaveDataLocally {
                     jsonClassObject.put("spdBase", context.getString(R.string.Archer_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
                     abilitiesArray.put(context.getString(R.string.Archer_Start_Ability)); // starts with one ability
-                    for (int i = 0; i < Character.MAX_ABILITIES - 1; i++) {
-                        abilitiesArray.put(0); // empty ability slots
-                    }
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
                     weaponsArray.put(context.getString(R.string.Archer_Start_Weapon)); // starts with one weapon
-                    for (int i = 0; i < Character.MAX_WEAPONS - 1; i++) {
-                        weaponsArray.put(0); // empty weapon slots
-                    }
                     jsonClassObject.put("weapons", weaponsArray);
-                    // equipped weapon
-                    jsonClassObject.put("equipped", context.getString(R.string.Archer_Start_Weapon));
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -161,18 +134,10 @@ public class SaveDataLocally {
                     jsonClassObject.put("spdBase", context.getString(R.string.Warrior_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
                     abilitiesArray.put(context.getString(R.string.Warrior_Start_Ability)); // starts with one ability
-                    for (int i = 0; i < Character.MAX_ABILITIES - 1; i++) {
-                        abilitiesArray.put(0); // empty ability slots
-                    }
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
                     weaponsArray.put(context.getString(R.string.Warrior_Start_Weapon)); // starts with one weapon
-                    for (int i = 0; i < Character.MAX_WEAPONS - 1; i++) {
-                        weaponsArray.put(0); // empty weapon slots
-                    }
                     jsonClassObject.put("weapons", weaponsArray);
-                    // equipped weapon
-                    jsonClassObject.put("equipped", context.getString(R.string.Warrior_Start_Weapon));
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -191,9 +156,6 @@ public class SaveDataLocally {
                 jsonClassObject.put("goldIncrease", 0);
                 JSONArray itemsArray = new JSONArray();
                 itemsArray.put(context.getString(R.string.Starting_Item));
-                for (int i = 0; i < Character.MAX_ITEMS-1; i++) {
-                    itemsArray.put(0);
-                }
                 jsonClassObject.put("items", itemsArray);
                 // specials - set all to 0
                 jsonClassObject.put("isStun", 0);
@@ -255,144 +217,15 @@ public class SaveDataLocally {
             String filename = context.getResources().getString(R.string.fileCharacter);
             FileOutputStream fOut;
             // JSON object holding all character information
-            JSONObject jsonClassObject = new JSONObject();
             Character character = characterArr[0];
-
+            JSONObject jsonClassObject = new JSONObject();
             try {
-                jsonClassObject.put("class", character.getClassType());
-                jsonClassObject.put("str", character.getStrength()); // str
-                jsonClassObject.put("strBase", character.getStrBase()); // base str
-                jsonClassObject.put("strIncrease", character.getStrIncrease());
-                jsonClassObject.put("strDecrease", character.getStrDecrease());
-                jsonClassObject.put("int", character.getIntelligence()); // int
-                jsonClassObject.put("intBase", character.getIntBase()); // base int
-                jsonClassObject.put("intIncrease", character.getIntIncrease());
-                jsonClassObject.put("intDecrease", character.getIntDecrease());
-                jsonClassObject.put("con", character.getConstitution()); // con
-                jsonClassObject.put("conBase", character.getConBase()); // base con
-                jsonClassObject.put("conIncrease", character.getConIncrease());
-                jsonClassObject.put("conDecrease", character.getConDecrease());
-                jsonClassObject.put("spd", character.getSpeed()); // spd
-                jsonClassObject.put("spdBase", character.getSpdBase()); // base spd
-                jsonClassObject.put("spdIncrease", character.getSpdIncrease());
-                jsonClassObject.put("spdDecrease", character.getSpdDecrease());
-                // abilities
-                JSONArray abilitiesArray = new JSONArray();
-                for (int i = 0; i < Character.MAX_ABILITIES; i++) {
-                    if (character.getAbilities().size() > i) {
-                        abilitiesArray.put(character.getAbilities().get(i).getAbilityID());
-                    }
-                    abilitiesArray.put(0);
-                }
-                jsonClassObject.put("abilities", abilitiesArray);
-                // weapons
-                JSONArray weaponsArray = new JSONArray();
-                for (int i = 0; i < Character.MAX_WEAPONS; i++) {
-                    if (character.getWeapons().size() > i) {
-                        weaponsArray.put(character.getWeapons().get(i).getWeaponID());
-                    } else {
-                        weaponsArray.put(0);
-                    }
-                }
-                jsonClassObject.put("weapons", weaponsArray);
-                // equipped weapon
-                jsonClassObject.put("equipped", character.getEquippedWeapon());
-                // bars
-                jsonClassObject.put("health", character.getHealth());
-                jsonClassObject.put("maxHealth", character.getMaxHealth());
-                jsonClassObject.put("mana", character.getMana());
-                jsonClassObject.put("maxMana", character.getMaxMana());
-                // misc
-                jsonClassObject.put("level", character.getLevel());
-                jsonClassObject.put("gold", character.getGold());
-                // Items
-                JSONArray itemsArray = new JSONArray();
-                for (int i = 0; i < Character.MAX_ITEMS; i++) {
-                    if (character.getItems().size() > i) {
-                        if (character.getItems().get(i).getIsGeneric()) {
-                            // save the generic Item name instead of its ID
-                            itemsArray.put(character.getItems().get(i).getName());
-                        } else {
-                            itemsArray.put(character.getItems().get(i).getItemID());
-                        }
-                    } else {
-                        itemsArray.put(0);
-                    }
-                }
-                jsonClassObject.put("items", itemsArray);
-                // specials
-                jsonClassObject.put(Effect.STUN, character.getIsStun());
-                jsonClassObject.put(Effect.CONFUSE, character.getIsConfuse());
-                jsonClassObject.put(Effect.INVINCIBILITY, character.getIsInvincible());
-                jsonClassObject.put(Effect.SILENCE, character.getIsSilence());
-                jsonClassObject.put(Effect.INVISIBILITY, character.getIsInvisible());
-                JSONArray specialArray = new JSONArray();
-                for (SpecialEffect appliedSpecial: character.getSpecialList()) {
-                    JSONArray special = new JSONArray();
-                    special.put(appliedSpecial.getType());
-                    special.put(appliedSpecial.getDuration());
-                    specialArray.put(special);
-                }
-                jsonClassObject.put("specialList", specialArray);
-                // temp health
-                jsonClassObject.put("tempExtraHealth", character.getTempExtraHealth());
-                JSONArray tempHealthArray = new JSONArray(); // <key, value>
-                for (int i = 0; i < character.getTempHealthList().size(); i++) {
-                    JSONArray tempHealth = new JSONArray(); // <duration, amount>
-                    tempHealth.put(character.getTempHealthList().get(i).getDuration());
-                    tempHealth.put(character.getTempHealthList().get(i).getAmount());
-                    tempHealthArray.put(tempHealth);
-                }
-                jsonClassObject.put("tempHealthList", tempHealthArray);
-                // temp mana
-                jsonClassObject.put("tempExtraMana", character.getTempExtraMana());
-                JSONArray tempManaArray = new JSONArray(); // <key, value>
-                for (int i = 0; i < character.getTempManaList().size(); i++) {
-                    JSONArray tempMana = new JSONArray(); // <duration, amount>
-                    tempMana.put(character.getTempManaList().get(i).getDuration());
-                    tempMana.put(character.getTempManaList().get(i).getAmount());
-                    tempManaArray.put(tempMana);
-                }
-                jsonClassObject.put("tempManaList", tempManaArray);
-                // stat increase
-                JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
-                for (int i = 0; i < character.getStatIncreaseList().size(); i++) {
-                    JSONArray statIncrease = new JSONArray();
-                    statIncrease.put(character.getStatIncreaseList().get(i).getType());
-                    statIncrease.put(character.getStatIncreaseList().get(i).getDuration());
-                    statIncrease.put(character.getStatIncreaseList().get(i).getAmount());
-                    statIncreaseArray.put(statIncrease);
-                }
-                jsonClassObject.put("statIncreaseList", statIncreaseArray);
-                // stat decrease
-                JSONArray statDecreaseArray = new JSONArray(); // <stat, duration, amount>
-                for (int i = 0; i < character.getStatDecreaseList().size(); i++) {
-                    JSONArray statDecrease = new JSONArray();
-                    statDecrease.put(character.getStatDecreaseList().get(i).getType());
-                    statDecrease.put(character.getStatDecreaseList().get(i).getDuration());
-                    statDecrease.put(character.getStatDecreaseList().get(i).getAmount());
-                    statDecreaseArray.put(statDecrease);
-                }
-                jsonClassObject.put("statDecreaseList", statDecreaseArray);
-                // DOT
-                jsonClassObject.put(Effect.BLEED, character.getIsBleed());
-                jsonClassObject.put(Effect.POISON, character.getIsPoison());
-                jsonClassObject.put(Effect.FIRE, character.getIsFire());
-                jsonClassObject.put(Effect.FROSTBURN, character.getIsFrostBurn());
-                jsonClassObject.put(Effect.HEALTH_DOT, character.getIsHealDot());
-                jsonClassObject.put(Effect.MANA_DOT, character.getIsManaDot());
-                JSONArray dotArray = new JSONArray(); // <key, value>
-                for (Dot appliedDot: character.getDotList()) {
-                    JSONArray dot = new JSONArray();
-                    dot.put(appliedDot.getType());
-                    dot.put(appliedDot.getDuration());
-                    dotArray.put(dot);
-                }
-                jsonClassObject.put("dotList", dotArray);
-
+                jsonClassObject = character.serializeToJSON();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+
             try {
                 fOut = context.openFileOutput(filename, Context.MODE_PRIVATE);
                 fOut.write(jsonClassObject.toString().getBytes());

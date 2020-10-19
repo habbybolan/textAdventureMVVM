@@ -11,6 +11,8 @@ import com.habbybolan.textadventure.model.dialogue.CombatActionDialogue;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.EffectDialogue;
+import com.habbybolan.textadventure.model.dialogue.ExpDialogue;
+import com.habbybolan.textadventure.model.dialogue.GoldDialogue;
 import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
 import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
@@ -61,6 +63,9 @@ public class DialogueRecyclerView {
         // stat
         setTempStatListener();
         setStatListener();
+        // xp/gold
+        setGoldListener();
+        setExpListener();
     }
     // Dialogue for adding basic String text
     public void addDialogue(Dialogue dialogue) {
@@ -298,6 +303,30 @@ public class DialogueRecyclerView {
             }
         };
         characterVM.getUpdateAllStatChange().addOnPropertyChangedCallback(callBackDecr);
+    }
+    // Dialogue for gold change
+    private void setGoldListener() {
+        // observe when gold changed
+        Observable.OnPropertyChangedCallback callBackGold = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                int goldAmount = characterVM.getGoldObserve().get();
+                adapter.addNewDialogue(new GoldDialogue(goldAmount));
+            }
+        };
+        characterVM.getGoldObserve().addOnPropertyChangedCallback(callBackGold);
+    }
+    // Dialogue for gold change
+    private void setExpListener() {
+        // observe when gold changed
+        Observable.OnPropertyChangedCallback callBackExp = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                int expAmount = characterVM.getExpObserve().get();
+                adapter.addNewDialogue(new ExpDialogue(expAmount));
+            }
+        };
+        characterVM.getExpObserve().addOnPropertyChangedCallback(callBackExp);
     }
 
     public ArrayList<DialogueType> getDialogueList() {

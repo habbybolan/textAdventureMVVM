@@ -28,6 +28,8 @@ public interface DialogueType {
     String TYPE_STAT = "stat_dialogue_type";
     String TYPE_TEMP_STAT = "temp_stat_dialogue_type";
     String TYPE_COMBAT_ACTION = "combat_action_dialogue_type";
+    String TYPE_GOLD = "gold_dialogue_type";
+    String TYPE_EXP = "exp_dialogue_type";
 
     int getViewType();
     JSONObject toJSON() throws JSONException;

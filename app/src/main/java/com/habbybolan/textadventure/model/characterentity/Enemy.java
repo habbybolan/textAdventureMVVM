@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.effects.Dot;
+import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
@@ -15,6 +16,10 @@ import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -34,17 +39,20 @@ public class Enemy extends CharacterEntity {
 
     private ArrayList<Ability> abilities = new ArrayList<>();
     private String[] arrayOfAbilities = new String[MAX_ABILITIES];
+    private int difficulty;
 
     private String type;
 
     private int numStatPoints;
 
-    public Enemy(int numStatPoints, String type, int difficulty, Context context) throws ExecutionException, InterruptedException {
+    public Enemy(int numStatPoints, String type, int difficulty, int ID, Context context) throws ExecutionException, InterruptedException {
         isCharacter = false;
+        this.difficulty = difficulty;
         // percentage of stat points for enemy compared to the main character
         double PERCENT_OF_STATS = 0.75;
         this.numStatPoints = (int) Math.rint(numStatPoints * PERCENT_OF_STATS);
         this.type = type;
+        this.ID = ID;
 
         // choose 2 random stats for the enemy
         Random rand = new Random();
@@ -70,6 +78,136 @@ public class Enemy extends CharacterEntity {
         // choose MAX_ABILITIES random abilities
         abilities = db.getRandomAbilities(MAX_ABILITIES);
         db.close();
+
+        drawableResID = R.drawable.skeleton_icon;
+        drawableDeadResID = R.drawable.skeleton_dead;
+    }
+
+    /**
+     * Constructor for reading a saved JSON String of an Enemy
+     * @param JSONEnemy     The JSON String of the saved Enemy data
+     */
+    public Enemy(String JSONEnemy) {
+        JSONObject enemyObject;
+        isCharacter = false;
+        try {
+            enemyObject = new JSONObject(JSONEnemy);
+            // enemy specific
+            difficulty = enemyObject.getInt("difficulty");
+            ID = enemyObject.getInt("id");
+            isAlive = enemyObject.getBoolean("isAlive");
+            type = enemyObject.getString("type");
+            // stats
+            strength = enemyObject.getInt("str");
+            strBase = enemyObject.getInt("strBase");
+            strIncrease = enemyObject.getInt("strIncrease");
+            strDecrease = enemyObject.getInt("strDecrease");
+            intelligence = enemyObject.getInt("int");
+            intBase = enemyObject.getInt("intBase");
+            intIncrease = enemyObject.getInt("intIncrease");
+            intDecrease = enemyObject.getInt("intDecrease");
+            constitution = enemyObject.getInt("con");
+            conBase = enemyObject.getInt("conBase");
+            conIncrease = enemyObject.getInt("conIncrease");
+            conDecrease = enemyObject.getInt("conDecrease");
+            speed = enemyObject.getInt("spd");
+            spdBase = enemyObject.getInt("spdBase");
+            spdIncrease = enemyObject.getInt("spdIncrease");
+            spdDecrease = enemyObject.getInt("spdDecrease");
+            numStatPoints = strBase + intBase + conBase + spdBase;
+            // misc
+            level = enemyObject.getInt("level");
+            // bars
+            health = enemyObject.getInt("health");
+            maxHealth = enemyObject.getInt("maxHealth");
+            mana = enemyObject.getInt("mana");
+            maxMana = enemyObject.getInt("maxMana");
+            // abilities
+            numAbilities = 0;
+            JSONArray abilitiesArray = enemyObject.getJSONArray("abilities");
+            for (int i= 0; i < abilitiesArray.length(); i++) {
+                abilities.add(new Ability(abilitiesArray.getString(i)));
+                numAbilities++;
+
+            }
+            // weapons
+            String weaponsString = enemyObject.getString("weapon");
+            numWeapons = 1;
+            weapon = new Weapon(weaponsString);
+
+            // items
+            numItems = 0;
+            JSONArray itemsArray = enemyObject.getJSONArray("items");
+            for (int i = 0; i < itemsArray.length(); i++) {
+                items.add(new Item(itemsArray.getString(i)));
+                numItems++;
+            }
+
+            // DOTS
+            isFire = enemyObject.getBoolean(Effect.FIRE);
+            isBleed = enemyObject.getBoolean(Effect.BLEED);
+            isPoison = enemyObject.getBoolean(Effect.POISON);
+            isFrostBurn = enemyObject.getBoolean(Effect.FROSTBURN);
+            isHealDot = enemyObject.getBoolean(Effect.HEALTH_DOT);
+            isManaDot = enemyObject.getBoolean(Effect.MANA_DOT);
+            JSONArray dotList = enemyObject.getJSONArray("dotList");
+            for (int i = 0; i < dotList.length(); i++) {
+                JSONArray dot = (JSONArray) dotList.get(i);
+                this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
+            }
+            // SPECIAL
+            isStun = enemyObject.getBoolean(Effect.STUN);
+            isConfuse = enemyObject.getBoolean(Effect.CONFUSE);
+            isSilence = enemyObject.getBoolean(Effect.SILENCE);
+            isInvincible = enemyObject.getBoolean(Effect.INVINCIBILITY);
+            isInvisible = enemyObject.getBoolean(Effect.INVISIBILITY);
+            JSONArray specialList = enemyObject.getJSONArray("specialList");
+            for (int i = 0; i < specialList.length(); i++) {
+                JSONArray special = (JSONArray) specialList.get(i);
+                this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
+            }
+            // tempHealth
+            JSONArray tempHealthArray = enemyObject.getJSONArray("tempHealthList");
+            for (int i = 0; i < tempHealthArray.length(); i++) {
+                JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
+                int duration = tempHealth.getInt(0);
+                int amount = tempHealth.getInt(1);
+                TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
+                tempHealthList.add(tempBar);
+            }
+            // tempMana
+            JSONArray tempManaArray = enemyObject.getJSONArray("tempManaList");
+            for (int i = 0; i < tempManaArray.length(); i++) {
+                JSONArray tempMana = (JSONArray) tempManaArray.get(i);
+                int duration = tempMana.getInt(0);
+                int amount = tempMana.getInt(1);
+                TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
+                tempManaList.add(tempBar);
+            }
+            // stat Increase
+            JSONArray statIncreaseArray = enemyObject.getJSONArray("statIncreaseList");
+            for (int i = 0; i < statIncreaseArray.length(); i++) {
+                JSONArray statIncrease = (JSONArray) statIncreaseArray.get(i);
+                String type = statIncrease.getString(0);
+                int duration = statIncrease.getInt(1);
+                int amount = statIncrease.getInt(2);
+                TempStat tempStat = new TempStat(type, duration, amount);
+                statIncreaseList.add(tempStat);
+            }
+            // stat Decrease
+            JSONArray statDecreaseArray = enemyObject.getJSONArray("statDecreaseList");
+            for (int i = 0; i < statDecreaseArray.length(); i++) {
+                JSONArray statDecrease = (JSONArray) statDecreaseArray.get(i);
+                String type = statDecrease.getString(0);
+                int duration = statDecrease.getInt(1);
+                int amount = statDecrease.getInt(2);
+                TempStat tempStat = new TempStat(type, duration, amount);
+                statDecreaseList.add(tempStat);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         drawableResID = R.drawable.skeleton_icon;
         drawableDeadResID = R.drawable.skeleton_dead;
@@ -203,6 +341,128 @@ public class Enemy extends CharacterEntity {
             abilities.get(i).decrementCooldownCurr();
         }
     }
+
+    @Override
+    public JSONObject serializeToJSON() throws JSONException {
+        JSONObject JSONEnemy = new JSONObject();
+        JSONEnemy.put("isCharacter", false);
+        JSONEnemy.put("difficulty", difficulty);
+        JSONEnemy.put("id", ID);
+        JSONEnemy.put("isAlive", isAlive);
+        JSONEnemy.put("type", type);
+
+        JSONEnemy.put("str", strength); // str
+        JSONEnemy.put("strBase", strBase); // base str
+        JSONEnemy.put("strIncrease", strIncrease);
+        JSONEnemy.put("strDecrease", strDecrease);
+        JSONEnemy.put("int", intelligence); // int
+        JSONEnemy.put("intBase", intBase); // base int
+        JSONEnemy.put("intIncrease", intIncrease);
+        JSONEnemy.put("intDecrease", intDecrease);
+        JSONEnemy.put("con", constitution); // con
+        JSONEnemy.put("conBase", conBase); // base con
+        JSONEnemy.put("conIncrease", conIncrease);
+        JSONEnemy.put("conDecrease", conDecrease);
+        JSONEnemy.put("spd", speed); // spd
+        JSONEnemy.put("spdBase", spdBase); // base spd
+        JSONEnemy.put("spdIncrease", spdIncrease);
+        JSONEnemy.put("spdDecrease", spdDecrease);
+        // abilities
+        JSONArray abilitiesArray = new JSONArray();
+        for (int i = 0; i < MAX_ABILITIES; i++) {
+            if (abilities.size() > i)
+                abilitiesArray.put(abilities.get(i).serializeToJSON());
+        }
+        JSONEnemy.put("abilities", abilitiesArray);
+        // weapon
+        JSONEnemy.put("weapon", weapon.serializeToJSON());
+        // bars
+        JSONEnemy.put("health", health);
+        JSONEnemy.put("maxHealth", maxHealth);
+        JSONEnemy.put("mana", mana);
+        JSONEnemy.put("maxMana", maxMana);
+        // misc
+        JSONEnemy.put("level",level);
+        // Items
+        JSONArray itemsArray = new JSONArray();
+        for (int i = 0; i < Character.MAX_ITEMS; i++) {
+            if (items.size() > i)
+                itemsArray.put(items.get(i).serializeToJSON());
+        }
+        JSONEnemy.put("items", itemsArray);
+        // specials
+        JSONEnemy.put(Effect.STUN, isStun);
+        JSONEnemy.put(Effect.CONFUSE, isConfuse);
+        JSONEnemy.put(Effect.INVINCIBILITY, isInvincible);
+        JSONEnemy.put(Effect.SILENCE, isSilence);
+        JSONEnemy.put(Effect.INVISIBILITY, isInvisible);
+        JSONArray specialArray = new JSONArray();
+        for (SpecialEffect appliedSpecial: specialList) {
+            JSONArray special = new JSONArray();
+            special.put(appliedSpecial.getType());
+            special.put(appliedSpecial.getDuration());
+            specialArray.put(special);
+        }
+        JSONEnemy.put("specialList", specialArray);
+        // temp health
+        JSONEnemy.put("tempExtraHealth", tempExtraHealth);
+        JSONArray tempHealthArray = new JSONArray(); // <key, value>
+        for (int i = 0; i < tempHealthList.size(); i++) {
+            JSONArray tempHealth = new JSONArray(); // <duration, amount>
+            tempHealth.put(tempHealthList.get(i).getDuration());
+            tempHealth.put(tempHealthList.get(i).getAmount());
+            tempHealthArray.put(tempHealth);
+        }
+        JSONEnemy.put("tempHealthList", tempHealthArray);
+        // temp mana
+        JSONEnemy.put("tempExtraMana", tempExtraMana);
+        JSONArray tempManaArray = new JSONArray(); // <key, value>
+        for (int i = 0; i < tempManaList.size(); i++) {
+            JSONArray tempMana = new JSONArray(); // <duration, amount>
+            tempMana.put(tempManaList.get(i).getDuration());
+            tempMana.put(tempManaList.get(i).getAmount());
+            tempManaArray.put(tempMana);
+        }
+        JSONEnemy.put("tempManaList", tempManaArray);
+        // stat increase
+        JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
+        for (int i = 0; i < statIncreaseList.size(); i++) {
+            JSONArray statIncrease = new JSONArray();
+            statIncrease.put(statIncreaseList.get(i).getType());
+            statIncrease.put(statIncreaseList.get(i).getDuration());
+            statIncrease.put(statIncreaseList.get(i).getAmount());
+            statIncreaseArray.put(statIncrease);
+        }
+        JSONEnemy.put("statIncreaseList", statIncreaseArray);
+        // stat decrease
+        JSONArray statDecreaseArray = new JSONArray(); // <stat, duration, amount>
+        for (int i = 0; i < statDecreaseList.size(); i++) {
+            JSONArray statDecrease = new JSONArray();
+            statDecrease.put(statDecreaseList.get(i).getType());
+            statDecrease.put(statDecreaseList.get(i).getDuration());
+            statDecrease.put(statDecreaseList.get(i).getAmount());
+            statDecreaseArray.put(statDecrease);
+        }
+        JSONEnemy.put("statDecreaseList", statDecreaseArray);
+        // DOT
+        JSONEnemy.put(Effect.BLEED, isBleed);
+        JSONEnemy.put(Effect.POISON, isPoison);
+        JSONEnemy.put(Effect.FIRE, isFire);
+        JSONEnemy.put(Effect.FROSTBURN, isFrostBurn);
+        JSONEnemy.put(Effect.HEALTH_DOT, isHealDot);
+        JSONEnemy.put(Effect.MANA_DOT, isManaDot);
+        JSONArray dotArray = new JSONArray(); // <key, value>
+        for (Dot appliedDot: dotList) {
+            JSONArray dot = new JSONArray();
+            dot.put(appliedDot.getType());
+            dot.put(appliedDot.getDuration());
+            dotArray.put(dot);
+        }
+        JSONEnemy.put("dotList", dotArray);
+
+        return JSONEnemy;
+    }
+
 
     public String getType() {
         return type;

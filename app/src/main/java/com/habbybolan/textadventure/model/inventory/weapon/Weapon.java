@@ -134,17 +134,6 @@ public class Weapon implements Inventory {
         return weaponID;
     }
 
-    @Override
-    public JSONObject toJSON() {
-        JSONObject toJSON = new JSONObject();
-        try {
-            toJSON.put(INVENTORY_TYPE, TYPE_WEAPON);
-            toJSON.put(ID, getID());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return toJSON;
-    }
 
     @Override
     public JSONObject serializeToJSON() throws JSONException {

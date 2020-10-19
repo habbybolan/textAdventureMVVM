@@ -164,7 +164,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     @Override
     public void endState() {
         // set up button to leave
-        setLeaveButton(mainGameVM, benefitBinding.layoutBtnOptions);
+        setLeaveButton(benefitBinding.layoutBtnOptions);
         // set up button to receive reward if one exists
         setReceiveInventory();
     }
@@ -177,6 +177,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
             final View viewPickUp = getLayoutInflater().inflate(R.layout.default_button_details, null);
             DefaultButtonDetailsBinding defaultBindingPickUp = DataBindingUtil.bind(viewPickUp);
             String permText = "Pick Up";
+            assert defaultBindingPickUp != null;
             defaultBindingPickUp.setTitle(permText);
             defaultBindingPickUp.btnDefault.setOnClickListener(new View.OnClickListener() {
                 @Override

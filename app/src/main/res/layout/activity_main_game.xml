@@ -114,19 +114,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:layout_marginEnd="60dp"
-            android:text="Level"
+            android:text="EXP"
             android:textSize="@dimen/txt_size_medium"
             app:layout_constraintEnd_toStartOf="@+id/health_mana_image"
             app:layout_constraintTop_toBottomOf="@+id/btn_character" />
 
         <TextView
-            android:id="@+id/txt_turn_number"
+            android:id="@+id/txt_exp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="28dp"
             android:textSize="@dimen/txt_size_medium"
-            android:text="@{mainGameViewModel.turnCounter}"
+            android:text="@{characterViewModel.exp}"
             app:layout_constraintStart_toEndOf="@+id/txt_turn"
             app:layout_constraintTop_toBottomOf="@+id/btn_character" />
 

@@ -19,9 +19,6 @@ public interface Inventory {
 
     int getID();
 
-    // converts the Inventory object to a JSON
-    JSONObject toJSON();
-
     // serializes an entire Inventory object into a JSON string
     JSONObject serializeToJSON() throws JSONException;
 

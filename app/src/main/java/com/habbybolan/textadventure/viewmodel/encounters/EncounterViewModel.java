@@ -2,9 +2,12 @@ package com.habbybolan.textadventure.viewmodel.encounters;
 
 import androidx.databinding.ObservableField;
 
+import com.habbybolan.textadventure.model.dialogue.CombatActionDialogue;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.EffectDialogue;
+import com.habbybolan.textadventure.model.dialogue.ExpDialogue;
+import com.habbybolan.textadventure.model.dialogue.GoldDialogue;
 import com.habbybolan.textadventure.model.dialogue.HealthDialogue;
 import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
@@ -29,15 +32,19 @@ public abstract class EncounterViewModel {
     // key values for JSON to save encounter
     public static String ENCOUNTER_TYPE = "encounter_type";
     public static String ENCOUNTER = "encounter";
-    public static String STATE = "state";
-    public static String DIALOGUE_REMAINING = "dialogue_remaining";
-    public static String INVENTORY = "inventory";
-    public static String DIALOGUE_ADDED = "dialogue_added";
+    static String STATE = "state";
+    static String DIALOGUE_REMAINING = "dialogue_remaining";
+    static String INVENTORY = "inventory";
+    static String DIALOGUE_ADDED = "dialogue_added";
+    static String COMBAT_ORDER = "combat_order";
+    static String ENEMIES = "enemies";
+
 
     // types of encounters that are values for the key ENCOUNTER_TYPE
-    public static String TYPE_CHOICE_BENEFIT = MainGameViewModel.CHOICE_BENEFIT_TYPE;
-    public static String TYPE_RANDOM_BENEFIT = MainGameViewModel.RANDOM_BENEFIT_TYPE;
-    public static String TYPE_TRAP = MainGameViewModel.TRAP_TYPE;
+    static String TYPE_CHOICE_BENEFIT = MainGameViewModel.CHOICE_BENEFIT_TYPE;
+    static String TYPE_RANDOM_BENEFIT = MainGameViewModel.RANDOM_BENEFIT_TYPE;
+    static String TYPE_TRAP = MainGameViewModel.TRAP_TYPE;
+    static String TYPE_COMBAT = MainGameViewModel.COMBAT_TYPE;
 
     // states
 
@@ -154,9 +161,16 @@ public abstract class EncounterViewModel {
                         jsonObject.getBoolean(DialogueType.IS_ADDED));
             case DialogueType.TYPE_STAT:
                 return new StatDialogue(jsonObject.getString(DialogueType.TYPE), jsonObject.getInt(DialogueType.AMOUNT));
-            default:
-                // otherWise, TYPE_TEMP_STAT
+            case DialogueType.TYPE_TEMP_STAT:
                 return new TempStatDialogue(jsonObject.getString(DialogueType.TYPE), jsonObject.getInt(DialogueType.AMOUNT), jsonObject.getInt(DialogueType.DURATION));
+            case DialogueType.TYPE_COMBAT_ACTION:
+                return new CombatActionDialogue(jsonObject.getString(DialogueType.ATTACKER), jsonObject.getString(DialogueType.TARGET), jsonObject.getString(DialogueType.ACTION));
+            case DialogueType.TYPE_GOLD:
+                return new GoldDialogue(jsonObject.getInt(DialogueType.AMOUNT));
+            case DialogueType.TYPE_EXP:
+                return new ExpDialogue(jsonObject.getInt(DialogueType.AMOUNT));
+            default:
+                throw new IllegalArgumentException("Incorrect dialogue key");
         }
     }
 

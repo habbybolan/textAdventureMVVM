@@ -19,19 +19,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 public class JsonAssetFileReader {
-    private static final String TAG = "";
     private String JSONFileName;// = "outdoor_encounters";
     private Context context;
     private String json;
 
     private int location;
     private String location_type;
-
-    private JSONObject encounter;
 
     public JsonAssetFileReader(Context context, String JSONFileName) {
         this.context = context;
@@ -47,7 +45,7 @@ public class JsonAssetFileReader {
             BufferedReader br = new BufferedReader(new FileReader(fileReader));
             String tempEncounter;
             while ((tempEncounter = br.readLine()) != null)
-                encounter = encounter + tempEncounter;
+                encounter += tempEncounter;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
@@ -70,7 +68,7 @@ public class JsonAssetFileReader {
                 is.read(buffer);
                 is.close();
 
-                json = new String(buffer, "UTF-8");
+                json = new String(buffer, StandardCharsets.UTF_8);
 
 
             } catch (IOException ex) {
@@ -104,7 +102,8 @@ public class JsonAssetFileReader {
             try {
                 // get the json object and array
                 JSONObject obj = new JSONObject(json);
-                JSONArray jsonArray = obj.getJSONArray("allEncounters");
+                JSONArray jsonArray = obj.getJSONArray(ALL_ENCOUNTERS);
+                // encounterTemp: encounter data to retrieve, store and return
                 JSONObject encounterTemp = jsonArray.getJSONObject(location);
                 jsonArray = encounterTemp.getJSONArray(location_type);
                 // get a random type of encounter // todo: control the weighting of the randomness for the type of encounter
@@ -118,81 +117,34 @@ public class JsonAssetFileReader {
                 // ***
 
                 // put type into encounter
-                String type = encounterTemp.getString("type");
-                outputEncounter.put("type", encounterTemp.get("type"));
+                String type = encounterTemp.getString(TYPE);
+                outputEncounter.put(TYPE, encounterTemp.get(TYPE));
 
                 // get a random encounter specific of "type"
-                jsonArray = encounterTemp.getJSONArray("encounters");
+                jsonArray = encounterTemp.getJSONArray(ENCOUNTERS);
                 encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
                 // find the proper encounter to initiate
                 switch (type) {
                     case MainGameViewModel.DUNGEON_TYPE:
-                        // get a random dialogue from that encounter specific
-                        outputEncounter.put("dialogue", getRandomDialogue(encounterTemp));
+                        dungeonEncounter(encounterTemp, outputEncounter);
                         break;
                     case MainGameViewModel.MULTI_LEVEL_TYPE:
-                        // get a random dialogue from that encounter specific
-                        outputEncounter.put("dialogue", getRandomDialogue(encounterTemp));
-                        jsonArray = encounterTemp.getJSONArray("options");
-                        outputEncounter.put("options", jsonArray);
+                        multiLevelEncounter(encounterTemp, outputEncounter);
                         break;
                     case MainGameViewModel.CHOICE_TYPE:
-                        // get a random dialogue from that encounter specific
-                        outputEncounter.put("dialogue", getRandomDialogue(encounterTemp));
-                        JSONArray options = new JSONArray(); // holds each option and the randomized encounter of each option
-                        JSONObject singleOption; // holds each single option to put into options JSONArray
-                        jsonArray = encounterTemp.getJSONArray("options");
-                        JSONArray allOptions = new JSONArray(); // array to add to encounter object
-                        JSONObject optionTemp;
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            singleOption = new JSONObject();
-                            optionTemp = jsonArray.getJSONObject(i);
-                            // set up option name
-                            String name = optionTemp.getString("name");
-                            singleOption.put("name", name);
-                            // get a random encounter within this specific option
-                            JSONArray randEncounter = optionTemp.getJSONArray(name);
-                            optionTemp = randEncounter.getJSONObject(getRandomJsonArrayIndex(randEncounter));
-                            // get the type of the random encounter chosen
-                            type = optionTemp.getString("type");
-                            singleOption.put("type", type);
-                            // set up the new object for the random encounter given the specific type of encounter, constrained by the possible encounters in the JSON file.
-                            randEncounter = optionTemp.getJSONArray(type);
-                            optionTemp = randEncounter.getJSONObject(getRandomJsonArrayIndex(randEncounter));
-                            singleOption.put(type, optionTemp);
-
-                            allOptions.put(singleOption);
-                        }
-                        // put the array of possible options, each with one randomized encounter for each index
-                        outputEncounter.put("options", allOptions);
+                        choiceEncounter(encounterTemp, outputEncounter);
                         break;
                     case MainGameViewModel.COMBAT_TYPE:
-                        // get a random dialogue from that encounter specific
-                        outputEncounter.put("dialogue", getRandomDialogue(encounterTemp));
-                        // if there is a conversation dialogue, then add to "conversation" object
-                        if (encounterTemp.has("conversation")) outputEncounter.put("conversation", encounterTemp.getJSONObject("conversation"));
-                        outputEncounter.put("fight", encounterTemp.getJSONObject("fight"));
+                        combatEncounter(encounterTemp, outputEncounter);
                         break;
                     case MainGameViewModel.TRAP_TYPE:
-                        // get a random dialogue from that encounter specific
-                        outputEncounter.put("dialogue", getRandomDialogue(encounterTemp));
-                        // put in the fail object
-                        outputEncounter.put("fail", encounterTemp.getJSONObject("fail"));
-                        // put in the success object
-                        outputEncounter.put("success", encounterTemp.getString("success"));
+                        trapEncounter(encounterTemp, outputEncounter);
                         break;
                     case MainGameViewModel.SHOP_TYPE: case MainGameViewModel.CHOICE_BENEFIT_TYPE: case MainGameViewModel.RANDOM_BENEFIT_TYPE:
-                        // get a random dialogue from that encounter specific
-                        outputEncounter.put("dialogue", getRandomDialogue(encounterTemp));
-                        // if there is a conversation dialogue, then add to "conversation" object
-                        if (encounterTemp.has("conversation")) outputEncounter.put("conversation", encounterTemp.getJSONObject("conversation"));
+                        shopRandomChoiceEncounter(encounterTemp, outputEncounter);
                         break;
                     case MainGameViewModel.QUEST_TYPE:
-                        type = encounterTemp.getString("type");
-                        jsonArray = encounterTemp.getJSONArray(type);
-                        encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
-                        encounterTemp.put("sub_type", type);
-                        outputEncounter.put("encounter", encounterTemp);
+                        questEncounter(encounterTemp, outputEncounter);
                         break;
                     default: //  shouldn't reach here
                         break;
@@ -204,6 +156,106 @@ public class JsonAssetFileReader {
         }
     }
 
+    /**
+     * helper method for retrieving and storing the combat encounter JSON data
+     *
+     * @params encounter   location to put the JSON data retrieved from encounterTemp
+     * @Params encounterTemp    JSON object to retrieve the encounter data from
+     */
+    private void combatEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // get a random dialogue from that encounter specific
+        encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
+        // if there is a conversation dialogue, then add to "conversation" object
+        if (encounterTemp.has(CONVERSATION)) encounter.put(CONVERSATION, encounterTemp.getJSONObject(CONVERSATION));
+        encounter.put(FIGHT, encounterTemp.getJSONObject(FIGHT));
+    }
+
+    /**
+     * helper method for retrieving and storing the trap encounter JSON data
+     */
+    private void trapEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // get a random dialogue from that encounter specific
+        encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
+        // put in the fail object
+        encounter.put(FAIL, encounterTemp.getJSONObject(FAIL));
+        // put in the success object
+        encounter.put(SUCCESS, encounterTemp.getString(SUCCESS));
+    }
+
+    /**
+     * helper method for retrieving and storing the Dungeon encounter JSON data
+     */
+    private void dungeonEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // get a random dialogue from that encounter specific
+        encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
+    }
+
+    /**
+     * helper method for retrieving and storing the shop, random benefit, and choice benefit encounter JSON data
+     */
+    private void shopRandomChoiceEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // get a random dialogue from that encounter specific
+        encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
+        // if there is a conversation dialogue, then add to "conversation" object
+        if (encounterTemp.has(CONVERSATION)) encounter.put(CONVERSATION, encounterTemp.getJSONObject(CONVERSATION));
+    }
+
+    /**
+     * helper method for retrieving and storing the Quest encounter JSON data
+     */
+    private void questEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        String type = encounterTemp.getString(TYPE);
+        JSONArray jsonArray = encounterTemp.getJSONArray(type);
+        encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
+        encounterTemp.put(SUB_TYPE, type);
+        encounter.put(ENCOUNTER, encounterTemp);
+    }
+
+    /**
+     * helper method for retrieving and storing the Choice encounter JSON data
+     */
+    private void choiceEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // get a random dialogue from that encounter specific
+        encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
+        JSONArray options = new JSONArray(); // holds each option and the randomized encounter of each option
+        JSONObject singleOption; // holds each single option to put into options JSONArray
+        JSONArray jsonArray = encounterTemp.getJSONArray(OPTIONS);
+        JSONArray allOptions = new JSONArray(); // array to add to encounter object
+        JSONObject optionTemp;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            singleOption = new JSONObject();
+            optionTemp = jsonArray.getJSONObject(i);
+            // set up option name
+            String name = optionTemp.getString(NAME);
+            singleOption.put(NAME, name);
+            // get a random encounter within this specific option
+            JSONArray randEncounter = optionTemp.getJSONArray(name);
+            optionTemp = randEncounter.getJSONObject(getRandomJsonArrayIndex(randEncounter));
+            // get the type of the random encounter chosen
+            String type = optionTemp.getString(TYPE);
+            singleOption.put(TYPE, type);
+            // set up the new object for the random encounter given the specific type of encounter, constrained by the possible encounters in the JSON file.
+            randEncounter = optionTemp.getJSONArray(type);
+            optionTemp = randEncounter.getJSONObject(getRandomJsonArrayIndex(randEncounter));
+            singleOption.put(type, optionTemp);
+
+            allOptions.put(singleOption);
+        }
+        // put the array of possible options, each with one randomized encounter for each index
+        encounter.put(OPTIONS, allOptions);
+    }
+
+    /**
+     * helper method for retrieving and storing the multi level encounter JSON data
+     */
+    private void multiLevelEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // get a random dialogue from that encounter specific
+        encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
+        JSONArray jsonArray = encounterTemp.getJSONArray(OPTIONS);
+        encounter.put(OPTIONS, jsonArray);
+    }
+
+
 
     // get a random encounter using the json String
     public JSONObject getRandomEncounter(int location, String location_type) throws ExecutionException, InterruptedException {
@@ -213,7 +265,7 @@ public class JsonAssetFileReader {
     }
 
     private JSONObject getRandomDialogue(JSONObject dialogue) throws JSONException {
-        JSONArray dialogueArray = dialogue.getJSONArray("dialogue");
+        JSONArray dialogueArray = dialogue.getJSONArray(DIALOGUE);
         int index = getRandomJsonArrayIndex(dialogueArray);
         return dialogueArray.getJSONObject(index);
     }
@@ -229,4 +281,18 @@ public class JsonAssetFileReader {
         return json;
     }
 
+
+    public static final String FIGHT = "fight";
+    public static final String ENCOUNTER = "encounter";
+    public static final String DIALOGUE = "dialogue";
+    public static final String SUB_TYPE = "sub_type";
+    public static final String TYPE = "type";
+    public static final String CONVERSATION = "conversation";
+    public static final String FAIL = "fail";
+    public static final String SUCCESS = "success";
+    public static final String OPTIONS = "options";
+    public static final String NAME = "name";
+    public static final String ENCOUNTERS = "encounters";
+    public static final String ALL_ENCOUNTERS = "allEncounters";
+    public static final String DIFFICULTY = "difficulty";
 }

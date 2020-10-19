@@ -37,7 +37,7 @@ import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 
-/*
+/**
 fragment for combat encounter
     state 1: dialogue
     state 2: before combat - go into fight or run attempt
@@ -45,9 +45,7 @@ fragment for combat encounter
         // swap between state 3 and 4 until either character dies, or all enemies die
     state 4: player character turn
     state 5: enemy turn
-    state 6: reward state
-    state 7 end state
-
+    state 6: end state
  */
 public class CombatFragment extends EncounterDialogueFragment implements EncounterFragment {
 
@@ -69,7 +67,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     public static final String INVENTORY_SERIALIZED = "INVENTORY_SERIALIZED";
     public static final String TYPE = "type";
 
-    public CombatFragment() {
+    private CombatFragment() {
         // Required empty public constructor
     }
 
@@ -104,61 +102,105 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         return combatBinding.getRoot();
     }
 
-    // sets up the RV dialogue adapter and the encounter state to enter
+    /**
+     *  sets up the RV dialogue adapter and the encounter state to enter
+     * @throws InterruptedException     for database accesses
+     * @throws ExecutionException       for database accesses
+     * @throws JSONException            for JSON reading
+     */
     private void setUpEncounterBeginning() throws InterruptedException, ExecutionException, JSONException {
         combatVM.setSavedData();
         // set up Recycler Viewer that holds all dialogue
         rv = new DialogueRecyclerView(getContext(), combatBinding.rvDialogue, combatVM.getDialogueList());
         setUpDialogueRV(rv, combatVM);
         stateListener(combatVM.getStateIndex(), combatVM, this);
+        initiateCombatInfo();
         // called after stateLister set up, signalling first state to enter
         combatVM.gotoBeginningState(mainGameVM);
     }
 
+    /**
+     * Initiates all info including recycler viewers, enemies, and button functionality for the combat state.
+     * @throws InterruptedException     for database accesses
+     * @throws ExecutionException       for database accesses
+     * @throws JSONException            for JSON reading
+     */
+    private void initiateCombatInfo() throws InterruptedException, ExecutionException, JSONException {
+        setUpInCombatRunButtonClick();
+        setClickersForCategoryOptions();
+        // if no saved encounter, then create necessary info
+        if (!combatVM.getIsSaved())
+            combatVM.createCombat();
+        setCombatOrdering();
+        setCombatDialogueListener();
+
+        setContinueButtonClick();
+        setActionSelect();
+
+        setInventoryRecyclerViewers();
+    }
+
     @Override
     public void checkState(int state) {
-        try {
-            switch (state) {
-                // first state
-                case CombatViewModel.firstState:
-                    combatBinding.layoutBtnOptions.removeAllViews();
-                    dialogueState(combatVM, combatBinding.layoutBtnOptions);
-                    break;
-                // second state
-                case CombatViewModel.secondState:
-                    combatBinding.layoutBtnOptions.removeAllViews();
-                    beforeCombatState();
-                    break;
-                case CombatViewModel.thirdState:
-                    combatBinding.layoutBtnOptions.removeAllViews();
-                    setCombatState();
-                    break;
-                case CombatViewModel.fourthState:
-                    characterTurnState();
-                    break;
-                case CombatViewModel.fifthState:
-                    enemyTurnState();
-                    break;
-                case CombatViewModel.sixthState:
-                    combatBinding.inCombatContainer.removeAllViews();
-                    combatBinding.layoutBtnOptions.removeAllViews();
-                    endState(); // todo: temporarily end state - should be reward state
-                    break;
+        switch (state) {
+            // first state
+            case CombatViewModel.firstState:
+                combatBinding.layoutBtnOptions.removeAllViews();
+                dialogueState(combatVM, combatBinding.layoutBtnOptions);
+                break;
+            // second state
+            case CombatViewModel.secondState:
+                combatBinding.layoutBtnOptions.removeAllViews();
+                beforeCombatState();
+                break;
+            case CombatViewModel.thirdState:
+                combatBinding.layoutBtnOptions.removeAllViews();
+                startCombatState();
+                break;
+            case CombatViewModel.fourthState:
+                characterTurnState();
+                break;
+            case CombatViewModel.fifthState:
+                enemyTurnState();
+                break;
                 // last state
-                case CombatViewModel.seventhState:
-                    combatBinding.layoutBtnOptions.removeAllViews();
-                    endState();
-                    break;
-            }
-            // set the isSaved to false to signal that the save has been retrieved
-            combatVM.setIsSaved(false);
-        } catch (InterruptedException | ExecutionException | JSONException e) {
-            e.printStackTrace();
+            case CombatViewModel.sixthState:
+                combatBinding.inCombatContainer.removeAllViews();
+                combatBinding.layoutBtnOptions.removeAllViews();
+                endState();
+                break;
         }
+        // set the isSaved to false to signal that the save has been retrieved
+        combatVM.setIsSaved(false);
     }
 
     // UI before combat, asking player to enter combat or attempt to escape
     private void beforeCombatState() {
+        setUpFightButton();
+        setUpBeforeCombatRunButton();
+    }
+
+    /**
+     * helper to programmatically create the button the run from combat encounter before combat starts
+     */
+    private void setUpBeforeCombatRunButton() {
+        View viewRun = getLayoutInflater().inflate(R.layout.default_button_details, null);
+        DefaultButtonDetailsBinding defaultBindingFight = DataBindingUtil.bind(viewRun);
+        String runText = "Run";
+        defaultBindingFight.setTitle(runText);
+        defaultBindingFight.btnDefault.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // todo: before combat run button
+            }
+        });
+        combatBinding.layoutBtnOptions.addView(viewRun);
+    }
+
+    /**
+     * helper to programmatically created button to enter the fight
+     */
+    private void setUpFightButton() {
         View viewFight = getLayoutInflater().inflate(R.layout.default_button_details, null);
         DefaultButtonDetailsBinding defaultBindingFight = DataBindingUtil.bind(viewFight);
         String fightText = "Fight";
@@ -171,20 +213,23 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             }
         });
         combatBinding.layoutBtnOptions.addView(viewFight);
-        setUpRunButtonClick();
     }
 
-    // buttons for attempting to escape the combat encounter
-    private void setUpRunButtonClick() {
+    /** buttons for attempting to escape the combat encounter
+     *
+     */
+    private void setUpInCombatRunButtonClick() {
         combatBinding.btnRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //combatVM.attemptRun();
+                // todo: in combat run button
             }
         });
-        combatBinding.btnRun.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * button for continuing through the enemy actions
+     */
     private void setContinueButtonClick() {
         combatBinding.btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,7 +240,9 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         });
     }
 
-    // the clickers for category options that swaps between the recyclerViewers that show character inventory options
+    /**
+     * the clickers for category options that swaps between the recyclerViewers that show character inventory options
+     */
     private void setClickersForCategoryOptions() {
         combatBinding.rvCategoryWeapons.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,28 +264,36 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         });
     }
 
-    // on weapon category button pressed
+    /**
+     * on weapon category button pressed
+     */
     private void onWeaponCategoryClick() {
         combatBinding.rvWeapons.setVisibility(View.VISIBLE);
         combatBinding.rvAbilities.setVisibility(View.GONE);
         combatBinding.rvItems.setVisibility(View.GONE);
     }
 
-    // on ability category button pressed
+    /**
+     * on ability category button pressed
+     */
     private void onAbilityCategoryClick() {
         combatBinding.rvWeapons.setVisibility(View.GONE);
         combatBinding.rvAbilities.setVisibility(View.VISIBLE);
         combatBinding.rvItems.setVisibility(View.GONE);
     }
 
-    // on item category button pressed
+    /**
+     * on item category button pressed
+     */
     private void onItemCategoryClick() {
         combatBinding.rvWeapons.setVisibility(View.GONE);
         combatBinding.rvAbilities.setVisibility(View.GONE);
         combatBinding.rvItems.setVisibility(View.VISIBLE);
     }
 
-    // creates the icons for the enemies that will be selected for applying the character action
+    /**
+     * creates the icons for the enemies that will be selected for applying the character action
+     */
     private void setActionSelect() {
         final int sizeDP = getResources().getDimensionPixelSize(R.dimen.combat_enemy_action_icon_size);
         for (EnemyViewModel enemyVM : combatVM.getEnemies()) {
@@ -270,7 +325,10 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         });
     }
 
-    // helper for performing character action on icon click, or displaying action error message
+    /**
+     * helper for performing character action on icon click, or displaying action error message
+     * @param target    The CharacterEntity action is used on
+     */
     private void characterActionOnClick(CharacterEntity target) {
         // perform the character action if it is a valid action on the target
         if (combatVM.characterAction(target)) {
@@ -283,23 +341,20 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         }
     }
 
-    // UI for combat state
-    private void setCombatState() throws InterruptedException, ExecutionException, JSONException {
-        combatBinding.rvCategoryOptions.setVisibility(View.VISIBLE);
-        combatBinding.characterActionIcon.setVisibility(View.VISIBLE);
-        setClickersForCategoryOptions();
-        combatVM.createCombat();
-        setCombatOrdering();
-        setCombatDialogueListener();
-
-        setContinueButtonClick();
-        setActionSelect();
-
-        setInventoryRecyclerViewers();
+    /**
+     * Shows the category recyclerViewer for the character actions and the target-able action icons. The first turn
+     * is also started here based on the CharacterEntity in the front of the combat ordering by calling setFirstTurn.
+     */
+    private void startCombatState() {
+        //combatBinding.rvCategoryOptions.setVisibility(View.VISIBLE);
+        //combatBinding.characterActionIcon.setVisibility(View.VISIBLE);
+        combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
         combatVM.setFirstTurn();
     }
 
-    // creates the inventory recycler viewers that hold all the character actions
+    /**
+     *  creates the inventory recycler viewers that hold all the character actions
+     */
     private void setInventoryRecyclerViewers() {
         // clickers for saving selected inventory action and un-select others
         abilityRV = new AbilityListRecyclerView(getContext(), combatBinding.rvAbilities, characterVM, combatVM, new InventoryClickListener() {
@@ -349,7 +404,10 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
 
     }
 
-    // creates the new information activity for the Inventory object clicked
+    /**
+     *  creates the new information activity for the Inventory object clicked
+     * @param object    Inventory used as an action
+     */
     private void InventoryActivity(Inventory object) {
         Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
         intent.putExtra(INVENTORY_SERIALIZED, combatVM.serializeInventory(object));
@@ -357,14 +415,18 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         startActivity(intent);
     }
 
-    // un-select all items in the inventory RVs
-    private void unSelectAll() {
+    /**
+     *  un-select all items in the inventory RVs
+     */
+    private void unSelectAllActionRV() {
         abilityRV.unSelectIfOneSelected();
         itemRV.unSelectIfOneSelected();
         weaponRV.unSelectIfOneSelected();
     }
 
-    // listener that adds the combat dialogue showing the attacker, target, and the action used on target
+    /**
+     *  listener that adds the combat dialogue showing the attacker, target, and the action used on target
+     */
     private void setCombatDialogueListener() {
         Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
             @Override
@@ -375,15 +437,22 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         combatVM.getNewCombatActionDialogue().addOnPropertyChangedCallback(callback);
     }
 
-    // deals with the character action UI in combat
+    /**
+     *  deals with the character action UI in combat
+     */
     private void characterTurnState() {
-        unSelectAll();
+        if (combatBinding.inCombatContainer.getVisibility() == View.GONE)
+            combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
+        unSelectAllActionRV();
         isCharacterViewsEnabled(true);
         combatBinding.btnContinue.setVisibility(View.GONE);
         combatBinding.btnRun.setVisibility(View.VISIBLE);
     }
 
-    // sets the character views interaction enabled or disabled
+    /**
+     *  sets the character views interaction enabled or disabled
+     * @param isEnabled     The boolean value to enable character views
+     */
     private void isCharacterViewsEnabled(boolean isEnabled) {
         // enable/disable character selectable icon
         combatBinding.characterActionIcon.setEnabled(isEnabled);
@@ -391,24 +460,37 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             // add/disable each enemy selectable icon inside enemyActionIcons
             combatBinding.enemyActionIcons.getChildAt(i).setEnabled(isEnabled);
         }
+        // remove ability to drop/consume Inventory Objects
+        characterVM.setStateInventoryObserver(isEnabled);
+        combatBinding.inCombatContainer.setEnabled(isEnabled);
     }
 
-    // deals with the enemy action UI in combat
+    /**
+     *  deals with the enemy action UI in combat
+     */
     private void enemyTurnState() {
-        unSelectAll();
+        if (combatBinding.inCombatContainer.getVisibility() == View.GONE)
+            combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
+        unSelectAllActionRV();
         isCharacterViewsEnabled(false);
         combatBinding.btnContinue.setVisibility(View.VISIBLE);
         combatBinding.btnRun.setVisibility(View.GONE);
     }
 
-    // updates all the RV for the 3 combat order lists
+    /**
+     *  updates all the RV for the 3 combat order lists
+     */
     private void notifyCombatOrderNextTurn() {
         currListAdapter.nextTurn();
         nextListAdapter.nextTurn();
         lastListAdapter.nextTurn();
     }
 
-    // set up initial RecyclerViewer adapters
+    /**
+     *  set up initial RecyclerViewer adapters for the combat ordering inside the 3 lists. combatOrderCurr deals with the current round
+     *  of turns, combatOrderNext deals with the next round, and combatOrderLast deals with the third if combatOrderCurr is not filled.
+     *  combatOrderCurr filled if it contains same number of elements as combatOrderNext. (all enemies and character included)
+     */
     private void setCombatOrdering() {
         // current list RV setup
         RecyclerView currRV = combatBinding.combatCurr;
@@ -424,9 +506,30 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         lastRV.setAdapter(lastListAdapter);
     }
 
+    /**
+     *  set up leave button and the reward for completing combat, as well as button to pick up any Inventory reward
+     */
     @Override
     public void endState() {
         // set up button to leave
-        setLeaveButton(mainGameVM, combatBinding.layoutBtnOptions);
+        setLeaveButton(combatBinding.layoutBtnOptions);
+        // sets the reward
+        setReward();
+    }
+
+    /**
+     *  creates reward based on combat difficult, and creates button for Inventory reward
+     */
+    private void setReward() {
+        combatVM.getExpReward();
+        combatVM.getGoldReward();
+        //Inventory inventoryReward = combatVM.getInventoryReward(getContext());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        characterVM.saveCharacter();
+        combatVM.saveEncounter(rv.getDialogueList());
     }
 }

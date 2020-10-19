@@ -69,7 +69,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_character_list"
                     android:layout_width="136dp"
-                    android:layout_height="51dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.232"
@@ -83,7 +83,7 @@
                     android:id="@+id/imageView"
                     android:layout_width="163dp"
                     android:layout_height="232dp"
-                    android:layout_marginTop="64dp"
+                    android:layout_marginTop="30dp"
                     android:adjustViewBounds="false"
                     android:cropToPadding="false"
                     app:imageResource="@{characterChoiceViewModel.characterPortrait}"
@@ -97,7 +97,6 @@
                     android:layout_width="40dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="84dp"
                     android:background="@color/colorStatBackground"
                     android:fontFamily="@font/press_start_2p"
                     android:gravity="center"
@@ -105,7 +104,7 @@
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     app:layout_constraintStart_toEndOf="@+id/imageView"
-                    app:layout_constraintTop_toBottomOf="@+id/button"
+                    app:layout_constraintTop_toTopOf="@+id/imageView"
                     tools:text="STR" />
 
                 <TextView
@@ -215,27 +214,12 @@
                     app:layout_constraintStart_toEndOf="@+id/spd_textView"
                     app:layout_constraintTop_toTopOf="@+id/spd_textView" />
 
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="24dp"
-                    android:layout_height="20dp"
-                    app:layout_constraintStart_toEndOf="@+id/rv_character_list"
-                    app:layout_constraintTop_toTopOf="@+id/rv_character_list"
-                    app:srcCompat="@drawable/uparror" />
-
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="24dp"
-                    android:layout_height="20dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/rv_character_list"
-                    app:layout_constraintStart_toEndOf="@+id/rv_character_list"
-                    app:srcCompat="@drawable/downarror" />
 
                 <ImageView
                     android:id="@+id/imageView4"
                     android:layout_width="@dimen/mana_health_bar_width"
                     android:layout_height="@dimen/mana_health_bar_height"
-                    android:layout_marginTop="40dp"
+                    android:layout_marginTop="25dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imageView"
