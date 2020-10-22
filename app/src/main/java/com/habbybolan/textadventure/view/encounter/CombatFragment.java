@@ -21,12 +21,13 @@ import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
-import com.habbybolan.textadventure.view.InventoryInfoActivity;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.InventoryClickListener;
 import com.habbybolan.textadventure.view.InventoryListAdapter.ItemListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.WeaponListRecyclerView;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
@@ -63,9 +64,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     private CombatOrderAdapter currListAdapter;
     private CombatOrderAdapter nextListAdapter;
     private CombatOrderAdapter lastListAdapter;
-
-    public static final String INVENTORY_SERIALIZED = "INVENTORY_SERIALIZED";
-    public static final String TYPE = "type";
 
     private CombatFragment() {
         // Required empty public constructor
@@ -143,28 +141,37 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void checkState(int state) {
         switch (state) {
-            // first state
             case CombatViewModel.firstState:
+                // dialogue state
+                isCharacterViewsEnabled(true);
                 combatBinding.layoutBtnOptions.removeAllViews();
                 dialogueState(combatVM, combatBinding.layoutBtnOptions);
                 break;
-            // second state
             case CombatViewModel.secondState:
+                // before combat state (fight/run buttons)
+                isCharacterViewsEnabled(true);
                 combatBinding.layoutBtnOptions.removeAllViews();
                 beforeCombatState();
                 break;
             case CombatViewModel.thirdState:
+                // set up combat views state
                 combatBinding.layoutBtnOptions.removeAllViews();
+                isCharacterViewsEnabled(false);
                 startCombatState();
                 break;
             case CombatViewModel.fourthState:
+                // character turn state
+                isCharacterViewsEnabled(false);
                 characterTurnState();
                 break;
             case CombatViewModel.fifthState:
+                // enemy turn state
+                isCharacterViewsEnabled(false);
                 enemyTurnState();
                 break;
-                // last state
             case CombatViewModel.sixthState:
+                // ending state for accepting rewards and button to leave encounter
+                isCharacterViewsEnabled(true);
                 combatBinding.inCombatContainer.removeAllViews();
                 combatBinding.layoutBtnOptions.removeAllViews();
                 endState();
@@ -410,8 +417,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      */
     private void InventoryActivity(Inventory object) {
         Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
-        intent.putExtra(INVENTORY_SERIALIZED, combatVM.serializeInventory(object));
-        intent.putExtra(TYPE, object.getType());
+        intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, combatVM.serializeInventory(object));
         startActivity(intent);
     }
 
@@ -444,7 +450,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         if (combatBinding.inCombatContainer.getVisibility() == View.GONE)
             combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
         unSelectAllActionRV();
-        isCharacterViewsEnabled(true);
         combatBinding.btnContinue.setVisibility(View.GONE);
         combatBinding.btnRun.setVisibility(View.VISIBLE);
     }
@@ -472,7 +477,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         if (combatBinding.inCombatContainer.getVisibility() == View.GONE)
             combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
         unSelectAllActionRV();
-        isCharacterViewsEnabled(false);
         combatBinding.btnContinue.setVisibility(View.VISIBLE);
         combatBinding.btnRun.setVisibility(View.GONE);
     }
@@ -513,17 +517,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     public void endState() {
         // set up button to leave
         setLeaveButton(combatBinding.layoutBtnOptions);
-        // sets the reward
-        setReward();
-    }
-
-    /**
-     *  creates reward based on combat difficult, and creates button for Inventory reward
-     */
-    private void setReward() {
-        combatVM.getExpReward();
-        combatVM.getGoldReward();
-        //Inventory inventoryReward = combatVM.getInventoryReward(getContext());
     }
 
     @Override

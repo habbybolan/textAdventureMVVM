@@ -67,6 +67,7 @@ public class DialogueRecyclerView {
         setGoldListener();
         setExpListener();
     }
+
     // Dialogue for adding basic String text
     public void addDialogue(Dialogue dialogue) {
         adapter.addNewDialogue(dialogue);
@@ -310,8 +311,9 @@ public class DialogueRecyclerView {
         Observable.OnPropertyChangedCallback callBackGold = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                int goldAmount = characterVM.getGoldObserve().get();
-                adapter.addNewDialogue(new GoldDialogue(goldAmount));
+                Integer goldAmount = characterVM.getGoldObserve().get();
+                if (goldAmount != null)
+                    adapter.addNewDialogue(new GoldDialogue(goldAmount));
             }
         };
         characterVM.getGoldObserve().addOnPropertyChangedCallback(callBackGold);
@@ -322,8 +324,9 @@ public class DialogueRecyclerView {
         Observable.OnPropertyChangedCallback callBackExp = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                int expAmount = characterVM.getExpObserve().get();
-                adapter.addNewDialogue(new ExpDialogue(expAmount));
+                Integer expAmount = characterVM.getExpObserve().get();
+                if (expAmount != null)
+                    adapter.addNewDialogue(new ExpDialogue(expAmount));
             }
         };
         characterVM.getExpObserve().addOnPropertyChangedCallback(callBackExp);

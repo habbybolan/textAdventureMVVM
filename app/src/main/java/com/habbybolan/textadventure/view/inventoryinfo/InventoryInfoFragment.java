@@ -1,57 +1,90 @@
-package com.habbybolan.textadventure.view;
+package com.habbybolan.textadventure.view.inventoryinfo;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.databinding.ActivityInventoryInfoBinding;
+import com.habbybolan.textadventure.databinding.FragmentInventoryInfoBinding;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.view.encounter.CombatFragment;
 
-public class InventoryInfoActivity extends AppCompatActivity {
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    ActivityInventoryInfoBinding binding;
+/**
+ *
+ */
+public class InventoryInfoFragment extends Fragment {
+
+    private FragmentInventoryInfoBinding binding;
+    public static final String INVENTORY_SERIALIZED = "INVENTORY_SERIALIZED";
+    public static final String COST = "cost";
+    public static final String POSITION = "position";
+
+    private String inventoryString;
+
+
+    private InventoryInfoFragment() {
+        // Required empty public constructor
+    }
+
+    private InventoryInfoFragment(String inventoryString) {
+        this.inventoryString = inventoryString;
+    }
+
+
+    // TODO: Rename and change types and number of parameters
+    public static InventoryInfoFragment newInstance(String inventoryString) {
+        return new InventoryInfoFragment(inventoryString);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // remove toolbar
-        ActionBar actionbar = getSupportActionBar();
-        if (actionbar != null) getSupportActionBar().hide();
+    }
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_inventory_info);
-        String stringInventory = getIntent().getStringExtra(CombatFragment.INVENTORY_SERIALIZED);
-        String type = getIntent().getStringExtra(CombatFragment.TYPE);
-
-        if (type == null || stringInventory == null) throw new IllegalArgumentException();
-        setInventoryObject(stringInventory, type);
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_inventory_info, container, false);
+        try {
+            setInventory();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return binding.getRoot();
     }
 
     // sets up the serialized inventory object
-    private void setInventoryObject(String stringInventory, String type) {
+    private void setInventory() throws JSONException {
+        JSONObject jsonObject = new JSONObject(inventoryString);
+        String type = jsonObject.getString(Inventory.INVENTORY_TYPE);
         switch (type) {
             case Inventory.TYPE_ABILITY:
-                setAbilityInfo(new Ability(stringInventory));
+                setAbilityInfo(new Ability(inventoryString));
                 break;
             case Inventory.TYPE_ITEM:
-                setItemInfo(new Item(stringInventory));
+                setItemInfo(new Item(inventoryString));
                 break;
             case Inventory.TYPE_WEAPON:
-                setWeaponInfo(new Weapon(stringInventory));
+                setWeaponInfo(new Weapon(inventoryString));
                 break;
             case Inventory.TYPE_ATTACK:
-                setAttackInfo(new Attack(stringInventory));
+                setAttackInfo(new Attack(inventoryString));
                 break;
             case Inventory.TYPE_S_ATTACK:
-                setSpecialAttackInfo(new SpecialAttack(stringInventory));
+                setSpecialAttackInfo(new SpecialAttack(inventoryString));
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -96,11 +129,5 @@ public class InventoryInfoActivity extends AppCompatActivity {
         binding.setName(ability.getName());
         binding.setImageIconResource(ability.getPictureResource());
         // todo: ability info
-    }
-
-    @Override
-    // destroy activity on back pressed
-    public void onBackPressed() {
-        finish();
     }
 }

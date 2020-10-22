@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.InventoryInfoActivity"></activity>
+        <activity android:name=".view.inventoryinfo.InventoryInfoActivity" />
         <activity android:name=".view.characterchoice.CharacterChoiceActivity" />
         <activity android:name=".view.MainGameActivity" />
         <activity android:name=".view.MainActivity">
@@ -19,6 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.shopgrid.BuyInformationActivity" />
+        <activity android:name=".view.shopgrid.SellInformationActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

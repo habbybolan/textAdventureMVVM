@@ -113,7 +113,7 @@ public class JsonAssetFileReader {
                 // todo: used for testing specific encounters
                 //Random rand = new Random();
                 //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.COMBAT);
+                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.SHOP);
                 // ***
 
                 // put type into encounter
@@ -165,8 +165,6 @@ public class JsonAssetFileReader {
     private void combatEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
         encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
-        // if there is a conversation dialogue, then add to "conversation" object
-        if (encounterTemp.has(CONVERSATION)) encounter.put(CONVERSATION, encounterTemp.getJSONObject(CONVERSATION));
         encounter.put(FIGHT, encounterTemp.getJSONObject(FIGHT));
     }
 
@@ -196,8 +194,6 @@ public class JsonAssetFileReader {
     private void shopRandomChoiceEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
         encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
-        // if there is a conversation dialogue, then add to "conversation" object
-        if (encounterTemp.has(CONVERSATION)) encounter.put(CONVERSATION, encounterTemp.getJSONObject(CONVERSATION));
     }
 
     /**
@@ -287,7 +283,6 @@ public class JsonAssetFileReader {
     public static final String DIALOGUE = "dialogue";
     public static final String SUB_TYPE = "sub_type";
     public static final String TYPE = "type";
-    public static final String CONVERSATION = "conversation";
     public static final String FAIL = "fail";
     public static final String SUCCESS = "success";
     public static final String OPTIONS = "options";

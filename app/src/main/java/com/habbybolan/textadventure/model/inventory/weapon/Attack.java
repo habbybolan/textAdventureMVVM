@@ -128,6 +128,7 @@ public class Attack extends Action {
     public JSONObject serializeToJSON() throws JSONException {
         JSONObject JSONInventory = new JSONObject();
         JSONInventory.put(ATTACK_NAME, attackName);
+        JSONInventory.put(INVENTORY_TYPE, TYPE_ATTACK);
         JSONInventory.put(ATTACK_ID, attackID);
         JSONInventory.put(DAMAGE_MIN, damageMin);
         JSONInventory.put(DAMAGE_MAX, damageMax);

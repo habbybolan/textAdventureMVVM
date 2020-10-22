@@ -62,7 +62,11 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return dialogueList.get(position).getViewType();
     }
 
-    // Return the DataBinder instance based on the view type
+    /**
+     *  Return the DataBinder instance based on the view type
+     * @param viewType      The viewType int associated with a binding object
+     * @return              The binding object associated with the viewType
+     */
     private DataBinder getDataBinder(int viewType) {
         if (viewType == R.layout.dialogue_details) return dialogueBinding;
         else if (viewType == R.layout.dialogue_effect_details) return effectDialogueBinding;
@@ -73,7 +77,8 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         else if (viewType == R.layout.dialogue_combat_action_details) return combatActionDialogueBinding;
         else if (viewType == R.layout.dialogue_gold_details) return goldDialogueBinding;
         else if (viewType == R.layout.dialogue_exp_details) return expDialogueBinding;
-        else return inventoryDialogueBinding;
+        else if (viewType == R.layout.dialogue_inventory_details) return inventoryDialogueBinding;
+        else throw new IllegalStateException();
     }
 
     // Define convert logic to the position in the DataBinder from the adapter position

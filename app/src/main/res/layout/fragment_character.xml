@@ -277,7 +277,6 @@
                             android:layout_height="24dp"
                             android:text="@string/special_plural"
                             android:gravity="center"
-                            android:textColor="#6A6A6A"
                             android:textSize="12sp"
                             android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"

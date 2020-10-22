@@ -450,6 +450,7 @@ public class Item extends Action {
             JSONInventory.put(ITEM_NAME, itemName);
             JSONInventory.put(ITEM_ID, itemID);
             JSONInventory.put(IS_GENERIC, isGeneric);
+            JSONInventory.put(INVENTORY_TYPE, TYPE_ITEM);
             if (ability != null) {
                 JSONObject JSONAbility = ability.serializeToJSON();
                 JSONInventory.put(ABILITY, JSONAbility);

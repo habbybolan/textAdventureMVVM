@@ -192,6 +192,7 @@ public class SpecialAttack extends Action {
         JSONObject JSONInventory = new JSONObject();
         JSONInventory.put(S_ATTACK_NAME, specialAttackName);
         JSONInventory.put(S_ATTACK_ID, specialAttackID);
+        JSONInventory.put(INVENTORY_TYPE, TYPE_S_ATTACK);
         // ability
         if (ability != null) {
             JSONObject JSONAbility = ability.serializeToJSON();

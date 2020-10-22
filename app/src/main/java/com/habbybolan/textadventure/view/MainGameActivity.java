@@ -13,9 +13,10 @@ import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.CombatFragment;
 import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
+import com.habbybolan.textadventure.view.encounter.ShopFragment;
 import com.habbybolan.textadventure.view.encounter.TrapFragment;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONException;
 
@@ -124,9 +125,15 @@ public class MainGameActivity extends AppCompatActivity {
                         .replace(R.id.fragment_container_game, trapFragment)
                         .commit();
                 break;
-            /*case SHOP_TYPE:
-                enterLeaveShop(encounter);
-                break;*/
+            case MainGameViewModel.SHOP_TYPE:
+                // if an instance exists, remove it and create a new one
+                ShopFragment shopFragment = ShopFragment.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, shopFragment)
+                        .commit();
+                break;
             case MainGameViewModel.CHOICE_BENEFIT_TYPE:
                 ChoiceBenefitFragment choiceBenefitFragment = ChoiceBenefitFragment.newInstance();
                 getSupportFragmentManager()

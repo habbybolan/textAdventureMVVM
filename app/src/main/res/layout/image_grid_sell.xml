@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="imageID"
+            type="Integer" />
+        <variable
+            name="cost"
+            type="String" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="72dp"
+            android:layout_height="61dp"
+            android:scaleType="fitXY"
+            app:imageResource="@{imageID}"/>
+
+        <TextView
+            android:id="@+id/buy_cost"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/image"
+            android:layout_alignEnd="@+id/image"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="19dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginEnd="19dp"
+            android:gravity="center"
+            android:textSize="@dimen/txt_size_small"
+            android:text="@{cost}" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="34dp"
+            android:layout_height="37dp"
+            android:layout_alignEnd="@+id/image"
+            android:layout_alignBottom="@+id/image"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="19dp"
+            android:layout_marginEnd="19dp"
+            android:layout_marginBottom="-15dp"
+            app:srcCompat="@drawable/buy_sell_board" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/imageView2"
+            android:layout_alignTop="@+id/imageView2"
+            android:layout_alignEnd="@+id/imageView2"
+            android:layout_alignBottom="@+id/imageView2"
+            android:gravity="center"
+            android:text="@string/sell"
+            android:textSize="@dimen/txt_size_small">
+
+        </TextView>
+
+    </RelativeLayout>
+</layout>

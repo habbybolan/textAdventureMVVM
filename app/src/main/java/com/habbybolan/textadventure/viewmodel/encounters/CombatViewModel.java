@@ -125,11 +125,11 @@ public class CombatViewModel extends EncounterViewModel {
         }, 2000);
     }
 
-    public ObservableField<CombatActionDialogue> newCombatActionDialogue = new ObservableField<>();
+    private ObservableField<CombatActionDialogue> newCombatActionDialogue = new ObservableField<>();
     public ObservableField<CombatActionDialogue> getNewCombatActionDialogue() {
         return newCombatActionDialogue;
     }
-    public void setNewCombatActionDialogue(CombatActionDialogue dialogue) {
+    private void setNewCombatActionDialogue(CombatActionDialogue dialogue) {
         newCombatActionDialogue.set(dialogue);
     }
     public CombatActionDialogue getNewCombatActionDialogueValue() {
@@ -137,7 +137,6 @@ public class CombatViewModel extends EncounterViewModel {
         if (dialogue != null) return dialogue;
         throw new NullPointerException();
     }
-
 
     // ***COMBAT ORDERING***
 
@@ -239,7 +238,7 @@ public class CombatViewModel extends EncounterViewModel {
      * Called if there is a saved game. Recovers the saved Enemy objects inside JSON and places them inside enemies ArrayList.
      * Must be called before retrieveCombatOrdering as that method uses the retrieved enemies to order them into the combat order arrays
      */
-    public void retrieveEnemies() throws JSONException {
+    private void retrieveEnemies() throws JSONException {
         JSONArray enemiesArray = mainGameVM.getSavedEncounter().getJSONArray(ENEMIES);
         for (int i = 0; i < enemiesArray.length(); i++) {
             Enemy enemy = new Enemy(enemiesArray.getString(i));
@@ -252,7 +251,7 @@ public class CombatViewModel extends EncounterViewModel {
      * combatOrderCurr, combatOrderNext and combatOrderLast that deals with the combat Ordering.
      * Only call this after retrieveEnemies.
      */
-    public void retrieveCombatOrdering() throws JSONException {
+    private void retrieveCombatOrdering() throws JSONException {
         if (enemies.isEmpty()) throw new IllegalStateException("Call retrieveEnemies() before this");
         JSONArray combatOrderArrays = mainGameVM.getSavedEncounter().getJSONArray(COMBAT_ORDER);
         JSONArray combatArrayCurr = combatOrderArrays.getJSONArray(0);
@@ -562,8 +561,19 @@ public class CombatViewModel extends EncounterViewModel {
                 return true;
             }
         }
+        setReward();
         stateIndex.set(sixthState);
         return false;
+    }
+
+    /**
+     *  creates reward based on combat difficult, and creates button for Inventory reward
+     */
+    private void setReward() {
+        getExpReward();
+        getGoldReward();
+        // todo: inventory reward?
+        //Inventory inventoryReward = combatVM.getInventoryReward(getContext());
     }
 
     public ArrayList<CharacterEntity> getCombatOrderCurr() {
@@ -599,12 +609,12 @@ public class CombatViewModel extends EncounterViewModel {
     // rewards
 
     // exp reward
-    public void getExpReward() {
+    private void getExpReward() {
         int expReward = combatModel.getExpReward(encounter);
         characterVM.addExp(expReward);
     }
     // gold reward
-    public void getGoldReward() {
+    private void getGoldReward() {
         int goldReward = combatModel.getGoldReward(encounter);
         characterVM.goldChange(goldReward);
     }

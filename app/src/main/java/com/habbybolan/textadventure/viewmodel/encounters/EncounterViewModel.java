@@ -38,6 +38,10 @@ public abstract class EncounterViewModel {
     static String DIALOGUE_ADDED = "dialogue_added";
     static String COMBAT_ORDER = "combat_order";
     static String ENEMIES = "enemies";
+    static String BUY_LIST = "buy_list";
+    static String BUY_INVENTORY = "buy_inventory";
+    static String BUY_COST = "buy_cost";
+
 
 
     // types of encounters that are values for the key ENCOUNTER_TYPE
@@ -45,6 +49,7 @@ public abstract class EncounterViewModel {
     static String TYPE_RANDOM_BENEFIT = MainGameViewModel.RANDOM_BENEFIT_TYPE;
     static String TYPE_TRAP = MainGameViewModel.TRAP_TYPE;
     static String TYPE_COMBAT = MainGameViewModel.COMBAT_TYPE;
+    static String TYPE_SHOP = MainGameViewModel.SHOP_TYPE;
 
     // states
 
@@ -95,8 +100,14 @@ public abstract class EncounterViewModel {
     public void setFirstStateJSON(JSONObject firstStateJSON) {
         this.firstStateJSON = firstStateJSON;
     }
+
+    /**
+     * Add the new dialogue to the dialogue recyclerView and set up the next dialogue line if any exists.
+     * @throws JSONException    if formatting error in the dialogue object
+     */
     public void firstDialogueState() throws JSONException {
-        if (firstStateJSON.has("dialogue")) setNewDialogue(new Dialogue(firstStateJSON.getString("dialogue")));
+        if (firstStateJSON.has("dialogue"))
+            setNewDialogue(new Dialogue(firstStateJSON.getString("dialogue")));
         if (firstStateJSON.has("next")) {
             firstStateJSON = firstStateJSON.getJSONObject("next");
         } else {
@@ -107,7 +118,14 @@ public abstract class EncounterViewModel {
     public JSONObject getFirstStateJSON() {
         return firstStateJSON;
     }
-    public void setDialogueRemainingInDialogueState(JSONObject encounter) throws JSONException {
+
+    /**
+     * Sets the remaining dialogue for the first dialogue state. If the encounter is just created, it will
+     * contain all of the dialogue. Otherwise, it will contain the remaining dialogue if any.
+     * @param encounter         The encounter JSONObject gathered from outdoor_encounters asset String file
+     * @throws JSONException    if problem with JSON string formatting
+     */
+    void setDialogueRemainingInDialogueState(JSONObject encounter) throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         if (mainGameVM.getSavedEncounter() != null) {
             setIsSaved(true);
@@ -122,8 +140,13 @@ public abstract class EncounterViewModel {
 
         // dialogueList
 
-    protected ArrayList<DialogueType> dialogueList = new ArrayList<>();
-    // set the saved dialogue list of previously added dialogue to RV
+    private ArrayList<DialogueType> dialogueList = new ArrayList<>();
+
+    /**
+     * set the saved dialogue list of previously added dialogue to RV
+     * @param mainGameVM        The view model that holds the saved encounter data
+     * @throws JSONException    if problem with JSON formatting of saved encounter String
+     */
     void setDialogueList(MainGameViewModel mainGameVM) throws JSONException {
         JSONArray dialogue = mainGameVM.getSavedEncounter().getJSONArray(DIALOGUE_ADDED);
         dialogueList = JSONArrayIntoDialogueTypesList(dialogue);
@@ -131,7 +154,13 @@ public abstract class EncounterViewModel {
     public ArrayList<DialogueType> getDialogueList() {
         return dialogueList;
     }
-    // helper to convert a JSONArray of DialogueTypes strings to a list of DialogueTypes
+
+    /**
+     *  Helper to convert a JSONArray of DialogueTypes strings to a list of DialogueTypes.
+     * @param jsonArray         The JSON String to be converted into a DialogueType object
+     * @return                  The converted DialogueType
+     * @throws JSONException    if formatting error in jsonObject JSON string
+     */
     private ArrayList<DialogueType> JSONArrayIntoDialogueTypesList(JSONArray jsonArray) throws JSONException {
         ArrayList<DialogueType> dialogueList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -140,7 +169,13 @@ public abstract class EncounterViewModel {
         }
         return dialogueList;
     }
-    // helper for turning a JSONObject of DialogueType into DialogueType
+
+    /**
+     *  Helper for turning a JSONObject of DialogueType into DialogueType.
+     * @param jsonObject        The JSON String of the DialogueType
+     * @return                  The DialogueType created from the jsonObject string data
+     * @throws JSONException    if formatting error in jsonObject JSON string
+     */
     private DialogueType JSONObjectToDialogueType(JSONObject jsonObject) throws JSONException {
         switch (jsonObject.getString(DialogueType.DIALOGUE_TYPE)) {
             case DialogueType.TYPE_DIALOGUE:

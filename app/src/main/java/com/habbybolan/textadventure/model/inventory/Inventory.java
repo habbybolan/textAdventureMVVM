@@ -23,7 +23,6 @@ public interface Inventory {
     JSONObject serializeToJSON() throws JSONException;
 
 
-
     void setPictureResource();
     int getPictureResource();
 }

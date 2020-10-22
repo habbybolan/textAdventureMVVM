@@ -140,6 +140,7 @@ public class Weapon implements Inventory {
         JSONObject JSONInventory = new JSONObject();
         JSONInventory.put(WEAPON_NAME, weaponName);
         JSONInventory.put(WEAPON_ID, weaponID);
+        JSONInventory.put(INVENTORY_TYPE, TYPE_WEAPON);
         JSONObject JSONAttack = attack.serializeToJSON();
         JSONInventory.put(ATTACK, JSONAttack);
         JSONObject JSONSAttack = specialAttack.serializeToJSON();

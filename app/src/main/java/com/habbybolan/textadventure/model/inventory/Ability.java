@@ -586,6 +586,7 @@ public class Ability extends Action {
         JSONObject JSONInventory = new JSONObject();
         JSONInventory.put(ABILITY_NAME, abilityName);
         JSONInventory.put(ABILITY_ID, abilityID);
+        JSONInventory.put(INVENTORY_TYPE, TYPE_ABILITY);
         // cooldown
         JSONInventory.put(COOLDOWN_CURR, cooldownCurr);
         JSONInventory.put(COOLDOWN_MAX, cooldownMax);

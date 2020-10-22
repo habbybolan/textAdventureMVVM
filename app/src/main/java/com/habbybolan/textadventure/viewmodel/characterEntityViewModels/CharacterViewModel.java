@@ -13,6 +13,7 @@ import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
@@ -72,6 +73,50 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         SaveDataLocally save = new SaveDataLocally(context);
         save.saveCharacterLocally(character);
     }
+
+
+    /**
+     * Add a new inventory, calling the proper method to add the Ability, Item, or Weapon
+     * @param inventory The Inventory object to be added.
+     */
+    public void addNewInventory(Inventory inventory) {
+        String type = inventory.getType();
+        switch (type) {
+            case Inventory.TYPE_ABILITY:
+                addAbility((Ability) inventory);
+                break;
+            case Inventory.TYPE_ITEM:
+                addItem((Item) inventory);
+                break;
+            case Inventory.TYPE_WEAPON:
+                addWeapon((Weapon) inventory);
+                break;
+            default:
+                throw new IllegalArgumentException("Inventory object not a Weapon, Ability, or Item");
+        }
+    }
+
+    /**
+     * Remove an Inventory object from player character inventory
+     * @param inventory Inventory object to remove.
+     */
+    public void removeInventory(Inventory inventory) {
+        String type = inventory.getType();
+        switch (type) {
+            case Inventory.TYPE_ABILITY:
+                removeAbility((Ability) inventory);
+                break;
+            case Inventory.TYPE_ITEM:
+                removeItem((Item) inventory);
+                break;
+            case Inventory.TYPE_WEAPON:
+                removeWeapon((Weapon) inventory);
+                break;
+            default:
+                throw new IllegalArgumentException("Inventory object not a Weapon, Ability, or Item");
+        }
+    }
+
 
         // Abilities
 
@@ -447,7 +492,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     public void goldChange(int amount) {
         int goldChange  = character.goldChange(amount);
         notifyPropertyChanged(BR.gold);
-        goldObserve.set(new Integer(goldChange));
+        goldObserve.set(goldChange);
     }
 
     private ObservableField<Integer> expObserve = new ObservableField<>();

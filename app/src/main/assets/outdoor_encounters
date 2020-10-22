@@ -138,7 +138,10 @@
 
 		{"type":"shop",
 			"encounters":[
-				{"dialogue":["Following a well used trail, you see a small, wooden cabin with a symbol of gold etched into the door."
+				{"dialogue":[{"dialogue":"Following a well used trail, you see a small, wooden cabin with a symbol of gold etched into the door."},
+				            {"dialogue":"dialogue1.",
+                            "next":{"dialogue":"dialogue2.",
+                                "next":{"dialogue":"dialogue3."}}}
 					]}
 			]
 		},
