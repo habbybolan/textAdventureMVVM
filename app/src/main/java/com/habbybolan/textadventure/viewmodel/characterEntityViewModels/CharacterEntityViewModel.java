@@ -238,7 +238,9 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             dotObserver.add(dot);;
     }
 
-    // apply dots and observe all removed if duration reaches 0 and effects applied
+    /**
+     * Apply dots effects to character and observe all removed if duration reaches 0.
+     */
     public void applyDots() {
         ArrayList<Dot> removedDots = characterEntity.applyDots();
         for (Dot dot : removedDots) {
@@ -266,6 +268,11 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         // observed by CharacterViewModel
         specialObserver.add(special);
     }
+
+    /**
+     * Decrement the duration of the special effect applied. If it reaches 0, remove the
+     * effects and observe the removed effect.
+     */
     public void decrSpecialDuration() {
         ArrayList<SpecialEffect> removedSpecials = characterEntity.decrSpecialDuration();
         for (SpecialEffect specialEffect : removedSpecials) {

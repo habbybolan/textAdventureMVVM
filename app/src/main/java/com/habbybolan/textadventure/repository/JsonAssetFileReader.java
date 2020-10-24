@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,23 +36,21 @@ public class JsonAssetFileReader {
     }
 
     // load JSON data, given path, from assets
-    static public String loadJSONFromData(String path) throws IOException, JSONException {
+    static public String loadJSONFromData(String path) {
 
-        String encounter = "";
+        StringBuilder encounter = new StringBuilder();
         try {
             File fileReader = new File(path);
             BufferedReader br = new BufferedReader(new FileReader(fileReader));
             String tempEncounter;
             while ((tempEncounter = br.readLine()) != null)
-                encounter += tempEncounter;
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+                encounter.append(tempEncounter);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
         // todo: encounter might be null - what to do>?
-        return encounter;
+        return encounter.toString();
     }
 
     public class loadJSONFromAssets extends AsyncTask<Void, Void, Void> {
@@ -113,7 +110,7 @@ public class JsonAssetFileReader {
                 // todo: used for testing specific encounters
                 //Random rand = new Random();
                 //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.SHOP);
+                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.CHOICE);
                 // ***
 
                 // put type into encounter
@@ -123,32 +120,7 @@ public class JsonAssetFileReader {
                 // get a random encounter specific of "type"
                 jsonArray = encounterTemp.getJSONArray(ENCOUNTERS);
                 encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
-                // find the proper encounter to initiate
-                switch (type) {
-                    case MainGameViewModel.DUNGEON_TYPE:
-                        dungeonEncounter(encounterTemp, outputEncounter);
-                        break;
-                    case MainGameViewModel.MULTI_LEVEL_TYPE:
-                        multiLevelEncounter(encounterTemp, outputEncounter);
-                        break;
-                    case MainGameViewModel.CHOICE_TYPE:
-                        choiceEncounter(encounterTemp, outputEncounter);
-                        break;
-                    case MainGameViewModel.COMBAT_TYPE:
-                        combatEncounter(encounterTemp, outputEncounter);
-                        break;
-                    case MainGameViewModel.TRAP_TYPE:
-                        trapEncounter(encounterTemp, outputEncounter);
-                        break;
-                    case MainGameViewModel.SHOP_TYPE: case MainGameViewModel.CHOICE_BENEFIT_TYPE: case MainGameViewModel.RANDOM_BENEFIT_TYPE:
-                        shopRandomChoiceEncounter(encounterTemp, outputEncounter);
-                        break;
-                    case MainGameViewModel.QUEST_TYPE:
-                        questEncounter(encounterTemp, outputEncounter);
-                        break;
-                    default: //  shouldn't reach here
-                        break;
-                }
+                finalizeEncounter(encounterTemp, outputEncounter, type);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -157,10 +129,51 @@ public class JsonAssetFileReader {
     }
 
     /**
-     * helper method for retrieving and storing the combat encounter JSON data
+     * Takes a JSONObject encounterTemp and finds the method to call to get the appropriate JSON encounter to store for use
+     * inside encounter
+     * @param encounterTemp     The JSONObject to trim and store in encounter.
+     * @param encounter         The JSONObject that holds the necessary encounter data.
+     */
+    private void finalizeEncounter(JSONObject encounterTemp, JSONObject encounter, String type) throws JSONException {
+        switch (type) {
+            case MainGameViewModel.DUNGEON_TYPE:
+                dungeonEncounter(encounterTemp, encounter);
+                break;
+            case MainGameViewModel.MULTI_LEVEL_TYPE:
+                multiLevelEncounter(encounterTemp, encounter);
+                break;
+            case MainGameViewModel.CHOICE_TYPE:
+                choiceEncounter(encounterTemp, encounter);
+                break;
+            case MainGameViewModel.COMBAT_TYPE:
+                combatEncounter(encounterTemp, encounter);
+                break;
+            case MainGameViewModel.TRAP_TYPE:
+                trapEncounter(encounterTemp, encounter);
+                break;
+            case MainGameViewModel.SHOP_TYPE: case MainGameViewModel.CHOICE_BENEFIT_TYPE: case MainGameViewModel.RANDOM_BENEFIT_TYPE:
+                shopRandomChoiceEncounter(encounterTemp, encounter);
+                break;
+            case MainGameViewModel.QUEST_TYPE:
+                questEncounter(encounterTemp, encounter);
+                break;
+            default: //  shouldn't reach here
+                throw new IllegalArgumentException(type + "not found for encounters");
+        }
+    }
+
+    /**
+     * Helper method for retrieving and storing the combat encounter JSON data.
+     * {"type":"combat",
+     *  "dialogue":{...},
+     *  "fight":{"type":["...", ...],
+     *          "difficulty":["...", ...]
+     *          }
+     * }
      *
-     * @params encounter   location to put the JSON data retrieved from encounterTemp
-     * @Params encounterTemp    JSON object to retrieve the encounter data from
+     * @param encounterTemp     object to parse
+     * @param encounter         object to put parsed object in
+     * @throws JSONException    JSON formatting error
      */
     private void combatEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
@@ -169,7 +182,18 @@ public class JsonAssetFileReader {
     }
 
     /**
-     * helper method for retrieving and storing the trap encounter JSON data
+     * Helper method for retrieving and storing the trap encounter JSON data.
+     * {"type":"trap",
+     *  "dialogue":{...},
+     *   "fail":{"dialogue":{...},
+     *           "debuff":[{...}, {...}, ...]
+     *          },
+     *    "success":"..."
+     *   }
+     *
+     * @param encounterTemp     object to parse
+     * @param encounter         object to put parsed object in
+     * @throws JSONException    JSON formatting error
      */
     private void trapEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
@@ -189,7 +213,14 @@ public class JsonAssetFileReader {
     }
 
     /**
-     * helper method for retrieving and storing the shop, random benefit, and choice benefit encounter JSON data
+     *  Helper method for retrieving and storing the shop, random benefit, and choice benefit encounter JSON data.
+     *  {"type":"random_benefit",
+     *  "dialogue":{...}
+     *  }
+     *
+     * @param encounterTemp     object to parse
+     * @param encounter         object to put parsed object in
+     * @throws JSONException    JSON formatting error
      */
     private void shopRandomChoiceEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
@@ -208,41 +239,57 @@ public class JsonAssetFileReader {
     }
 
     /**
-     * helper method for retrieving and storing the Choice encounter JSON data
+     * Helper method for retrieving and storing the Choice encounter JSON data.
+     *  {"type":"choice",
+     *   "dialogue":{...},
+     *    "options":[
+     *          {"name":"...",
+     *          "type":"...",
+     *          "dialogue":{...},
+     *          ...},
+     *
+     *          {...},
+     *
+     *          {...}
+     *          ]
+     *  }
+     * @param encounterTemp     object to parse
+     * @param encounter         object to put parsed object in
+     * @throws JSONException    JSON formatting error
      */
     private void choiceEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
         encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
-        JSONArray options = new JSONArray(); // holds each option and the randomized encounter of each option
-        JSONObject singleOption; // holds each single option to put into options JSONArray
-        JSONArray jsonArray = encounterTemp.getJSONArray(OPTIONS);
-        JSONArray allOptions = new JSONArray(); // array to add to encounter object
-        JSONObject optionTemp;
-        for (int i = 0; i < jsonArray.length(); i++) {
-            singleOption = new JSONObject();
-            optionTemp = jsonArray.getJSONObject(i);
-            // set up option name
-            String name = optionTemp.getString(NAME);
-            singleOption.put(NAME, name);
-            // get a random encounter within this specific option
-            JSONArray randEncounter = optionTemp.getJSONArray(name);
-            optionTemp = randEncounter.getJSONObject(getRandomJsonArrayIndex(randEncounter));
-            // get the type of the random encounter chosen
-            String type = optionTemp.getString(TYPE);
-            singleOption.put(TYPE, type);
-            // set up the new object for the random encounter given the specific type of encounter, constrained by the possible encounters in the JSON file.
-            randEncounter = optionTemp.getJSONArray(type);
-            optionTemp = randEncounter.getJSONObject(getRandomJsonArrayIndex(randEncounter));
-            singleOption.put(type, optionTemp);
-
-            allOptions.put(singleOption);
+        JSONArray options = encounterTemp.getJSONArray(OPTIONS);
+        JSONArray optionsToStore = new JSONArray();
+        for (int i = 0; i < options.length(); i++) {
+            // create the objectToStore JSONObject and place it in optionsToStore JSONArray
+            JSONObject optionToStore = new JSONObject();
+            JSONObject option = options.getJSONObject(i);
+            // name of the option
+            optionToStore.put(NAME, option.getString("name"));
+            JSONObject encounterInOption = getRandomOption(option.getJSONArray(ENCOUNTERS_IN_OPTION));
+            optionToStore.put(TYPE, encounterInOption.getString(TYPE));
+            finalizeEncounter(encounterInOption.getJSONObject(ENCOUNTER), optionToStore, encounterInOption.getString(TYPE));
+            optionsToStore.put(optionToStore);
         }
-        // put the array of possible options, each with one randomized encounter for each index
-        encounter.put(OPTIONS, allOptions);
+        encounter.put(OPTIONS, optionsToStore);
     }
 
     /**
-     * helper method for retrieving and storing the multi level encounter JSON data
+     * Helper to choose random specific encounter for one of the JSONArray options that hold multiple possible encounters.
+     * @param option    JSONArray that holds multiple possible encounters for an option.
+     * @return          The random JSONObject encounter.
+     */
+    private JSONObject getRandomOption(JSONArray option) throws JSONException {
+        Random random = new Random();
+        int jsonIndex = random.nextInt(option.length());
+        return option.getJSONObject(jsonIndex);
+    }
+
+
+    /**
+     * Helper method for retrieving and storing the multi level encounter JSON data.
      */
     private void multiLevelEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
@@ -290,4 +337,7 @@ public class JsonAssetFileReader {
     public static final String ENCOUNTERS = "encounters";
     public static final String ALL_ENCOUNTERS = "allEncounters";
     public static final String DIFFICULTY = "difficulty";
+    public static final String ENCOUNTERS_IN_OPTION = "encounters_in_option";
+
+
 }

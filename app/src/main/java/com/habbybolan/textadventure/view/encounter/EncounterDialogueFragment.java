@@ -1,16 +1,15 @@
 package com.habbybolan.textadventure.view.encounter;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.GridLayout;
 
-import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
 import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
+import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
@@ -55,9 +54,16 @@ class EncounterDialogueFragment extends Fragment {
             } else {
                 // otherwise, multiple dialogue snippets
                 vm.firstDialogueState();
-                Button btnContinue = new Button(getContext());
-                btnContinue.setText(getResources().getString(R.string.continue_dialogue));
-                btnContinue.setOnClickListener(new View.OnClickListener() {
+                // set continue button to the default button view
+                String txtContinue = getResources().getString(R.string.continue_dialogue);
+                DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(gridLayout, txtContinue, getActivity());
+                binding.btnDefault.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MainGameViewModel.getInstance().gotoNextRandomEncounter();
+                    }
+                });
+                binding.btnDefault.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         try {
@@ -67,7 +73,6 @@ class EncounterDialogueFragment extends Fragment {
                         }
                     }
                 });
-                gridLayout.addView(btnContinue);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -80,20 +85,14 @@ class EncounterDialogueFragment extends Fragment {
      * @param gridLayout    The Grid layout to place the leave button inside.
      */
     void setLeaveButton(GridLayout gridLayout) {
-        final MainGameViewModel vm = MainGameViewModel.getInstance();
-        final View viewLeave = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingLeave = DataBindingUtil.bind(viewLeave);
         String leaveText = getResources().getString(R.string.leave_encounter);
-        assert defaultBindingLeave != null;
-        defaultBindingLeave.setTitle(leaveText);
-
-        defaultBindingLeave.btnDefault.setOnClickListener(new View.OnClickListener() {
+        DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(gridLayout, leaveText, getActivity());
+        binding.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                vm.gotoNextEncounter();
+                MainGameViewModel.getInstance().gotoNextRandomEncounter();
             }
         });
-        gridLayout.addView(viewLeave);
     }
 
     /**

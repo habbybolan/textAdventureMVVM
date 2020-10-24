@@ -36,7 +36,7 @@ public class BuyInformationActivity extends AppCompatActivity {
         int cost = getIntent().getIntExtra(InventoryInfoFragment.COST, 0);
         position = getIntent().getIntExtra(InventoryInfoFragment.POSITION, 0);
 
-        if (stringInventory == null) throw new IllegalArgumentException();
+        if (stringInventory == null || cost == -1 || position == -1) throw new IllegalArgumentException("Value not sent through intent");
         setFragmentInfo(stringInventory);
     }
 

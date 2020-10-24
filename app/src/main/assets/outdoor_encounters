@@ -86,20 +86,22 @@
 
 		{"type":"choice",
 			"encounters":[
-				{"dialogue":["You see a bag laying against a tree.",
-							"A bag, alone and suspiciously placed, hangs from a tree branch.",
-							"A dirty bag lays under some leaves, just barely able to be seen."
+				{"dialogue":[{"dialogue":"You see a bag laying against a tree."},
+							{"dialogue":"1",
+							"next":{"dialogue":"2",
+							        "next":{"dialogue":"3"}}}
 							],
 				"options":[{"name": "Check Bag",
-							"Check Bag":[
-									{"type":"small_benefit",
-                                    		    "small_benefit":[
-                                    		        {"dialogue":[""]}
-                                    		    ]
-
+							"encounters_in_option":[
+									{"type":"choice_benefit",
+                                    "encounter":{
+                                            "dialogue":[{"dialogue":"1",
+                                    		            "next":{"dialogue":"2"}},
+                                    		            {"dialogue":"one liner"}]
                                     		}
-									]}
-						    ]
+                                    }
+							]
+							}]
 				}
 			]
 		},

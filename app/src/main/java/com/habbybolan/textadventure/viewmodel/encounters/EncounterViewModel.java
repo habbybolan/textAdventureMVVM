@@ -50,6 +50,7 @@ public abstract class EncounterViewModel {
     static String TYPE_TRAP = MainGameViewModel.TRAP_TYPE;
     static String TYPE_COMBAT = MainGameViewModel.COMBAT_TYPE;
     static String TYPE_SHOP = MainGameViewModel.SHOP_TYPE;
+    static String TYPE_CHOICE = MainGameViewModel.CHOICE_TYPE;
 
     // states
 
@@ -97,7 +98,7 @@ public abstract class EncounterViewModel {
         throw new NullPointerException();
     }
     private JSONObject firstStateJSON = new JSONObject();
-    public void setFirstStateJSON(JSONObject firstStateJSON) {
+    private void setFirstStateJSON(JSONObject firstStateJSON) {
         this.firstStateJSON = firstStateJSON;
     }
 

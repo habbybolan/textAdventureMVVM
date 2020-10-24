@@ -29,9 +29,9 @@ public class SellInformationActivity extends AppCompatActivity {
 
         ActivitySellInformationBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_sell_information);
         stringInventory = getIntent().getStringExtra(InventoryInfoFragment.INVENTORY_SERIALIZED);
-        cost = getIntent().getIntExtra(InventoryInfoFragment.COST, 0);
-        position = getIntent().getIntExtra(InventoryInfoFragment.POSITION, 0);
-        if (stringInventory == null) throw new IllegalArgumentException();
+        cost = getIntent().getIntExtra(InventoryInfoFragment.COST, -1);
+        position = getIntent().getIntExtra(InventoryInfoFragment.POSITION, -1);
+        if (stringInventory == null || cost == -1 || position == -1) throw new IllegalArgumentException("Value not sent through intent");
         setFragmentInfo(stringInventory);
     }
 

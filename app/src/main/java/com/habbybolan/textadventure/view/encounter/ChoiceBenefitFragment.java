@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.view.encounter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +15,12 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentChoiceBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.ChoiceBenefitViewModel;
 
 import org.json.JSONException;
@@ -108,11 +112,9 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     // state to choose the dialogue
     private void chooseBenefitTypeState() {
         // temp. stat increase button
-        View viewTemp = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingTemp = DataBindingUtil.bind(viewTemp);
-        String tempText = "Inventory";
-        defaultBindingTemp.setTitle(tempText);
-        defaultBindingTemp.btnDefault.setOnClickListener(new View.OnClickListener() {
+        String txtInventory = "Inventory";
+        DefaultButtonDetailsBinding bindingInventory = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, txtInventory, getActivity());
+        bindingInventory.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 benefitVM.setTangible();
@@ -121,11 +123,9 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
         });
 
         // perm. stat increase button
-        View viewPerm = getLayoutInflater().inflate(R.layout.default_button_details,null);
-        DefaultButtonDetailsBinding defaultBindingPerm = DataBindingUtil.bind(viewPerm);
         String permText = "Perm. Increase";
-        defaultBindingPerm.setTitle(permText);
-        defaultBindingPerm.btnDefault.setOnClickListener(new View.OnClickListener() {
+        DefaultButtonDetailsBinding bindingPerm = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, permText, getActivity());
+        bindingPerm.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 benefitVM.setPermIncrease();
@@ -134,21 +134,15 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
         });
 
         // gain inventory item button
-        View viewInv = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingInv = DataBindingUtil.bind(viewInv);
-        String invText = "Temp. Increase";
-        defaultBindingInv.setTitle(invText);
-        defaultBindingInv.btnDefault.setOnClickListener(new View.OnClickListener() {
+        String tempText = "Temp. Increase";
+        DefaultButtonDetailsBinding bindingTemp = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, tempText, getActivity());
+        bindingTemp.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 benefitVM.setTempIncrease();
                 benefitVM.incrementStateIndex();
             }
         });
-
-        benefitBinding.layoutBtnOptions.addView(viewTemp);
-        benefitBinding.layoutBtnOptions.addView(viewPerm);
-        benefitBinding.layoutBtnOptions.addView(viewInv);
     }
 
     // inventory snippet of new Inventory object to retrieve
@@ -159,6 +153,18 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
         snippetBinding.setInventoryName(inventoryToRetrieve.getName());
         snippetBinding.setInventoryPic(inventoryToRetrieve.getPictureResource());
         benefitBinding.frameInventorySnippet.addView(view);
+        snippetBinding.inventoryInfoAttack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
+                try {
+                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventoryToRetrieve.serializeToJSON().toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

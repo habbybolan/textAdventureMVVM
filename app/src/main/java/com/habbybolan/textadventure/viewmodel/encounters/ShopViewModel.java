@@ -57,7 +57,7 @@ public class ShopViewModel extends EncounterViewModel  {
     }
 
     @Override
-    void saveEncounter(ArrayList<DialogueType> dialogueList) {
+    public void saveEncounter(ArrayList<DialogueType> dialogueList) {
         SaveDataLocally save = new SaveDataLocally(context);
         JSONObject encounterData = new JSONObject();
         try {

@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.view.encounter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +15,12 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentRandomBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.RandomBenefitViewModel;
 
 import org.json.JSONException;
@@ -102,28 +106,37 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
 
     // second state entered
     private void checkBenefitState() {
-        View viewCheck = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingCheck = DataBindingUtil.bind(viewCheck);
-        String check = "Check";
-        defaultBindingCheck.setTitle(check);
-        defaultBindingCheck.btnDefault.setOnClickListener(new View.OnClickListener() {
+        String txtCheck = "Check";
+        DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, txtCheck, getActivity());
+        binding.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 benefitVM.setTangible();
                 benefitVM.incrementStateIndex();
             }
         });
-        benefitBinding.layoutBtnOptions.addView(viewCheck);
     }
 
     // inventory snippet of new Inventory object to retrieve
-    private void setUpInventorySnippet(Inventory inventoryToRetrieve) {
+    private void setUpInventorySnippet(final Inventory inventoryToRetrieve) {
         View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
         InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
 
         snippetBinding.setInventoryName(inventoryToRetrieve.getName());
         snippetBinding.setInventoryPic(inventoryToRetrieve.getPictureResource());
         benefitBinding.frameInventorySnippet.addView(view);
+        snippetBinding.inventoryInfoAttack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
+                try {
+                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventoryToRetrieve.serializeToJSON().toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                startActivity(intent);
+            }
+        });
     }
 
     // third and final state
@@ -131,24 +144,9 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
     @Override
     public void endState() {
         // set up button to leave
-        setLeaveButton();
+        setLeaveButton(benefitBinding.layoutBtnOptions);
         // set up button to receive reward if one exists
         setReceiveInventory();
-    }
-
-    // helper for endState to set up the button to leave encounter
-    private void setLeaveButton() {
-        final View viewLeave = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingLeave = DataBindingUtil.bind(viewLeave);
-        String leaveText = getResources().getString(R.string.leave_encounter);
-        defaultBindingLeave.setTitle(leaveText);
-        defaultBindingLeave.btnDefault.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainGameVM.gotoNextEncounter();
-            }
-        });
-        benefitBinding.layoutBtnOptions.addView(viewLeave);
     }
 
     // helper for create button to receive Inventory reward if one exists and display it

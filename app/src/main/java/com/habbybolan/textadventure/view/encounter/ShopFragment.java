@@ -16,6 +16,7 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentShopBinding;
 import com.habbybolan.textadventure.model.GridModel;
 import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.view.shopgrid.BuyGridAdapter;
@@ -139,30 +140,26 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
     }
 
     /**
-     * Button for entering the shop
+     * Button for entering the shop.
      */
     private void enterShopButton() {
-        final View viewLeave = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingLeave = DataBindingUtil.bind(viewLeave);
         String enterTxt = "Enter Shop";
-        assert defaultBindingLeave != null;
-        defaultBindingLeave.setTitle(enterTxt);
-
-        defaultBindingLeave.btnDefault.setOnClickListener(new View.OnClickListener() {
+        DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(shopBinding.layoutBtnOptions, enterTxt, getActivity());
+        binding.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // if entering the shop, increment state to go to shop state
                 shopVM.incrementStateIndex();
             }
         });
-        shopBinding.layoutBtnOptions.addView(viewLeave);
     }
 
     /**
-     * set up all shop UI and signal functionality
+     * set up all shop UI and signal functionality.
      */
     private void setShopkeeper() {
         try {
+            shopBinding.dialogueRV.setVisibility(View.GONE);
             setShopkeeperImage();
             setLeaveButtonFunctionality();
             setUpItemToBuy();
@@ -187,7 +184,7 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
         shopBinding.btnLeaveShop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainGameVM.gotoNextEncounter();
+                mainGameVM.gotoNextRandomEncounter();
             }
         });
     }
@@ -291,7 +288,13 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
 
     @Override
     public void endState() {
-
         // todo: need this for exit dialogue?
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        characterVM.saveCharacter();
+        shopVM.saveEncounter(rv.getDialogueList());
     }
 }

@@ -11,6 +11,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityMainGameBinding;
 import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
+import com.habbybolan.textadventure.view.encounter.ChoiceFragment;
 import com.habbybolan.textadventure.view.encounter.CombatFragment;
 import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.ShopFragment;
@@ -68,15 +69,7 @@ public class MainGameActivity extends AppCompatActivity {
 
     // listener for when the character reaches 0 health
     private void characterDeathListener() {
-        characterViewModel.getHealthObserve().addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                Integer health = characterViewModel.getHealthObserve().get();
-                if (health != null && health <= 0) {
-                    // todo: death screen
-                }
-            }
-        });
+        // todo: death by observing health changes and checking if character is dead (<= 0 health)
     }
 
 
@@ -104,11 +97,15 @@ public class MainGameActivity extends AppCompatActivity {
                 isMultiLevel = true;
                 MultiLevelEncounter multiLevelEncounter = new MultiLevelEncounter(getContext(), character, damage, view, this, model);
                 multiLevelEncounter.setInitialMultiLevel(encounter);
-                break;
-            case CHOICE_TYPE:
-                ChoiceEncounter choiceEncounter = new ChoiceEncounter(getContext(), character, damage, view, this, model);
-                choiceEncounter.setInitialChoice(encounter);
                 break;*/
+            case MainGameViewModel.CHOICE_TYPE:
+                ChoiceFragment choiceFragment = ChoiceFragment.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, choiceFragment)
+                        .commit();
+                break;
             case MainGameViewModel.COMBAT_TYPE:
                 CombatFragment combatFragment = CombatFragment.newInstance();
                 getSupportFragmentManager()

@@ -4,16 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 
 import com.habbybolan.textadventure.R;
+import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentTrapBinding;
+import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.TrapEncounterViewModel;
 
 import org.json.JSONException;
@@ -100,10 +101,10 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
     private void beforeTrapState() {
         // remove ability to drop/consume Inventory Objects
         characterVM.setStateInventoryObserver(false);
-        Button btnDodgeTrap = new Button(getContext());
+
         String dodge = "Dodge Trap";
-        btnDodgeTrap.setText(dodge);
-        btnDodgeTrap.setOnClickListener(new View.OnClickListener() {
+        DefaultButtonDetailsBinding bindingDodge = ButtonInflaters.setDefaultButton(trapBinder.layoutBtnOptions, dodge, getActivity());
+        bindingDodge.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -113,18 +114,15 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
                 }
             }
         });
-        trapBinder.layoutBtnOptions.addView(btnDodgeTrap);
 
-        Button btnUseItem = new Button(getContext());
         String useItem = "Use Item";
-        btnUseItem.setText(useItem);
-        btnUseItem.setOnClickListener(new View.OnClickListener() {
+        DefaultButtonDetailsBinding bindingUseItem = ButtonInflaters.setDefaultButton(trapBinder.layoutBtnOptions, useItem, getActivity());
+        bindingUseItem.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 trapEncounterVM.secondStateUseItem();
             }
         });
-        trapBinder.layoutBtnOptions.addView(btnUseItem);
     }
 
     // third and final state

@@ -112,6 +112,11 @@ public class MainGameViewModel extends BaseObservable {
         this.encounterType.set(encounterType);
     }
 
+    /**
+     * Checks if there is a previously saved encounter to enter. If one exists, then goto that specific
+         * saved encounter, otherwise create a new random encounter to enter.
+         * @throws JSONException    If problem in JSON encounter formatting.
+     */
     public void openGameEncounter() throws JSONException {
         SaveDataLocally save = new SaveDataLocally(context);
         JSONObject prevSave = save.readSavedEncounter();
@@ -122,18 +127,15 @@ public class MainGameViewModel extends BaseObservable {
             setEncounterType(prevSave.getString(EncounterViewModel.ENCOUNTER_TYPE));
         } else {
             // otherwise, create a new encounter
-            gotoNextEncounter();
+            gotoNextRandomEncounter();
         }
     }
 
-    // called by outside this viewModel to start a new encounter
-    public void gotoNextEncounter() {
-        characterVM.applyDots();
-        savedEncounter = null;
-        // todo: decrement stat and bar durations
-        //characterVM.decrementStatChangeDuration();
-        //characterVM.decrementTempExtraDuration();
-        characterVM.decrSpecialDuration();
+    /**
+     *  Start a new random encounter once one has finished or a new game has started.
+     */
+    public void gotoNextRandomEncounter() {
+        applyAfterEncounterActions();
         try {
             createNewEncounter(context);
         } catch (JSONException e) {
@@ -141,8 +143,35 @@ public class MainGameViewModel extends BaseObservable {
         }
     }
 
+    /**
+     * Starts a specified encounter from specifiedEncounter JSON.
+     * @param specifiedEncounter    The encounter to start relating to the JSON.
+     */
+    public void gotoSpecifiedEncounter(JSONObject specifiedEncounter) throws JSONException {
+        applyAfterEncounterActions();
+        JSONEncounter = specifiedEncounter;
+        String type = JSONEncounter.getString("type");
+        setEncounterType(type);
+    }
+
+    /**
+     * Helper to apply necessary actions after an encounter ends, including:
+     *  applying and decrementing dot effects applied to character
+     *  decrementing special effects applied to character
+     *  decrementing stat and tempExtra changes applied to character
+     *  setting the savedEncounter to null
+     */
+    private void applyAfterEncounterActions() {
+        characterVM.applyDots();
+        savedEncounter = null;
+        // todo: decrement stat and bar durations
+        //characterVM.decrementStatChangeDuration();
+        //characterVM.decrementTempExtraDuration();
+        characterVM.decrSpecialDuration();
+    }
+
     // creates a new encounter and saves it to JSONEncounter local field
-    public void createNewEncounter(Context context) throws JSONException {
+    private void createNewEncounter(Context context) throws JSONException {
         JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context, outdoorJSONFilename);
         jsonAssetFileReader.loadJSONFromAssets();
 
@@ -152,12 +181,6 @@ public class MainGameViewModel extends BaseObservable {
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        /*
-        String jsonString = JSONEncounter.toString();
-        // save the new encounter object to filePrevEncounters local file
-        SaveDataLocally save = new SaveDataLocally(context);
-        save.saveEncounter(context, jsonString);
-        */
         String type = JSONEncounter.getString("type");
         setEncounterType(type);
     }

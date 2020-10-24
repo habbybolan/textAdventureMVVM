@@ -11,10 +11,6 @@
             type="Integer" />
     </data>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,22 +71,19 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     android:numColumns="3"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_sell">
-
-                </GridView>
+                    app:layout_constraintTop_toBottomOf="@+id/btn_sell"/>
 
                 <GridView
                     android:id="@+id/grid_sell"
                     android:layout_width="251dp"
-                    android:layout_height="wrap_content"
                     android:layout_marginTop="44dp"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     android:numColumns="3"
                     app:layout_constraintTop_toBottomOf="@+id/btn_sell"
-                    android:visibility="gone">
+                    android:visibility="gone"/>
 
-                </GridView>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <GridLayout
@@ -99,15 +92,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:rowCount="2"
-                android:columnCount="3">
+                android:columnCount="2">
             </GridLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/dialogueRV"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                android:layout_height="wrap_content"/>
 
-    </ScrollView>
+        </LinearLayout>
 
 </layout>
