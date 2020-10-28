@@ -10,9 +10,11 @@ import androidx.databinding.Observable;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityMainGameBinding;
 import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
+import com.habbybolan.textadventure.view.encounter.CheckFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceFragment;
 import com.habbybolan.textadventure.view.encounter.CombatFragment;
+import com.habbybolan.textadventure.view.encounter.MultiDungeonFragment;
 import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.ShopFragment;
 import com.habbybolan.textadventure.view.encounter.TrapFragment;
@@ -93,11 +95,15 @@ public class MainGameActivity extends AppCompatActivity {
                 DungeonEncounter dungeonEncounter = new DungeonEncounter(getContext(), character, damage);
                 dungeonEncounter.setInitialChoice(encounter);
                 break;
-            case MULTI_LEVEL_TYPE:
-                isMultiLevel = true;
-                MultiLevelEncounter multiLevelEncounter = new MultiLevelEncounter(getContext(), character, damage, view, this, model);
-                multiLevelEncounter.setInitialMultiLevel(encounter);
-                break;*/
+                */
+            case MainGameViewModel.MULTI_DUNGEON_TYPE:
+                MultiDungeonFragment multiDungeonFragment = MultiDungeonFragment.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, multiDungeonFragment)
+                        .commit();
+                break;
             case MainGameViewModel.CHOICE_TYPE:
                 ChoiceFragment choiceFragment = ChoiceFragment.newInstance();
                 getSupportFragmentManager()
@@ -145,6 +151,14 @@ public class MainGameActivity extends AppCompatActivity {
                         .beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
                         .replace(R.id.fragment_container_game, randomBenefitFragment)
+                        .commit();
+                break;
+            case MainGameViewModel.CHECK_TYPE:
+                CheckFragment checkFragment = CheckFragment.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, checkFragment)
                         .commit();
                 break;
             /*case QUEST_TYPE:

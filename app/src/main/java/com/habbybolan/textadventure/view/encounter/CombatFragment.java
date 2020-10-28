@@ -92,8 +92,8 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         combatBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_combat, container, false);
         combatBinding.setCharacterVM(characterVM);
         try {
-            setUpEncounterBeginning();
-        } catch (JSONException | ExecutionException | InterruptedException e) {
+            rv = setUpEncounterBeginning(combatVM, this, combatBinding.rvDialogue);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -101,41 +101,25 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     }
 
     /**
-     *  sets up the RV dialogue adapter and the encounter state to enter
-     * @throws InterruptedException     for database accesses
-     * @throws ExecutionException       for database accesses
-     * @throws JSONException            for JSON reading
-     */
-    private void setUpEncounterBeginning() throws InterruptedException, ExecutionException, JSONException {
-        combatVM.setSavedData();
-        // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), combatBinding.rvDialogue, combatVM.getDialogueList());
-        setUpDialogueRV(rv, combatVM);
-        stateListener(combatVM.getStateIndex(), combatVM, this);
-        initiateCombatInfo();
-        // called after stateLister set up, signalling first state to enter
-        combatVM.gotoBeginningState(mainGameVM);
-    }
-
-    /**
      * Initiates all info including recycler viewers, enemies, and button functionality for the combat state.
-     * @throws InterruptedException     for database accesses
-     * @throws ExecutionException       for database accesses
-     * @throws JSONException            for JSON reading
      */
-    private void initiateCombatInfo() throws InterruptedException, ExecutionException, JSONException {
-        setUpInCombatRunButtonClick();
-        setClickersForCategoryOptions();
-        // if no saved encounter, then create necessary info
-        if (!combatVM.getIsSaved())
-            combatVM.createCombat();
-        setCombatOrdering();
-        setCombatDialogueListener();
+    private void initiateCombatInfo()  {
+        try {
+            setUpInCombatRunButtonClick();
+            setClickersForCategoryOptions();
+            // if no saved encounter, then create necessary info
+            if (!combatVM.getIsSaved())
+                combatVM.createCombat();
+            setCombatOrdering();
+            setCombatDialogueListener();
 
-        setContinueButtonClick();
-        setActionSelect();
+            setContinueButtonClick();
+            setActionSelect();
 
-        setInventoryRecyclerViewers();
+            setInventoryRecyclerViewers();
+        } catch (InterruptedException | ExecutionException | JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -161,7 +145,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 break;
             case CombatViewModel.fourthState:
                 // character turn state
-                isCharacterViewsEnabled(false);
+                isCharacterViewsEnabled(true);
                 characterTurnState();
                 break;
             case CombatViewModel.fifthState:
@@ -353,9 +337,8 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      * is also started here based on the CharacterEntity in the front of the combat ordering by calling setFirstTurn.
      */
     private void startCombatState() {
-        //combatBinding.rvCategoryOptions.setVisibility(View.VISIBLE);
-        //combatBinding.characterActionIcon.setVisibility(View.VISIBLE);
         combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
+        initiateCombatInfo();
         combatVM.setFirstTurn();
     }
 
@@ -412,8 +395,9 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     }
 
     /**
-     *  creates the new information activity for the Inventory object clicked
-     * @param object    Inventory used as an action
+     *  Creates the new information activity for the Inventory object clicked. Puts current Activity on back stack and fills the screen
+     *  with the information activity to show necessary information of Inventory object clicked.
+     * @param object    Inventory used as an action whose information will be displayed.
      */
     private void InventoryActivity(Inventory object) {
         Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
@@ -522,7 +506,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void onStop() {
         super.onStop();
-        characterVM.saveCharacter();
-        combatVM.saveEncounter(rv.getDialogueList());
+        combatVM.saveGame(rv);
     }
 }

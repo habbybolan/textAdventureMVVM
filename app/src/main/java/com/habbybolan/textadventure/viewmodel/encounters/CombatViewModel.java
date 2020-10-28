@@ -17,8 +17,8 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
-import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
@@ -103,11 +103,11 @@ public class CombatViewModel extends EncounterViewModel {
         // create the enemies
         JSONObject fightObject = encounter.getJSONObject("fight");
         JSONArray typeArray = fightObject.getJSONArray("type");
-        JSONArray difficultyArray = fightObject.getJSONArray("difficulty");
         // ID associated with the enemy
         int ID = 2;
+        DatabaseAdapter db = new DatabaseAdapter(context);
         for (int i = 0; i < typeArray.length(); i++) {
-            Enemy enemy = new Enemy(characterVM.getCharacter().getNumStatPoints(), typeArray.getString(i), difficultyArray.getInt(i), ID, context);
+            Enemy enemy = db.getEnemy(typeArray.getString(i), 1, characterVM.getCharacter().getNumStatPoints());
             enemies.add(new EnemyViewModel(enemy));
             ID++;
         }
@@ -221,16 +221,19 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     /**
-     * set up the saved dialogue, inventory reward if one exists, and the combat ordering
-     * @throws JSONException    problem reading saved JSON
+     * Set up the saved dialogue, inventory reward if one exists, and the combat ordering.
      */
     @Override
-    public void setSavedData() throws JSONException {
-        if (getIsSaved()) {
-            setDialogueList(mainGameVM);
-            setSavedInventory();
-            retrieveEnemies();
-            retrieveCombatOrdering();
+    public void setSavedData() {
+        try {
+            if (getIsSaved()) {
+                setDialogueList(mainGameVM);
+                inventoryToRetrieve = setSavedInventory();
+                retrieveEnemies();
+                retrieveCombatOrdering();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -282,28 +285,6 @@ public class CombatViewModel extends EncounterViewModel {
             for (EnemyViewModel enemyVM : enemies) {
                 if (enemyVM.getEnemy().getID() == ID)
                     combatList.add(enemyVM.getEnemy());
-            }
-        }
-    }
-
-
-    // get the saved Inventory Object from the json
-    private void setSavedInventory() throws JSONException {
-        // check if an inventory value has been stored
-        if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
-            JSONObject inventory = mainGameVM.getSavedEncounter().getJSONObject(INVENTORY);
-
-            if (inventory.getString("type").equals("ability")) {
-                // saved Inventory object is an Ability
-                inventoryToRetrieve = new Ability(inventory.toString());
-
-            } else if (inventory.getString("type").equals("item")) {
-                // saved Inventory object is an Item
-                inventoryToRetrieve = new Item(inventory.toString());
-
-            } else {
-                // otherwise, saved Inventory object is a Weapon
-                inventoryToRetrieve = new Weapon(inventory.toString());
             }
         }
     }
@@ -610,17 +591,24 @@ public class CombatViewModel extends EncounterViewModel {
 
     // exp reward
     private void getExpReward() {
-        int expReward = combatModel.getExpReward(encounter);
+        int expReward = combatModel.getExpReward(getEnemiesList());
         characterVM.addExp(expReward);
     }
     // gold reward
     private void getGoldReward() {
-        int goldReward = combatModel.getGoldReward(encounter);
+        int goldReward = combatModel.getGoldReward(getEnemiesList());
         characterVM.goldChange(goldReward);
+    }
+    private ArrayList<Enemy> getEnemiesList() {
+        ArrayList<Enemy> enemiesList = new ArrayList<>();
+        for (EnemyViewModel enemyVM : enemies) {
+            enemiesList.add(enemyVM.getEnemy());
+        }
+        return enemiesList;
     }
     // Weapon/Ability/Item reward
     public Inventory getInventoryReward(Context context) {
-        Inventory inventoryRewards = combatModel.getInventoryReward(encounter, context);
+        Inventory inventoryRewards = combatModel.getInventoryReward(getEnemiesList(), context);
         // todo: apply the Inventory rewards to character
         return inventoryRewards;
     }

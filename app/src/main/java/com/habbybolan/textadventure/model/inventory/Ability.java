@@ -98,8 +98,7 @@ public class Ability extends Action {
     }
 
     // constructor to read database for ability
-    public Ability(Cursor cursor, int abilityID) throws ExecutionException, InterruptedException {
-        this.abilityID = abilityID;
+    public Ability(Cursor cursor) {
         setVariables(cursor);
         setPictureResource();
     }
@@ -191,7 +190,9 @@ public class Ability extends Action {
         return ability.getName().equals(getName());
     }
 
-    private void setVariables(Cursor cursor) throws ExecutionException, InterruptedException {
+    private void setVariables(Cursor cursor) {
+        int abilityColID = cursor.getColumnIndex(ABILITY_ID);
+        abilityID = cursor.getInt(abilityColID);
         // set ability name
         int nameOfAbilityColIndex = cursor.getColumnIndex(ABILITY_NAME);
         setAbilityName(cursor.getString(nameOfAbilityColIndex));
@@ -584,6 +585,7 @@ public class Ability extends Action {
     @Override
     public JSONObject serializeToJSON() throws JSONException {
         JSONObject JSONInventory = new JSONObject();
+        JSONInventory.put(TYPE, TYPE_ABILITY);
         JSONInventory.put(ABILITY_NAME, abilityName);
         JSONInventory.put(ABILITY_ID, abilityID);
         JSONInventory.put(INVENTORY_TYPE, TYPE_ABILITY);

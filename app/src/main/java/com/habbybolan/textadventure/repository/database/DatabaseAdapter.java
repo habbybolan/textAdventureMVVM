@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.habbybolan.textadventure.model.characterentity.Enemy;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
@@ -31,6 +32,11 @@ public class DatabaseAdapter {
     private String S_ATTACK_ID = "s_attack_id";
     private String ABILITY_ID = "ability_id";
     private String ITEM_ID = "item_id";
+
+    private String ENEMY_ID = "enemy_id";
+    private String ENEMY_TYPE = "type";
+    private String ENEMY_ABILITY_ID = "enemy_ability_id";
+    private String TIER = "tier";
 
     // TODO: establish the number of tiers weapons/abilities/items have
     private double WEAPON_TIER_1 = 0.70;
@@ -112,9 +118,7 @@ public class DatabaseAdapter {
         int limit = 1;
         String sql = "SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT " + limit;
         Cursor weaponCursor = new queryDatabase().execute(sql).get();
-        int weaponColID = weaponCursor.getColumnIndex(WEAPON_ID);
-        int weaponID = weaponCursor.getInt(weaponColID);
-        Weapon weapon =  new Weapon(weaponCursor, this, weaponID);
+        Weapon weapon =  new Weapon(weaponCursor, this);
         close();
         return weapon;
     }
@@ -145,13 +149,12 @@ public class DatabaseAdapter {
         ArrayList<Weapon> weapons = new ArrayList<>();
         // used to get random cursors without repeat of the random value previously chosen
         ArrayList<Integer> possibleCursorIndices = new ArrayList<>();
-        for (int i = 0; i < LOOT_POOL_SIZE; i++) possibleCursorIndices.add(i);
+        for (int i = 0; i < LOOT_POOL_SIZE; i++)
+            possibleCursorIndices.add(i);
         Collections.shuffle(possibleCursorIndices); // randomize the ArrayList<Weapon>
         for (int i = 0; i < numWeapons; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
-            int weaponColID = cursor.getColumnIndex(WEAPON_ID);
-            int weaponID = cursor.getInt(weaponColID);
-            weapons.add(new Weapon(cursor, this, weaponID));
+            weapons.add(new Weapon(cursor, this));
         }
         close();
         return weapons;
@@ -182,9 +185,7 @@ public class DatabaseAdapter {
         String table = Ability.table;
         String sql ="SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT 1";
         Cursor abilityCursor = new queryDatabase().execute(sql).get();
-        int abilityColID = abilityCursor.getColumnIndex(WEAPON_ID);
-        int abilityID = abilityCursor.getInt(abilityColID);
-        Ability ability =  new Ability(abilityCursor, abilityID);
+        Ability ability =  new Ability(abilityCursor);
         abilityCursor.close();
         close();
         return ability;
@@ -219,9 +220,7 @@ public class DatabaseAdapter {
         Collections.shuffle(possibleCursorIndices); // randomize the ArrayList<Ability>
         for (int i = 0; i < numAbilities; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
-            int abilityColID = cursor.getColumnIndex(ABILITY_ID);
-            int abilityID = cursor.getInt(abilityColID);
-            abilities.add(new Ability(cursor, abilityID));
+            abilities.add(new Ability(cursor));
         }
         cursor.close();
         close();
@@ -247,9 +246,7 @@ public class DatabaseAdapter {
         String table = Item.table;
         String sql ="SELECT * FROM " + table + " WHERE " + "tier" + " = " + tier + " ORDER BY RANDOM() LIMIT 1";
         Cursor itemCursor = new queryDatabase().execute(sql).get();
-        int itemColID = itemCursor.getColumnIndex(ITEM_ID);
-        int itemID = itemCursor.getInt(itemColID);
-        Item item =  new Item(itemCursor, this, itemID);
+        Item item =  new Item(itemCursor, this);
         itemCursor.close();
         close();
         return item;
@@ -283,9 +280,7 @@ public class DatabaseAdapter {
         Collections.shuffle(possibleCursorIndices); // randomize the ArrayList<Item>
         for (int i = 0; i < numItems; i++) {
             cursor.moveToPosition(possibleCursorIndices.get(i));
-            int itemColID = cursor.getColumnIndex(ITEM_ID);
-            int itemID = cursor.getInt(itemColID);
-            items.add(new Item(cursor, this, itemID));
+            items.add(new Item(cursor, this));
         }
         cursor.close();
         close();
@@ -297,6 +292,62 @@ public class DatabaseAdapter {
         String table = Item.table;
         String sql = "SELECT * FROM " + table + " WHERE " + ITEM_ID + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
         return new queryDatabase().execute(sql).get();
+    }
+
+    /**
+     * Retrieves the Enemy given a type and tier from the database table enemy.
+     * @param type              The type of the enemy, used as a primary key in the database table enemy.
+     * @param tier              The tier from 1-3, determining the strength of the enemy, 1 being weakest, 3 being strongest.
+     * @param numStatPoints     The number of stat points to be distributed to the enemy.
+     * @return                  The Enemy object created from the info retrieved from the database table.
+     */
+    public Enemy getEnemy(String type, int tier, int numStatPoints) throws ExecutionException, InterruptedException {
+        open();
+        String sql = "SELECT * FROM " + Enemy.TABLE_ENEMY + " WHERE " + "type" + " = " + "\"" + type + "\"";
+        Cursor cursor = new queryDatabase().execute(sql).get();
+        // holds the column of the next column to look at
+        int colIndex;
+        // enemy ID
+        colIndex = cursor.getColumnIndex(ENEMY_ID);
+        int id = cursor.getInt(colIndex);
+        // if enemy has a weapon
+        colIndex = cursor.getColumnIndex(Enemy.IS_WEAPON);
+        boolean isWeapon = cursor.getInt(colIndex) == 1;
+        // percentages
+        colIndex = cursor.getColumnIndex(Enemy.STR_PERCENT);
+        int strPercent = cursor.getInt(colIndex);
+        colIndex = cursor.getColumnIndex(Enemy.INT_PERCENT);
+        int intPercent  = cursor.getInt(colIndex);
+        colIndex = cursor.getColumnIndex(Enemy.CON_PERCENT);
+        int colPercent = cursor.getInt(colIndex);
+        colIndex = cursor.getColumnIndex(Enemy.SPD_PERCENT);
+        int spdPercent = cursor.getInt(colIndex);
+        ArrayList<Ability> abilities = getAbilitiesOfEnemy(id, tier);
+        Weapon weapon = null;
+        if (isWeapon) weapon = getRandomWeaponOfTier(1);
+        return new Enemy(type, tier, isWeapon, strPercent, intPercent, colPercent, spdPercent, abilities, numStatPoints, weapon);
+    }
+
+    /**
+     * Retrieves the abilities associated with the Enemy, given its ID and tier, by looking at the bridge table enemy_ability_bridge in the database
+     * and finding all abilities associated with those 2 keys.
+     * @param id        The ID of the enemy.
+     * @param tier      The tier of the enemy.
+     */
+    private ArrayList<Ability> getAbilitiesOfEnemy(int id, int tier) throws ExecutionException, InterruptedException {
+        ArrayList<Ability> abilities = new ArrayList<>();
+        String sql = "SELECT * FROM " + Enemy.TABLE_ENEMY_ABILITY_BRIDGE + " WHERE " + ENEMY_ID + " = " + id + " AND " + TIER + " = " + tier;
+        Cursor cursor = new queryDatabase().execute(sql).get();
+        do {
+            // get the specific ability ID from the bridge table that cursor is pointing to, and query for that ability in enemy_ability table.
+            int abilityIdColIndex = cursor.getColumnIndex(Enemy.ENEMY_ABILITY_ID);
+            int ability_id = cursor.getInt(abilityIdColIndex);
+            // query a single ability given enemy_ability primary key ability_id
+            sql = "SELECT * FROM " + Enemy.TABLE_ENEMY_ABILITY + " WHERE " + ABILITY_ID + " = " + ability_id;
+            Cursor cursorAbility = new queryDatabase().execute(sql).get();
+            abilities.add(new Ability(cursorAbility));
+        } while (cursor.moveToNext());
+        return abilities;
     }
 
 }

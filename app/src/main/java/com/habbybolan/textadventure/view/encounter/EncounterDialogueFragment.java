@@ -6,6 +6,7 @@ import android.widget.GridLayout;
 import androidx.databinding.Observable;
 import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
@@ -101,7 +102,7 @@ class EncounterDialogueFragment extends Fragment {
      * @param vm            View Model of the current encounter
      * @param fragment      The fragment of the current encounter, associated with the vm
      */
-    void stateListener(ObservableField<Integer> stateIndex, final EncounterViewModel vm, final EncounterFragment fragment) {
+    private void stateListener(ObservableField<Integer> stateIndex, final EncounterViewModel vm, final EncounterFragment fragment) {
         final Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
@@ -110,5 +111,23 @@ class EncounterDialogueFragment extends Fragment {
             }
         };
         stateIndex.addOnPropertyChangedCallback(callback);
+    }
+
+    /**
+     * Sets up the dialogue recyclerViewer that holds all dialogue and sets up the beginning fragment state to enter
+     * @param viewModel         The viewModel associated with the current encounter.
+     * @param fragment          The fragment associated with the current encounter.
+     * @param rv                The view for the RecyclerView to set up the DialogueRecyclerView
+     * @throws JSONException    For any JSON formatting error.
+     */
+    DialogueRecyclerView setUpEncounterBeginning(EncounterViewModel viewModel, EncounterFragment fragment, RecyclerView rv) throws JSONException {
+        viewModel.setSavedData();
+        // set up Recycler Viewer that holds all dialogue
+        DialogueRecyclerView dialogueRV = new DialogueRecyclerView(getContext(), rv, viewModel.getDialogueList());
+        setUpDialogueRV(dialogueRV, viewModel);
+        stateListener(viewModel.getStateIndex(), viewModel, fragment);
+        // called after stateLister set up, signalling first state to enter
+        viewModel.gotoBeginningState();
+        return dialogueRV;
     }
 }

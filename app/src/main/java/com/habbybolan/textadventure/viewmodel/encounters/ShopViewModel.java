@@ -96,10 +96,14 @@ public class ShopViewModel extends EncounterViewModel  {
     }
 
     @Override
-    public void setSavedData() throws JSONException {
-        if (getIsSaved()) {
-            setDialogueList(mainGameVM);
-            setBuyListFromSave();
+    public void setSavedData() {
+        try {
+            if (getIsSaved()) {
+                setDialogueList(mainGameVM);
+                setBuyListFromSave();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 

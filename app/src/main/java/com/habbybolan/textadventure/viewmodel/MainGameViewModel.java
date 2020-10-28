@@ -8,6 +8,7 @@ import androidx.databinding.Bindable;
 import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.BR;
+import com.habbybolan.textadventure.model.locations.MultiDungeon;
 import com.habbybolan.textadventure.repository.JsonAssetFileReader;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -15,8 +16,6 @@ import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 
 /*
 Holds encounter information to deal with flow and creation of encounters
@@ -31,7 +30,10 @@ public class MainGameViewModel extends BaseObservable {
     private int gameFragmentVisible = View.VISIBLE; // visibility of the game fragment
     private int characterFragmentVisible = View.GONE; // visibility of the character fragment
 
-    private static final String outdoorJSONFilename = "outdoor_encounters";
+    public static final String outdoorJSONFilename = "outdoor_encounters";
+    public static final String multiDungeonJSONFilename = "multi_dungeon_encounters";
+    public static final String dungeonJSONFilename = "dungeon_encounters";
+
     private JSONObject JSONEncounter;
 
     // keeps track of the location
@@ -53,24 +55,29 @@ public class MainGameViewModel extends BaseObservable {
     final public static int numLocations = 4;
 
     // encounter types - int corresponding to the index of the location in a JSONArray in outdoor_encounters
-    final public static int DUNGEON = 0;
+    final public static String TYPE = "type";
+
+    private final static int OUTDOOR_STATE = 0;
+    private final static int MULTI_DUNGEON_STATE = 1;
+    private final static int DUNGEON_STATE = 2;
+
     final public static String DUNGEON_TYPE = "dungeon";
-    final public static int MULTI_LEVEL = 1; // enter into a multi-level encounter
-    final public static String MULTI_LEVEL_TYPE = "multi_level";
-    final public static int CHOICE = 2; // a choice to interact or not, leading to a semi-random encounter based on type of choice
+    final public static String MULTI_DUNGEON_TYPE = "multi_dungeon";
     final public static String CHOICE_TYPE = "choice";
-    final public static int COMBAT = 3; // enter combat
     final public static String COMBAT_TYPE = "combat";
-    final public static int TRAP = 4; // enter a trap - take damage if fail to escape
     final public static String TRAP_TYPE = "trap";
-    final public static int SHOP = 5; // a shop that sells an assortment of random items/weapons/abilities
     final public static String SHOP_TYPE = "shop";
-    final public static int CHOICE_BENEFIT = 6; // a random, guaranteed temporary/permanent benefit - stat/health increase, item, weapon
     final public static String CHOICE_BENEFIT_TYPE = "choice_benefit";
-    final public static int RANDOM_BENEFIT = 7; // a random reward of either gold/Weapon/Item/Ability
     final public static String RANDOM_BENEFIT_TYPE = "random_benefit";
-    final public static int QUEST = 8; // temporary leave the "area" to finish a specific task for a reward
     final public static String QUEST_TYPE = "quest";
+    final public static String CHECK_TYPE = "check";
+
+    /** The state of the encounters to get
+     *      0: outdoor encounters
+     *      1: multi dungeon encounters
+     *      2: dungeon encounters
+     */
+    private int encounterState = OUTDOOR_STATE;
 
     private CharacterViewModel characterVM;
     private Context context;
@@ -108,7 +115,7 @@ public class MainGameViewModel extends BaseObservable {
     public ObservableField<String> getEncounterType() {
         return encounterType;
     }
-    public void setEncounterType(String encounterType) {
+    private void setEncounterType(String encounterType) {
         this.encounterType.set(encounterType);
     }
 
@@ -132,16 +139,34 @@ public class MainGameViewModel extends BaseObservable {
     }
 
     /**
-     *  Start a new random encounter once one has finished or a new game has started.
+     *  Start a new random encounter once one has finished or a new game has started. Used in Choice and Multi_level encounters.
      */
     public void gotoNextRandomEncounter() {
         applyAfterEncounterActions();
         try {
-            createNewEncounter(context);
+            switch (encounterState) {
+                case OUTDOOR_STATE:
+                    createNewEncounter(context);
+                    break;
+                case MULTI_DUNGEON_STATE:
+                    continueMultiDungeonEncounters();
+                    break;
+                case DUNGEON_STATE:
+                    // todo:
+                    break;
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Sets the encounter state back to outdoor encounters.
+     */
+    public void setStateToOutdoor() {
+        encounterState = OUTDOOR_STATE;
+    }
+
 
     /**
      * Starts a specified encounter from specifiedEncounter JSON.
@@ -151,6 +176,47 @@ public class MainGameViewModel extends BaseObservable {
         applyAfterEncounterActions();
         JSONEncounter = specifiedEncounter;
         String type = JSONEncounter.getString("type");
+        setEncounterType(type);
+    }
+
+    /**
+     * Called from multiDungeonFragment to signal character entered a multi dungeon.
+     */
+    public void startMultiDungeon() throws JSONException {
+        encounterState = MULTI_DUNGEON_STATE;
+        checkContinueMultiDungeon();
+    }
+
+    /**
+     * Start fragment to check if player wants to continue in multi dungeon encounter, or leave
+     * the dungeon and continue on with outdoor encounters. Called from an encounter view Model and startMultiDungeon.
+     * Sets up the encounter object with type 'check' and a single dialogue line.
+     */
+    private void checkContinueMultiDungeon() throws JSONException {
+        JSONObject check = new JSONObject();
+        check.put(TYPE, MultiDungeon.CHECK_TYPE);
+        JSONObject dialogueObj = new JSONObject();
+        dialogueObj.put("dialogue", "Continue in the dungeon?");
+        check.put("dialogue", dialogueObj);
+        // create a check JSONObject that only holds {"type":"check",
+        //                                            "dialogue":{"Continue in the dungeon?"}}
+        // and set as encounter
+        JSONEncounter = check;
+        setEncounterType(MultiDungeon.CHECK_TYPE);
+    }
+
+    /**
+     * Continue with the multi dungeon encounters, finding a random encounter to enter.
+     */
+    private void continueMultiDungeonEncounters() throws JSONException {
+        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
+        // get a random encounter from jsonFileReader for multi dungeon
+        try {
+            JSONEncounter = jsonAssetFileReader.getRandomMultiDungeonEncounter();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String type = JSONEncounter.getString(TYPE);
         setEncounterType(type);
     }
 
@@ -172,13 +238,12 @@ public class MainGameViewModel extends BaseObservable {
 
     // creates a new encounter and saves it to JSONEncounter local field
     private void createNewEncounter(Context context) throws JSONException {
-        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context, outdoorJSONFilename);
-        jsonAssetFileReader.loadJSONFromAssets();
+        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
 
         // get a random encounter from jsonFileReader
         try {
-            JSONEncounter = jsonAssetFileReader.getRandomEncounter(location, location_type);
-        } catch (ExecutionException | InterruptedException e) {
+            JSONEncounter = jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         String type = JSONEncounter.getString("type");
@@ -240,5 +305,6 @@ public class MainGameViewModel extends BaseObservable {
     public JSONObject getSavedEncounter() {
         return savedEncounter;
     }
+
 
 }

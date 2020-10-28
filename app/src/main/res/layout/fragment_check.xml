@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".view.encounter.CheckFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/choice_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <GridLayout
+                android:id="@+id/layout_btn_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:rowCount="2"
+                android:columnCount="2">
+
+                <Button
+                    android:id="@+id/btn_continue"
+                    android:layout_width="@dimen/default_btn_width"
+                    android:layout_height="@dimen/default_btn_height"
+                    android:onClick="clickLeave"
+                    android:text="@string/continue_game"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/btn_leave"
+                    android:layout_width="@dimen/default_btn_width"
+                    android:layout_height="@dimen/default_btn_height"
+                    android:onClick="clickContinue"
+                    android:text="leave"
+                    android:visibility="gone"/>
+
+            </GridLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_dialogue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</layout>

@@ -32,7 +32,7 @@
     <dimen name="inventory_info_icon_margins">7sp</dimen>
 
     <dimen name="default_btn_height">42dp</dimen>
-    <dimen name="default_btn_width">97dp</dimen>
+    <dimen name="default_btn_width">100dp</dimen>
 
     <dimen name="character_frag_title">20dp</dimen>
 

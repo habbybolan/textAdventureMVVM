@@ -9,16 +9,14 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 
 public class RandomBenefitViewModel extends EncounterViewModel {
@@ -70,34 +68,14 @@ public class RandomBenefitViewModel extends EncounterViewModel {
     }
 
     @Override
-    public void setSavedData() throws JSONException, ExecutionException, InterruptedException {
-        if (getIsSaved()) {
-            setDialogueList(mainGameVM);
-            setSavedInventory();
-        }
-    }
-
-    // get the saved Inventory Object from the json
-    private void setSavedInventory() throws JSONException, ExecutionException, InterruptedException {
-        // check if an inventory value has been stored
-        if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
-            JSONObject inventory = mainGameVM.getSavedEncounter().getJSONObject(INVENTORY);
-            // retrieve id of the Inventory Object
-            int id = inventory.getInt("id");
-            DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
-
-            if (inventory.getString("type").equals("ability")) {
-                // saved Inventory object is an Ability
-                inventoryToRetrieve = new Ability(id, mDbHelper);
-
-            } else if (inventory.getString("type").equals("item")) {
-                // saved Inventory object is an Item
-                inventoryToRetrieve = new Item(id, mDbHelper);
-
-            } else {
-                // otherwise, saved Inventory object is a Weapon
-                inventoryToRetrieve = new Weapon(id, mDbHelper);
+    public void setSavedData() {
+        try {
+            if (getIsSaved()) {
+                setDialogueList(mainGameVM);
+                inventoryToRetrieve = setSavedInventory();
             }
+        } catch(JSONException e) {
+            e.printStackTrace();
         }
     }
 

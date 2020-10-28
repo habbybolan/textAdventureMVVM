@@ -83,27 +83,11 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
         shopBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_shop, container, false);
         shopBinding.setShopVM(shopVM);
         try {
-            setUpEncounterBeginning();
-        } catch (JSONException | ExecutionException | InterruptedException e) {
+            rv = setUpEncounterBeginning(shopVM, this, shopBinding.dialogueRV);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return shopBinding.getRoot();
-    }
-
-    /**
-     *  sets up the RV dialogue adapter and the encounter state to enter
-     * @throws InterruptedException     for database accesses
-     * @throws ExecutionException       for database accesses
-     * @throws JSONException            for JSON reading
-     */
-    private void setUpEncounterBeginning() throws InterruptedException, ExecutionException, JSONException {
-        shopVM.setSavedData();
-        // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), shopBinding.dialogueRV, shopVM.getDialogueList());
-        setUpDialogueRV(rv, shopVM);
-        stateListener(shopVM.getStateIndex(), shopVM, this);
-        // called after stateLister set up, signalling first state to enter
-        shopVM.gotoBeginningState(mainGameVM);
     }
 
     @Override
@@ -294,7 +278,6 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
     @Override
     public void onStop() {
         super.onStop();
-        characterVM.saveCharacter();
-        shopVM.saveEncounter(rv.getDialogueList());
+        shopVM.saveGame(rv);
     }
 }

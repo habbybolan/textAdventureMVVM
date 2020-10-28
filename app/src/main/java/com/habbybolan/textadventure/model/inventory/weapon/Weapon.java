@@ -36,8 +36,7 @@ public class Weapon implements Inventory {
     }
 
     // Constructor where database opened and closed elsewhere
-    public Weapon(Cursor cursor, DatabaseAdapter mDbHelper, int weaponID) throws ExecutionException, InterruptedException {
-        this.weaponID = weaponID;
+    public Weapon(Cursor cursor, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         setVariables(mDbHelper, cursor);
         setPictureResource();
     }
@@ -85,6 +84,8 @@ public class Weapon implements Inventory {
 
     // sets all the variables that describe the weapon
     private void setVariables(DatabaseAdapter mDbHelper, Cursor cursor) throws ExecutionException, InterruptedException {
+        int weaponColID = cursor.getColumnIndex(WEAPON_ID);
+        weaponID = cursor.getInt(weaponColID);
         // set up the weapon name
         int weaponNameColIndex = cursor.getColumnIndex(WEAPON_NAME);
         setWeaponName(cursor.getString(weaponNameColIndex));
@@ -138,6 +139,7 @@ public class Weapon implements Inventory {
     @Override
     public JSONObject serializeToJSON() throws JSONException {
         JSONObject JSONInventory = new JSONObject();
+        JSONInventory.put(TYPE, TYPE_WEAPON);
         JSONInventory.put(WEAPON_NAME, weaponName);
         JSONInventory.put(WEAPON_ID, weaponID);
         JSONInventory.put(INVENTORY_TYPE, TYPE_WEAPON);

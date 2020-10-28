@@ -5,80 +5,64 @@ Loads and Reads JSON files in the assets folder in the background thread
  */
 
 import android.content.Context;
-import android.os.AsyncTask;
 
+import com.habbybolan.textadventure.model.locations.MultiDungeon;
+import com.habbybolan.textadventure.model.locations.Outdoor;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class JsonAssetFileReader {
-    private String JSONFileName;// = "outdoor_encounters";
+    private String outdoorJSONFilename = MainGameViewModel.outdoorJSONFilename;
+    private String multiDungeonJSONFilename = MainGameViewModel.multiDungeonJSONFilename;
+    private String dungeonJSONFilename = MainGameViewModel.dungeonJSONFilename;
     private Context context;
     private String json;
 
     private int location;
     private String location_type;
 
-    public JsonAssetFileReader(Context context, String JSONFileName) {
+    public JsonAssetFileReader(Context context) {
         this.context = context;
-        this.JSONFileName = JSONFileName;
     }
 
-    // load JSON data, given path, from assets
-    static public String loadJSONFromData(String path) {
+    /**
+     * Calls callable to load the JSON String from assets on a separate thread, returning the result through call.
+     */
+    private static class LoadJSONFromFile implements Callable<String> {
+        private final String fileName;
+        private final Context context;
 
-        StringBuilder encounter = new StringBuilder();
-        try {
-            File fileReader = new File(path);
-            BufferedReader br = new BufferedReader(new FileReader(fileReader));
-            String tempEncounter;
-            while ((tempEncounter = br.readLine()) != null)
-                encounter.append(tempEncounter);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        LoadJSONFromFile(String fileName, Context context) {
+            this.fileName = fileName;
+            this.context = context;
         }
 
-        // todo: encounter might be null - what to do>?
-        return encounter.toString();
-    }
-
-    public class loadJSONFromAssets extends AsyncTask<Void, Void, Void> {
-
         @Override
-        protected Void doInBackground(Void... voids) {
+        public String call() {
             try {
-                InputStream is = context.getAssets().open(JSONFileName);
-
+                InputStream is = context.getAssets().open(fileName);
                 int size = is.available();
                 byte[] buffer = new byte[size];
                 is.read(buffer);
                 is.close();
-
-                json = new String(buffer, StandardCharsets.UTF_8);
-
+                return new String(buffer, StandardCharsets.UTF_8);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
-                return null;
             }
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
         }
     }
 
@@ -87,15 +71,18 @@ public class JsonAssetFileReader {
     }
 
     // reads the json file in assets and saves to json field
-    public void loadJSONFromAssets() {
-        new loadJSONFromAssets().execute();
+    private void loadJSONFromAssets(String fileName) throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Callable callable = new LoadJSONFromFile(fileName, context);
+        Future<String> future = executor.submit(callable);
+        json = future.get();
     }
 
-    public class parseRandomJSONData extends AsyncTask<Void, Void, JSONObject> {
+    class parseRandomOutdoorJSON implements Callable<JSONObject> {
         JSONObject outputEncounter = new JSONObject();
 
         @Override
-        protected JSONObject doInBackground(Void ... voids) {
+        public JSONObject call() {
             try {
                 // get the json object and array
                 JSONObject obj = new JSONObject(json);
@@ -110,7 +97,7 @@ public class JsonAssetFileReader {
                 // todo: used for testing specific encounters
                 //Random rand = new Random();
                 //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(MainGameViewModel.CHOICE);
+                encounterTemp = jsonArray.getJSONObject(Outdoor.MULTI_DUNGEON);
                 // ***
 
                 // put type into encounter
@@ -120,7 +107,34 @@ public class JsonAssetFileReader {
                 // get a random encounter specific of "type"
                 jsonArray = encounterTemp.getJSONArray(ENCOUNTERS);
                 encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
-                finalizeEncounter(encounterTemp, outputEncounter, type);
+                finalizeOutdoorEncounter(encounterTemp, outputEncounter, type);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return outputEncounter;
+        }
+    }
+
+    class parseRandomMultiDungeonJSON implements Callable<JSONObject> {
+        JSONObject outputEncounter = new JSONObject();
+
+        @Override
+        public JSONObject call() {
+            try {
+                // get the json object and array
+                JSONObject obj = new JSONObject(json);
+                JSONArray jsonArray = obj.getJSONArray(ALL_ENCOUNTERS);
+                // encounterTemp: encounter data to retrieve, store and return
+                JSONObject encounterTemp = jsonArray.getJSONObject(MultiDungeon.TRAP);
+
+                // put type into encounter
+                String type = encounterTemp.getString(TYPE);
+                outputEncounter.put(TYPE, encounterTemp.get(TYPE));
+
+                // get a random encounter specific of "type"
+                jsonArray = encounterTemp.getJSONArray(ENCOUNTERS);
+                encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
+                finalizeMultiDungeonEncounter(encounterTemp, outputEncounter, type);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -129,36 +143,61 @@ public class JsonAssetFileReader {
     }
 
     /**
-     * Takes a JSONObject encounterTemp and finds the method to call to get the appropriate JSON encounter to store for use
+     * Takes a JSONObject encounterTemp and finds the method to call to get the appropriate JSON outdoor encounter to store for use
      * inside encounter
      * @param encounterTemp     The JSONObject to trim and store in encounter.
      * @param encounter         The JSONObject that holds the necessary encounter data.
      */
-    private void finalizeEncounter(JSONObject encounterTemp, JSONObject encounter, String type) throws JSONException {
+    private void finalizeOutdoorEncounter(JSONObject encounterTemp, JSONObject encounter, String type) throws JSONException {
         switch (type) {
-            case MainGameViewModel.DUNGEON_TYPE:
+            case Outdoor.DUNGEON_TYPE:
                 dungeonEncounter(encounterTemp, encounter);
                 break;
-            case MainGameViewModel.MULTI_LEVEL_TYPE:
+            case Outdoor.MULTI_DUNGEON_TYPE:
                 multiLevelEncounter(encounterTemp, encounter);
                 break;
-            case MainGameViewModel.CHOICE_TYPE:
+            case Outdoor.CHOICE_TYPE:
                 choiceEncounter(encounterTemp, encounter);
                 break;
-            case MainGameViewModel.COMBAT_TYPE:
+            case Outdoor.COMBAT_TYPE:
                 combatEncounter(encounterTemp, encounter);
                 break;
-            case MainGameViewModel.TRAP_TYPE:
+            case Outdoor.TRAP_TYPE:
                 trapEncounter(encounterTemp, encounter);
                 break;
-            case MainGameViewModel.SHOP_TYPE: case MainGameViewModel.CHOICE_BENEFIT_TYPE: case MainGameViewModel.RANDOM_BENEFIT_TYPE:
+            case Outdoor.SHOP_TYPE: case Outdoor.CHOICE_BENEFIT_TYPE: case Outdoor.RANDOM_BENEFIT_TYPE:
                 shopRandomChoiceEncounter(encounterTemp, encounter);
                 break;
-            case MainGameViewModel.QUEST_TYPE:
+            case Outdoor.QUEST_TYPE:
                 questEncounter(encounterTemp, encounter);
                 break;
             default: //  shouldn't reach here
-                throw new IllegalArgumentException(type + "not found for encounters");
+                throw new IllegalArgumentException(type + " not a valid encounter type");
+        }
+    }
+
+    /**
+     * Takes a JSONObject encounterTemp and finds the method to call to get the appropriate JSON outdoor encounter to store for use
+     * inside encounter
+     * @param encounterTemp     The JSONObject to trim and store in encounter.
+     * @param encounter         The JSONObject that holds the necessary encounter data.
+     */
+    private void finalizeMultiDungeonEncounter(JSONObject encounterTemp, JSONObject encounter, String type) throws JSONException {
+        switch (type) {
+            case MultiDungeon.CHOICE_TYPE:
+                choiceEncounter(encounterTemp, encounter);
+                break;
+            case MultiDungeon.COMBAT_TYPE:
+                combatEncounter(encounterTemp, encounter);
+                break;
+            case MultiDungeon.TRAP_TYPE:
+                trapEncounter(encounterTemp, encounter);
+                break;
+            case MultiDungeon.SHOP_TYPE: case MultiDungeon.CHOICE_BENEFIT_TYPE: case MultiDungeon.RANDOM_BENEFIT_TYPE:
+                shopRandomChoiceEncounter(encounterTemp, encounter);
+                break;
+            default: //  shouldn't reach here
+                throw new IllegalArgumentException(type + " not a valid encounter type");
         }
     }
 
@@ -231,6 +270,7 @@ public class JsonAssetFileReader {
      * helper method for retrieving and storing the Quest encounter JSON data
      */
     private void questEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // todo: quest JSON encounter parser
         String type = encounterTemp.getString(TYPE);
         JSONArray jsonArray = encounterTemp.getJSONArray(type);
         encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
@@ -270,7 +310,7 @@ public class JsonAssetFileReader {
             optionToStore.put(NAME, option.getString("name"));
             JSONObject encounterInOption = getRandomOption(option.getJSONArray(ENCOUNTERS_IN_OPTION));
             optionToStore.put(TYPE, encounterInOption.getString(TYPE));
-            finalizeEncounter(encounterInOption.getJSONObject(ENCOUNTER), optionToStore, encounterInOption.getString(TYPE));
+            finalizeOutdoorEncounter(encounterInOption.getJSONObject(ENCOUNTER), optionToStore, encounterInOption.getString(TYPE));
             optionsToStore.put(optionToStore);
         }
         encounter.put(OPTIONS, optionsToStore);
@@ -294,17 +334,37 @@ public class JsonAssetFileReader {
     private void multiLevelEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
         encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
-        JSONArray jsonArray = encounterTemp.getJSONArray(OPTIONS);
-        encounter.put(OPTIONS, jsonArray);
     }
 
 
-
-    // get a random encounter using the json String
-    public JSONObject getRandomEncounter(int location, String location_type) throws ExecutionException, InterruptedException {
+    /**
+     * Get a random outdoor JSON encounter given the location and location_type values
+     * @param location                  Location int of outdoor encounter that decides the possible encounters from outdoor_encounters
+     * @param location_type             Location String of outdoor encounter that decides the possible encounters from outdoor_encounters
+     * @return                          The JSONObject of the new random outdoor encounter to enter
+     */
+    public JSONObject getRandomOutdoorEncounter(int location, String location_type) throws Exception {
+        loadJSONFromAssets(outdoorJSONFilename);
         this.location = location;
         this.location_type = location_type;
-        return new parseRandomJSONData().execute().get();
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Callable callable = new parseRandomOutdoorJSON();
+        Future<JSONObject> future = executor.submit(callable);
+        return future.get();
+    }
+
+    /**
+     * create and return a random encounter inside the multi dungeon encounter set
+     * @return  The JSON data of the multi dungeon encounter to enter.
+     */
+    public JSONObject getRandomMultiDungeonEncounter() throws Exception {
+        loadJSONFromAssets(multiDungeonJSONFilename);
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Callable callable = new parseRandomMultiDungeonJSON();
+        Future<JSONObject> future = executor.submit(callable);
+        return future.get();
     }
 
     private JSONObject getRandomDialogue(JSONObject dialogue) throws JSONException {

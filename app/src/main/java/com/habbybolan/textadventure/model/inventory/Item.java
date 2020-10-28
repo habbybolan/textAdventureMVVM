@@ -44,7 +44,7 @@ public class Item extends Action {
     private int tier = 0;
     // ability
     private Ability ability;
-    // trap disablers
+    // trap disabler
     private boolean escapeTrap = false;
     // DOTS
     private boolean isFire = false;
@@ -80,8 +80,7 @@ public class Item extends Action {
     }
 
     // constructor where database opened and closed elsewhere
-    public Item(Cursor cursor, DatabaseAdapter mDbHelper, int itemID) throws ExecutionException, InterruptedException {
-        this.itemID = itemID;
+    public Item(Cursor cursor, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
         setVariables(mDbHelper, cursor);
         setPictureResource();
     }
@@ -180,6 +179,8 @@ public class Item extends Action {
 
     // sets all the variables that describe the weapon
     private void setVariables(DatabaseAdapter mDbHelper , Cursor cursor) throws ExecutionException, InterruptedException {
+        int itemColID = cursor.getColumnIndex(ITEM_ID);
+        itemID = cursor.getInt(itemColID);
         // set up the item name
         int nameOfItemColIndex = cursor.getColumnIndex(ITEM_NAME);
         setItemName(cursor.getString(nameOfItemColIndex));
@@ -446,6 +447,7 @@ public class Item extends Action {
     @Override
     public JSONObject serializeToJSON() throws JSONException {
         JSONObject JSONInventory = new JSONObject();
+        JSONInventory.put(TYPE, TYPE_ITEM);
         if (!isGeneric) {
             JSONInventory.put(ITEM_NAME, itemName);
             JSONInventory.put(ITEM_ID, itemID);

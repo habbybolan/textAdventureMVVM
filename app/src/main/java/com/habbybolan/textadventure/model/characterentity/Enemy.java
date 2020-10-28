@@ -1,7 +1,5 @@
 package com.habbybolan.textadventure.model.characterentity;
 
-import android.content.Context;
-
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
@@ -14,7 +12,6 @@ import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
@@ -23,13 +20,35 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 public class Enemy extends CharacterEntity {
 
     public static final int MAX_WEAPONS = 1;
-    public static final int MAX_ABILITIES = 2;
     public static final int MAX_TIER = 3;
+
+    public static final String OGRE = "ogre";
+    public static final String SPIDER = "spider";
+    public static final String DEMON = "demon";
+    public static final String SLIME = "slime";
+    public static final String SKELETON = "skeleton";
+
+    // Tables
+    public static final String TABLE_ENEMY = "enemy";
+    public static final String TABLE_ENEMY_ABILITY = "enemy_ability";
+    public static final String TABLE_ENEMY_ABILITY_BRIDGE = "enemy_ability_bridge";
+    // column names enemy_table
+    public static final String ENEMY_ID = "enemy_id";
+    public static final String ENEMY_ABILITY_ID = "enemy_ability_id";
+    public static final String TYPE = "type";
+    public static final String IS_WEAPON = "is_weapon";
+    public static final String STR_PERCENT = "str_percent";
+    public static final String INT_PERCENT = "int_percent";
+    public static final String CON_PERCENT = "con_percent";
+    public static final String SPD_PERCENT = "spd_percent";
+    public static final String TIER = "tier";
+
+
+
 
 
     // Character info
@@ -38,13 +57,13 @@ public class Enemy extends CharacterEntity {
 
 
     private ArrayList<Ability> abilities = new ArrayList<>();
-    private String[] arrayOfAbilities = new String[MAX_ABILITIES];
     private int difficulty;
 
     private String type;
-
     private int numStatPoints;
+    private boolean isWeapon;
 
+    /*
     public Enemy(int numStatPoints, String type, int difficulty, int ID, Context context) throws ExecutionException, InterruptedException {
         isCharacter = false;
         this.difficulty = difficulty;
@@ -81,7 +100,52 @@ public class Enemy extends CharacterEntity {
 
         drawableResID = R.drawable.skeleton_icon;
         drawableDeadResID = R.drawable.skeleton_dead;
+    }*/
+
+    public Enemy(String type, int tier, boolean isWeapon, int strPercent, int intPercent, int conPercent, int spdPercent, ArrayList<Ability> abilities, int numStatPoints, Weapon weapon) {
+        this.type = type;
+        this.difficulty = tier;
+        this.isWeapon = isWeapon;
+        strength = numStatPoints * (strPercent / 100);
+        intelligence = numStatPoints * (intPercent / 100);
+        constitution = numStatPoints * (conPercent / 100);
+        speed = numStatPoints * (spdPercent / 100);
+        this.abilities = abilities;
+        this.weapon = weapon;
+        setDrawables(type);
     }
+
+    /**
+     * Sets the image resource icon id given the type of enemy
+     * @param type  Enemy type
+     */
+    private void setDrawables(String type) {
+        switch (type) {
+            case SPIDER:
+                drawableResID = R.drawable.spider_icon;
+                drawableDeadResID = R.drawable.skeleton_dead;
+                break;
+            case OGRE:
+                drawableResID = R.drawable.ogre_icon;
+                drawableDeadResID = R.drawable.skeleton_dead;
+                break;
+            case DEMON:
+                drawableResID = R.drawable.demon_icon;
+                drawableDeadResID = R.drawable.skeleton_dead;
+                break;
+            case SKELETON:
+                drawableResID = R.drawable.skeleton_icon;
+                drawableDeadResID = R.drawable.skeleton_dead;
+                break;
+            case SLIME:
+                drawableResID = R.drawable.slime_icon;
+                drawableDeadResID = R.drawable.skeleton_dead;
+                break;
+            default:
+                throw new IllegalArgumentException(type + "is an incorrect enemy type");
+        }
+    }
+
 
     /**
      * Constructor for reading a saved JSON String of an Enemy
@@ -97,6 +161,7 @@ public class Enemy extends CharacterEntity {
             ID = enemyObject.getInt("id");
             isAlive = enemyObject.getBoolean("isAlive");
             type = enemyObject.getString("type");
+            setDrawables(type);
             // stats
             strength = enemyObject.getInt("str");
             strBase = enemyObject.getInt("strBase");
@@ -214,30 +279,6 @@ public class Enemy extends CharacterEntity {
     }
 
 
-    // helper for constructor to set up enemy stats
-    private void selectStats(int stat, int amount) {
-        switch (stat) {
-            case 0:
-                setStrength(amount);
-                setStrBase(amount);
-                break;
-            case 1:
-                setIntelligence(amount);
-                setIntBase(amount);
-                break;
-            case 2:
-                setConstitution(amount);
-                setConBase(amount);
-                break;
-            case 3:
-                setSpeed(amount);
-                setSpdBase(amount);
-                break;
-            default:
-                break;
-        }
-    }
-
     // ** ITEMS **
 
     // use the ability attached to the item
@@ -337,7 +378,7 @@ public class Enemy extends CharacterEntity {
     public void decrCooldowns() {
         // check the ability in special attack if it exists
         weapon.getSpecialAttack().decrementCooldownCurr();
-        for (int i = 0; i < MAX_ABILITIES; i++) {
+        for (int i = 0; i < abilities.size(); i++) {
             abilities.get(i).decrementCooldownCurr();
         }
     }
@@ -369,13 +410,14 @@ public class Enemy extends CharacterEntity {
         JSONEnemy.put("spdDecrease", spdDecrease);
         // abilities
         JSONArray abilitiesArray = new JSONArray();
-        for (int i = 0; i < MAX_ABILITIES; i++) {
+        for (int i = 0; i < abilities.size(); i++) {
             if (abilities.size() > i)
                 abilitiesArray.put(abilities.get(i).serializeToJSON());
         }
         JSONEnemy.put("abilities", abilitiesArray);
-        // weapon
-        JSONEnemy.put("weapon", weapon.serializeToJSON());
+        // serialize weapon if the enemy has one (isWeapon = true)
+        if (isWeapon)
+            JSONEnemy.put("weapon", weapon.serializeToJSON());
         // bars
         JSONEnemy.put("health", health);
         JSONEnemy.put("maxHealth", maxHealth);
@@ -466,5 +508,8 @@ public class Enemy extends CharacterEntity {
 
     public String getType() {
         return type;
+    }
+    public int getDifficulty() {
+        return difficulty;
     }
 }

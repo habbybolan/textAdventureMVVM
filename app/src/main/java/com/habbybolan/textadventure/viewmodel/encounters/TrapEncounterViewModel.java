@@ -67,9 +67,13 @@ public class TrapEncounterViewModel extends EncounterViewModel {
     }
 
     @Override
-    public void setSavedData() throws JSONException {
-        if (getIsSaved()) {
-            setDialogueList(mainGameVM);
+    public void setSavedData() {
+        try {
+            if (getIsSaved()) {
+                setDialogueList(mainGameVM);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 

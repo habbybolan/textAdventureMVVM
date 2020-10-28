@@ -13,14 +13,19 @@ import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.model.dialogue.StatDialogue;
 import com.habbybolan.textadventure.model.dialogue.TempStatDialogue;
+import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 /*
 View Model that all encounter view models extend
@@ -72,7 +77,8 @@ public abstract class EncounterViewModel {
         throw new NullPointerException();
     }
     // goto the the saved state if one is saved, otherwise start at beginning
-    public void gotoBeginningState(MainGameViewModel mainGameVM) throws JSONException {
+    public void gotoBeginningState() throws JSONException {
+        MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         if (!isSaved) // if no save, then go to dialogue state normally
             stateIndex.set(1);
         else { // there is a save, goto saved state
@@ -212,6 +218,44 @@ public abstract class EncounterViewModel {
 
     // saved encounter
 
+    /**
+     * get the saved Inventory Object from the json
+     * @return                  The saved inventory Object if one exists, otherwise return null.
+     * @throws JSONException    For JSON formatting error in serialized Inventory object.
+     */
+    Inventory setSavedInventory() throws JSONException {
+        MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
+        // check if an inventory value has been stored
+        if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
+            JSONObject inventory = mainGameVM.getSavedEncounter().getJSONObject(INVENTORY);
+            if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_ABILITY)) {
+                // saved Inventory object is an Ability
+                return new Ability(inventory.toString());
+
+            } else if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_ITEM)) {
+                // saved Inventory object is an Item
+                return new Item(inventory.toString());
+
+            } else if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_WEAPON)) {
+                // otherwise, saved Inventory object is a Weapon
+                return new Weapon(inventory.toString());
+            } else {
+                throw new IllegalArgumentException(inventory.getString(Inventory.TYPE) + " is not a correct Inventory type");
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Save the player character and the encounter the player is currently in.
+     * @param rv            The DialogueRecyclerView holding all dialogue data.
+     */
+    public void saveGame(DialogueRecyclerView rv) {
+        CharacterViewModel.getInstance().saveCharacter();
+        saveEncounter(rv.getDialogueList());
+    }
+
     private boolean isSaved = false;
     public void setIsSaved(boolean isSaved) {
         this.isSaved = isSaved;
@@ -221,5 +265,5 @@ public abstract class EncounterViewModel {
     }
     // saved the necessary data of fragment to retrieve it
     abstract void saveEncounter(ArrayList<DialogueType> dialogueList);
-    abstract void setSavedData() throws JSONException, ExecutionException, InterruptedException;
+    public abstract void setSavedData();
 }

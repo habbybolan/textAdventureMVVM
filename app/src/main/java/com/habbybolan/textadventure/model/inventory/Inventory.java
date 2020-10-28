@@ -14,6 +14,8 @@ public interface Inventory {
     String INVENTORY_TYPE = "inventory_type";
     String ID = "id";
 
+    public static final String TYPE = "type";
+
     String getType();
     String getName();
 

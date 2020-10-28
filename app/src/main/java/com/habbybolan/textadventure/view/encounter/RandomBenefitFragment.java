@@ -26,8 +26,6 @@ import com.habbybolan.textadventure.viewmodel.encounters.RandomBenefitViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.ExecutionException;
-
 
 public class RandomBenefitFragment extends EncounterDialogueFragment implements EncounterFragment{
 
@@ -63,23 +61,12 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
         benefitBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_random_benefit, container, false);
 
         try {
-            setUpEncounterBeginning();
-        } catch (JSONException | ExecutionException | InterruptedException e) {
+            rv = setUpEncounterBeginning(benefitVM, this, benefitBinding.rvDialogue);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return benefitBinding.getRoot();
-    }
-
-    // sets up the RV dialogue adapter and the encounter state to enter
-    private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
-        benefitVM.setSavedData();
-        // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, benefitVM.getDialogueList());
-        setUpDialogueRV(rv, benefitVM);
-        stateListener(benefitVM.getStateIndex(), benefitVM, this);
-        // called after stateLister set up, signalling first state to enter
-        benefitVM.gotoBeginningState(mainGameVM);
     }
 
     // checks which state the trap encounter is in and starts that new state
@@ -171,6 +158,12 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
             }
         });
         benefitBinding.layoutBtnOptions.addView(viewPickUp);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        benefitVM.saveGame(rv);
     }
 
 }

@@ -19,8 +19,6 @@ import com.habbybolan.textadventure.viewmodel.encounters.ChoiceViewModel;
 
 import org.json.JSONException;
 
-import java.util.concurrent.ExecutionException;
-
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ChoiceFragment#newInstance} factory method to
@@ -68,24 +66,11 @@ public class ChoiceFragment extends EncounterDialogueFragment implements Encount
         choiceBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_choice, container, false);
         choiceBinding.setChoiceVM(choiceViewModel);
         try {
-            setUpEncounterBeginning();
-        } catch (JSONException | ExecutionException | InterruptedException e) {
+            rv = setUpEncounterBeginning(choiceViewModel, this, choiceBinding.rvDialogue);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return choiceBinding.getRoot();
-    }
-
-    /**
-     * Set up initial Choice encounter data.
-     */
-    private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
-        choiceViewModel.setSavedData();
-        // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), choiceBinding.rvDialogue, choiceViewModel.getDialogueList());
-        setUpDialogueRV(rv, choiceViewModel);
-        stateListener(choiceViewModel.getStateIndex(), choiceViewModel, this);
-        // called after stateLister set up, signalling first state to enter
-        choiceViewModel.gotoBeginningState(mainGameVM);
     }
 
     @Override
@@ -129,8 +114,7 @@ public class ChoiceFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void onStop() {
         super.onStop();
-        characterVM.saveCharacter();
-        choiceViewModel.saveEncounter(rv.getDialogueList());
+        choiceViewModel.saveGame(rv);
     }
 
 }

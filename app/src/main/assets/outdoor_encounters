@@ -60,26 +60,13 @@
             ]
 		},
 
-		{"type":"multi_level",
+		{"type":"multi_dungeon",
 			"encounters":[
-                {"dialogue":["Walking up to a large rock overpass, you see a ."],
-                "options":[{"name":"go left",
-                        "encounter":{"type":"combat",
-                                "dialogue":"spiders descend from its web, landing in front of you.",
-                                "fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]},
-                                "next":{"type":"end",
-                                        "dialogue":"You reached the end of the thing."
-                                        }
-                                }
-                        },
-                        {"name":"go right",
-                        "encounter":{"type":"benefit",
-                                "dialogue":"You hear a powerful, reverberating voice echo past a large, expansive oak tree. It says a reward is awaiting for you traveller. Walking around the tree, a 10ft marble statue with glowing red ruby eyes looks down at you.",
-                                "next":{"type":"end",
-                                        "dialogue":"You reached the end."
-                                        }
-                                }
-                        }]
+                {"dialogue":[{"dialogue":"blah"},
+                            {"dialogue":"1",
+                            "next":{"dialogue":"2",
+                            "next":{"dialogue":"3"}}}
+                            ]
                 }
 			]
 		},
@@ -111,12 +98,12 @@
 			{"dialogue":[{"dialogue":"spiders descend from its web, landing in front of you."},
 						{"dialogue":"Spiders crawl down from the tree with the ferocity of a creature that hasn't eaten for days."}
 						],
-			"fight":{"type":["spider", "spider"], "difficulty":["1","1"]}},
+			"fight":{"type":["spider", "spider"]}},
 
 			{"dialogue":[{"dialogue":"A bony hand breaks through the ground and grabs you by the ankle."},
 						{"dialogue":"Multiple bony arms reach out through a pile of leaves on the ground."}
 						],
-			"fight":{"type":["skeleton", "skeleton", "skeleton"], "difficulty":["1","1","1"]}}
+			"fight":{"type":["skeleton", "skeleton", "skeleton"]}}
 			]
 		},
 

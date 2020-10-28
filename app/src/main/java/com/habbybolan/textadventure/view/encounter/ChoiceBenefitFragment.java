@@ -26,8 +26,6 @@ import com.habbybolan.textadventure.viewmodel.encounters.ChoiceBenefitViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.ExecutionException;
-
 /*
 deals with a choice benefit encounter
   - gives the character a choice of a random permanent state increase, temporary stat increase, or Inventory reward
@@ -67,23 +65,12 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
         benefitBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_choice_benefit, container, false);
 
         try {
-            setUpEncounterBeginning();
-        } catch (JSONException | ExecutionException | InterruptedException e) {
+            rv = setUpEncounterBeginning(benefitVM, this, benefitBinding.rvDialogue);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         // create state listener and go into first state
         return benefitBinding.getRoot();
-    }
-
-    // sets up the RV dialogue adapter and the encounter state to enter
-    private void setUpEncounterBeginning() throws JSONException, ExecutionException, InterruptedException {
-        benefitVM.setSavedData();
-        // set up Recycler Viewer that holds all dialogue
-        rv = new DialogueRecyclerView(getContext(), benefitBinding.rvDialogue, benefitVM.getDialogueList());
-        setUpDialogueRV(rv, benefitVM);
-        stateListener(benefitVM.getStateIndex(), benefitVM, this);
-        // called after stateLister set up, signalling first state to enter
-        benefitVM.gotoBeginningState(mainGameVM);
     }
 
     @Override
@@ -178,7 +165,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     // helper for create button to receive Inventory reward if one exists
     private void setReceiveInventory() {
         // if an inventory reward exists, then create button for it
-        if (benefitVM.getInventoryToRetrieve() != null) {
+        if (benefitVM.isInventoryToRetrieve()) {
             setUpInventorySnippet(benefitVM.getInventoryToRetrieve());
             final View viewPickUp = getLayoutInflater().inflate(R.layout.default_button_details, null);
             DefaultButtonDetailsBinding defaultBindingPickUp = DataBindingUtil.bind(viewPickUp);
@@ -206,7 +193,6 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     @Override
     public void onStop() {
         super.onStop();
-        characterVM.saveCharacter();
-        benefitVM.saveEncounter(rv.getDialogueList());
+        benefitVM.saveGame(rv);
     }
 }

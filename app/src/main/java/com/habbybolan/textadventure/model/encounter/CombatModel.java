@@ -3,16 +3,12 @@ package com.habbybolan.textadventure.model.encounter;
 import android.content.Context;
 
 import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
+import com.habbybolan.textadventure.model.characterentity.Enemy;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.repository.JsonAssetFileReader;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -62,8 +58,8 @@ public class CombatModel {
     // rewards
 
     // exp reward
-    public int getExpReward(JSONObject encounter) {
-        int difficulty = getMeanDifficulty(encounter);
+    public int getExpReward(ArrayList<Enemy> enemies) {
+        int difficulty = getMeanDifficulty(enemies);
         Random rand = new Random();
         switch (difficulty) {
             case 1:
@@ -77,8 +73,8 @@ public class CombatModel {
         }
     }
     // gold reward
-    public int getGoldReward(JSONObject encounter) {
-        int difficulty = getMeanDifficulty(encounter);
+    public int getGoldReward(ArrayList<Enemy> enemies) {
+        int difficulty = getMeanDifficulty(enemies);
         Random rand = new Random();
         switch (difficulty) {
             case 1:
@@ -92,8 +88,8 @@ public class CombatModel {
         }
     }
     // Weapon/Ability/Item reward
-    public Inventory getInventoryReward(JSONObject encounter, Context context) {
-        int difficulty = getMeanDifficulty(encounter);
+    public Inventory getInventoryReward(ArrayList<Enemy> enemies, Context context) {
+        int difficulty = getMeanDifficulty(enemies);
         Random rand = new Random();
         int inventoryRand = rand.nextInt(3);
         DatabaseAdapter db = new DatabaseAdapter(context);
@@ -204,17 +200,11 @@ public class CombatModel {
     }
 
     // gets the JSONArray for the difficulty of all enemies and returns the mean difficulty as int
-    private int getMeanDifficulty(JSONObject encounter) {
+    private int getMeanDifficulty(ArrayList<Enemy> enemies) {
         int val = 0;
-        try {
-            JSONArray tierArray = encounter.getJSONObject(JsonAssetFileReader.FIGHT).getJSONArray(JsonAssetFileReader.DIFFICULTY);
-            for (int i = 0; i < tierArray.length(); i++)
-                val += tierArray.getInt(i);
-            return val/tierArray.length();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return val;
+        for (int i = 0; i < enemies.size(); i++)
+            val += enemies.get(i).getDifficulty();
+        return val/enemies.size();
     }
 
     // parsing enemy into JSON
