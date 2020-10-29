@@ -2,6 +2,8 @@ package com.habbybolan.textadventure.model.locations;
 
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
+import java.util.Random;
+
 public class MultiDungeon {
 
 
@@ -18,4 +20,19 @@ public class MultiDungeon {
     final public static int RANDOM_BENEFIT = 5;
     final public static String RANDOM_BENEFIT_TYPE =  MainGameViewModel.RANDOM_BENEFIT_TYPE;
     final public static String CHECK_TYPE = MainGameViewModel.CHECK_TYPE;
+
+    // min number of encounters inside multi dungeon
+    private static final int MIN_AMOUNT = 5;
+    // max number of encounters inside multi dungeon
+    private static final int MAX_AMOUNT = 10;
+
+    /**
+     * Creates a random integer between MIN_AMOUNT and MAX_AMOUNT that sets up the number
+     * of encounters that are in the multi dungeon.
+     * @return  The number of encounters inside the multi dungeon.
+     */
+    public static int getMultiDungeonLength() {
+        Random rand = new Random();
+        return rand.nextInt((MAX_AMOUNT - MIN_AMOUNT)/2 + 1) + MIN_AMOUNT;
+    }
 }

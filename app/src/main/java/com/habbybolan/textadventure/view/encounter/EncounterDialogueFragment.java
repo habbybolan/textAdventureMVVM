@@ -23,6 +23,8 @@ deals with the functionality and UI of the dialogue and state switching of a fra
  */
 class EncounterDialogueFragment extends Fragment {
 
+    private static final String DIALOGUE_CONTINUE = "dialogue_continue";
+
     /**
      * deals with adding dialogue to the dialogue recycler viewer, calling the necessary method through a callback
      * @param rv    The recycler Viewer model used to call the adding dialogue method
@@ -61,12 +63,6 @@ class EncounterDialogueFragment extends Fragment {
                 binding.btnDefault.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        MainGameViewModel.getInstance().gotoNextRandomEncounter();
-                    }
-                });
-                binding.btnDefault.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
                         try {
                             vm.firstDialogueState();
                         } catch (JSONException e) {
@@ -74,11 +70,24 @@ class EncounterDialogueFragment extends Fragment {
                         }
                     }
                 });
+                // sets the tag of the continue dialogue button so it could be removed by removeDialogueContinueButton()
+                int childCount = gridLayout.getChildCount();
+                gridLayout.getChildAt(childCount-1).setTag(DIALOGUE_CONTINUE);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Finds the view in gridLayout with tag == DIALOGUE_CONTINUE and removes it.
+     * @param gridLayout    The layout holding the dialogue continue view to remove.
+     */
+    void removeDialogueContinueButton(GridLayout gridLayout) {
+        View view = gridLayout.findViewWithTag(DIALOGUE_CONTINUE);
+        gridLayout.removeView(view);
+    }
+
 
     /**
      * Helper for endState to set up the button to leave encounter. Pressing the leave button leaves the current encounter and signals to go to next

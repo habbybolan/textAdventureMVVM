@@ -66,7 +66,6 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
 
     @Override
     public void checkState(int state) {
-        checkBinding.layoutBtnOptions.removeAllViews();
         switch(state) {
             // first state
             case CheckViewModel.firstState:
@@ -81,25 +80,25 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
 
     @Override
     public void endState() {
+        removeDialogueContinueButton(checkBinding.layoutBtnOptions);
         checkBinding.btnContinue.setVisibility(View.VISIBLE);
+        checkBinding.btnContinue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // clicker functionality to continue in multi dungeon
+                checkVM.clickContinue();
+            }
+        });
         checkBinding.btnLeave.setVisibility(View.VISIBLE);
+        checkBinding.btnLeave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // clicker functionality to leave the multi dungeon
+                checkVM.clickLeave();
+            }
+        });
     }
 
-    /**
-     * Calls clicker functionality in CheckViewModel for leaving the dungeon.
-     * @param v     Button view
-     */
-    public void clickLeave(View v) {
-        checkVM.clickLeave();
-    }
-
-    /**
-     * Calls clicker functionality in CheckViewModel for continuing in the dungeon.
-     * @param v     Button view
-     */
-    public void clickContinue(View v) {
-        checkVM.clickContinue();
-    }
 
     @Override
     public void onStop() {

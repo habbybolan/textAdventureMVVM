@@ -1,8 +1,6 @@
 package com.habbybolan.textadventure.model;
 
-import android.content.Context;
-
-import org.json.JSONObject;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 /*
 creates new encounters, retrieved from JSON asset file
@@ -10,11 +8,8 @@ creates new encounters, retrieved from JSON asset file
  */
 public class MainGameModel {
 
-    private JSONObject encounter;
 
-    Context context;
-    public MainGameModel(Context context) {
-        this.context = context;
+    public MainGameModel() {
     }
 
     // creates an completely new JSONObject encounter
@@ -27,8 +22,12 @@ public class MainGameModel {
         return "";
     }
 
-
-    public JSONObject getEncounter() {
-        return encounter;
+    /**
+     * Calculated if the dungeon turn counter has reached 0 to signal the dungeon is finished.
+     * @return  True if the dungeon is over. False otherwise.
+     */
+    public boolean isDungeonOver(CharacterViewModel characterVM) {
+        characterVM.decrementDungeonCounter();
+        return characterVM.getDungeonCounter() == 0;
     }
 }

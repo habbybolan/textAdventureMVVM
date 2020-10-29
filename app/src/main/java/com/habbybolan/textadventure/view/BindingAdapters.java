@@ -30,4 +30,13 @@ public class BindingAdapters {
                 target;
         view.setText(builder);
     }
+
+    // turns a int into a String
+    @BindingAdapter(value = {"value"})
+    public static void intToString(TextView view, int value) {
+        String text = String.valueOf(value);
+        view.setText(text);
+    }
+
+
 }

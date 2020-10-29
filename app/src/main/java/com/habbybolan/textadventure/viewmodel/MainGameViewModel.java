@@ -8,7 +8,10 @@ import androidx.databinding.Bindable;
 import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.BR;
+import com.habbybolan.textadventure.model.MainGameModel;
+import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.locations.MultiDungeon;
+import com.habbybolan.textadventure.model.locations.Outdoor;
 import com.habbybolan.textadventure.repository.JsonAssetFileReader;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -17,9 +20,11 @@ import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/*
-Holds encounter information to deal with flow and creation of encounters
-   saves and retrieves encounters
+/**
+ * Creates the logic for swapping between encounters and dealing with location changes from outdoors
+ * to multi dungeon and combat dungeon.
+ * Holds the JSONEncounter, all necessary JSON data for the current encounter being played.
+ * Holds logic for swapping between the game fragment and character fragment.
  */
 public class MainGameViewModel extends BaseObservable {
 
@@ -57,11 +62,11 @@ public class MainGameViewModel extends BaseObservable {
     // encounter types - int corresponding to the index of the location in a JSONArray in outdoor_encounters
     final public static String TYPE = "type";
 
-    private final static int OUTDOOR_STATE = 0;
-    private final static int MULTI_DUNGEON_STATE = 1;
-    private final static int DUNGEON_STATE = 2;
+    private final static int OUTDOOR_STATE = Character.OUTDOOR_STATE;
+    private final static int MULTI_DUNGEON_STATE = Character.MULTI_DUNGEON_STATE;
+    private final static int COMBAT_DUNGEON_STATE = Character.COMBAT_DUNGEON_STATE;
 
-    final public static String DUNGEON_TYPE = "dungeon";
+    final public static String COMBAT_DUNGEON_TYPE = "combat_dungeon";
     final public static String MULTI_DUNGEON_TYPE = "multi_dungeon";
     final public static String CHOICE_TYPE = "choice";
     final public static String COMBAT_TYPE = "combat";
@@ -72,12 +77,8 @@ public class MainGameViewModel extends BaseObservable {
     final public static String QUEST_TYPE = "quest";
     final public static String CHECK_TYPE = "check";
 
-    /** The state of the encounters to get
-     *      0: outdoor encounters
-     *      1: multi dungeon encounters
-     *      2: dungeon encounters
-     */
-    private int encounterState = OUTDOOR_STATE;
+    MainGameModel mainGameModel = new MainGameModel();
+
 
     private CharacterViewModel characterVM;
     private Context context;
@@ -144,27 +145,21 @@ public class MainGameViewModel extends BaseObservable {
     public void gotoNextRandomEncounter() {
         applyAfterEncounterActions();
         try {
-            switch (encounterState) {
+            switch (characterVM.getEncounterState()) {
                 case OUTDOOR_STATE:
-                    createNewEncounter(context);
+                    characterVM.incrementDistance();
+                    createNewOutdoorEncounter();
                     break;
                 case MULTI_DUNGEON_STATE:
-                    continueMultiDungeonEncounters();
+                    checkContinueMultiDungeon();
                     break;
-                case DUNGEON_STATE:
-                    // todo:
+                case COMBAT_DUNGEON_STATE:
+                    createNewCombatDungeonEncounter();
                     break;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Sets the encounter state back to outdoor encounters.
-     */
-    public void setStateToOutdoor() {
-        encounterState = OUTDOOR_STATE;
     }
 
 
@@ -183,8 +178,10 @@ public class MainGameViewModel extends BaseObservable {
      * Called from multiDungeonFragment to signal character entered a multi dungeon.
      */
     public void startMultiDungeon() throws JSONException {
-        encounterState = MULTI_DUNGEON_STATE;
-        checkContinueMultiDungeon();
+        // set the size of the dungeon
+        characterVM.setDungeonCounter(MultiDungeon.getMultiDungeonLength());
+        characterVM.setStateToMultiDungeon();
+        createNewMultiDungeonEncounter();
     }
 
     /**
@@ -198,26 +195,78 @@ public class MainGameViewModel extends BaseObservable {
         JSONObject dialogueObj = new JSONObject();
         dialogueObj.put("dialogue", "Continue in the dungeon?");
         check.put("dialogue", dialogueObj);
-        // create a check JSONObject that only holds {"type":"check",
-        //                                            "dialogue":{"Continue in the dungeon?"}}
+        // create a check JSONObject that only holds
+        //      {"type":"check",
+        //      "dialogue":{"Continue in the dungeon?"}}
         // and set as encounter
         JSONEncounter = check;
         setEncounterType(MultiDungeon.CHECK_TYPE);
     }
 
     /**
-     * Continue with the multi dungeon encounters, finding a random encounter to enter.
+     * Creates a new random outdoor encounter and saves it to JSONEncounter local field.
      */
-    private void continueMultiDungeonEncounters() throws JSONException {
+    private void createNewOutdoorEncounter() throws JSONException {
         JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
-        // get a random encounter from jsonFileReader for multi dungeon
+        // get a random encounter from jsonFileReader
         try {
-            JSONEncounter = jsonAssetFileReader.getRandomMultiDungeonEncounter();
+            JSONEncounter = jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String type = JSONEncounter.getString(TYPE);
+        String type = JSONEncounter.getString("type");
         setEncounterType(type);
+
+    }
+
+    /**
+     * Creates a random_benefit_encounter with set JSON data.
+     */
+    private void createRewardEncounter() throws JSONException {
+        JSONObject randomBenefitJSON = new JSONObject();
+        // store the type for random benefit encounter
+        randomBenefitJSON.put(TYPE, Outdoor.RANDOM_BENEFIT_TYPE);
+        JSONObject dialogueJSON = new JSONObject();
+        // store dialogue to be displayed
+        dialogueJSON.put("dialogue", "You have reached the end of the dungeon. Claim your prize");
+        randomBenefitJSON.put("dialogue", dialogueJSON);
+        // set the JSON data and update the new encounter type to start the encounter
+        JSONEncounter = randomBenefitJSON;
+        setEncounterType(Outdoor.RANDOM_BENEFIT_TYPE);
+    }
+
+    /**
+     * Continue with the multi dungeon encounters, finding a random encounter to enter.
+     * todo: Counter for how long multi dungeon encounter is - reward fragment
+     */
+    public void createNewMultiDungeonEncounter() throws JSONException {
+        if (mainGameModel.isDungeonOver(characterVM)) {
+            // set the state to being outdoors
+            characterVM.setStateToOutdoor();
+            // if the dungeon counter reaches 0, then enter a reward state and leave the dungeon
+            createRewardEncounter();
+        } else {
+            // otherwise, continue with multi dungeon encounters
+            JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
+            // get a random encounter from jsonFileReader for multi dungeon
+            try {
+                JSONEncounter = jsonAssetFileReader.getRandomMultiDungeonEncounter();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String type = JSONEncounter.getString(TYPE);
+            setEncounterType(type);
+        }
+    }
+
+
+
+    /**
+     * Creates a new random dungeon encounter.
+     * todo: counter for how long the dungeon encounter is - boss/reward fragment
+     */
+    private void createNewCombatDungeonEncounter() {
+        // todo: creates new dungeon encounter
     }
 
     /**
@@ -236,19 +285,7 @@ public class MainGameViewModel extends BaseObservable {
         characterVM.decrSpecialDuration();
     }
 
-    // creates a new encounter and saves it to JSONEncounter local field
-    private void createNewEncounter(Context context) throws JSONException {
-        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
 
-        // get a random encounter from jsonFileReader
-        try {
-            JSONEncounter = jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String type = JSONEncounter.getString("type");
-        setEncounterType(type);
-    }
 
     @Bindable
     public String getTurnCounter() {
@@ -305,6 +342,5 @@ public class MainGameViewModel extends BaseObservable {
     public JSONObject getSavedEncounter() {
         return savedEncounter;
     }
-
 
 }

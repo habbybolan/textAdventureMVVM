@@ -49,6 +49,21 @@ public class Character extends CharacterEntity {
     private int gold;
     private int goldIncrease;
 
+    // how 'far' the character has travelled, measured in number of outdoor encounters that have occurred;
+    private int distance = 0;
+
+    /** The state of the encounters to get
+     *      0: outdoor encounters
+     *      1: multi dungeon encounters
+     *      2: dungeon encounters
+     */
+    private int encounterState = 0;
+    // number of encounters inside the current dungeon to play out until the end
+    private int dungeonCounter = 0;
+
+    public final static int OUTDOOR_STATE = 0;
+    public final static int MULTI_DUNGEON_STATE = 1;
+    public final static int COMBAT_DUNGEON_STATE = 2;
 
     public Character(String characterData, Context context) {
         JSONObject characterObject;
@@ -57,6 +72,9 @@ public class Character extends CharacterEntity {
         try {
             characterObject = new JSONObject(characterData);
             classType = characterObject.getString("class");
+            encounterState = characterObject.getInt("encounterState");
+            distance = characterObject.getInt("distance");
+            dungeonCounter = characterObject.getInt("dungeonCounter");
             // stats
             strength = characterObject.getInt("str");
             strBase = characterObject.getInt("strBase");
@@ -215,6 +233,22 @@ public class Character extends CharacterEntity {
     }
 
     /**
+     * Sets encounterState to change to.
+     * @param encounterState    The new encounter state to enter.
+     */
+    public void setEncounterState(int encounterState) {
+        this.encounterState = encounterState;
+    }
+
+    /**
+     * Increment the distance the player character has travelled.
+     */
+    public void incrementDistance() {
+        distance++;
+    }
+
+
+    /**
      *
      * @param c     single character from the ID String
      * @return      true if the character is an integer
@@ -247,6 +281,9 @@ public class Character extends CharacterEntity {
         JSONObject JSONCharacter = new JSONObject();
 
         JSONCharacter.put("class", classType);
+        JSONCharacter.put("encounterState", encounterState);
+        JSONCharacter.put("distance", distance);
+        JSONCharacter.put("dungeonCounter", dungeonCounter);
 
         JSONCharacter.put("str", strength); // str
         JSONCharacter.put("strBase", strBase); // base str
@@ -532,5 +569,21 @@ public class Character extends CharacterEntity {
 
     public int getNumStatPoints() {
         return strBase + intBase + conBase + spdBase;
+    }
+
+    public int getEncounterState() {
+        return encounterState;
+    }
+    public int getDistance() {
+        return distance;
+    }
+    public int getDungeonCounter() {
+        return dungeonCounter;
+    }
+    public void setDungeonCounter(int dungeonCounter) {
+        this.dungeonCounter = dungeonCounter;
+    }
+    public void decrementDungeonCounter() {
+        dungeonCounter--;
     }
 }

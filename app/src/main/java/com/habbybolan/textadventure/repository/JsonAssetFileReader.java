@@ -150,7 +150,7 @@ public class JsonAssetFileReader {
      */
     private void finalizeOutdoorEncounter(JSONObject encounterTemp, JSONObject encounter, String type) throws JSONException {
         switch (type) {
-            case Outdoor.DUNGEON_TYPE:
+            case Outdoor.COMBAT_DUNGEON_TYPE:
                 dungeonEncounter(encounterTemp, encounter);
                 break;
             case Outdoor.MULTI_DUNGEON_TYPE:

@@ -30,7 +30,6 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     public static final int firstState = 1;
     public static final int secondState = 2;
-    public static final int thirdState = 3;
 
     private Inventory inventoryToRetrieve = null;
 

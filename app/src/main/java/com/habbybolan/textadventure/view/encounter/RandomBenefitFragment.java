@@ -15,7 +15,6 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentRandomBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Inventory;
-import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
@@ -26,7 +25,9 @@ import com.habbybolan.textadventure.viewmodel.encounters.RandomBenefitViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
+/**
+ * Gives the player a random Inventory object reward.
+ */
 public class RandomBenefitFragment extends EncounterDialogueFragment implements EncounterFragment{
 
 
@@ -78,30 +79,12 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
                 benefitBinding.layoutBtnOptions.removeAllViews();
                 dialogueState(benefitVM, benefitBinding.layoutBtnOptions);
                 break;
-            // second state
-            case RandomBenefitViewModel.secondState:
-                benefitBinding.layoutBtnOptions.removeAllViews();
-                checkBenefitState();
-                break;
             // last state
-            case RandomBenefitViewModel.thirdState:
+            case RandomBenefitViewModel.secondState:
                 benefitBinding.layoutBtnOptions.removeAllViews();
                 endState();
                 break;
         }
-    }
-
-    // second state entered
-    private void checkBenefitState() {
-        String txtCheck = "Check";
-        DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, txtCheck, getActivity());
-        binding.btnDefault.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                benefitVM.setTangible();
-                benefitVM.incrementStateIndex();
-            }
-        });
     }
 
     // inventory snippet of new Inventory object to retrieve
@@ -130,6 +113,7 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
         // set up the button to leave the encounter and to pick up item
     @Override
     public void endState() {
+        benefitVM.setTangible();
         // set up button to leave
         setLeaveButton(benefitBinding.layoutBtnOptions);
         // set up button to receive reward if one exists

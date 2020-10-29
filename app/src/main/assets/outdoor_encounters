@@ -52,7 +52,7 @@
 
 	{"forest":[
 
-		{"type":"dungeon",
+		{"type":"combat_dungeon",
 			"encounters":[
             	{"dialogue":["As you walk over some leaves, you hear a thud. Clearing the leaves, you discover a wooden hatch painted black with a white circle and a single line crossing over it.",
             	"In the distance, you notice a large, stone spiraling tower sitting just above the canopy of trees. Walking closer, you see a slightly opened door. Painted over it is a white circle with a line running across it."
@@ -147,7 +147,10 @@
 
 		{"type":"random_benefit",
 		    "encounters":[
-		        {"dialogue":[{"dialogue":"A small glint underneath some leaves appears."}]}
+		        {"dialogue":[{"dialogue":"A small glint underneath some leaves appears.",
+		                        "next":{"dialogue":"As you push away the leaves, you find an item that a traveller must have unknowingly dropped."}}
+
+		        ]}
 		    ]
 
 		},

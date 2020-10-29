@@ -523,4 +523,44 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     public Character getCharacter() {
         return character;
     }
+    public int getEncounterState() {
+        return character.getEncounterState();
+    }
+    /**
+     * Sets the encounter state back to outdoor encounters.
+     */
+    public void setStateToOutdoor() {
+        character.setEncounterState(Character.OUTDOOR_STATE);
+    }
+
+    /**
+     * Sets the encounter state back to outdoor encounters.
+     */
+    public void setStateToMultiDungeon() {
+        character.setEncounterState(Character.MULTI_DUNGEON_STATE);
+    }
+
+    /**
+     * Sets the encounter state back to outdoor encounters.
+     */
+    public void setStateToDungeon() {
+        character.setEncounterState(Character.COMBAT_DUNGEON_STATE);
+    }
+    @Bindable
+    public int getDistance() {
+        return character.getDistance();
+    }
+    public void incrementDistance() {
+        character.incrementDistance();
+        notifyPropertyChanged(BR.distance);
+    }
+    public void setDungeonCounter(int counter) {
+        character.setDungeonCounter(counter);
+    }
+    public int getDungeonCounter() {
+        return character.getDungeonCounter();
+    }
+    public void decrementDungeonCounter() {
+        character.decrementDungeonCounter();
+    }
 }

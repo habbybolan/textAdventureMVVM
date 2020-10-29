@@ -41,6 +41,10 @@ public class SaveDataLocally {
             if ((CharacterChoiceViewModel.wizard).equals(character[0])) {
                 try {
                     jsonClassObject.put("class", Character.WIZARD_CLASS_TYPE);
+                    jsonClassObject.put("encounterState", 0);
+                    jsonClassObject.put("distance", 0);
+                    jsonClassObject.put("dungeonCounter", 0);
+
                     jsonClassObject.put("str", context.getString(R.string.Wizard_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Wizard_Start_Str)); // base str
                     int intelligence = Integer.parseInt(context.getString(R.string.Wizard_Start_Int));

@@ -4,8 +4,8 @@ import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
 public class Outdoor {
 
-    final public static int DUNGEON = 0;
-    final public static String DUNGEON_TYPE = MainGameViewModel.DUNGEON_TYPE;
+    final public static int COMBAT_DUNGEON = 0;
+    final public static String COMBAT_DUNGEON_TYPE = MainGameViewModel.COMBAT_DUNGEON_TYPE;
     final public static int MULTI_DUNGEON = 1;
     final public static String MULTI_DUNGEON_TYPE =  MainGameViewModel.MULTI_DUNGEON_TYPE;
     final public static int CHOICE = 2;

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +67,7 @@ public class CheckViewModel extends EncounterViewModel {
      * Clicker functionality in CheckViewModel for leaving the dungeon.
      */
     public void clickLeave() {
-        mainGameVM.setStateToOutdoor();
+        CharacterViewModel.getInstance().setStateToOutdoor();
         mainGameVM.gotoNextRandomEncounter();
     }
 
@@ -74,6 +75,10 @@ public class CheckViewModel extends EncounterViewModel {
      * Clicker functionality in CheckViewModel for continuing in the dungeon.
      */
     public void clickContinue() {
-        mainGameVM.gotoNextRandomEncounter();
+        try {
+            mainGameVM.createNewMultiDungeonEncounter();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

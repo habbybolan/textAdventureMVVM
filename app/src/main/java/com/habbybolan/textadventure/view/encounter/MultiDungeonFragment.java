@@ -79,10 +79,8 @@ public class MultiDungeonFragment  extends EncounterDialogueFragment implements 
     }
 
 
-
     @Override
     public void checkState(int state) {
-        multiDungeonBinding.layoutBtnOptions.removeAllViews();
         switch(state) {
             // first state
             case MultiDungeonViewModel.firstState:
@@ -97,23 +95,23 @@ public class MultiDungeonFragment  extends EncounterDialogueFragment implements 
 
     @Override
     public void endState() {
-
-    }
-
-    /**
-     * Calls clicker functionality in MultiDungeonViewModel for entering the dungeon.
-     * @param v     Button view
-     */
-    public void clickEnter(View v) {
-        multiDungeonVM.clickEnter();
-    }
-
-    /**
-     * Calls clicker functionality in MultiDungeonViewModel for not entering the dungeon.
-     * @param v     Button view
-     */
-    public void clickLeave(View v) {
-        multiDungeonVM.clickLeave();
+        removeDialogueContinueButton(multiDungeonBinding.layoutBtnOptions);
+        multiDungeonBinding.btnEnter.setVisibility(View.VISIBLE);
+        multiDungeonBinding.btnEnter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // clicker functionality to enter the multi dungeon
+                multiDungeonVM.clickEnter();
+            }
+        });
+        multiDungeonBinding.btnLeave.setVisibility(View.VISIBLE);
+        multiDungeonBinding.btnLeave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // clicker functionality to not enter multi dungeon
+                multiDungeonVM.clickLeave();
+            }
+        });
     }
 
     @Override

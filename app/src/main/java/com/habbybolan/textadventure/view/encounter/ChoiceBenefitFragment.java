@@ -26,12 +26,11 @@ import com.habbybolan.textadventure.viewmodel.encounters.ChoiceBenefitViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/*
-deals with a choice benefit encounter
-  - gives the character a choice of a random permanent state increase, temporary stat increase, or Inventory reward
-  - state 1: dialogue state
-  - state 2: choose benefit type
-  - state 3: end state
+/**
+ * gives the character a choice of a:
+ *      random permanent stat increase,
+ *      temporary stat increase,
+ *      or Inventory reward
  */
 public class ChoiceBenefitFragment extends EncounterDialogueFragment implements EncounterFragment {
 
