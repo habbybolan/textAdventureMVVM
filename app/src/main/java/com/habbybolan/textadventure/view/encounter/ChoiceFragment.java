@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
@@ -20,9 +19,7 @@ import com.habbybolan.textadventure.viewmodel.encounters.ChoiceViewModel;
 import org.json.JSONException;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link ChoiceFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Choice encounter
  */
 public class ChoiceFragment extends EncounterDialogueFragment implements EncounterFragment {
 
@@ -75,7 +72,6 @@ public class ChoiceFragment extends EncounterDialogueFragment implements Encount
 
     @Override
     public void checkState(int state) {
-        // remove ability to drop/consume Inventory Objects
         characterVM.setStateInventoryObserver(true);
         choiceBinding.layoutBtnOptions.removeAllViews();
         switch (state) {

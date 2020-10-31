@@ -22,9 +22,9 @@ public class MultiDungeon {
     final public static String CHECK_TYPE = MainGameViewModel.CHECK_TYPE;
 
     // min number of encounters inside multi dungeon
-    private static final int MIN_AMOUNT = 5;
+    private static final int MIN_AMOUNT = 4;
     // max number of encounters inside multi dungeon
-    private static final int MAX_AMOUNT = 10;
+    private static final int MAX_AMOUNT = 8;
 
     /**
      * Creates a random integer between MIN_AMOUNT and MAX_AMOUNT that sets up the number

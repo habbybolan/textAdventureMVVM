@@ -5,6 +5,7 @@ import android.content.Context;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,20 +13,22 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MultiDungeonViewModel extends EncounterViewModel {
+public class CombatDungeonViewModel extends EncounterViewModel {
+
+    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
+    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
+    private JSONObject encounter;
+    Context context;
 
     public static final int firstState = 1;
     public static final int secondState = 2;
 
-    private JSONObject encounter;
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private Context context;
-
-    public MultiDungeonViewModel(Context context) throws JSONException {
+    public CombatDungeonViewModel(Context context) throws JSONException {
         encounter = mainGameVM.getJSONEncounter();
         setDialogueRemainingInDialogueState(encounter);
         this.context = context;
     }
+
 
     @Override
     void saveEncounter(ArrayList<DialogueType> dialogueList) {
@@ -62,21 +65,20 @@ public class MultiDungeonViewModel extends EncounterViewModel {
     }
 
     /**
-     * clicker functionality for entering the dungeon.
+     * Button functionality for entering the combat dungeon.
      */
     public void clickEnter() {
         try {
-            mainGameVM.startMultiDungeon();
+            mainGameVM.startCombatDungeon();
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * clicker functionality for not entering the dungeon. Continue with outdoor encounters.
+     * Button functionality for not entering the combat dungeon. Continue with outdoor encounters.
      */
     public void clickLeave() {
         mainGameVM.gotoNextRandomEncounter();
     }
-
 }

@@ -6,10 +6,11 @@ import java.util.Random;
 /*
 holds the business logic for the Trap encounter
  */
-public class TrapModel {
+public class TrapModel extends EncounterModel {
     private final static int SPD_SCALE = 5;
 
     CharacterViewModel characterVM;
+
     public TrapModel(CharacterViewModel characterVM) {
         this.characterVM = characterVM;
     }

@@ -323,7 +323,7 @@ public class DatabaseAdapter {
         colIndex = cursor.getColumnIndex(Enemy.SPD_PERCENT);
         int spdPercent = cursor.getInt(colIndex);
         ArrayList<Ability> abilities = getAbilitiesOfEnemy(id, tier);
-        Weapon weapon = null;
+        Weapon weapon = getRandomWeaponOfTier(tier);
         if (isWeapon) weapon = getRandomWeaponOfTier(1);
         return new Enemy(type, tier, isWeapon, strPercent, intPercent, colPercent, spdPercent, abilities, numStatPoints, weapon);
     }

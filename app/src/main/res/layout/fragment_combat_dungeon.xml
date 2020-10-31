@@ -2,7 +2,12 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".view.encounter.MultiDungeonFragment">
+    tools:context=".view.encounter.CombatDungeonFragment">
+    <data>
+        <variable
+            name="CombatDungeonVM"
+            type="com.habbybolan.textadventure.viewmodel.encounters.CombatDungeonViewModel" />
+    </data>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -44,4 +49,5 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
 </layout>

@@ -67,9 +67,17 @@ public class CombatOrderAdapter extends RecyclerView.Adapter<CombatOrderAdapter.
     }
 
     // from of the list deleted and added to the end
-    public void nextTurn() {
-        //notifyItemRemoved(0);
-        //notifyItemInserted(allEntities.size()-1);
+    public void nextTurnCurr() {
+        notifyItemRemoved(0);
+        notifyDataSetChanged();
+    }
+    // from of the list deleted and added to the end
+    public void nextTurnNext() {
+        notifyDataSetChanged();
+    }
+    // from of the list deleted and added to the end
+    public void nextTurnLast() {
+        notifyItemInserted(getItemCount()-1);
         notifyDataSetChanged();
     }
 

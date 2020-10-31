@@ -43,7 +43,6 @@ public class SaveDataLocally {
                     jsonClassObject.put("class", Character.WIZARD_CLASS_TYPE);
                     jsonClassObject.put("encounterState", 0);
                     jsonClassObject.put("distance", 0);
-                    jsonClassObject.put("dungeonCounter", 0);
 
                     jsonClassObject.put("str", context.getString(R.string.Wizard_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Wizard_Start_Str)); // base str
@@ -153,44 +152,9 @@ public class SaveDataLocally {
             }
             // this info is consistent for all starting characters
             try {
-                JSONArray emptyArray = new JSONArray();
-                jsonClassObject.put("level", 0);
-                jsonClassObject.put("expIncrease", 0);
-                jsonClassObject.put("gold", context.getString(R.string.Starting_Gold));
-                jsonClassObject.put("goldIncrease", 0);
                 JSONArray itemsArray = new JSONArray();
                 itemsArray.put(context.getString(R.string.Starting_Item));
                 jsonClassObject.put("items", itemsArray);
-                // specials - set all to 0
-                jsonClassObject.put("isStun", 0);
-                jsonClassObject.put("isConfuse", 0);
-                jsonClassObject.put("isInvincibility", 0);
-                jsonClassObject.put("isSilence", 0);
-                jsonClassObject.put("invisibility", 0);
-                jsonClassObject.put("specialMap", emptyArray);
-                // stats
-                jsonClassObject.put("strIncrease", 0);
-                jsonClassObject.put("strDecrease", 0);
-                jsonClassObject.put("intIncrease", 0);
-                jsonClassObject.put("intDecrease", 0);
-                jsonClassObject.put("conIncrease", 0);
-                jsonClassObject.put("conDecrease", 0);
-                jsonClassObject.put("spdIncrease", 0);
-                jsonClassObject.put("spdDecrease", 0);
-                jsonClassObject.put("evasionIncrease", 0);
-                jsonClassObject.put("evasionDecrease", 0);
-                jsonClassObject.put("blockIncrease", 0);
-                jsonClassObject.put("blockDecrease", 0);
-                jsonClassObject.put("tempExtraHealth", 0);
-                // stats array
-                jsonClassObject.put("statIncreaseList", emptyArray);
-                jsonClassObject.put("statDecreaseList", emptyArray);
-                jsonClassObject.put("tempHealthList", emptyArray);
-                jsonClassObject.put("tempManaList", emptyArray);
-                // DOT
-                jsonClassObject.put("dotMap", emptyArray);
-
-
 
             } catch (JSONException e) {
                 e.printStackTrace();

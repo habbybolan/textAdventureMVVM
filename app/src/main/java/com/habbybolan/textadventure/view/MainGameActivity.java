@@ -13,6 +13,7 @@ import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
 import com.habbybolan.textadventure.view.encounter.CheckFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceFragment;
+import com.habbybolan.textadventure.view.encounter.CombatDungeonFragment;
 import com.habbybolan.textadventure.view.encounter.CombatFragment;
 import com.habbybolan.textadventure.view.encounter.MultiDungeonFragment;
 import com.habbybolan.textadventure.view.encounter.RandomBenefitFragment;
@@ -90,12 +91,14 @@ public class MainGameActivity extends AppCompatActivity {
     public void alterEncounterFragment() {
         encounterType = mainGameViewModel.getEncounterType().get();
         switch (encounterType) {
-            /*case DUNGEON_TYPE:
-                isDungeon = true;
-                DungeonEncounter dungeonEncounter = new DungeonEncounter(getContext(), character, damage);
-                dungeonEncounter.setInitialChoice(encounter);
+            case MainGameViewModel.COMBAT_DUNGEON_TYPE:
+                CombatDungeonFragment combatDungeonFragment = CombatDungeonFragment.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, combatDungeonFragment)
+                        .commit();
                 break;
-                */
             case MainGameViewModel.MULTI_DUNGEON_TYPE:
                 MultiDungeonFragment multiDungeonFragment = MultiDungeonFragment.newInstance();
                 getSupportFragmentManager()
@@ -166,7 +169,7 @@ public class MainGameActivity extends AppCompatActivity {
                 questEncounter.setInitialQuest(encounter.getJSONObject("encounter"));
                 break;*/
             default: //  shouldn't reach here
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("No encounter of " + encounterType);
         }
     }
 

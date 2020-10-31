@@ -38,6 +38,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:layoutAnimation="@anim/layout_animation"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -45,6 +46,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:layoutAnimation="@anim/layout_animation"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -52,6 +54,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:layoutAnimation="@anim/layout_animation"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
                 </LinearLayout>
 

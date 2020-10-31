@@ -162,26 +162,33 @@ public class Enemy extends CharacterEntity {
             isAlive = enemyObject.getBoolean("isAlive");
             type = enemyObject.getString("type");
             setDrawables(type);
+
             // stats
-            strength = enemyObject.getInt("str");
-            strBase = enemyObject.getInt("strBase");
-            strIncrease = enemyObject.getInt("strIncrease");
-            strDecrease = enemyObject.getInt("strDecrease");
-            intelligence = enemyObject.getInt("int");
-            intBase = enemyObject.getInt("intBase");
-            intIncrease = enemyObject.getInt("intIncrease");
-            intDecrease = enemyObject.getInt("intDecrease");
-            constitution = enemyObject.getInt("con");
-            conBase = enemyObject.getInt("conBase");
-            conIncrease = enemyObject.getInt("conIncrease");
-            conDecrease = enemyObject.getInt("conDecrease");
-            speed = enemyObject.getInt("spd");
-            spdBase = enemyObject.getInt("spdBase");
-            spdIncrease = enemyObject.getInt("spdIncrease");
-            spdDecrease = enemyObject.getInt("spdDecrease");
+            if (enemyObject.has("str")) strength = enemyObject.getInt("str");
+            if (enemyObject.has("strBase")) strBase = enemyObject.getInt("strBase");
+            if (enemyObject.has("strIncrease")) strIncrease = enemyObject.getInt("strIncrease");
+            if (enemyObject.has("strDecrease")) strDecrease = enemyObject.getInt("strDecrease");
+            if (enemyObject.has("int")) intelligence = enemyObject.getInt("int");
+            if (enemyObject.has("intBase")) intBase = enemyObject.getInt("intBase");
+            if (enemyObject.has("intIncrease")) intIncrease = enemyObject.getInt("intIncrease");
+            if (enemyObject.has("intDecrease")) intDecrease = enemyObject.getInt("intDecrease");
+            if (enemyObject.has("con")) constitution = enemyObject.getInt("con");
+            if (enemyObject.has("conBase")) conBase = enemyObject.getInt("conBase");
+            if (enemyObject.has("conIncrease")) conIncrease = enemyObject.getInt("conIncrease");
+            if (enemyObject.has("conDecrease")) conDecrease = enemyObject.getInt("conDecrease");
+            if (enemyObject.has("spd")) speed = enemyObject.getInt("spd");
+            if (enemyObject.has("spdBase")) spdBase = enemyObject.getInt("spdBase");
+            if (enemyObject.has("spdIncrease")) spdIncrease = enemyObject.getInt("spdIncrease");
+            if (enemyObject.has("spdDecrease")) spdDecrease = enemyObject.getInt("spdDecrease");
             numStatPoints = strBase + intBase + conBase + spdBase;
+            if (enemyObject.has("block")) strength = enemyObject.getInt("block");
+            if (enemyObject.has("blockIncrease")) strength = enemyObject.getInt("blockIncrease");
+            if (enemyObject.has("blockDecrease")) strength = enemyObject.getInt("blockDecrease");
+            if (enemyObject.has("evasion")) strength = enemyObject.getInt("evasion");
+            if (enemyObject.has("evasionIncrease")) strength = enemyObject.getInt("evasionIncrease");
+            if (enemyObject.has("evasionDecrease")) strength = enemyObject.getInt("evasionDecrease");
             // misc
-            level = enemyObject.getInt("level");
+            if (enemyObject.has("level")) level = enemyObject.getInt("level");
             // bars
             health = enemyObject.getInt("health");
             maxHealth = enemyObject.getInt("maxHealth");
@@ -191,83 +198,95 @@ public class Enemy extends CharacterEntity {
             numAbilities = 0;
             JSONArray abilitiesArray = enemyObject.getJSONArray("abilities");
             for (int i= 0; i < abilitiesArray.length(); i++) {
-                abilities.add(new Ability(abilitiesArray.getString(i)));
+                String abilityString = abilitiesArray.getString(i);
+                abilities.add(new Ability(abilityString));
                 numAbilities++;
 
             }
             // weapons
-            String weaponsString = enemyObject.getString("weapon");
-            numWeapons = 1;
-            weapon = new Weapon(weaponsString);
+            JSONArray weaponsArray = enemyObject.getJSONArray("weapons");
+            numWeapons = 0;
+            for (int i = 0; i < weaponsArray.length(); i++) {
+                String weaponString = weaponsArray.getString(i);
+                weapons.add(new Weapon(weaponString));
+                numWeapons++;
 
-            // items
-            numItems = 0;
-            JSONArray itemsArray = enemyObject.getJSONArray("items");
-            for (int i = 0; i < itemsArray.length(); i++) {
-                items.add(new Item(itemsArray.getString(i)));
-                numItems++;
             }
 
             // DOTS
-            isFire = enemyObject.getBoolean(Effect.FIRE);
-            isBleed = enemyObject.getBoolean(Effect.BLEED);
-            isPoison = enemyObject.getBoolean(Effect.POISON);
-            isFrostBurn = enemyObject.getBoolean(Effect.FROSTBURN);
-            isHealDot = enemyObject.getBoolean(Effect.HEALTH_DOT);
-            isManaDot = enemyObject.getBoolean(Effect.MANA_DOT);
-            JSONArray dotList = enemyObject.getJSONArray("dotList");
-            for (int i = 0; i < dotList.length(); i++) {
-                JSONArray dot = (JSONArray) dotList.get(i);
-                this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
+            if (enemyObject.has(Effect.FIRE)) isFire = enemyObject.getBoolean(Effect.FIRE);
+            if (enemyObject.has(Effect.BLEED)) isBleed = enemyObject.getBoolean(Effect.BLEED);
+            if (enemyObject.has(Effect.POISON)) isPoison = enemyObject.getBoolean(Effect.POISON);
+            if (enemyObject.has(Effect.FROSTBURN)) isFrostBurn = enemyObject.getBoolean(Effect.FROSTBURN);
+            if (enemyObject.has(Effect.HEALTH_DOT)) isHealDot = enemyObject.getBoolean(Effect.HEALTH_DOT);
+            if (enemyObject.has(Effect.MANA_DOT)) isManaDot = enemyObject.getBoolean(Effect.MANA_DOT);
+            if (enemyObject.has("dotList")) {
+                JSONArray dotList = enemyObject.getJSONArray("dotList");
+                for (int i = 0; i < dotList.length(); i++) {
+                    JSONArray dot = (JSONArray) dotList.get(i);
+                    this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
+                }
             }
             // SPECIAL
-            isStun = enemyObject.getBoolean(Effect.STUN);
-            isConfuse = enemyObject.getBoolean(Effect.CONFUSE);
-            isSilence = enemyObject.getBoolean(Effect.SILENCE);
-            isInvincible = enemyObject.getBoolean(Effect.INVINCIBILITY);
-            isInvisible = enemyObject.getBoolean(Effect.INVISIBILITY);
-            JSONArray specialList = enemyObject.getJSONArray("specialList");
-            for (int i = 0; i < specialList.length(); i++) {
-                JSONArray special = (JSONArray) specialList.get(i);
-                this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
+            if (enemyObject.has(Effect.STUN)) isStun = enemyObject.getBoolean(Effect.STUN);
+            if (enemyObject.has(Effect.CONFUSE)) isConfuse = enemyObject.getBoolean(Effect.CONFUSE);
+            if (enemyObject.has(Effect.SILENCE)) isSilence = enemyObject.getBoolean(Effect.SILENCE);
+            if (enemyObject.has(Effect.INVINCIBILITY)) isInvincible = enemyObject.getBoolean(Effect.INVINCIBILITY);
+            if (enemyObject.has(Effect.INVISIBILITY)) isInvisible = enemyObject.getBoolean(Effect.INVISIBILITY);
+            if (enemyObject.has("specialList")) {
+                JSONArray specialList = enemyObject.getJSONArray("specialList");
+                for (int i = 0; i < specialList.length(); i++) {
+                    JSONArray special = (JSONArray) specialList.get(i);
+                    this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
+                }
             }
             // tempHealth
-            JSONArray tempHealthArray = enemyObject.getJSONArray("tempHealthList");
-            for (int i = 0; i < tempHealthArray.length(); i++) {
-                JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
-                int duration = tempHealth.getInt(0);
-                int amount = tempHealth.getInt(1);
-                TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
-                tempHealthList.add(tempBar);
+            if (enemyObject.has("tempHealthList")) {
+                JSONArray tempHealthArray = enemyObject.getJSONArray("tempHealthList");
+                for (int i = 0; i < tempHealthArray.length(); i++) {
+                    JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
+                    int duration = tempHealth.getInt(0);
+                    int amount = tempHealth.getInt(1);
+                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
+                    tempHealthList.add(tempBar);
+                }
             }
+            if (enemyObject.has("tempExtraHealth")) tempExtraHealth = enemyObject.getInt("tempExtraHealth");
             // tempMana
-            JSONArray tempManaArray = enemyObject.getJSONArray("tempManaList");
-            for (int i = 0; i < tempManaArray.length(); i++) {
-                JSONArray tempMana = (JSONArray) tempManaArray.get(i);
-                int duration = tempMana.getInt(0);
-                int amount = tempMana.getInt(1);
-                TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
-                tempManaList.add(tempBar);
+            if (enemyObject.has("tempManaList")) {
+                JSONArray tempManaArray = enemyObject.getJSONArray("tempManaList");
+                for (int i = 0; i < tempManaArray.length(); i++) {
+                    JSONArray tempMana = (JSONArray) tempManaArray.get(i);
+                    int duration = tempMana.getInt(0);
+                    int amount = tempMana.getInt(1);
+                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
+                    tempManaList.add(tempBar);
+                }
             }
+            if (enemyObject.has("tempExtraMana")) tempExtraHealth = enemyObject.getInt("tempExtraMana");
             // stat Increase
-            JSONArray statIncreaseArray = enemyObject.getJSONArray("statIncreaseList");
-            for (int i = 0; i < statIncreaseArray.length(); i++) {
-                JSONArray statIncrease = (JSONArray) statIncreaseArray.get(i);
-                String type = statIncrease.getString(0);
-                int duration = statIncrease.getInt(1);
-                int amount = statIncrease.getInt(2);
-                TempStat tempStat = new TempStat(type, duration, amount);
-                statIncreaseList.add(tempStat);
+            if (enemyObject.has("statIncreaseList")) {
+                JSONArray statIncreaseArray = enemyObject.getJSONArray("statIncreaseList");
+                for (int i = 0; i < statIncreaseArray.length(); i++) {
+                    JSONArray statIncrease = (JSONArray) statIncreaseArray.get(i);
+                    String type = statIncrease.getString(0);
+                    int duration = statIncrease.getInt(1);
+                    int amount = statIncrease.getInt(2);
+                    TempStat tempStat = new TempStat(type, duration, amount);
+                    statIncreaseList.add(tempStat);
+                }
             }
             // stat Decrease
-            JSONArray statDecreaseArray = enemyObject.getJSONArray("statDecreaseList");
-            for (int i = 0; i < statDecreaseArray.length(); i++) {
-                JSONArray statDecrease = (JSONArray) statDecreaseArray.get(i);
-                String type = statDecrease.getString(0);
-                int duration = statDecrease.getInt(1);
-                int amount = statDecrease.getInt(2);
-                TempStat tempStat = new TempStat(type, duration, amount);
-                statDecreaseList.add(tempStat);
+            if (enemyObject.has("statDecreaseList")) {
+                JSONArray statDecreaseArray = enemyObject.getJSONArray("statDecreaseList");
+                for (int i = 0; i < statDecreaseArray.length(); i++) {
+                    JSONArray statDecrease = (JSONArray) statDecreaseArray.get(i);
+                    String type = statDecrease.getString(0);
+                    int duration = statDecrease.getInt(1);
+                    int amount = statDecrease.getInt(2);
+                    TempStat tempStat = new TempStat(type, duration, amount);
+                    statDecreaseList.add(tempStat);
+                }
             }
 
         } catch (JSONException e) {
@@ -312,7 +331,8 @@ public class Enemy extends CharacterEntity {
     public Inventory getRandomAction() {
         // action can be either attack, special attack, ability 1, or ability 2
         Random random = new Random();
-        int actionNum = random.nextInt(4);
+        // todo: change to be able to account for multiple abilities
+        int actionNum = random.nextInt(3);
         switch (actionNum) {
             case 0:
                 // weapon attack
@@ -323,9 +343,6 @@ public class Enemy extends CharacterEntity {
             case 2:
                 // ability 1
                 return abilities.get(0);
-            case 3:
-                // ability 2
-                return abilities.get(1);
             default:
                 throw new IllegalStateException();
 
@@ -408,30 +425,32 @@ public class Enemy extends CharacterEntity {
         JSONEnemy.put("spdBase", spdBase); // base spd
         JSONEnemy.put("spdIncrease", spdIncrease);
         JSONEnemy.put("spdDecrease", spdDecrease);
+
+        JSONEnemy.put("block", block);
+        JSONEnemy.put("blockIncrease", blockIncrease);
+        JSONEnemy.put("blockDecrease", blockDecrease);
+        JSONEnemy.put("evasion", evasion);
+        JSONEnemy.put("evasionIncrease", evasionIncrease);
+        JSONEnemy.put("evasionDecrease", evasionDecrease);
         // abilities
         JSONArray abilitiesArray = new JSONArray();
         for (int i = 0; i < abilities.size(); i++) {
-            if (abilities.size() > i)
-                abilitiesArray.put(abilities.get(i).serializeToJSON());
+            abilitiesArray.put(abilities.get(i).serializeToJSON());
         }
         JSONEnemy.put("abilities", abilitiesArray);
-        // serialize weapon if the enemy has one (isWeapon = true)
-        if (isWeapon)
-            JSONEnemy.put("weapon", weapon.serializeToJSON());
+        // weapons
+        JSONArray weaponsArray = new JSONArray();
+        for (int i = 0; i < weapons.size(); i++) {
+            weaponsArray.put(weapons.get(i).serializeToJSON());
+        }
+        JSONEnemy.put("weapons", weaponsArray);
         // bars
         JSONEnemy.put("health", health);
         JSONEnemy.put("maxHealth", maxHealth);
         JSONEnemy.put("mana", mana);
         JSONEnemy.put("maxMana", maxMana);
         // misc
-        JSONEnemy.put("level",level);
-        // Items
-        JSONArray itemsArray = new JSONArray();
-        for (int i = 0; i < Character.MAX_ITEMS; i++) {
-            if (items.size() > i)
-                itemsArray.put(items.get(i).serializeToJSON());
-        }
-        JSONEnemy.put("items", itemsArray);
+        JSONEnemy.put("level", level);
         // specials
         JSONEnemy.put(Effect.STUN, isStun);
         JSONEnemy.put(Effect.CONFUSE, isConfuse);
@@ -456,6 +475,7 @@ public class Enemy extends CharacterEntity {
             tempHealthArray.put(tempHealth);
         }
         JSONEnemy.put("tempHealthList", tempHealthArray);
+        JSONEnemy.put("tempExtraHealth", tempExtraHealth);
         // temp mana
         JSONEnemy.put("tempExtraMana", tempExtraMana);
         JSONArray tempManaArray = new JSONArray(); // <key, value>
@@ -466,6 +486,7 @@ public class Enemy extends CharacterEntity {
             tempManaArray.put(tempMana);
         }
         JSONEnemy.put("tempManaList", tempManaArray);
+        JSONEnemy.put("tempExtraMana", tempExtraMana);
         // stat increase
         JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
         for (int i = 0; i < statIncreaseList.size(); i++) {

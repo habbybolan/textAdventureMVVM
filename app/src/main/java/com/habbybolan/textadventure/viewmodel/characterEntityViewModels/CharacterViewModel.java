@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.characterEntityViewModels;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import androidx.databinding.Bindable;
@@ -486,11 +487,12 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         notifyPropertyChanged(BR.gold);
     }
     /**
-     * change the gold by amount and update it with observable fields and databinding
+     * change the gold by amount and update it with observable fields and data binding
      * @param amount    amount to change gold by
      */
+    @SuppressLint("UseValueOf")
     public void goldChange(int amount) {
-        int goldChange  = character.goldChange(amount);
+        Integer goldChange  = character.goldChange(amount);
         notifyPropertyChanged(BR.gold);
         goldObserve.set(goldChange);
     }
@@ -506,7 +508,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     public void addExp(int amount) {
         character.addExp(amount);
         notifyPropertyChanged(BR.exp);
-        expObserve.set(new Integer(amount));
+        expObserve.set(amount);
     }
 
 
@@ -543,7 +545,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     /**
      * Sets the encounter state back to outdoor encounters.
      */
-    public void setStateToDungeon() {
+    public void setStateToCombatDungeon() {
         character.setEncounterState(Character.COMBAT_DUNGEON_STATE);
     }
     @Bindable
@@ -562,5 +564,8 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     }
     public void decrementDungeonCounter() {
         character.decrementDungeonCounter();
+    }
+    public int getDungeonLength() {
+        return character.getDungeonLength();
     }
 }

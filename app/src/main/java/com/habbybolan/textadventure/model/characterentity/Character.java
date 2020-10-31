@@ -17,7 +17,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -38,16 +37,13 @@ public class Character extends CharacterEntity {
     public static final int MAX_ABILITIES = 4;
     public static final int MAX_WEAPONS = 2;
     public static final int MAX_ITEMS = 5;
-    public final int NUM_ACTIONS = 2;
 
-    // holds all the buff and debuff abilities applied to the player character
-    private ArrayList<Ability> appliedAbilities = new ArrayList<>();
+    public final int NUM_ACTIONS = 2;
 
     // Character info
     private String classType;
-    private int exp;
-    private int gold;
-    private int goldIncrease;
+    private int exp = 0;
+    private int gold = 0;
 
     // how 'far' the character has travelled, measured in number of outdoor encounters that have occurred;
     private int distance = 0;
@@ -58,8 +54,10 @@ public class Character extends CharacterEntity {
      *      2: dungeon encounters
      */
     private int encounterState = 0;
-    // number of encounters inside the current dungeon to play out until the end
+    // current number of dungeon encounters to enter
     private int dungeonCounter = 0;
+    // the original number of dungeon encounters to enter
+    private int dungeonLength = 0;
 
     public final static int OUTDOOR_STATE = 0;
     public final static int MULTI_DUNGEON_STATE = 1;
@@ -74,28 +72,37 @@ public class Character extends CharacterEntity {
             classType = characterObject.getString("class");
             encounterState = characterObject.getInt("encounterState");
             distance = characterObject.getInt("distance");
-            dungeonCounter = characterObject.getInt("dungeonCounter");
+            if (characterObject.has("dungeonCounter"))
+                dungeonCounter = characterObject.getInt("dungeonCounter");
+            if (characterObject.has("dungeonLength"))
+                dungeonLength = characterObject.getInt("dungeonLength");
             // stats
-            strength = characterObject.getInt("str");
-            strBase = characterObject.getInt("strBase");
-            strIncrease = characterObject.getInt("strIncrease");
-            strDecrease = characterObject.getInt("strDecrease");
-            intelligence = characterObject.getInt("int");
-            intBase = characterObject.getInt("intBase");
-            intIncrease = characterObject.getInt("intIncrease");
-            intDecrease = characterObject.getInt("intDecrease");
-            constitution = characterObject.getInt("con");
-            conBase = characterObject.getInt("conBase");
-            conIncrease = characterObject.getInt("conIncrease");
-            conDecrease = characterObject.getInt("conDecrease");
-            speed = characterObject.getInt("spd");
-            spdBase = characterObject.getInt("spdBase");
-            spdIncrease = characterObject.getInt("spdIncrease");
-            spdDecrease = characterObject.getInt("spdDecrease");
+            if (characterObject.has("str")) strength = characterObject.getInt("str");
+            if (characterObject.has("strBase")) strBase = characterObject.getInt("strBase");
+            if (characterObject.has("strIncrease")) strIncrease = characterObject.getInt("strIncrease");
+            if (characterObject.has("strDecrease")) strDecrease = characterObject.getInt("strDecrease");
+            if (characterObject.has("int")) intelligence = characterObject.getInt("int");
+            if (characterObject.has("intBase")) intBase = characterObject.getInt("intBase");
+            if (characterObject.has("intIncrease")) intIncrease = characterObject.getInt("intIncrease");
+            if (characterObject.has("intDecrease")) intDecrease = characterObject.getInt("intDecrease");
+            if (characterObject.has("con")) constitution = characterObject.getInt("con");
+            if (characterObject.has("conBase")) conBase = characterObject.getInt("conBase");
+            if (characterObject.has("conIncrease")) conIncrease = characterObject.getInt("conIncrease");
+            if (characterObject.has("conDecrease")) conDecrease = characterObject.getInt("conDecrease");
+            if (characterObject.has("spd")) speed = characterObject.getInt("spd");
+            if (characterObject.has("spdBase")) spdBase = characterObject.getInt("spdBase");
+            if (characterObject.has("spdIncrease")) spdIncrease = characterObject.getInt("spdIncrease");
+            if (characterObject.has("spdDecrease")) spdDecrease = characterObject.getInt("spdDecrease");
             numStatPoints = strBase + intBase + conBase + spdBase;
+            if (characterObject.has("block")) strength = characterObject.getInt("block");
+            if (characterObject.has("blockIncrease")) strength = characterObject.getInt("blockIncrease");
+            if (characterObject.has("blockDecrease")) strength = characterObject.getInt("blockDecrease");
+            if (characterObject.has("evasion")) strength = characterObject.getInt("evasion");
+            if (characterObject.has("evasionIncrease")) strength = characterObject.getInt("evasionIncrease");
+            if (characterObject.has("evasionDecrease")) strength = characterObject.getInt("evasionDecrease");
             // misc
-            level = characterObject.getInt("level");
-            gold = characterObject.getInt("gold");
+            if (characterObject.has("level")) level = characterObject.getInt("level");
+            if (characterObject.has("gold")) gold = characterObject.getInt("gold");
             // bars
             health = characterObject.getInt("health");
             maxHealth = characterObject.getInt("maxHealth");
@@ -139,65 +146,79 @@ public class Character extends CharacterEntity {
             }
 
             // DOTS
-            isFire = characterObject.getBoolean(Effect.FIRE);
-            isBleed = characterObject.getBoolean(Effect.BLEED);
-            isPoison = characterObject.getBoolean(Effect.POISON);
-            isFrostBurn = characterObject.getBoolean(Effect.FROSTBURN);
-            isHealDot = characterObject.getBoolean(Effect.HEALTH_DOT);
-            isManaDot = characterObject.getBoolean(Effect.MANA_DOT);
-            JSONArray dotList = characterObject.getJSONArray("dotList");
-            for (int i = 0; i < dotList.length(); i++) {
-                JSONArray dot = (JSONArray) dotList.get(i);
-                this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
+            if (characterObject.has(Effect.FIRE)) isFire = characterObject.getBoolean(Effect.FIRE);
+            if (characterObject.has(Effect.BLEED)) isBleed = characterObject.getBoolean(Effect.BLEED);
+            if (characterObject.has(Effect.POISON)) isPoison = characterObject.getBoolean(Effect.POISON);
+            if (characterObject.has(Effect.FROSTBURN)) isFrostBurn = characterObject.getBoolean(Effect.FROSTBURN);
+            if (characterObject.has(Effect.HEALTH_DOT)) isHealDot = characterObject.getBoolean(Effect.HEALTH_DOT);
+            if (characterObject.has(Effect.MANA_DOT)) isManaDot = characterObject.getBoolean(Effect.MANA_DOT);
+            if (characterObject.has("dotList")) {
+                JSONArray dotList = characterObject.getJSONArray("dotList");
+                for (int i = 0; i < dotList.length(); i++) {
+                    JSONArray dot = (JSONArray) dotList.get(i);
+                    this.dotList.add(new Dot(dot.getString(0), dot.getInt(1)));
+                }
             }
             // SPECIAL
-            isStun = characterObject.getBoolean(Effect.STUN);
-            isConfuse = characterObject.getBoolean(Effect.CONFUSE);
-            isSilence = characterObject.getBoolean(Effect.SILENCE);
-            isInvincible = characterObject.getBoolean(Effect.INVINCIBILITY);
-            isInvisible = characterObject.getBoolean(Effect.INVISIBILITY);
-            JSONArray specialList = characterObject.getJSONArray("specialList");
-            for (int i = 0; i < specialList.length(); i++) {
-                JSONArray special = (JSONArray) specialList.get(i);
-                this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
+            if (characterObject.has(Effect.STUN)) isStun = characterObject.getBoolean(Effect.STUN);
+            if (characterObject.has(Effect.CONFUSE)) isConfuse = characterObject.getBoolean(Effect.CONFUSE);
+            if (characterObject.has(Effect.SILENCE)) isSilence = characterObject.getBoolean(Effect.SILENCE);
+            if (characterObject.has(Effect.INVINCIBILITY)) isInvincible = characterObject.getBoolean(Effect.INVINCIBILITY);
+            if (characterObject.has(Effect.INVISIBILITY)) isInvisible = characterObject.getBoolean(Effect.INVISIBILITY);
+            if (characterObject.has("specialList")) {
+                JSONArray specialList = characterObject.getJSONArray("specialList");
+                for (int i = 0; i < specialList.length(); i++) {
+                    JSONArray special = (JSONArray) specialList.get(i);
+                    this.specialList.add(new SpecialEffect(special.getString(0), special.getInt(1)));
+                }
             }
             // tempHealth
-            JSONArray tempHealthArray = characterObject.getJSONArray("tempHealthList");
-            for (int i = 0; i < tempHealthArray.length(); i++) {
-                JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
-                int duration = tempHealth.getInt(0);
-                int amount = tempHealth.getInt(1);
-                TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
-                tempHealthList.add(tempBar);
+            if (characterObject.has("tempHealthList")) {
+                JSONArray tempHealthArray = characterObject.getJSONArray("tempHealthList");
+                for (int i = 0; i < tempHealthArray.length(); i++) {
+                    JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
+                    int duration = tempHealth.getInt(0);
+                    int amount = tempHealth.getInt(1);
+                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
+                    tempHealthList.add(tempBar);
+                }
             }
+            if (characterObject.has("tempExtraHealth")) tempExtraHealth = characterObject.getInt("tempExtraHealth");
             // tempMana
-            JSONArray tempManaArray = characterObject.getJSONArray("tempManaList");
-            for (int i = 0; i < tempManaArray.length(); i++) {
-                JSONArray tempMana = (JSONArray) tempManaArray.get(i);
-                int duration = tempMana.getInt(0);
-                int amount = tempMana.getInt(1);
-                TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
-                tempManaList.add(tempBar);
+            if (characterObject.has("tempManaList")) {
+                JSONArray tempManaArray = characterObject.getJSONArray("tempManaList");
+                for (int i = 0; i < tempManaArray.length(); i++) {
+                    JSONArray tempMana = (JSONArray) tempManaArray.get(i);
+                    int duration = tempMana.getInt(0);
+                    int amount = tempMana.getInt(1);
+                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
+                    tempManaList.add(tempBar);
+                }
             }
+            if (characterObject.has("tempExtraMana")) tempExtraHealth = characterObject.getInt("tempExtraMana");
             // stat Increase
-            JSONArray statIncreaseArray = characterObject.getJSONArray("statIncreaseList");
-            for (int i = 0; i < statIncreaseArray.length(); i++) {
-                JSONArray statIncrease = (JSONArray) statIncreaseArray.get(i);
-                String type = statIncrease.getString(0);
-                int duration = statIncrease.getInt(1);
-                int amount = statIncrease.getInt(2);
-                TempStat tempStat = new TempStat(type, duration, amount);
-                statIncreaseList.add(tempStat);
+            if (characterObject.has("statIncreaseList")) {
+                JSONArray statIncreaseArray = characterObject.getJSONArray("statIncreaseList");
+                for (int i = 0; i < statIncreaseArray.length(); i++) {
+                    JSONArray statIncrease = (JSONArray) statIncreaseArray.get(i);
+                    String type = statIncrease.getString(0);
+                    int duration = statIncrease.getInt(1);
+                    int amount = statIncrease.getInt(2);
+                    TempStat tempStat = new TempStat(type, duration, amount);
+                    statIncreaseList.add(tempStat);
+                }
             }
             // stat Decrease
-            JSONArray statDecreaseArray = characterObject.getJSONArray("statDecreaseList");
-            for (int i = 0; i < statDecreaseArray.length(); i++) {
-                JSONArray statDecrease = (JSONArray) statDecreaseArray.get(i);
-                String type = statDecrease.getString(0);
-                int duration = statDecrease.getInt(1);
-                int amount = statDecrease.getInt(2);
-                TempStat tempStat = new TempStat(type, duration, amount);
-                statDecreaseList.add(tempStat);
+            if (characterObject.has("statDecreaseList")) {
+                JSONArray statDecreaseArray = characterObject.getJSONArray("statDecreaseList");
+                for (int i = 0; i < statDecreaseArray.length(); i++) {
+                    JSONArray statDecrease = (JSONArray) statDecreaseArray.get(i);
+                    String type = statDecrease.getString(0);
+                    int duration = statDecrease.getInt(1);
+                    int amount = statDecrease.getInt(2);
+                    TempStat tempStat = new TempStat(type, duration, amount);
+                    statDecreaseList.add(tempStat);
+                }
             }
 
         } catch (JSONException | InterruptedException | ExecutionException e) {
@@ -284,6 +305,7 @@ public class Character extends CharacterEntity {
         JSONCharacter.put("encounterState", encounterState);
         JSONCharacter.put("distance", distance);
         JSONCharacter.put("dungeonCounter", dungeonCounter);
+        JSONCharacter.put("dungeonLength", dungeonLength);
 
         JSONCharacter.put("str", strength); // str
         JSONCharacter.put("strBase", strBase); // base str
@@ -301,6 +323,13 @@ public class Character extends CharacterEntity {
         JSONCharacter.put("spdBase", spdBase); // base spd
         JSONCharacter.put("spdIncrease", spdIncrease);
         JSONCharacter.put("spdDecrease", spdDecrease);
+
+        JSONCharacter.put("block", block);
+        JSONCharacter.put("blockIncrease", blockIncrease);
+        JSONCharacter.put("blockDecrease", blockDecrease);
+        JSONCharacter.put("evasion", evasion);
+        JSONCharacter.put("evasionIncrease", evasionIncrease);
+        JSONCharacter.put("evasionDecrease", evasionDecrease);
         // abilities
         JSONArray abilitiesArray = new JSONArray();
         for (int i = 0; i < abilities.size(); i++) {
@@ -352,6 +381,7 @@ public class Character extends CharacterEntity {
             tempHealthArray.put(tempHealth);
         }
         JSONCharacter.put("tempHealthList", tempHealthArray);
+        JSONCharacter.put("tempExtraHealth", tempExtraHealth);
         // temp mana
         JSONCharacter.put("tempExtraMana", tempExtraMana);
         JSONArray tempManaArray = new JSONArray(); // <key, value>
@@ -362,6 +392,7 @@ public class Character extends CharacterEntity {
             tempManaArray.put(tempMana);
         }
         JSONCharacter.put("tempManaList", tempManaArray);
+        JSONCharacter.put("tempExtraMana", tempExtraMana);
         // stat increase
         JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
         for (int i = 0; i < statIncreaseList.size(); i++) {
@@ -520,9 +551,6 @@ public class Character extends CharacterEntity {
 
 
     // setter methods
-    public void setGoldIncrease(int goldIncrease) {
-        this.goldIncrease = goldIncrease;
-    }
     public void setGold(int gold) {
         this.gold = gold;
     }
@@ -563,9 +591,6 @@ public class Character extends CharacterEntity {
     public int getGold() {
         return gold;
     }
-    public int getGoldIncrease() {
-        return goldIncrease;
-    }
 
     public int getNumStatPoints() {
         return strBase + intBase + conBase + spdBase;
@@ -580,10 +605,15 @@ public class Character extends CharacterEntity {
     public int getDungeonCounter() {
         return dungeonCounter;
     }
+    // sets the initial dungeon counter and the dungeon length once when entering
     public void setDungeonCounter(int dungeonCounter) {
         this.dungeonCounter = dungeonCounter;
+        dungeonLength = dungeonCounter;
     }
     public void decrementDungeonCounter() {
         dungeonCounter--;
+    }
+    public int getDungeonLength() {
+        return dungeonLength;
     }
 }

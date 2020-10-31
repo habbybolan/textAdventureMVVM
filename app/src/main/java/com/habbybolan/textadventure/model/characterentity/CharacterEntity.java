@@ -18,35 +18,35 @@ import java.util.Random;
 
 public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
-    protected int strIncrease;
-    protected int intIncrease;
-    protected int conIncrease;
-    protected int spdIncrease;
-    protected int evasionIncrease;
-    protected int blockIncrease;
+    protected int strIncrease = 0;
+    protected int intIncrease = 0;
+    protected int conIncrease = 0;
+    protected int spdIncrease = 0;
+    protected int evasionIncrease = 0;
+    protected int blockIncrease = 0;
 
-    protected int strDecrease;
-    protected int intDecrease;
-    protected int conDecrease;
-    protected int spdDecrease;
-    protected int evasionDecrease;
-    protected int blockDecrease;
+    protected int strDecrease = 0;
+    protected int intDecrease = 0;
+    protected int conDecrease = 0;
+    protected int spdDecrease = 0;
+    protected int evasionDecrease = 0;
+    protected int blockDecrease = 0;
 
-    protected int strBase;
-    protected int intBase;
-    protected int conBase;
-    protected int spdBase;
-    protected int evasionBase;
-    protected int blockBase;
+    protected int strBase = 0;
+    protected int intBase = 0;
+    protected int conBase = 0;
+    protected int spdBase = 0;
+    protected int evasionBase = 0;
+    protected int blockBase = 0;
     
-    protected int strength;
-    protected int intelligence;
-    protected int constitution;
-    protected int speed;
-    protected int evasion;
-    protected int block;
+    protected int strength = 0;
+    protected int intelligence = 0;
+    protected int constitution = 0;
+    protected int speed = 0;
+    protected int evasion = 0;
+    protected int block = 0;
 
-    int numStatPoints;
+    int numStatPoints = 0;
     boolean isCharacter;
 
     private String strDescription = "Increases the damage of attack based moves.";

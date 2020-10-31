@@ -39,7 +39,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
         this.characterVM = characterVM;
         this.encounter = encounter;
         this.context = context;
-        randomBenefitModel = new RandomBenefitModel(context);
+        randomBenefitModel = new RandomBenefitModel();
     }
 
     @Override
@@ -81,7 +81,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     // finds a random Inventory loot
     public void setTangible() {
-        inventoryToRetrieve = randomBenefitModel.getRandomInventory();
+        inventoryToRetrieve = randomBenefitModel.getRandomInventory(context);
     }
 
     // if space in inventory, return true and add inventory object to inventory, otherwise return false

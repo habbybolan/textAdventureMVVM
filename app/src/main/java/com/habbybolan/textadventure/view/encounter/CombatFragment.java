@@ -469,9 +469,9 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      *  updates all the RV for the 3 combat order lists
      */
     private void notifyCombatOrderNextTurn() {
-        currListAdapter.nextTurn();
-        nextListAdapter.nextTurn();
-        lastListAdapter.nextTurn();
+        currListAdapter.nextTurnCurr();
+        nextListAdapter.nextTurnNext();
+        lastListAdapter.nextTurnLast();
     }
 
     /**
