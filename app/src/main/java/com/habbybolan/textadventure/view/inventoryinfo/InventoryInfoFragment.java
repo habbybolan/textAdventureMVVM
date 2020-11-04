@@ -11,15 +11,16 @@ import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentInventoryInfoBinding;
+import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.viewmodel.InventoryInfoViewModel;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *
@@ -31,21 +32,13 @@ public class InventoryInfoFragment extends Fragment {
     public static final String COST = "cost";
     public static final String POSITION = "position";
 
-    private String inventoryString;
+    private InventoryInfoViewModel inventoryInfoVM = InventoryInfoViewModel.getInstance();
 
-
-    private InventoryInfoFragment() {
-        // Required empty public constructor
-    }
-
-    private InventoryInfoFragment(String inventoryString) {
-        this.inventoryString = inventoryString;
-    }
-
+    private InventoryInfoFragment() {}
 
     // TODO: Rename and change types and number of parameters
-    public static InventoryInfoFragment newInstance(String inventoryString) {
-        return new InventoryInfoFragment(inventoryString);
+    public static InventoryInfoFragment newInstance() {
+        return new InventoryInfoFragment();
     }
 
     @Override
@@ -58,76 +51,140 @@ public class InventoryInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_inventory_info, container, false);
-        try {
-            setInventory();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        setInventory();
         return binding.getRoot();
     }
 
-    // sets up the serialized inventory object
-    private void setInventory() throws JSONException {
-        JSONObject jsonObject = new JSONObject(inventoryString);
-        String type = jsonObject.getString(Inventory.INVENTORY_TYPE);
-        switch (type) {
-            case Inventory.TYPE_ABILITY:
-                setAbilityInfo(new Ability(inventoryString));
-                break;
-            case Inventory.TYPE_ITEM:
-                setItemInfo(new Item(inventoryString));
-                break;
-            case Inventory.TYPE_WEAPON:
-                setWeaponInfo(new Weapon(inventoryString));
-                break;
-            case Inventory.TYPE_ATTACK:
-                setAttackInfo(new Attack(inventoryString));
-                break;
-            case Inventory.TYPE_S_ATTACK:
-                setSpecialAttackInfo(new SpecialAttack(inventoryString));
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
+    /**
+     * Calls the proper method to set up the UI info on the specific stored inventory.
+     */
+    private void setInventory() {
+        Inventory inventory = inventoryInfoVM.getInventory();
+        if (inventory.isAbility())
+            setAbilityInfo((Ability) inventory);
+        else if (inventory.isItem())
+            setItemInfo((Item) inventory);
+        else if (inventory.isWeapon())
+            setWeaponInfo((Weapon) inventory);
+        else if (inventory.isAttack())
+            setAttackInfo((Attack) inventory);
+        else if (inventory.isSpecialAttack())
+            setSpecialAttackInfo((SpecialAttack) inventory);
+        else
+            throw new IllegalArgumentException();
     }
 
     // displays all info for the special attack
-    private void setSpecialAttackInfo(SpecialAttack specialAttack) {
+    private void setSpecialAttackInfo(final SpecialAttack specialAttack) {
         // top info
         binding.setName(specialAttack.getName());
         binding.setImageIconResource(specialAttack.getPictureResource());
-        // todo: special attack info
+        binding.setInfo(inventoryInfoVM.getSpecialAttackInfo(specialAttack));
+
+        // ability inventory snippet
+        if (specialAttack.getAbility() != null) {
+            View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
+            InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
+            snippetBinding.setInventoryName(specialAttack.getAbility().getName());
+            snippetBinding.setInventoryPic(specialAttack.getAbility().getAbilityID());
+            binding.inventorySnippet.addView(view);
+            snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        inventoryInfoVM.setInventoryInfoObservable(specialAttack.getAbility().serializeToJSON().toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     // displays all info for the attack
-    private void setAttackInfo(Attack attack) {
+    private void setAttackInfo(final Attack attack) {
         // top info
         binding.setName(attack.getName());
         binding.setImageIconResource(attack.getPictureResource());
-        // todo: attack info
+        binding.setInfo(inventoryInfoVM.getAttackInfo(attack));
     }
 
     // displays all info for the weapon
-    private void setWeaponInfo(Weapon weapon) {
+    private void setWeaponInfo(final Weapon weapon) {
         // top info
         binding.setName(weapon.getName());
         binding.setImageIconResource(weapon.getPictureResource());
-        // todo: weapon info
+        binding.setInfo(inventoryInfoVM.getWeaponInfo(weapon));
+        if (weapon.getAttack() != null) {
+            // attack inventory snippet
+            View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
+            InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
+            snippetBinding.setInventoryName(weapon.getAttack().getName());
+            snippetBinding.setInventoryPic(weapon.getAttack().getPictureResource());
+            binding.inventorySnippet.addView(view);
+            snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        inventoryInfoVM.setInventoryInfoObservable(weapon.getAttack().serializeToJSON().toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+        if (weapon.getSpecialAttack() != null) {
+            // special attack inventory snippet
+            View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
+            InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
+            snippetBinding.setInventoryName(weapon.getSpecialAttack().getName());
+            snippetBinding.setInventoryPic(weapon.getSpecialAttack().getPictureResource());
+            binding.inventorySnippet.addView(view);
+            snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        inventoryInfoVM.setInventoryInfoObservable(weapon.getSpecialAttack().serializeToJSON().toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     // displays all info for the item
-    private void setItemInfo(Item item) {
+    private void setItemInfo(final Item item) {
         // top info
         binding.setName(item.getName());
         binding.setImageIconResource(item.getPictureResource());
-        // todo: item info
+        binding.setInfo(inventoryInfoVM.getItemInfo(item));
+
+        // ability inventory snippet
+        if (item.getAbility() != null) {
+            View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
+            InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
+            snippetBinding.setInventoryName(item.getAbility().getName());
+            snippetBinding.setInventoryPic(item.getAbility().getAbilityID());
+            binding.inventorySnippet.addView(view);
+            snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        inventoryInfoVM.setInventoryInfoObservable(item.getAbility().serializeToJSON().toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     // displays all info for the ability
-    private void setAbilityInfo(Ability ability) {
+    private void setAbilityInfo(final Ability ability) {
         // top info
         binding.setName(ability.getName());
         binding.setImageIconResource(ability.getPictureResource());
-        // todo: ability info
+        binding.setInfo(inventoryInfoVM.getAbilityInfo(ability));
     }
 }

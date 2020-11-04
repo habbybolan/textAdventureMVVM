@@ -1,7 +1,8 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme"
+        parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:fontFamily">@font/press_start_2p</item>
         <item name="android:textSize">12sp</item>
@@ -14,5 +15,11 @@
         <item name="android:layout_width">@dimen/default_btn_width</item>
         <item name="android:layout_height">@dimen/default_btn_height</item>
     </style>
+
+    <style name="DungeonPopupAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_dungeon_show</item>
+        <item name="android:windowExitAnimation">@anim/popup_dungeon_hide</item>
+    </style>
+
 
 </resources>

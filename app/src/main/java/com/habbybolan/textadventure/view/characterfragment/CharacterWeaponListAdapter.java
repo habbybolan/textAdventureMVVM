@@ -3,7 +3,6 @@ package com.habbybolan.textadventure.view.characterfragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -92,7 +91,7 @@ public class CharacterWeaponListAdapter extends RecyclerView.Adapter<CharacterWe
         // only displays a message to hold drop button if trying to remove
         @Override
         public void onClick(View v) {
-            Toast.makeText(v.getContext(), "Hold to drop weapon", Toast.LENGTH_SHORT).show();
+            listener.onClick("Hold to drop weapon");
         }
         // deleted the inventory element if long click
         @Override

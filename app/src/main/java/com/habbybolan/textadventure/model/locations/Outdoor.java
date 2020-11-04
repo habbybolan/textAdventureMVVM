@@ -20,6 +20,6 @@ public class Outdoor {
     final public static String CHOICE_BENEFIT_TYPE =  MainGameViewModel.CHOICE_BENEFIT_TYPE;
     final public static int RANDOM_BENEFIT = 7;
     final public static String RANDOM_BENEFIT_TYPE =  MainGameViewModel.RANDOM_BENEFIT_TYPE;
-    final public static int QUEST = 8;
-    final public static String QUEST_TYPE =  MainGameViewModel.QUEST_TYPE;
+
+    final public static String BREAK_TYPE = MainGameViewModel.BREAK_TYPE;
 }

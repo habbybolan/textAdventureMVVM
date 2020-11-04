@@ -27,4 +27,10 @@ public interface Inventory {
 
     void setPictureResource();
     int getPictureResource();
+
+    boolean isAbility();
+    boolean isItem();
+    boolean isWeapon();
+    boolean isAttack();
+    boolean isSpecialAttack();
 }

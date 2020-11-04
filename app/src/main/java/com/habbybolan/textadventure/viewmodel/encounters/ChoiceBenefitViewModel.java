@@ -138,8 +138,8 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
         }
     }
 
-    // return toast message for being full on inventory space
-    public String getToastString(Inventory inventoryToRetrieve) {
+    // return message for being full on inventory space
+    public String getFullMessageString(Inventory inventoryToRetrieve) {
         if (inventoryToRetrieve.getType().equals(Inventory.TYPE_ITEM)) {
             return "You are full on Items";
         } else if (inventoryToRetrieve.getType().equals(Inventory.TYPE_ABILITY)) {

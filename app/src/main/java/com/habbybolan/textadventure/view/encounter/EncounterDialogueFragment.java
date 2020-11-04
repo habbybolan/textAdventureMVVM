@@ -81,6 +81,8 @@ class EncounterDialogueFragment extends Fragment {
 
     /**
      * Finds the view in gridLayout with tag == DIALOGUE_CONTINUE and removes it.
+     * Used in cases where statically places views in the xml that are set to 'gone' should not be removed, only
+     * the continue button for the dialogue.
      * @param gridLayout    The layout holding the dialogue continue view to remove.
      */
     void removeDialogueContinueButton(GridLayout gridLayout) {
@@ -91,7 +93,7 @@ class EncounterDialogueFragment extends Fragment {
 
     /**
      * Helper for endState to set up the button to leave encounter. Pressing the leave button leaves the current encounter and signals to go to next
-     * through the MainGameViewModel
+     * through the MainGameViewModel.
      * @param gridLayout    The Grid layout to place the leave button inside.
      */
     void setLeaveButton(GridLayout gridLayout) {

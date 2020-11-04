@@ -143,6 +143,31 @@ public class Item extends Action {
     }
 
     @Override
+    public boolean isAbility() {
+        return false;
+    }
+
+    @Override
+    public boolean isItem() {
+        return true;
+    }
+
+    @Override
+    public boolean isWeapon() {
+        return false;
+    }
+
+    @Override
+    public boolean isAttack() {
+        return false;
+    }
+
+    @Override
+    public boolean isSpecialAttack() {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null) return false;
         else if (o.getClass() != getClass()) return false;

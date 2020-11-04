@@ -41,6 +41,7 @@ public class MainGameViewModel extends BaseObservable {
     public static final String outdoorJSONFilename = "outdoor_encounters";
     public static final String multiDungeonJSONFilename = "multi_dungeon_encounters";
     public static final String combatDungeonJSONFilename = "combat_dungeon_encounters";
+    public static final String breakJSONFilename = "break_encounters";
 
     private JSONObject JSONEncounter;
 
@@ -79,6 +80,7 @@ public class MainGameViewModel extends BaseObservable {
     final public static String RANDOM_BENEFIT_TYPE = "random_benefit";
     final public static String QUEST_TYPE = "quest";
     final public static String CHECK_TYPE = "check";
+    final public static String BREAK_TYPE = "break";
 
     private MainGameModel mainGameModel = new MainGameModel();
 
@@ -151,8 +153,14 @@ public class MainGameViewModel extends BaseObservable {
         try {
             switch (characterVM.getEncounterState()) {
                 case OUTDOOR_STATE:
-                    characterVM.incrementDistance();
-                    createNewOutdoorEncounter();
+                    if (mainGameModel.breakEncounterCheck()) {
+                        // Enter break encounter
+                        createNewBreakEncounter();
+                    } else {
+                        // otherwise, enter a random outdoor encounter
+                        characterVM.incrementDistance();
+                        createNewOutdoorEncounter();
+                    }
                     break;
                 case MULTI_DUNGEON_STATE:
                     checkContinueMultiDungeon();
@@ -225,6 +233,18 @@ public class MainGameViewModel extends BaseObservable {
         // get a random encounter from jsonFileReader
         try {
             JSONEncounter = jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String type = JSONEncounter.getString("type");
+        setEncounterType(type);
+    }
+
+    private void createNewBreakEncounter() throws JSONException {
+        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
+        // get a random encounter from jsonFileReader
+        try {
+            JSONEncounter = jsonAssetFileReader.getRandomBreakEncounter();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -312,6 +332,13 @@ public class MainGameViewModel extends BaseObservable {
         //characterVM.decrementStatChangeDuration();
         //characterVM.decrementTempExtraDuration();
         characterVM.decrSpecialDuration();
+        classSpecificCheck();
+    }
+
+    /**
+     * Run a check for any class specific checks that occur between encounters.
+     */
+    private void classSpecificCheck() {
     }
 
 

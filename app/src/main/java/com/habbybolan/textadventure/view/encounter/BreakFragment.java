@@ -9,33 +9,31 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.databinding.FragmentCheckBinding;
+import com.habbybolan.textadventure.databinding.FragmentBreakBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
+import com.habbybolan.textadventure.viewmodel.encounters.BreakViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CheckViewModel;
 
 import org.json.JSONException;
 
-
 /**
- * Simple encounter state that checks if player wants to continue in the multi dungeon. Clicking 'leave' leaves
- * the multi dungeon and continues on 'main path' with more random outdoor encounters.
+ * Encounter that can initiate between encounters. Flavor text to break up encounters.
  */
-public class CheckFragment extends EncounterDialogueFragment implements EncounterFragment {
+public class BreakFragment extends EncounterDialogueFragment implements EncounterFragment {
 
-    private static CheckFragment instance = null;
     private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
     private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private CheckViewModel checkVM;
-    private FragmentCheckBinding checkBinding;
+    private FragmentBreakBinding binding;
     private DialogueRecyclerView rv;
+    private BreakViewModel breakVM;
 
-    private CheckFragment() {}
+    public BreakFragment() {}
 
-    public static CheckFragment newInstance() {
-        instance = new CheckFragment();
-        return instance;
+    // TODO: Rename and change types and number of parameters
+    public static BreakFragment newInstance() {
+        return new BreakFragment();
     }
 
     @Override
@@ -44,7 +42,7 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
         mainGameVM = MainGameViewModel.getInstance();
         characterVM = CharacterViewModel.getInstance();
         try {
-            checkVM = new CheckViewModel(getActivity());
+            breakVM = new BreakViewModel(getActivity());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -54,14 +52,13 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        checkBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_check, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_break, container, false);
         try {
-            // create dialogue recyclerView to show actions happening
-            rv = setUpEncounterBeginning(checkVM, this, checkBinding.rvDialogue);
+            rv = setUpEncounterBeginning(breakVM, this, binding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return checkBinding.getRoot();
+        return binding.getRoot();
     }
 
     @Override
@@ -69,7 +66,7 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
         switch(state) {
             // first state
             case CheckViewModel.firstState:
-                dialogueState(checkVM, checkBinding.layoutBtnOptions);
+                dialogueState(breakVM, binding.layoutBtnOptions);
                 break;
             // last state
             case CheckViewModel.secondState:
@@ -80,29 +77,13 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
 
     @Override
     public void endState() {
-        removeDialogueContinueButton(checkBinding.layoutBtnOptions);
-        checkBinding.btnContinue.setVisibility(View.VISIBLE);
-        checkBinding.btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // clicker functionality to continue in multi dungeon
-                checkVM.clickContinue();
-            }
-        });
-        checkBinding.btnLeave.setVisibility(View.VISIBLE);
-        checkBinding.btnLeave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // clicker functionality to leave the multi dungeon
-                checkVM.clickLeave();
-            }
-        });
+        binding.layoutBtnOptions.removeAllViews();
+        setLeaveButton(binding.layoutBtnOptions);
     }
-
 
     @Override
     public void onStop() {
         super.onStop();
-        checkVM.saveGame(rv);
+        breakVM.saveGame(rv);
     }
 }

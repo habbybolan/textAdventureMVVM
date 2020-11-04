@@ -54,6 +54,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         this.context = context;
         SaveDataLocally save = new SaveDataLocally(context);
         String characterData = save.readCharacterData();
+        // todo: set up ObservableArrayLists?
         character = new Character(characterData, context);
         this.characterEntity = character;
     }

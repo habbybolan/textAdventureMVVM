@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -16,6 +16,7 @@ import com.habbybolan.textadventure.databinding.FragmentChoiceBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.ButtonInflaters;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
@@ -139,7 +140,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
         snippetBinding.setInventoryName(inventoryToRetrieve.getName());
         snippetBinding.setInventoryPic(inventoryToRetrieve.getPictureResource());
         benefitBinding.frameInventorySnippet.addView(view);
-        snippetBinding.inventoryInfoAttack.setOnClickListener(new View.OnClickListener() {
+        snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
@@ -175,8 +176,8 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
                 @Override
                 public void onClick(View v) {
                     if (!benefitVM.addNewInventory(benefitVM.getInventoryToRetrieve()))
-                        // Inventory full, display Toast message
-                        Toast.makeText(getContext(), benefitVM.getToastString(benefitVM.getInventoryToRetrieve()), Toast.LENGTH_SHORT).show();
+                        // Inventory full, display popup window message
+                        CustomPopupWindow.setTempMessage(benefitVM.getFullMessageString(benefitVM.getInventoryToRetrieve()), getContext(), new PopupWindow(), benefitBinding.benefitContainer);
                     else {
                         // remove the button to pick up Inventory reward
                         benefitBinding.layoutBtnOptions.removeView(viewPickUp);

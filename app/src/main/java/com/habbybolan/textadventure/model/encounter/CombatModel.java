@@ -2,6 +2,7 @@ package com.habbybolan.textadventure.model.encounter;
 
 import android.content.Context;
 
+import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.characterentity.Enemy;
 import com.habbybolan.textadventure.model.inventory.Ability;
@@ -20,7 +21,8 @@ model that does the business logic of the combat encounter
 public class CombatModel {
 
     // a speed check that returns true if speed * multiplier is above a random value
-    public boolean runSpeedCheck(int speed) {
+    public boolean runCheck(Character character) {
+        int speed = character.getSpeed();
         int RUN_SPEED_MULTIPLIER = 5;
         Random rand = new Random();
         int numToCheck = rand.nextInt(100);
@@ -42,8 +44,13 @@ public class CombatModel {
         }
     }
 
-    // take characterEntity from combatOrderCurr and add to combatOrderLast
-        // if combatOrderCurr is empty, then move all from combatOrder
+    /**
+     * Remove the front item of the arrayList combatOrderCurr and add the removed item to end of combatOrderLast.
+     * If combatOrderCurr is empty, then add all items from combatOrderNext to combatOrderCurr and clear combatOrderLast.
+     * @param combatOrderCurr       The current 'round' of characterEntities in the combat order list. The first arrayList on the combat Order.
+     * @param combatOrderNext       The next 'round' of characterEntities in the combat order list. The second arrayList on the combat Order.
+     * @param combatOrderLast       The last 'round' of characterEntities in the combat order list. The third arrayList on the combat Order.
+     */
     public void moveEntityToBackOfCombatOrder(ArrayList<CharacterEntity> combatOrderCurr, ArrayList<CharacterEntity> combatOrderNext, ArrayList<CharacterEntity> combatOrderLast) {
         CharacterEntity tempEntity = combatOrderCurr.get(0);
         combatOrderCurr.remove(0);

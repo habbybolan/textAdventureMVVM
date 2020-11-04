@@ -66,18 +66,24 @@ public class CombatOrderAdapter extends RecyclerView.Adapter<CombatOrderAdapter.
         notifyItemChanged(index);
     }
 
-    // from of the list deleted and added to the end
+    /**
+     *  Update changed to CombatOrderCurr array.
+     */
     public void nextTurnCurr() {
-        notifyItemRemoved(0);
         notifyDataSetChanged();
     }
-    // from of the list deleted and added to the end
+
+    /**
+     * Update the images of any icon that may have changed.
+     */
     public void nextTurnNext() {
         notifyDataSetChanged();
     }
-    // from of the list deleted and added to the end
+
+    /**
+     * Update changed to CombatOrderLast array.
+     */
     public void nextTurnLast() {
-        notifyItemInserted(getItemCount()-1);
         notifyDataSetChanged();
     }
 

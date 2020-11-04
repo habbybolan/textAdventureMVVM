@@ -6,11 +6,13 @@ import android.view.View;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.Observable;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivitySellInformationBinding;
 import com.habbybolan.textadventure.view.encounter.ShopFragment;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
+import com.habbybolan.textadventure.viewmodel.InventoryInfoViewModel;
 
 
 public class SellInformationActivity extends AppCompatActivity {
@@ -18,6 +20,7 @@ public class SellInformationActivity extends AppCompatActivity {
     private String stringInventory;
     private int cost;
     private int position;
+    InventoryInfoViewModel inventoryInfoViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,17 +30,32 @@ public class SellInformationActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) getSupportActionBar().hide();
 
+        // todo: change to work with view model and fragment changes
         ActivitySellInformationBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_sell_information);
         stringInventory = getIntent().getStringExtra(InventoryInfoFragment.INVENTORY_SERIALIZED);
         cost = getIntent().getIntExtra(InventoryInfoFragment.COST, -1);
         position = getIntent().getIntExtra(InventoryInfoFragment.POSITION, -1);
         if (stringInventory == null || cost == -1 || position == -1) throw new IllegalArgumentException("Value not sent through intent");
-        setFragmentInfo(stringInventory);
+        InventoryInfoViewModel.newInstance();
+        inventoryInfoViewModel = InventoryInfoViewModel.getInstance();
+        setInventoryInfoListener();
+        inventoryInfoViewModel.setInventoryInfoObservable(stringInventory);
     }
 
     // sets up the serialized inventory object
-    private void setFragmentInfo(String stringInventory) {
-        InventoryInfoFragment fragment = InventoryInfoFragment.newInstance(stringInventory);
+    private void setInventoryInfoListener() {
+        final Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                setFragmentInfo();
+            }
+        };
+        inventoryInfoViewModel.getInventoryInfoObservable().addOnPropertyChangedCallback(callback);
+    }
+
+    // sets up the serialized inventory object
+    private void setFragmentInfo() {
+        InventoryInfoFragment fragment = InventoryInfoFragment.newInstance();
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.fragment_sell_info, fragment)

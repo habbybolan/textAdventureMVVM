@@ -70,6 +70,31 @@ public class Weapon implements Inventory {
     }
 
     @Override
+    public boolean isAbility() {
+        return false;
+    }
+
+    @Override
+    public boolean isItem() {
+        return false;
+    }
+
+    @Override
+    public boolean isWeapon() {
+        return true;
+    }
+
+    @Override
+    public boolean isAttack() {
+        return false;
+    }
+
+    @Override
+    public boolean isSpecialAttack() {
+        return false;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null) return false;
         else if (o.getClass() != getClass()) return false;

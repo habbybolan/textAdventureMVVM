@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentMultiDungeonBinding;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -96,22 +98,48 @@ public class MultiDungeonFragment  extends EncounterDialogueFragment implements 
     @Override
     public void endState() {
         removeDialogueContinueButton(multiDungeonBinding.layoutBtnOptions);
+        // popup view
+        final PopupWindow popupWindow = new PopupWindow();
+        multiDungeonBinding.btnInfo.setVisibility(View.VISIBLE);
+        multiDungeonBinding.btnInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (popupWindow.isShowing()) {
+                    // remove the popup if showing
+                    popupWindow.dismiss();
+                } else {
+                    // otherwise, set up the popup dungeon
+                    CustomPopupWindow.setDungeonInfo("A dungeon with a multitude of different encounters, more difficult than usual." +
+                            " Reach the end and there may be loot awaiting you. Although, you may leave at any point.",
+                            getContext(), popupWindow, multiDungeonBinding.scrollviewContainer);
+                }
+            }
+        });
+
+        // button to enter the multi dungeon
         multiDungeonBinding.btnEnter.setVisibility(View.VISIBLE);
         multiDungeonBinding.btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // remove the popup if showing
+                if (popupWindow.isShowing()) popupWindow.dismiss();
                 // clicker functionality to enter the multi dungeon
                 multiDungeonVM.clickEnter();
             }
         });
+
+        // button to leave the multi dungeon
         multiDungeonBinding.btnLeave.setVisibility(View.VISIBLE);
         multiDungeonBinding.btnLeave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // remove the popup if showing
+                if (popupWindow.isShowing()) popupWindow.dismiss();
                 // clicker functionality to not enter multi dungeon
                 multiDungeonVM.clickLeave();
             }
         });
+
     }
 
     @Override

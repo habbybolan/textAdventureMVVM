@@ -4,12 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable
-            name="imageIconResource"
-            type="Integer" />
-        <variable
-            name="name"
-            type="String" />
+
     </data>
 
     <LinearLayout
@@ -17,23 +12,12 @@
         android:layout_height="match_parent"
         tools:context=".view.inventoryinfo.InventoryInfoActivity"
         android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/img_icon"
-            android:layout_width="@dimen/icon_info_size"
-            android:layout_height="@dimen/icon_info_size"
-            app:imageResource="@{imageIconResource}"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{name}"
-            android:textSize="@dimen/txt_size_large"/>
+        android:orientation="vertical"
+        android:background="@color/behind_scroll">
 
         <FrameLayout
             android:id="@+id/fragment_container"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>

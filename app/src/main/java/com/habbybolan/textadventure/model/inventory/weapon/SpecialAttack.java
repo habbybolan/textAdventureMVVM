@@ -224,6 +224,31 @@ public class SpecialAttack extends Action {
         return pictureResource;
     }
 
+    @Override
+    public boolean isAbility() {
+        return false;
+    }
+
+    @Override
+    public boolean isItem() {
+        return false;
+    }
+
+    @Override
+    public boolean isWeapon() {
+        return false;
+    }
+
+    @Override
+    public boolean isAttack() {
+        return false;
+    }
+
+    @Override
+    public boolean isSpecialAttack() {
+        return true;
+    }
+
     public static final String S_ATTACK_NAME = "s_attack_name";
     public static final String S_ATTACK_ID = "s_attack_id";
     public static final String ABILITY = "ability";

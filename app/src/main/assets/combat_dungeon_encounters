@@ -5,7 +5,7 @@
                     "next":{"dialogue":"second line",
                             "next":{"dialogue":"third line"}}}
                     ],
-        "fight":{"type":["spider", "spider"]}}
+        "fight":{"type":["spider", "ogre", "demon", "slime", "skeleton"]}}
 
         ]
 }

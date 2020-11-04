@@ -1,0 +1,8 @@
+{"dialogue":[{"dialogue":"one line"},
+            {"dialogue":"first line",
+            "next":{"dialogue":"second line",
+                    "next":{"dialogue":"third line"}}}
+            ]
+}
+
+

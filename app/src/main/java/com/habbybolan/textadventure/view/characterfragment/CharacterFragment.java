@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentCharacterBinding;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 public class CharacterFragment extends Fragment {
@@ -52,6 +54,11 @@ public class CharacterFragment extends Fragment {
             public void onLongClicked(int index) {
                 characterVM.removeAbilityAtIndex(index);
             }
+
+            @Override
+            public void onClick(String message) {
+                CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
+            }
         });
         recyclerView.setAdapter(adapter);
         // set the layout manager to position the items
@@ -81,6 +88,11 @@ public class CharacterFragment extends Fragment {
             @Override
             public void onLongClicked(int index) {
                 characterVM.removeWeaponAtIndex(index);
+            }
+
+            @Override
+            public void onClick(String message) {
+                CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -112,10 +124,20 @@ public class CharacterFragment extends Fragment {
             public void onLongClicked(int index) {
                 characterVM.removeItemAtIndex(index);
             }
+
+            @Override
+            public void onClick(String message) {
+                CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
+            }
         }, new CharacterListClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.consumeItemAtIndex(index);
+            }
+
+            @Override
+            public void onClick(String message) {
+                CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
             }
         });
         recyclerView.setAdapter(adapter);

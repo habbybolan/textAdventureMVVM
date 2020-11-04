@@ -48,18 +48,18 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
         if (isExpanded) {
             previousExpandedPosition = position;
             if (selectedPosition == 0) {
-                holder.binding.txtNameAttack.setTextColor(Color.RED);
+                holder.binding.txtName.setTextColor(Color.RED);
                 holder.binding.txtNameSAttack.setTextColor(Color.BLACK);
             }
             else if (selectedPosition == 1) {
-                holder.binding.txtNameAttack.setTextColor(Color.BLACK);
+                holder.binding.txtName.setTextColor(Color.BLACK);
                 holder.binding.txtNameSAttack.setTextColor(Color.RED);
             } else {
-                holder.binding.txtNameAttack.setTextColor(Color.BLACK);
+                holder.binding.txtName.setTextColor(Color.BLACK);
                 holder.binding.txtNameSAttack.setTextColor(Color.BLACK);
             }
         } else {
-            holder.binding.txtNameAttack.setTextColor(Color.BLACK);
+            holder.binding.txtName.setTextColor(Color.BLACK);
             holder.binding.txtNameSAttack.setTextColor(Color.BLACK);
         }
 
@@ -91,7 +91,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
             this.binding = binding;
             this.inventoryClickListener = inventoryClickListener;
 
-            binding.txtNameAttack.setOnClickListener(new View.OnClickListener() {
+            binding.txtName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     adapter.selectedPosition = 0;
@@ -100,7 +100,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
                 }
             });
 
-            binding.inventoryInfoAttack.setOnClickListener(new View.OnClickListener() {
+            binding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     inventoryClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getAttack());

@@ -2,10 +2,9 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".view.encounter.MultiDungeonFragment">
+    tools:context=".view.encounter.BreakFragment">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollview_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -21,28 +20,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:rowCount="2"
-                android:columnCount="3">
+                android:columnCount="2">
 
-                <Button
-                    android:id="@+id/btn_enter"
-                    android:layout_width="@dimen/default_btn_width"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="enter"
-                    android:visibility="gone"/>
-
-                <Button
-                    android:id="@+id/btn_leave"
-                    android:layout_width="@dimen/default_btn_width"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="leave"
-                    android:visibility="gone"/>
-
-                <Button
-                    android:id="@+id/btn_info"
-                    android:layout_width="50dp"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="Info"
-                    android:visibility="gone"/>
             </GridLayout>
 
             <androidx.recyclerview.widget.RecyclerView

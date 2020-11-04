@@ -70,13 +70,13 @@
             app:layout_constraintTop_toBottomOf="@+id/weapon_container">
 
             <ImageView
-                android:id="@+id/img_icon_attack"
+                android:id="@+id/img_icon"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 app:imageResource="@{attackIconResource}" />
 
             <TextView
-                android:id="@+id/txt_name_attack"
+                android:id="@+id/txt_name"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_marginStart="10dp"
@@ -84,7 +84,7 @@
                 android:text="@{attackName}" />
 
             <ImageView
-                android:id="@+id/inventory_info_attack"
+                android:id="@+id/inventory_info"
                 android:layout_width="@dimen/inventory_info_icon_size"
                 android:layout_height="@dimen/inventory_info_icon_size"
                 android:layout_gravity="center"

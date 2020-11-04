@@ -3,7 +3,6 @@ package com.habbybolan.textadventure.view.characterfragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -67,7 +66,7 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
             binding.btnDropItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "Hold to drop item", Toast.LENGTH_SHORT).show();
+                    dropListener.onClick("Hold to drop item");
                 }
             });
             // deleted the inventory item if long click
@@ -85,7 +84,7 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
             binding.btnConsumeItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "Hold to consume item", Toast.LENGTH_SHORT).show();
+                    consumeListener.onClick("Hold to consume item");
                 }
             });
 

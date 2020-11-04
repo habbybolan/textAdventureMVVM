@@ -149,6 +149,31 @@ public class Attack extends Action {
         return pictureResource;
     }
 
+    @Override
+    public boolean isAbility() {
+        return false;
+    }
+
+    @Override
+    public boolean isItem() {
+        return false;
+    }
+
+    @Override
+    public boolean isWeapon() {
+        return false;
+    }
+
+    @Override
+    public boolean isAttack() {
+        return true;
+    }
+
+    @Override
+    public boolean isSpecialAttack() {
+        return false;
+    }
+
     public static final String ATTACK_NAME = "attack_name";
     public static final String ATTACK_ID = "attack_id";
     public static final String DAMAGE_MIN = "damage_min";

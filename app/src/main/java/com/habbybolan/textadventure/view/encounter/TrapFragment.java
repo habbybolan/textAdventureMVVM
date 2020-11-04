@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -12,6 +13,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentTrapBinding;
 import com.habbybolan.textadventure.view.ButtonInflaters;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -90,7 +92,7 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
         characterVM.setStateInventoryObserver(false);
 
         String dodge = "Dodge Trap";
-        DefaultButtonDetailsBinding bindingDodge = ButtonInflaters.setDefaultButton(trapBinder.layoutBtnOptions, dodge, getActivity());
+        final DefaultButtonDetailsBinding bindingDodge = ButtonInflaters.setDefaultButton(trapBinder.layoutBtnOptions, dodge, getActivity());
         bindingDodge.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,7 +109,8 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
         bindingUseItem.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                trapVM.secondStateUseItem();
+                if (!trapVM.secondStateUseItem())
+                    CustomPopupWindow.setTempMessage("You don't possess any item to escape.", getContext(), new PopupWindow(), trapBinder.trapContainer);
             }
         });
     }

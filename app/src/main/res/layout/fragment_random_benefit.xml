@@ -11,11 +11,11 @@
     </data>
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         tools:context=".view.encounter.RandomBenefitFragment">
 
         <LinearLayout
-            android:id="@+id/trap_container"
+            android:id="@+id/benefit_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">

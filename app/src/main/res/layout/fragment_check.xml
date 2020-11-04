@@ -6,7 +6,7 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/choice_container"
@@ -26,7 +26,6 @@
                     android:id="@+id/btn_continue"
                     android:layout_width="@dimen/default_btn_width"
                     android:layout_height="@dimen/default_btn_height"
-                    android:onClick="clickLeave"
                     android:text="@string/continue_game"
                     android:visibility="gone"/>
 
@@ -34,7 +33,6 @@
                     android:id="@+id/btn_leave"
                     android:layout_width="@dimen/default_btn_width"
                     android:layout_height="@dimen/default_btn_height"
-                    android:onClick="clickContinue"
                     android:text="leave"
                     android:visibility="gone"/>
 

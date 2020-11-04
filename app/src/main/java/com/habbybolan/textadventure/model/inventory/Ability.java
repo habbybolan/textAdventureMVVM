@@ -108,6 +108,7 @@ public class Ability extends Action {
             JSONObject JSONAbility = new JSONObject(stringAbility);
             abilityName = JSONAbility.getString(ABILITY_NAME);
             abilityID = JSONAbility.getInt(ABILITY_ID);
+            cost = JSONAbility.getInt(COST);
             // cooldown
             cooldownCurr = JSONAbility.getInt(COOLDOWN_CURR);
             cooldownMax = JSONAbility.getInt(COOLDOWN_MAX);
@@ -185,6 +186,31 @@ public class Ability extends Action {
         return pictureResource;
     }
 
+    @Override
+    public boolean isAbility() {
+        return true;
+    }
+
+    @Override
+    public boolean isItem() {
+        return false;
+    }
+
+    @Override
+    public boolean isWeapon() {
+        return false;
+    }
+
+    @Override
+    public boolean isAttack() {
+        return false;
+    }
+
+    @Override
+    public boolean isSpecialAttack() {
+        return false;
+    }
+
     // helper for checking if 2 ability scrolls are equal
     private boolean checkAbilityEquality(Ability ability) {
         return ability.getName().equals(getName());
@@ -200,6 +226,9 @@ public class Ability extends Action {
         int cooldownColIndex = cursor.getColumnIndex(COOLDOWN);
         cooldownMax = (cursor.getInt(cooldownColIndex));
         cooldownCurr = 0;
+        // cost
+        int costColIndex = cursor.getColumnIndex(COST);
+        cost = cursor.getInt(costColIndex);
         // set direct damage
         int damageMinColIndex = cursor.getColumnIndex(DAMAGE_MIN);
         setMinDamage(cursor.getInt(damageMinColIndex));
@@ -580,6 +609,9 @@ public class Ability extends Action {
     public int getTier() {
         return tier;
     }
+    public int getCost() {
+        return cost;
+    }
 
 
     @Override
@@ -589,6 +621,7 @@ public class Ability extends Action {
         JSONInventory.put(ABILITY_NAME, abilityName);
         JSONInventory.put(ABILITY_ID, abilityID);
         JSONInventory.put(INVENTORY_TYPE, TYPE_ABILITY);
+        JSONInventory.put(COST, cost);
         // cooldown
         JSONInventory.put(COOLDOWN_CURR, cooldownCurr);
         JSONInventory.put(COOLDOWN_MAX, cooldownMax);
@@ -660,6 +693,7 @@ public class Ability extends Action {
     public static final String ABILITY_NAME = "ability_name";
     public static final String ABILITY_ID = "ability_id";
     public static final String COOLDOWN = "cooldown";
+    public static final String COST = "cost";
     public static final String COOLDOWN_CURR = "cooldown_curr";
     public static final String COOLDOWN_MAX = "cooldown_max";
     public static final String DAMAGE_MIN = "damage_min";

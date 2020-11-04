@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Toast;
+import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -17,6 +17,7 @@ import com.habbybolan.textadventure.databinding.FragmentShopBinding;
 import com.habbybolan.textadventure.model.GridModel;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.ButtonInflaters;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.view.shopgrid.BuyGridAdapter;
@@ -175,8 +176,6 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
 
     /**
      * create the items to buy and set up gridModel and clicker for list
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
     private void setUpItemToBuy() throws ExecutionException, InterruptedException {
         // create a buy GridModel list
@@ -243,7 +242,8 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
             sellGridAdapter.updateSellGrid();
             buyGridAdapter.updateBuyGrid();
         } else {
-            Toast.makeText(getContext(), "You don't have enough gold.", Toast.LENGTH_SHORT).show();
+            // todo: popup window not working - swapping back from info activity causes trouble with displaying message
+            CustomPopupWindow.setTempMessage("You don't have enough gold.", getContext(), new PopupWindow(), shopBinding.encounterContainer);
         }
     }
 

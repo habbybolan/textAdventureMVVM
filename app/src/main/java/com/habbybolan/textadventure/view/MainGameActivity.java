@@ -10,6 +10,7 @@ import androidx.databinding.Observable;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityMainGameBinding;
 import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
+import com.habbybolan.textadventure.view.encounter.BreakFragment;
 import com.habbybolan.textadventure.view.encounter.CheckFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceFragment;
@@ -87,7 +88,10 @@ public class MainGameActivity extends AppCompatActivity {
         mainGameViewModel.getEncounterType().addOnPropertyChangedCallback(callback);
     }
 
-    // changes the fragment for fragment_container_game to appropriate fragment for the encounter type
+    /**
+     * Replaces the fragment in container fragment_container_game to the new encounter fragment to enter.
+     * Creates the new fragment to enter, sets up its animations, and enters the fragment.
+     */
     public void alterEncounterFragment() {
         encounterType = mainGameViewModel.getEncounterType().get();
         switch (encounterType) {
@@ -132,7 +136,6 @@ public class MainGameActivity extends AppCompatActivity {
                         .commit();
                 break;
             case MainGameViewModel.SHOP_TYPE:
-                // if an instance exists, remove it and create a new one
                 ShopFragment shopFragment = ShopFragment.newInstance();
                 getSupportFragmentManager()
                         .beginTransaction()
@@ -164,10 +167,14 @@ public class MainGameActivity extends AppCompatActivity {
                         .replace(R.id.fragment_container_game, checkFragment)
                         .commit();
                 break;
-            /*case QUEST_TYPE:
-                QuestEncounter questEncounter = new QuestEncounter(getContext(), character, damage, view, this, model);
-                questEncounter.setInitialQuest(encounter.getJSONObject("encounter"));
-                break;*/
+            case MainGameViewModel.BREAK_TYPE:
+                BreakFragment breakFragment = BreakFragment.newInstance();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
+                        .replace(R.id.fragment_container_game, breakFragment)
+                        .commit();
+                break;
             default: //  shouldn't reach here
                 throw new IllegalArgumentException("No encounter of " + encounterType);
         }

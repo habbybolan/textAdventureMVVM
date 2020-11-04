@@ -8,8 +8,9 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,12 +22,13 @@ import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.InventoryClickListener;
 import com.habbybolan.textadventure.view.InventoryListAdapter.ItemListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.WeaponListRecyclerView;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -86,7 +88,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         combatBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_combat, container, false);
@@ -213,7 +215,8 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         combatBinding.btnRun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // todo: in combat run button
+                combatVM.attemptInCombatRun();
+                notifyCombatOrderNextTurn();
             }
         });
     }
@@ -225,6 +228,10 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         combatBinding.btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // size of the 2 lists before being altered
+                int prevSizeCurr = combatVM.getSizeCombatOrderCurr();
+                int prevSizeLast = combatVM.getSizeCombatOrderLast();
+                // applies the enemy action and updates the combat order lists.
                 combatVM.enemyAction();
                 notifyCombatOrderNextTurn();
             }
@@ -317,18 +324,17 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     }
 
     /**
-     * helper for performing character action on icon click, or displaying action error message
+     * Helper for performing character action on icon click, or displaying action error message.
      * @param target    The CharacterEntity action is used on
      */
     private void characterActionOnClick(CharacterEntity target) {
-        // perform the character action if it is a valid action on the target
         if (combatVM.characterAction(target)) {
             // action is valid and performed, so update the combat ordering
             notifyCombatOrderNextTurn();
         } else {
-            // otherwise the action failed, get the error message from combatVM and display with Toast
+            // otherwise the action failed, get the error message from combatVM and display with popup window
             String error = combatVM.getActionError(target);
-            Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+            CustomPopupWindow.setTempMessage(error, getContext(), new PopupWindow(), combatBinding.container);
         }
     }
 
@@ -466,7 +472,8 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     }
 
     /**
-     *  updates all the RV for the 3 combat order lists
+     *  Updates the curr (first) and last (third) list of the combat ordering.
+     *  The next (second) list doesn't change, thus doesn't need to be updated.
      */
     private void notifyCombatOrderNextTurn() {
         currListAdapter.nextTurnCurr();

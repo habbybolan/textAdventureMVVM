@@ -72,11 +72,11 @@ public class CombatViewModel extends EncounterViewModel {
         combatModel = new CombatModel();
     }
 
-    // attempt to escape the combat encounter
-        // if successful, goto end state and display text you escaped
-    public void attemptRun() {
-        int speed = characterVM.getSpeed();
-        if (combatModel.runSpeedCheck(speed)) {
+    /**
+     *  Check for escaping the combat encounter.
+     */
+    public void attemptInCombatRun() {
+        if (combatModel.runCheck(characterVM.getCharacter())) {
             // speed check successful
             String failText = "You successfully escaped the encounter.";
             setNewDialogue(new Dialogue(failText));
@@ -84,7 +84,9 @@ public class CombatViewModel extends EncounterViewModel {
             gotoEndState();
         } else {
             // speed check not successful, enter combat
-            incrementStateIndex();
+            String failText = "You were unsuccessful with your escape.";
+            setNewDialogue(new Dialogue(failText));
+            nextTurn();
         }
     }
 
@@ -289,7 +291,10 @@ public class CombatViewModel extends EncounterViewModel {
         }
     }
 
-    // helper for applying the character action to a CharacterEntity that was chosen
+    /**
+     * helper for applying the character action to a CharacterEntity that was chosen
+     * @param target    The target characterEntity to use the character selectedAction on.
+     */
     private void applyCharacterAction(CharacterEntity target) {
         String attackerString = "you";
         String action = selectedAction.getName();
@@ -321,29 +326,38 @@ public class CombatViewModel extends EncounterViewModel {
         nextTurn();
     }
 
-    // apply the character action selected if valid, otherwise return false
-    public boolean characterAction(CharacterEntity entity) {
+    /**
+     *  apply the character action selected if valid, otherwise return false
+     * @param target    The target characterEntity to apply selectedAction on.
+     * @return          True if the selectedAction on target is valid, otherwise return false.
+     */
+    public boolean characterAction(CharacterEntity target) {
         if (isSelectedAction()) {
             // if the action is not out of cooldown, don't apply action
             if (!selectedAction.isActionReady()) return false;
             // if target is not alive
-            if (!entity.getIsAlive()) return false;
+            if (!target.getIsAlive()) return false;
             // cannot use a consumable item on an enemy, only action on self
-            if (isValidAction(entity)) {
-                applyCharacterAction(entity);
+            if (isValidAction(target)) {
+                applyCharacterAction(target);
                 return true;
             }
         }
         return false;
     }
 
-    // returns an error message for when action not selected or an action is invalid on a certain target
-    public String getActionError(CharacterEntity entity) {
+    /**
+     *  Returns an error message for when action not selected or an action is invalid on a certain target. Only called if
+     *  the action being used is invalid.
+     * @param target    The target characterEntity to apply selectedAction on.
+     * @return          The error message as a String to be displayed
+     */
+    public String getActionError(CharacterEntity target) {
         if (!isSelectedAction())
             return "Select an action";
-        else if (!entity.getIsAlive())
+        else if (!target.getIsAlive())
             return "selected target is dead";
-        else if (!isValidAction(entity))
+        else if (!isValidAction(target))
             return "Action not possible";
         else if (!selectedAction.isActionReady()) {
             return "Action in cooldown";
@@ -352,7 +366,12 @@ public class CombatViewModel extends EncounterViewModel {
         else throw new IllegalStateException();
     }
 
-    // helper for applyCharacterAction to use selected ability action
+    /**
+     *  Helper to use selected ability action on target from attacker.
+     * @param ability       The ability action to be used.
+     * @param target        The target to use the ability action on.
+     * @param attacker      The one using the ability action on the target
+     */
     private void applyAbilityAction(Ability ability, CharacterEntity target, CharacterEntity attacker) {
         if (target.getIsCharacter()) characterVM.applyAbility(ability, attacker);
         else {
@@ -362,7 +381,12 @@ public class CombatViewModel extends EncounterViewModel {
         ability.setActionUsed();
     }
 
-    // helper for applyCharacterAction to use selected attack
+    /**
+     *  Helper to use selected attack action on target from attacker.
+     * @param attack       The attack action to be used.
+     * @param target       The target to use the attack action on.
+     * @param attacker     The one using the attack action on the target
+     */
     private void applyAttackAction(Attack attack, CharacterEntity target, CharacterEntity attacker) {
         if (target.getIsCharacter()) characterVM.applyAttack(attack, attacker);
         else {
@@ -370,7 +394,13 @@ public class CombatViewModel extends EncounterViewModel {
             enemy.applyAttack(attack, attacker);
         }
     }
-    // helper for applyCharacterAction to use selected special attack
+
+    /**
+     *  Helper to use selected special attack on target from attacker.
+     * @param specialAttack     The special attack action to be used.
+     * @param target            The target to use the special attack action on.
+     * @param attacker          The one using the special attack action on the target
+     */
     private void applySpecialAttackAction(SpecialAttack specialAttack, CharacterEntity target, CharacterEntity attacker) {
         if (target.getIsCharacter()) characterVM.applySpecialAttack(specialAttack, attacker);
         else {
@@ -379,7 +409,12 @@ public class CombatViewModel extends EncounterViewModel {
         }
         specialAttack.setActionUsed();
     }
-    // helper for applyCharacterAction to use selected Item action
+
+    /**
+     *  Helper to use selected Item action on target.
+     * @param item      The item to be used.
+     * @param target    The target for the item to be used on.
+     */
     private void applyItemCharacterAction(Item item, CharacterEntity target) {
         CharacterEntity attacker = characterVM.getCharacter();
         if (target.getIsCharacter()) {
@@ -612,6 +647,11 @@ public class CombatViewModel extends EncounterViewModel {
         // todo: apply the Inventory rewards to character
         return inventoryRewards;
     }
-
+    public int getSizeCombatOrderCurr() {
+        return combatOrderCurr.size();
+    }
+    public int getSizeCombatOrderLast() {
+        return combatOrderLast.size();
+    }
 
 }

@@ -28,6 +28,7 @@ public class JsonAssetFileReader {
     private String outdoorJSONFilename = MainGameViewModel.outdoorJSONFilename;
     private String multiDungeonJSONFilename = MainGameViewModel.multiDungeonJSONFilename;
     private String combatDungeonJSONFilename = MainGameViewModel.combatDungeonJSONFilename;
+    private String breakJSONFilename = MainGameViewModel.breakJSONFilename;
     private Context context;
     private String json;
 
@@ -101,7 +102,7 @@ public class JsonAssetFileReader {
                 // todo: used for testing specific encounters
                 //Random rand = new Random();
                 //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(Outdoor.COMBAT_DUNGEON);
+                encounterTemp = jsonArray.getJSONObject(Outdoor.TRAP);
                 // ***
 
                 // put type into encounter
@@ -175,6 +176,42 @@ public class JsonAssetFileReader {
     }
 
     /**
+     * Parse a random break encounter from the stored JSONObject json in break_encounters asset file
+     */
+    class parseRandomBreakJSON implements Callable<JSONObject> {
+        JSONObject outputEncounter = new JSONObject();
+
+        @Override
+        public JSONObject call() {
+            try {
+                // get the json object and parse a random dialogue from the array
+                JSONObject obj = new JSONObject(json);
+                JSONArray jsonArray = obj.getJSONArray(DIALOGUE);
+                JSONObject encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
+
+                finalizeBreakEncounter(encounterTemp, outputEncounter);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return outputEncounter;
+        }
+    }
+
+    /**
+     * Takes a JSONObject encounterTemp and finds the method to call to get the appropriate JSON outdoor encounter to store for use
+     * inside encounter
+     * @param encounterTemp     The JSONObject to trim and store in encounter.
+     * @param encounter         The JSONObject that holds the necessary encounter data.
+     */
+    private void finalizeBreakEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // store the encounter type
+        encounter.put(TYPE, MainGameViewModel.BREAK_TYPE);
+        // get a random dialogue from that specific encounter
+        encounter.put(DIALOGUE, encounterTemp);
+    }
+
+
+    /**
      * Takes a JSONObject encounterTemp and finds the method to call to get the appropriate JSON outdoor encounter to store for use
      * inside encounter
      * @param encounterTemp     The JSONObject to trim and store in encounter.
@@ -199,9 +236,6 @@ public class JsonAssetFileReader {
                 break;
             case Outdoor.SHOP_TYPE: case Outdoor.CHOICE_BENEFIT_TYPE: case Outdoor.RANDOM_BENEFIT_TYPE:
                 shopRandomChoiceEncounter(encounterTemp, encounter);
-                break;
-            case Outdoor.QUEST_TYPE:
-                questEncounter(encounterTemp, encounter);
                 break;
             default: //  shouldn't reach here
                 throw new IllegalArgumentException(type + " not a valid encounter type");
@@ -398,6 +432,19 @@ public class JsonAssetFileReader {
 
         ExecutorService executor = Executors.newFixedThreadPool(1);
         Callable callable = new parseRandomOutdoorJSON();
+        Future<JSONObject> future = executor.submit(callable);
+        return future.get();
+    }
+
+    /**
+     * Get a random break JSON encounter.
+     * @return              The JSONObject of the new random break encounter to enter.
+     */
+    public JSONObject getRandomBreakEncounter() throws Exception {
+        loadJSONFromAssets(breakJSONFilename);
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Callable callable = new parseRandomBreakJSON();
         Future<JSONObject> future = executor.submit(callable);
         return future.get();
     }

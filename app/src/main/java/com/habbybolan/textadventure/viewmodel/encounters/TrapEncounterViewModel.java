@@ -1,7 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
@@ -9,8 +8,8 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.encounter.TrapModel;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -111,13 +110,18 @@ public class TrapEncounterViewModel extends EncounterViewModel {
         }
     }
 
-    public void secondStateUseItem() {
+    /**
+     * If possible, use an item to escape the trap and return true, otherwise return false.
+     * @return  True if escape trap item is in inventory, otherwise return false;
+     */
+    public boolean secondStateUseItem() {
         if (characterVM.checkInventoryForTrapItem()) {
-            String dialogue = "You throw the escape orb to the ground, the black smoke releasing and engulfing you in an instant. Once the smoke dissipates, Everything around you has changed. A feeling of relief washes over you as you wonder what would have happened if you did not possess that item.";
+            String dialogue = "You throw the escape orb to the ground, the black smoke releasing and engulfing you in an instant. Once the smoke dissipates, " +
+                    "Everything around you has changed. A feeling of relief washes over you as you wonder what would have happened if you did not possess that item.";
             setNewDialogue(new Dialogue(dialogue));
             incrementStateIndex();
-        } else {
-            Toast.makeText(context, "You don't possess any item to escape.", Toast.LENGTH_SHORT).show();
+            return true;
         }
+        return false;
     }
 }
