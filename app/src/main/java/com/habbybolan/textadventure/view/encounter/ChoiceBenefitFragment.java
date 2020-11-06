@@ -37,7 +37,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
 
     private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
     private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getJSONEncounter();
+    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
     private FragmentChoiceBenefitBinding benefitBinding;
     private ChoiceBenefitViewModel benefitVM;
     private DialogueRecyclerView rv;

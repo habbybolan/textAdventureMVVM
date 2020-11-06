@@ -51,7 +51,7 @@ public class ShopViewModel extends EncounterViewModel  {
     private ArrayList<GridModel> listGridModelSell = new ArrayList<>();
 
     public ShopViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getJSONEncounter();
+        encounter = mainGameVM.getEncounter().getEncounterJSON();
         setDialogueRemainingInDialogueState(encounter);
         this.context = context;
     }

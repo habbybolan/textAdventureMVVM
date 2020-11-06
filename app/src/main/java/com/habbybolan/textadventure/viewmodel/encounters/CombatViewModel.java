@@ -1,7 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
 import android.content.Context;
-import android.os.Handler;
 
 import androidx.databinding.ObservableField;
 
@@ -116,17 +115,6 @@ public class CombatViewModel extends EncounterViewModel {
         createCombatOrderLists();
     }
 
-    // pause a separate thread to create a pause between enemy actions
-    public void tempPause() {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        }, 2000);
-    }
-
     private ObservableField<CombatActionDialogue> newCombatActionDialogue = new ObservableField<>();
     public ObservableField<CombatActionDialogue> getNewCombatActionDialogue() {
         return newCombatActionDialogue;
@@ -155,7 +143,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // go directly to the end state
-    public void gotoEndState() {
+    private void gotoEndState() {
         stateIndex.set(sixthState);
     }
 
@@ -539,13 +527,17 @@ public class CombatViewModel extends EncounterViewModel {
         }
     }
 
-    // return true if the next turn is an Enemy's turn
-    public boolean isCharacterTurn() {
+    /**
+     * Returns true if the next turn is an character turn.
+     */
+    private boolean isCharacterTurn() {
         return combatOrderCurr.get(0).getIsCharacter();
     }
 
-    // moves the entity at front of combatOrderCurr list to back of combatOrderLast list
-        // applies all necessary effects on entity, checks if combat still going, and calls the next UI state
+    /**
+     * Move the CharacterEntity fom the front of the combatOrderCurr list to back of combatOrderLast list to signal turn is over.
+     * Apply all necessary effects on the current CharacterEntity, check if the combat is still ongoing, and signal the next UI state.
+     */
     private void nextTurn() {
         // check if still in combat before action
         if (isCombatInProgress()) {
@@ -569,8 +561,10 @@ public class CombatViewModel extends EncounterViewModel {
         }
     }
 
-    // returns true if all of the enemies are alive, otherwise return false
-        // calls the end of combat state
+    /**
+     * Find if combat is still ongoing. If combat is over, then signal to go to end of UI states.
+     * @return  True if if all enemies are dead in enemies list.
+     */
     private boolean isCombatInProgress() {
         for (EnemyViewModel enemyVM : enemies) {
             if (enemyVM.getEnemy().getIsAlive()) {

@@ -24,7 +24,7 @@ public class CombatDungeonViewModel extends EncounterViewModel {
     public static final int secondState = 2;
 
     public CombatDungeonViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getJSONEncounter();
+        encounter = mainGameVM.getEncounter().getEncounterJSON();
         setDialogueRemainingInDialogueState(encounter);
         this.context = context;
     }

@@ -29,7 +29,7 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
 
     private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
     private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getJSONEncounter();
+    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
     private DialogueRecyclerView rv;
 
 

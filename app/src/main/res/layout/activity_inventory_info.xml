@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-    <data>
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".view.inventoryinfo.InventoryInfoActivity"
 
-    </data>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:background="@color/behind_scroll">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/container_info_fragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".view.inventoryinfo.InventoryInfoActivity"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:background="@color/behind_scroll">
+        android:layout_height="wrap_content" />
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </LinearLayout>
-
-</layout>
+</LinearLayout>

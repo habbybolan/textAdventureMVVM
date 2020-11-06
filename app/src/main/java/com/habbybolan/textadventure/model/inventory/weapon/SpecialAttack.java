@@ -20,9 +20,9 @@ A special attack that represents one of two uses for a weapon
 public class SpecialAttack extends Action {
 
     private String specialAttackName = "";
-    private String specialAttackDescription = "";
+    private String specialAttackDescription = "Special Attack Description";
     private Ability ability = null;
-    private boolean isRanged;
+    private boolean isRanged = false;
     private int aoe;
     private int splashDamageMin;
     private int splashDamageMax;
@@ -74,6 +74,17 @@ public class SpecialAttack extends Action {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Creates a default special attack used for the default weapon 'fists'.
+     */
+    public SpecialAttack() {
+        specialAttackName = "Upper Cut";
+        damageMin = 2;
+        damageMax = 3;
+        cooldownMax = 2;
+        setPictureResource();
     }
 
     private void setVariables(Cursor cursor, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
@@ -216,6 +227,7 @@ public class SpecialAttack extends Action {
 
     @Override
     public void setPictureResource() {
+        // todo: special attack picture resource
         pictureResource = R.drawable.sword;
     }
 

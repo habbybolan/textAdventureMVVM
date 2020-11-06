@@ -441,19 +441,12 @@ public class Character extends CharacterEntity {
     public void removeWeapon(Weapon weapon) {
         if (!weapons.remove(weapon)) throw new IllegalArgumentException();
         else numWeapons--;
+        // check if no weapon left
+        noWeaponCheck();
     }
+
     /**
-     * add a new weapon to weapons array
-     * @param weapon    the weapon object
-     */
-    public void addWeapon (Weapon weapon) {
-        if (weapons.size() != MAX_WEAPONS) {
-            numWeapons++;
-            weapons.add(weapon);
-        }
-    }
-    /**
-     * remove a weapon from a specific index in weapons
+     * remove a weapon from a specific index in weapons and return removed weapon
      * @param index     the index of weapons array to remove
      * @return          the weapon removed from weapons
      */
@@ -461,8 +454,43 @@ public class Character extends CharacterEntity {
         numWeapons--;
         Weapon weapon = weapons.get(index);
         weapons.remove(index);
+        // check if no weapon left
+        noWeaponCheck();
         return weapon;
     }
+
+    /**
+     * Checks if the player has no weapons. If so, then set up a default 'fist' weapon.
+     */
+    private void noWeaponCheck() {
+        if (getNumWeapons() == 0) {
+            weapons.add(new Weapon());
+        }
+    }
+
+    /**
+     * add a new weapon to weapons array
+     * @param weapon    the weapon object
+     */
+    public void addWeapon (Weapon weapon) {
+        if (weapons.size() != MAX_WEAPONS) {
+            // check if there only exists a default weapon, deleting it if it does
+            defaultWeaponCheck();
+            // add the new weapon
+            numWeapons++;
+            weapons.add(weapon);
+        }
+    }
+
+    /**
+     * If only a default weapon exists in weapons, then remove it.
+     */
+    private void defaultWeaponCheck() {
+        if (getNumWeapons() == 1 && weapons.get(0).isDefaultWeapon()) {
+            weapons.remove(0);
+        }
+    }
+
 
     // Abilities
 

@@ -16,7 +16,7 @@ Sets up a weapon for a CharacterEntity with an Attack and Special Attack
  */
 
 public class Weapon implements Inventory {
-    private String description = "blahblahblah"; //  weapon description
+    private String description = "Weapon description"; //  weapon description
     private String weaponName = ""; // weapon name
     private int tier; //  the quality of a weapon - higher the tier, the better
     static final private int numberOfWeapons = 1;
@@ -24,6 +24,7 @@ public class Weapon implements Inventory {
     private SpecialAttack specialAttack; // the weapon's special attack
     static public final String table = "weapons";
     private int weaponID;
+    private final String DEFAULT_NAME = "fist";
 
     private int pictureResource;
 
@@ -41,6 +42,10 @@ public class Weapon implements Inventory {
         setPictureResource();
     }
 
+    /**
+     * Weapon object to be parse from JSON String
+     * @param stringWeapon  JSON String of weapon to parse.
+     */
     public Weapon(String stringWeapon) {
         try {
             JSONObject JSONWeapon = new JSONObject(stringWeapon);
@@ -54,6 +59,23 @@ public class Weapon implements Inventory {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Creates a default weapon object called 'fists'
+     */
+    public Weapon() {
+        weaponName = DEFAULT_NAME;
+        attack = new Attack();
+        specialAttack = new SpecialAttack();
+    }
+
+    /**
+     * Find if the weapon object is a default weapon.
+     * @return  True if the name of the weapon is DEFAULT_WEAPON.
+     */
+    public boolean isDefaultWeapon() {
+        return weaponName.equals(DEFAULT_NAME);
     }
 
 

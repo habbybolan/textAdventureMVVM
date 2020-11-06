@@ -102,7 +102,7 @@ public class JsonAssetFileReader {
                 // todo: used for testing specific encounters
                 //Random rand = new Random();
                 //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(Outdoor.TRAP);
+                encounterTemp = jsonArray.getJSONObject(Outdoor.getRandomEncounter());
                 // ***
 
                 // put type into encounter

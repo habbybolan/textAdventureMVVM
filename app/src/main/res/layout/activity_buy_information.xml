@@ -14,24 +14,26 @@
             android:id="@+id/btn_confirm"
             android:layout_width="@dimen/default_btn_width"
             android:layout_height="@dimen/default_btn_height"
-            android:layout_marginStart="24dp"
+            android:layout_marginEnd="@dimen/inventory_info_button_side_margin"
+            android:layout_marginTop="@dimen/inventory_info_button_top_margin"
             android:onClick="confirmBuy"
             android:text="@string/buy"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fragment_buy_info" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/fragment_buy_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/button2" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_back" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_back"
             android:layout_width="@dimen/default_btn_width"
             android:layout_height="@dimen/default_btn_height"
-            android:layout_marginStart="24dp"
-            android:onClick="goBack"
+            android:layout_marginStart="@dimen/inventory_info_button_side_margin"
+            android:layout_marginTop="@dimen/inventory_info_button_top_margin"
+            android:onClick="backButton"
             android:text="Back"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

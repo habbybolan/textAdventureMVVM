@@ -34,7 +34,7 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
 
     private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
     private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getJSONEncounter();
+    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
 
     private FragmentRandomBenefitBinding benefitBinding;
     private RandomBenefitViewModel benefitVM;

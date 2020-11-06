@@ -34,11 +34,12 @@
             android:layout_gravity="center"
             android:textSize="@dimen/txt_size_large"/>
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/inventory_snippet"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_height="wrap_content"/>
+            android:layout_gravity="center" />
 
         <TextView
             android:layout_width="match_parent"

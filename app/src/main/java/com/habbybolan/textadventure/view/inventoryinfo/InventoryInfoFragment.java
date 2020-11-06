@@ -23,7 +23,9 @@ import com.habbybolan.textadventure.viewmodel.InventoryInfoViewModel;
 import org.json.JSONException;
 
 /**
- *
+ * Fragment for displaying any Inventory's information. Creates Inventory snippets if it contains
+ * another Inventory object inside the inventory object. Uses the InventoryInfoViewModel observable to
+ * notify a new Inner Inventory Object has been clicked.
  */
 public class InventoryInfoFragment extends Fragment {
 
@@ -32,18 +34,32 @@ public class InventoryInfoFragment extends Fragment {
     public static final String COST = "cost";
     public static final String POSITION = "position";
 
+    private static final String INVENTORY_ARG = "inventory";
+    private String inventoryString;
+
     private InventoryInfoViewModel inventoryInfoVM = InventoryInfoViewModel.getInstance();
 
-    private InventoryInfoFragment() {}
+    private InventoryInfoFragment() {
+    }
 
     // TODO: Rename and change types and number of parameters
-    public static InventoryInfoFragment newInstance() {
+    public static InventoryInfoFragment newInstance(String inventoryString) {
+        InventoryInfoFragment fragment = new InventoryInfoFragment();
+        // set up inventory String for configuration changes
+        Bundle args = new Bundle();
+        args.putString(INVENTORY_ARG, inventoryString);
+        fragment.setArguments(args);
         return new InventoryInfoFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            inventoryString= savedInstanceState.getString(INVENTORY_ARG);
+        } else {
+            inventoryString = inventoryInfoVM.getInventoryString();
+        }
     }
 
     @Override
@@ -55,11 +71,18 @@ public class InventoryInfoFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString(INVENTORY_ARG, inventoryInfoVM.getInventoryString());
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     /**
      * Calls the proper method to set up the UI info on the specific stored inventory.
      */
     private void setInventory() {
-        Inventory inventory = inventoryInfoVM.getInventory();
+        Inventory inventory = inventoryInfoVM.getInventoryFromString(inventoryString);
         if (inventory.isAbility())
             setAbilityInfo((Ability) inventory);
         else if (inventory.isItem())

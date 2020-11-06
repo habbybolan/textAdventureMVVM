@@ -18,10 +18,10 @@ An attack that represents one of the two uses for a weapon
 
 public class Attack extends Action {
     private String attackName = "";
-    private String attackDescription = "";
+    private String attackDescription = "Attack Description";
     private int damageMin;
     private int damageMax;
-    private boolean isRanged;
+    private boolean isRanged = false;
 
     private int attackID;
     public static final String table = "attacks";
@@ -52,6 +52,16 @@ public class Attack extends Action {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Creates a default attack used for the default weapon 'fists'.
+     */
+    public Attack() {
+        attackName = "Punch";
+        damageMin = 1;
+        damageMax = 3;
+        setPictureResource();
     }
 
     private void setVariables(Cursor cursor) {
@@ -141,6 +151,7 @@ public class Attack extends Action {
 
     @Override
     public void setPictureResource() {
+        // todo: attack picture resource
         pictureResource = R.drawable.sword;
     }
 

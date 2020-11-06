@@ -85,7 +85,7 @@ public class MainGameActivity extends AppCompatActivity {
                 alterEncounterFragment();
             }
         };
-        mainGameViewModel.getEncounterType().addOnPropertyChangedCallback(callback);
+        mainGameViewModel.getEncounterObservable().addOnPropertyChangedCallback(callback);
     }
 
     /**
@@ -93,7 +93,7 @@ public class MainGameActivity extends AppCompatActivity {
      * Creates the new fragment to enter, sets up its animations, and enters the fragment.
      */
     public void alterEncounterFragment() {
-        encounterType = mainGameViewModel.getEncounterType().get();
+        encounterType = mainGameViewModel.getEncounter().getType();
         switch (encounterType) {
             case MainGameViewModel.COMBAT_DUNGEON_TYPE:
                 CombatDungeonFragment combatDungeonFragment = CombatDungeonFragment.newInstance();
@@ -182,6 +182,7 @@ public class MainGameActivity extends AppCompatActivity {
 
     // disable the back button
     @Override
-    public void onBackPressed() {}
+    public void onBackPressed() {
+    }
 
 }

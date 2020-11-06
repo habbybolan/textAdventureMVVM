@@ -235,7 +235,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
 
     public void addInputDot(Dot dot) {
         if (characterEntity.addNewDot(dot))
-            dotObserver.add(dot);;
+            dotObserver.add(dot);
     }
 
     /**

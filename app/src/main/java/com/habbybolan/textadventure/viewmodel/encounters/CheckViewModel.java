@@ -24,7 +24,7 @@ public class CheckViewModel extends EncounterViewModel {
     private Context context;
 
     public CheckViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getJSONEncounter();
+        encounter = mainGameVM.getEncounter().getEncounterJSON();
         setDialogueRemainingInDialogueState(encounter);
         this.context = context;
     }

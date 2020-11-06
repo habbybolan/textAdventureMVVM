@@ -10,11 +10,11 @@ import androidx.databinding.ObservableField;
 import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.model.MainGameModel;
 import com.habbybolan.textadventure.model.characterentity.Character;
+import com.habbybolan.textadventure.model.encounter.Encounter;
 import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
 import com.habbybolan.textadventure.model.encounter.ShopModel;
 import com.habbybolan.textadventure.model.locations.CombatDungeon;
 import com.habbybolan.textadventure.model.locations.MultiDungeon;
-import com.habbybolan.textadventure.model.locations.Outdoor;
 import com.habbybolan.textadventure.repository.JsonAssetFileReader;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -43,13 +43,11 @@ public class MainGameViewModel extends BaseObservable {
     public static final String combatDungeonJSONFilename = "combat_dungeon_encounters";
     public static final String breakJSONFilename = "break_encounters";
 
-    private JSONObject JSONEncounter;
+    private Encounter encounter;
 
     // keeps track of the location
     private int location = FOREST;
     private String location_type = FOREST_TYPE;
-
-    private int encounterLayout;
 
     // locations - int corresponding to the index of the location in a JSONArray in outdoor_encounters
     final public static int DESERT = 0;
@@ -117,12 +115,13 @@ public class MainGameViewModel extends BaseObservable {
     }
 
     // observer for when the encounter changes, starting a new one
-    private ObservableField<String> encounterType = new ObservableField<>();
-    public ObservableField<String> getEncounterType() {
-        return encounterType;
+    private ObservableField<Encounter> encounterObservable = new ObservableField<>();
+    public ObservableField<Encounter> getEncounterObservable() {
+        return encounterObservable;
     }
-    private void setEncounterType(String encounterType) {
-        this.encounterType.set(encounterType);
+    private void setEncounterObservable(Encounter encounterObservable) {
+        this.encounter = encounterObservable;
+        this.encounterObservable.set(encounterObservable);
     }
 
     /**
@@ -136,8 +135,8 @@ public class MainGameViewModel extends BaseObservable {
         if (prevSave != null) {
             // if a saved encounter exists, then go into it
             savedEncounter = prevSave;
-            JSONEncounter = prevSave.getJSONObject(EncounterViewModel.ENCOUNTER);
-            setEncounterType(prevSave.getString(EncounterViewModel.ENCOUNTER_TYPE));
+            encounter = new Encounter(prevSave.getJSONObject(EncounterViewModel.ENCOUNTER));
+            setEncounterObservable(encounter);
         } else {
             // otherwise, create a new encounter
             gotoNextRandomEncounter();
@@ -181,9 +180,8 @@ public class MainGameViewModel extends BaseObservable {
      */
     public void gotoSpecifiedEncounter(JSONObject specifiedEncounter) throws JSONException {
         applyAfterEncounterActions();
-        JSONEncounter = specifiedEncounter;
-        String type = JSONEncounter.getString("type");
-        setEncounterType(type);
+        encounter = new Encounter(specifiedEncounter);
+        setEncounterObservable(encounter);
     }
 
     /**
@@ -221,35 +219,33 @@ public class MainGameViewModel extends BaseObservable {
         //      {"type":"check",
         //      "dialogue":{"Continue in the dungeon?"}}
         // and set as encounter
-        JSONEncounter = check;
-        setEncounterType(MultiDungeon.CHECK_TYPE);
+        encounter = new Encounter(check);
+        setEncounterObservable(encounter);
     }
 
     /**
      * Creates a new random outdoor encounter and saves it to JSONEncounter local field.
      */
-    private void createNewOutdoorEncounter() throws JSONException {
+    private void createNewOutdoorEncounter() {
         JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
         // get a random encounter from jsonFileReader
         try {
-            JSONEncounter = jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type);
+            encounter = new Encounter(jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String type = JSONEncounter.getString("type");
-        setEncounterType(type);
+        setEncounterObservable(encounter);
     }
 
     private void createNewBreakEncounter() throws JSONException {
         JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
         // get a random encounter from jsonFileReader
         try {
-            JSONEncounter = jsonAssetFileReader.getRandomBreakEncounter();
+            encounter = new Encounter(jsonAssetFileReader.getRandomBreakEncounter());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String type = JSONEncounter.getString("type");
-        setEncounterType(type);
+        setEncounterObservable(encounter);
     }
 
     /**
@@ -259,8 +255,8 @@ public class MainGameViewModel extends BaseObservable {
         // create and set the JSON data and update the new encounter type to start the encounter
         RandomBenefitModel rbModel = new RandomBenefitModel();
         String[] dialogue = {"1", "2", "You have reached the end of the dungeon. Claim your prize"};
-        JSONEncounter = rbModel.createRandomBenefitEncounter(dialogue);
-        setEncounterType(Outdoor.RANDOM_BENEFIT_TYPE);
+        encounter = new Encounter(rbModel.createRandomBenefitEncounter(dialogue));
+        setEncounterObservable(encounter);
     }
 
     /**
@@ -277,12 +273,11 @@ public class MainGameViewModel extends BaseObservable {
             JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
             // get a random encounter from jsonFileReader for multi dungeon
             try {
-                JSONEncounter = jsonAssetFileReader.getRandomMultiDungeonEncounter();
+                encounter = new Encounter(jsonAssetFileReader.getRandomMultiDungeonEncounter());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            String type = JSONEncounter.getString(TYPE);
-            setEncounterType(type);
+            setEncounterObservable(encounter);
         }
     }
 
@@ -301,20 +296,19 @@ public class MainGameViewModel extends BaseObservable {
                 // if halfway through the dungeon, then create a shop encounter
                 ShopModel shopModel = new ShopModel();
                 String[] dialogue = {"A shop, wow."};
-                JSONEncounter = shopModel.createShopEncounter(dialogue);
+                encounter = new Encounter(shopModel.createShopEncounter(dialogue));
             } else {
                 // otherwise, create a normal random combat encounter.
                 JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
                 // get a random encounter from jsonFileReader for multi dungeon
                 try {
-                    JSONEncounter = jsonAssetFileReader.getRandomCombatDungeonEncounter();
+                    encounter = new Encounter(jsonAssetFileReader.getRandomCombatDungeonEncounter());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             // start the encounter given its type
-            String type = JSONEncounter.getString(TYPE);
-            setEncounterType(type);
+            setEncounterObservable(encounter);
         }
     }
 
@@ -376,12 +370,8 @@ public class MainGameViewModel extends BaseObservable {
         }
     }
 
-    public JSONObject getJSONEncounter() {
-        return JSONEncounter;
-    }
-
-    public int getEncounterLayout() {
-        return encounterLayout;
+    public Encounter getEncounter() {
+        return encounterObservable.get();
     }
 
     public JSONObject getSavedEncounter() {

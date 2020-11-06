@@ -22,7 +22,7 @@ public class MultiDungeonViewModel extends EncounterViewModel {
     private Context context;
 
     public MultiDungeonViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getJSONEncounter();
+        encounter = mainGameVM.getEncounter().getEncounterJSON();
         setDialogueRemainingInDialogueState(encounter);
         this.context = context;
     }

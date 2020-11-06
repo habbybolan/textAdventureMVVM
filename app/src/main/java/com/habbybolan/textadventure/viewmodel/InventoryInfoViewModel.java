@@ -41,8 +41,12 @@ public class InventoryInfoViewModel {
         return getInventoryFromString(inventoryInfoObservable.get());
     }
 
+    public String getInventoryString() {
+        return inventoryInfoObservable.get();
+    }
 
-    private Inventory getInventoryFromString(String inventoryString) {
+
+    public Inventory getInventoryFromString(String inventoryString) {
         String type = "";
         try {
             JSONObject jsonObject = new JSONObject(inventoryString);

@@ -30,7 +30,7 @@ class EncounterDialogueFragment extends Fragment {
      * @param rv    The recycler Viewer model used to call the adding dialogue method
      * @param vm    View model of the current encounter the dialogue is being added from
      */
-    void setUpDialogueRV(final DialogueRecyclerView rv, final EncounterViewModel vm) {
+    private void setUpDialogueRV(final DialogueRecyclerView rv, final EncounterViewModel vm) {
         // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
         Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
             @Override

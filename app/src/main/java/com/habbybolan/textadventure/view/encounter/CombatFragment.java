@@ -54,7 +54,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
 
     private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
     private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getJSONEncounter();
+    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
     private FragmentCombatBinding combatBinding;
     private CombatViewModel combatVM;
     private DialogueRecyclerView rv;
@@ -136,26 +136,36 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             case CombatViewModel.secondState:
                 // before combat state (fight/run buttons)
                 isCharacterViewsEnabled(true);
+                // remove ability to drop/consume Inventory Objects
+                characterVM.setStateInventoryObserver(false);
                 combatBinding.layoutBtnOptions.removeAllViews();
                 beforeCombatState();
                 break;
             case CombatViewModel.thirdState:
+                // remove ability to drop/consume Inventory Objects
+                characterVM.setStateInventoryObserver(false);
                 // set up combat views state
                 combatBinding.layoutBtnOptions.removeAllViews();
                 isCharacterViewsEnabled(false);
                 startCombatState();
                 break;
             case CombatViewModel.fourthState:
+                // remove ability to drop/consume Inventory Objects
+                characterVM.setStateInventoryObserver(false);
                 // character turn state
                 isCharacterViewsEnabled(true);
                 characterTurnState();
                 break;
             case CombatViewModel.fifthState:
+                // remove ability to drop/consume Inventory Objects
+                characterVM.setStateInventoryObserver(false);
                 // enemy turn state
                 isCharacterViewsEnabled(false);
                 enemyTurnState();
                 break;
             case CombatViewModel.sixthState:
+                // remove ability to drop/consume Inventory Objects
+                characterVM.setStateInventoryObserver(true);
                 // ending state for accepting rewards and button to leave encounter
                 isCharacterViewsEnabled(true);
                 combatBinding.inCombatContainer.removeAllViews();
@@ -228,9 +238,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         combatBinding.btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // size of the 2 lists before being altered
-                int prevSizeCurr = combatVM.getSizeCombatOrderCurr();
-                int prevSizeLast = combatVM.getSizeCombatOrderLast();
                 // applies the enemy action and updates the combat order lists.
                 combatVM.enemyAction();
                 notifyCombatOrderNextTurn();
@@ -455,8 +462,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             // add/disable each enemy selectable icon inside enemyActionIcons
             combatBinding.enemyActionIcons.getChildAt(i).setEnabled(isEnabled);
         }
-        // remove ability to drop/consume Inventory Objects
-        characterVM.setStateInventoryObserver(isEnabled);
         combatBinding.inCombatContainer.setEnabled(isEnabled);
     }
 

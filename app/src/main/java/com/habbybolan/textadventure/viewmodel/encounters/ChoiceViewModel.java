@@ -25,7 +25,7 @@ public class ChoiceViewModel extends EncounterViewModel {
     public static final int secondState = 2;
 
     public ChoiceViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getJSONEncounter();
+        encounter = mainGameVM.getEncounter().getEncounterJSON();
         setDialogueRemainingInDialogueState(encounter);
         this.context = context;
     }

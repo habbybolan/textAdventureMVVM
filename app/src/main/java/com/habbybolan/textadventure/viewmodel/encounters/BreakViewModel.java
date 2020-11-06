@@ -22,7 +22,7 @@ public class BreakViewModel extends EncounterViewModel {
     private Context context;
 
     public BreakViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getJSONEncounter();
+        encounter = mainGameVM.getEncounter().getEncounterJSON();
         setDialogueRemainingInDialogueState(encounter);
         this.context = context;
     }

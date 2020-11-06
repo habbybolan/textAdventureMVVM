@@ -60,7 +60,8 @@
                         {"dialogue":"dialogue1.",
                         "next":{"dialogue":"dialogue2.",
                             "next":{"dialogue":"dialogue3."}}}
-                ]}
+                        ]
+            }
         ]
     },
 
