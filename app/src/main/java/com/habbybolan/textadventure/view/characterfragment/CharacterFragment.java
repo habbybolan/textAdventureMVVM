@@ -174,7 +174,9 @@ public class CharacterFragment extends Fragment {
         // observed whenever CharacterViewModel observes change in dotList
         characterVM.getDotObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onChanged(ObservableList sender) {}
+            public void onChanged(ObservableList sender) {
+                adapter.notifyDataSetChanged();
+            }
             @Override
             public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {
                 adapter.notifyDataSetChanged();

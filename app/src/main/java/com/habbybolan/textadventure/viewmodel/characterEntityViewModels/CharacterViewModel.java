@@ -495,7 +495,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     public void goldChange(int amount) {
         Integer goldChange  = character.goldChange(amount);
         notifyPropertyChanged(BR.gold);
-        goldObserve.set(goldChange);
+        goldObserve.set(new Integer(goldChange));
     }
 
     private ObservableField<Integer> expObserve = new ObservableField<>();
@@ -509,7 +509,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     public void addExp(int amount) {
         character.addExp(amount);
         notifyPropertyChanged(BR.exp);
-        expObserve.set(amount);
+        expObserve.set(new Integer(amount));
     }
 
 

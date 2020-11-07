@@ -56,7 +56,7 @@ public class InventoryInfoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            inventoryString= savedInstanceState.getString(INVENTORY_ARG);
+            inventoryString = savedInstanceState.getString(INVENTORY_ARG);
         } else {
             inventoryString = inventoryInfoVM.getInventoryString();
         }

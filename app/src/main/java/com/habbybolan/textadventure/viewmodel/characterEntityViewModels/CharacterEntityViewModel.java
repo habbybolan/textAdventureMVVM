@@ -224,18 +224,13 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     }
     ObservableArrayList<Dot> dotObserver = new ObservableArrayList<>();
 
-    /*public ObservableField<Void>  getUpdateAllDotRemove() {
-        return updateAllDotRemove;
-    }
-    private ObservableField<Void> updateAllDotRemove = new ObservableField<>();*/
-
     public ArrayList<Dot> getDotList() {
         return characterEntity.getDotList();
     }
 
     public void addInputDot(Dot dot) {
-        if (characterEntity.addNewDot(dot))
-            dotObserver.add(dot);
+        characterEntity.addNewDot(dot);
+        dotObserver.add(dot);
     }
 
     /**
@@ -245,10 +240,6 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         ArrayList<Dot> removedDots = characterEntity.applyDots();
         for (Dot dot : removedDots) {
             dotObserver.remove(dot);
-        }
-        for (Dot dot : dotObserver) {
-            dotObserver.remove(dot);
-            dotObserver.add(dot);
         }
     }
 
@@ -279,9 +270,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             specialObserver.remove(specialEffect);
         }
         for (SpecialEffect specialEffect : specialObserver) {
-            specialObserver.remove(specialEffect);
-            specialObserver.add(specialEffect);
-
+            specialEffect.decrementDuration();
         }
     }
 
@@ -483,6 +472,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     // Health mana changes
 
     @Bindable
+    private
     ObservableField<Integer> healthObserve = new ObservableField<>();
     public ObservableField<Integer> getHealthObserve() {
         return healthObserve;
@@ -494,14 +484,14 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     // set the new health
     public void setHealth(int health) {
         // observe the health change
-        healthObserve.set(health - characterEntity.getHealth());
+        healthObserve.set(new Integer(health - characterEntity.getHealth()));
         // apply the change
         characterEntity.setHealth(health);
         notifyPropertyChanged(BR.health);
     }
     // notify healthChange to changeHealth
     public void notifyChangeHealth(int changeHealth) {
-        healthObserve.set(changeHealth);
+        healthObserve.set(new Integer(changeHealth));
         notifyPropertyChanged(BR.health);
         notifyPropertyChanged(BR.maxHealth);
     }
@@ -523,14 +513,14 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     }
     public void setMana(int mana) {
         // observe mana changes
-        manaObserve.set(mana - characterEntity.getMana());
+        manaObserve.set(new Integer(mana - characterEntity.getMana()));
         // apply the change
         characterEntity.setMana(mana);
         notifyPropertyChanged(BR.mana);
     }
     // notify manaChange to changeMana
     public void notifyChangeMana(int changeMana) {
-        manaObserve.set(changeMana);
+        manaObserve.set(new Integer(changeMana));
         notifyPropertyChanged(BR.mana);
         notifyPropertyChanged(BR.maxMana);
     }

@@ -51,6 +51,7 @@ public class SellInformationActivity extends InventoryInfoDisplay {
     public void confirmSell(View view) {
         ShopFragment.getInstance().sellInventory(position);
         finish();
+        overridePendingTransition(R.anim.fade_in, R.anim.exit_to_right);
     }
 
     @Override

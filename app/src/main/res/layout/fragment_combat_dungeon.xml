@@ -10,6 +10,7 @@
     </data>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -19,28 +20,48 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <GridLayout
-                android:id="@+id/layout_btn_options"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:rowCount="2"
-                android:columnCount="2">
+                android:orientation="horizontal">
+
+                <GridLayout
+                    android:id="@+id/layout_btn_options"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:rowCount="2"
+                    android:columnCount="3">
+
+                    <Button
+                        android:id="@+id/btn_enter"
+                        android:layout_width="@dimen/default_btn_width"
+                        android:layout_height="@dimen/default_btn_height"
+                        android:text="enter"
+                        android:visibility="gone"/>
+
+                    <Button
+                        android:id="@+id/btn_leave"
+                        android:layout_width="@dimen/default_btn_width"
+                        android:layout_height="@dimen/default_btn_height"
+                        android:text="leave"
+                        android:visibility="gone"/>
+
+                </GridLayout>
 
                 <Button
-                    android:id="@+id/btn_enter"
-                    android:layout_width="@dimen/default_btn_width"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="enter"
+                    android:id="@+id/btn_info"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="@dimen/margin_side_inside_scroll"
+                    android:background="@drawable/info"
+                    android:gravity="start"
                     android:visibility="gone"/>
 
-                <Button
-                    android:id="@+id/btn_leave"
-                    android:layout_width="@dimen/default_btn_width"
-                    android:layout_height="@dimen/default_btn_height"
-                    android:text="leave"
-                    android:visibility="gone"/>
-            </GridLayout>
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_dialogue"

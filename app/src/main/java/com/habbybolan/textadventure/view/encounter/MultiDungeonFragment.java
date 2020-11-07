@@ -98,7 +98,7 @@ public class MultiDungeonFragment  extends EncounterDialogueFragment implements 
     @Override
     public void endState() {
         removeDialogueContinueButton(multiDungeonBinding.layoutBtnOptions);
-        // popup view
+        // popup view, only show one at a time
         final PopupWindow popupWindow = new PopupWindow();
         multiDungeonBinding.btnInfo.setVisibility(View.VISIBLE);
         multiDungeonBinding.btnInfo.setOnClickListener(new View.OnClickListener() {

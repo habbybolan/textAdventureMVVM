@@ -107,6 +107,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return Integer.compare(entity.getSpeed(), speed);
     }
 
+    abstract JSONObject serializeToJSON() throws JSONException;
+
     // *** Damage ***
 
     // check any buffs or protections that characterEntity has
@@ -717,11 +719,15 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // if the value < 0, do nothing, permanent special
     public ArrayList<SpecialEffect> decrSpecialDuration() {
         ArrayList<SpecialEffect> removedSpecials = new ArrayList<>();
-        for (SpecialEffect special : specialList) {
+        int i = 0;
+        while (i < specialList.size()) {
+            SpecialEffect special = specialList.get(i);
             special.decrementDuration();
             if (special.getDuration() == 0) {
                 removeInputSpecial(special);
                 removedSpecials.add(special);
+            } else {
+                i++;
             }
         }
         return removedSpecials;
@@ -754,7 +760,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // list of Dots applied to character
     ArrayList<Dot> dotList = new ArrayList<>();
 
-    /// returns true if still effected by dot effect from other items or applied dots
+    /**
+     * Finds the correct method to call to check if the dot effect is still applied to character.
+     * @param dot   The dot effect to check.
+     * @return      True if the dot effect should still be applied.
+     */
     public boolean isStillDotEffect(Dot dot) {
         switch (dot.getType()) {
             case Dot.FIRE:
@@ -773,7 +783,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
                 throw new IllegalArgumentException();
         }
     }
-    // helper for isStillDotEffect to check if Fire is still applied after item removal
+
+    /**
+     * Helper for isStillDotEffect to check if the health dot is still applied.
+     * @return  True if isFire should still be true by indefinite means.
+     */
     private boolean isStillFire() {
         boolean stillFire = false;
         for (Item item : items) {
@@ -786,7 +800,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         setIsFire(stillFire);
         return stillFire;
     }
-    // helper for isStillDotEffect to check if Bleed is still applied after item removal
+
+    /**
+     * Helper for isStillDotEffect to check if the health dot is still applied.
+     * @return  True if isBleed should still be true by indefinite means.
+     */
     private boolean isStillBleed() {
         boolean stillBleed = false;
         for (Item item : items) {
@@ -799,7 +817,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         setIsBleed(stillBleed);
         return stillBleed;
     }
-    // helper for isStillDotEffect to check if Poison is still applied after item removal
+
+    /**
+     * Helper for isStillDotEffect to check if the health dot is still applied.
+     * @return  True if isPoison should still be true by indefinite means.
+     */
     private boolean isStillPoison() {
         boolean stillPoison = false;
         for (Item item : items) {
@@ -812,7 +834,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         setIsPoison(stillPoison);
         return stillPoison;
     }
-    // helper for isStillDotEffect to check if FrostBurn is still applied after item removal
+
+    /**
+     * Helper for isStillDotEffect to check if the health dot is still applied.
+     * @return  True if isFrostBurn should still be true by indefinite means.
+     */
     private boolean isStillFrostBurn() {
         boolean stillFrostBurn = false;
         for (Item item : items) {
@@ -825,7 +851,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         setIsFrostBurn(stillFrostBurn);
         return stillFrostBurn;
     }
-    // helper for isStillDotEffect to check if Health dot is still applied after item removal
+
+    /**
+     * Helper for isStillDotEffect to check if the health dot is still applied.
+     * @return  True if isHealthDot should still be true by indefinite means.
+     */
     private boolean isStillHealthDot() {
         boolean stillHealthDot = false;
         for (Item item : items) {
@@ -838,7 +868,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         setIsHealDot(stillHealthDot);
         return stillHealthDot;
     }
-    // helper for isStillDotEffect to check if Mana dot is still applied after item removal
+
+    /**
+     * Helper for isStillDotEffect for checking if the mana dot is still applied.
+     * @return  True is isManaDot should still be true by indefinite means.
+     */
     private boolean isStillManaDot() {
         boolean stillManaDot = false;
         for (Item item : items) {
@@ -852,7 +886,13 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return stillManaDot;
     }
 
-    // remove a dot from the dotList and return true if isDot is still true
+
+    /**
+     * Remove a specific dot from dotList. Find if the effect of the dot is still applied to the character
+     * through an indefinite means.
+     * @param dot   The dot to remove from dotList.
+     * @return      True is the dot effect is still applied after removal from dotList through indefinite means.
+     */
     public boolean removeInputDot(Dot dot) {
         if (dot.getIsIndefinite()) {
             // key may not be in dotList if isInfinite
@@ -863,10 +903,13 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return isStillDotEffect(dot);
     }
 
-    // adds a new Dot to to dotList if not already existing
-        // if exists, it reset the time for the dot
-        // if isInfinite is true, then only make isDot true, not adding to dotMap
-        // return true if the isDot is set from false to true
+    /**
+     * Adds a new Dot to the dotList if not already existing.
+     * If it already exists in the list, then reset the time for the dot.
+     * If isInfinite is true, then only make isDot true, not adding to the dotList.
+     * @param dot   The dot to add the dotList
+     * @return      True if character is now affected by the effect after the dot is added.
+     */
     public boolean addNewDot(Dot dot) {
         boolean isChanged = false;
         switch (dot.getType()) {
@@ -912,7 +955,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return isChanged;
     }
 
-    // swap the isDot on entity
+    /**
+     * Swaps the boolean on isDot field applied to character.
+     * @param dotType   The dot type to flip.
+     */
     private void alterIsDot(String dotType) {
         switch (dotType) {
             case Dot.FIRE:
@@ -937,26 +983,33 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         }
     }
 
-    // applies the effect of the DOT and decrements the time remaining in DotMap
-        // if duration == 0, then remove from the dotMap
-        // returns true if any dots applied are removed
+    /**
+     * Applies the effect of the Dot and decrements the remaining duration of the dot. If the duration == 0, then
+     * remove from the dotList.
+     * @return  The Dots that were removed from dotList.
+     */
     public ArrayList<Dot> applyDots() {
         ArrayList<Dot> dotsRemoved = new ArrayList<>();
-        for (Dot dot : dotList) {
+        int i = 0;
+        // remove any dot if duration == 0, adding to dotsRemoved to return
+        while (i < dotList.size()) {
+            Dot dot = dotList.get(i);
             findDotToApply(dot.getType());
             dot.decrementDuration();
             if (dot.getDuration() == 0) {
-                removeInputDot(dot);
+                dotList.remove(i);
                 dotsRemoved.add(dot);
+            } else {
+                i++;
             }
         }
         return dotsRemoved;
     }
 
-    abstract JSONObject serializeToJSON() throws JSONException;
-
-    // helper for applyDots
-        // find the proper method to call for using a specific dot
+    /**
+     * Helper for applyDots. Find the proper method to call corresponding the the correct dot being applied.
+     * @param dot   The dot to apply to character (damage)
+     */
     private void findDotToApply(String dot) {
         switch (dot) {
             case Dot.FIRE:

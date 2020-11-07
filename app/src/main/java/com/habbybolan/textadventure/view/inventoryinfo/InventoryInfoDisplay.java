@@ -3,6 +3,7 @@ package com.habbybolan.textadventure.view.inventoryinfo;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.Observable;
 
+import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.viewmodel.InventoryInfoViewModel;
 
 /**
@@ -20,6 +21,7 @@ public abstract class InventoryInfoDisplay extends AppCompatActivity {
         InventoryInfoFragment fragment = InventoryInfoFragment.newInstance(inventoryInfoViewModel.getInventoryString());
         getSupportFragmentManager()
                 .beginTransaction()
+                .setCustomAnimations(R.anim.fade_in_slow, 0)
                 .addToBackStack(null)
                 .replace(getFragmentContainer(), fragment)
                 .commit();
@@ -45,6 +47,7 @@ public abstract class InventoryInfoDisplay extends AppCompatActivity {
     public void backButtonFunctionality() {
         if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
             finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.exit_to_right);
         } else {
             super.onBackPressed();
         }

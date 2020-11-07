@@ -119,7 +119,7 @@
 
 				{"dialogue":[{"dialogue":"As you take a step, you feel your foot go through the ground as all of your weight pushes into a hole, previously covered by leaves and sticks"}],
 				"fail":{"dialogue":"You couldn't grab yourself in time and you foot penetrates through a protruding root.",
-						"debuff":[{"debuff":"bleed"}, {"debuff":"damage", "damage":"5"}]},
+						"debuff":[{"debuff":"poison"}, {"debuff":"damage", "damage":"5"}]},
 				"success":"jumping to the side, you are able to just barely avoid a large branch that smashes into the ground, creating a ripple through the surrounding leaves."
 				}
 			]

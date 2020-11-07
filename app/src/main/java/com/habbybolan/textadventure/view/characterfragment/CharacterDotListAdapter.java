@@ -11,13 +11,13 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.CharacterDotSpecialDetailsBinding;
 import com.habbybolan.textadventure.model.effects.Dot;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class CharacterDotListAdapter extends RecyclerView.Adapter<CharacterDotListAdapter.ViewHolder>{
 
-    private List<Dot> dotList;
+    private ArrayList<Dot> dotList;
 
-    CharacterDotListAdapter(List<Dot> dotList) {
+    CharacterDotListAdapter(ArrayList<Dot> dotList) {
         this.dotList = dotList;
     }
 
@@ -60,14 +60,5 @@ public class CharacterDotListAdapter extends RecyclerView.Adapter<CharacterDotLi
         return dotList != null ? dotList.size() : 0;
     }
 
-    /*
-    // adds new dot effect to the list if it doesn't already exist
-    void newDotAdded() {
-        notifyItemInserted(dotList.size() - 1);
-    }
-    // deleted a dot effect from the list
-    void dotRemoved(int index) {
-        notifyItemRemoved(index);
-    }*/
 
 }

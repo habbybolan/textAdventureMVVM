@@ -20,7 +20,8 @@ public class RandomBenefitModel extends EncounterModel{
     public RandomBenefitModel() {}
 
     // finds a random Inventory loot
-    public Inventory getRandomInventory(Context context) {
+    public Inventory getRandomInventory(Context context, int encounterState) {
+        // todo: 
         Random rand = new Random();
         DatabaseAdapter adapter = new DatabaseAdapter(context);
         // randomly choose Inventory object, Weapon/Item/Ability

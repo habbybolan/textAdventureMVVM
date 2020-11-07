@@ -81,7 +81,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     // finds a random Inventory loot
     public void setTangible() {
-        inventoryToRetrieve = randomBenefitModel.getRandomInventory(context);
+        inventoryToRetrieve = randomBenefitModel.getRandomInventory(context, characterVM.getEncounterState());
     }
 
     // if space in inventory, return true and add inventory object to inventory, otherwise return false

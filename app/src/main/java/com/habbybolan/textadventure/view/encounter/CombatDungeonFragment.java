@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentCombatDungeonBinding;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -89,10 +91,28 @@ public class CombatDungeonFragment extends EncounterDialogueFragment implements 
     @Override
     public void endState() {
         removeDialogueContinueButton(combatDungeonBinding.layoutBtnOptions);
+        // popup view, only show one at a time
+        final PopupWindow popupWindow = new PopupWindow();
+        combatDungeonBinding.btnInfo.setVisibility(View.VISIBLE);
+        combatDungeonBinding.btnInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (popupWindow.isShowing()) {
+                    // remove the popup if showing
+                    popupWindow.dismiss();
+                } else {
+                    // otherwise, set up the popup dungeon
+                    CustomPopupWindow.setDungeonInfo("A difficult dungeon with only combat. Cannot leave once entered unless dungeon is finished.",
+                            getContext(), popupWindow, combatDungeonBinding.scrollViewContainer);
+                }
+            }
+        });
         combatDungeonBinding.btnEnter.setVisibility(View.VISIBLE);
         combatDungeonBinding.btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // remove the popup if showing
+                if (popupWindow.isShowing()) popupWindow.dismiss();
                 // clicker functionality to enter the multi dungeon
                 combatDungeonVM.clickEnter();
             }
@@ -101,6 +121,8 @@ public class CombatDungeonFragment extends EncounterDialogueFragment implements 
         combatDungeonBinding.btnLeave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // remove the popup if showing
+                if (popupWindow.isShowing()) popupWindow.dismiss();
                 // clicker functionality to not enter multi dungeon
                 combatDungeonVM.clickLeave();
             }

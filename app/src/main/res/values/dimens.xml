@@ -37,6 +37,8 @@
     <dimen name="character_frag_title">20dp</dimen>
     <dimen name="inventory_image_size">50dp</dimen>
 
+    <dimen name="margin_side_inside_scroll">20dp</dimen>
+
     <dimen name="inventory_info_button_side_margin">24dp</dimen>
     <dimen name="inventory_info_button_top_margin">6dp</dimen>
 </resources>

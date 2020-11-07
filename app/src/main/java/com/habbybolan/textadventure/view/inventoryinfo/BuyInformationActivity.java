@@ -2,10 +2,14 @@ package com.habbybolan.textadventure.view.inventoryinfo;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.PopupWindow;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.databinding.DataBindingUtil;
 
 import com.habbybolan.textadventure.R;
+import com.habbybolan.textadventure.databinding.ActivityBuyInformationBinding;
+import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.encounter.ShopFragment;
 import com.habbybolan.textadventure.viewmodel.InventoryInfoViewModel;
 
@@ -17,6 +21,7 @@ import com.habbybolan.textadventure.viewmodel.InventoryInfoViewModel;
 public class BuyInformationActivity extends InventoryInfoDisplay {
 
     private int position;
+    ActivityBuyInformationBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +30,7 @@ public class BuyInformationActivity extends InventoryInfoDisplay {
         // remove toolbar
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) getSupportActionBar().hide();
-        setContentView(R.layout.activity_buy_information);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_buy_information);
 
         String stringInventory = getIntent().getStringExtra(InventoryInfoFragment.INVENTORY_SERIALIZED);
         int cost = getIntent().getIntExtra(InventoryInfoFragment.COST, 0);
@@ -51,8 +56,12 @@ public class BuyInformationActivity extends InventoryInfoDisplay {
      * @param view  btn_confirm view.
      */
     public void confirmBuy(View view) {
-        ShopFragment.getInstance().buyInventory(position);
-        finish();
+        if (!ShopFragment.getInstance().buyInventory(position))
+            CustomPopupWindow.setTempMessage("You don't have enough gold.", this, new PopupWindow(), binding.shopBuyContainer);
+        else {
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.exit_to_right);
+        }
     }
 
 

@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -17,13 +16,12 @@ import com.habbybolan.textadventure.databinding.FragmentShopBinding;
 import com.habbybolan.textadventure.model.GridModel;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.ButtonInflaters;
-import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
-import com.habbybolan.textadventure.view.shopgrid.BuyGridAdapter;
 import com.habbybolan.textadventure.view.inventoryinfo.BuyInformationActivity;
-import com.habbybolan.textadventure.view.shopgrid.SellGridAdapter;
+import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.view.inventoryinfo.SellInformationActivity;
+import com.habbybolan.textadventure.view.shopgrid.BuyGridAdapter;
+import com.habbybolan.textadventure.view.shopgrid.SellGridAdapter;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.ShopViewModel;
@@ -196,6 +194,7 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
                     e.printStackTrace();
                 }
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
             }
         });
     }
@@ -220,6 +219,7 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
                     e.printStackTrace();
                 }
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
             }
         });
     }
@@ -237,14 +237,13 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
      * Calls shopVM's buyInventory method to buy the Inventory object in listGridModelBuy at index position
      * @param position   The position in listGridModelBuy holding the Inventory object to buy
      */
-    public void buyInventory(int position) {
+    public boolean buyInventory(int position) {
         if (shopVM.buyInventory(position)) {
             sellGridAdapter.updateSellGrid();
             buyGridAdapter.updateBuyGrid();
-        } else {
-            // todo: popup window not working - swapping back from info activity causes trouble with displaying message
-            CustomPopupWindow.setTempMessage("You don't have enough gold.", getContext(), new PopupWindow(), shopBinding.encounterContainer);
+            return true;
         }
+        return false;
     }
 
 

@@ -98,12 +98,9 @@ public class JsonAssetFileReader {
                 // get a random type of encounter // todo: control the weighting of the randomness for the type of encounter
                 //encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
 
-                // ***
-                // todo: used for testing specific encounters
-                //Random rand = new Random();
-                //int num = rand.nextInt(2);
-                encounterTemp = jsonArray.getJSONObject(Outdoor.getRandomEncounter());
-                // ***
+                // get random outdoor encounter with weighting
+                //encounterTemp = jsonArray.getJSONObject(Outdoor.getRandomEncounter());
+                encounterTemp = jsonArray.getJSONObject(Outdoor.TRAP);
 
                 // put type into encounter
                 String type = encounterTemp.getString(TYPE);
