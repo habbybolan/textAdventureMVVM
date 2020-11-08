@@ -47,55 +47,49 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         SpecialEffect special;
         if (ability.getIsConfuse()) {
             special = new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration());
-            if (characterEntity.addNewSpecial(special))
-                specialObserver.add(special);
+            characterEntity.addNewSpecial(special);
         }
         if (ability.getIsStun()) {
             special = new SpecialEffect(SpecialEffect.STUN, ability.getDuration());
-            if (characterEntity.addNewSpecial(special))
-                specialObserver.add(special);
+            characterEntity.addNewSpecial(special);
         }
         if (ability.getIsInvincibility()) {
             special = new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration());
-            if (characterEntity.addNewSpecial(special))
-                specialObserver.add(special);
+            characterEntity.addNewSpecial(special);
         }
         if (ability.getIsSilence()) {
             special = new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration());
-            if (characterEntity.addNewSpecial(special))
-                specialObserver.add(special);
+            characterEntity.addNewSpecial(special);
         }
         if (ability.getIsInvisible()) {
             special = new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration());
-            if (characterEntity.addNewSpecial(special))
-                specialObserver.add(special);
+            characterEntity.addNewSpecial(special);
         }
         // DOT
         Dot dot;
         if (ability.getIsFire()) {
             dot = new Dot(Dot.FIRE, false);
-            if (characterEntity.addNewDot(dot))
-                dotObserver.add(dot);
+            characterEntity.addNewDot(dot);
         }
         if (ability.getIsPoison()) {
             dot = new Dot(Dot.POISON, false);
-            if (characterEntity.addNewDot(dot)) dotObserver.add(dot);
+            characterEntity.addNewDot(dot);
         }
         if (ability.getIsBleed()) {
             dot = new Dot(Dot.BLEED, false);
-            if (characterEntity.addNewDot(dot)) dotObserver.add(dot);
+            characterEntity.addNewDot(dot);
         }
         if (ability.getIsFrostBurn()) {
             dot = new Dot(Dot.FROSTBURN, false);
-            if (characterEntity.addNewDot(dot)) dotObserver.add(dot);
+            characterEntity.addNewDot(dot);
         }
         if (ability.getIsHealDot()) {
             dot = new Dot(Dot.HEALTH_DOT, false);
-            if (characterEntity.addNewDot(dot)) dotObserver.add(dot);
+            characterEntity.addNewDot(dot);
         }
         if (ability.getIsManaDot()) {
             dot = new Dot(Dot.MANA_DOT, false);
-            if (characterEntity.addNewDot(dot)) dotObserver.add(dot);
+            characterEntity.addNewDot(dot);
         }
         // direct heal/mana
         if (ability.getHealMin() != 0) {
@@ -219,45 +213,28 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
 
     // ** Dot Effects **
 
-    public ObservableArrayList<Dot> getDotObserver() {
-        return dotObserver;
-    }
-    ObservableArrayList<Dot> dotObserver = new ObservableArrayList<>();
-
-    public ArrayList<Dot> getDotList() {
+    public ObservableArrayList<Dot> getDotList() {
         return characterEntity.getDotList();
     }
 
     public void addInputDot(Dot dot) {
         characterEntity.addNewDot(dot);
-        dotObserver.add(dot);
     }
 
     /**
      * Apply dots effects to character and observe all removed if duration reaches 0.
      */
     public void applyDots() {
-        ArrayList<Dot> removedDots = characterEntity.applyDots();
-        for (Dot dot : removedDots) {
-            dotObserver.remove(dot);
-        }
+        characterEntity.applyDots();
     }
 
     // ** Special Effects **
 
-    ObservableArrayList<SpecialEffect> specialObserver = new ObservableArrayList<>();
-    public ObservableArrayList<SpecialEffect> getSpecialObserver() {
-        return specialObserver;
-    }
-
-    public ArrayList<SpecialEffect> getSpecialList() {
+    public ObservableArrayList<SpecialEffect> getSpecialList() {
         return characterEntity.getSpecialList();
     }
     public void addInputSpecial(SpecialEffect special) {
-        // observed by XML
         characterEntity.addNewSpecial(special);
-        // observed by CharacterViewModel
-        specialObserver.add(special);
     }
 
     /**
@@ -265,13 +242,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
      * effects and observe the removed effect.
      */
     public void decrSpecialDuration() {
-        ArrayList<SpecialEffect> removedSpecials = characterEntity.decrSpecialDuration();
-        for (SpecialEffect specialEffect : removedSpecials) {
-            specialObserver.remove(specialEffect);
-        }
-        for (SpecialEffect specialEffect : specialObserver) {
-            specialEffect.decrementDuration();
-        }
+        characterEntity.decrSpecialDuration();
     }
 
     // ** Stat Changes **

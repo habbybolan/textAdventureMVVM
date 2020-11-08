@@ -170,9 +170,8 @@ public class CharacterFragment extends Fragment {
         final CharacterDotListAdapter adapter = new CharacterDotListAdapter(characterVM.getDotList());
         recyclerView.setAdapter(adapter);
 
-
         // observed whenever CharacterViewModel observes change in dotList
-        characterVM.getDotObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+        characterVM.getDotList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
             public void onChanged(ObservableList sender) {
                 adapter.notifyDataSetChanged();
@@ -203,7 +202,7 @@ public class CharacterFragment extends Fragment {
 
 
         // observed whenever CharacterViewModel observes change in dotList
-        characterVM.getSpecialObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+        characterVM.getSpecialList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
             public void onChanged(ObservableList sender) {
                 adapter.notifyDataSetChanged();

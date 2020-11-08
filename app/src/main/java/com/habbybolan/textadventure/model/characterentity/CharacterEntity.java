@@ -1,5 +1,7 @@
 package com.habbybolan.textadventure.model.characterentity;
 
+import androidx.databinding.ObservableArrayList;
+
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
@@ -96,6 +98,18 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     protected ArrayList<Weapon> weapons = new ArrayList<>();
     protected ArrayList<Item> items = new ArrayList<>();
 
+    // keep track of special duration left <name, duration> sorted by duration
+    ObservableArrayList<SpecialEffect> specialList = new ObservableArrayList<>();
+
+    // list of Dots applied to character
+    ObservableArrayList<Dot> dotList = new ObservableArrayList<>();
+
+    // keep track of stat increases - list<ArrayList<stat, duration, amount>> sorted by duration
+    ObservableArrayList<TempStat> statIncreaseList = new ObservableArrayList<>();
+
+    // keep track of stat decreases - list<ArrayList<stat, duration, amount>> sorted by duration
+    ObservableArrayList<TempStat> statDecreaseList = new ObservableArrayList<>();
+
     // decrement all ability cooldowns
     public abstract void decrCooldowns();
 
@@ -186,12 +200,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public static final String SPD = "SPD";
     public static final String EVASION = "Evasion";
     public static final String BLOCK = "Block";
-
-    // keep track of stat increases - list<ArrayList<stat, duration, amount>> sorted by duration
-    List<TempStat> statIncreaseList = new ArrayList<>();
-
-    // keep track of stat decreases - list<ArrayList<stat, duration, amount>> sorted by duration
-    List<TempStat> statDecreaseList = new ArrayList<>();
 
     // updates all the stat's main value, given its new baseStat, statIncrease, and statDecrease
         // helper for when statIncrease/statDecrease changes
@@ -557,9 +565,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     // ** Special Effects **
 
-    // keep track of special duration left <name, duration> sorted by duration
-    ArrayList<SpecialEffect> specialList = new ArrayList<>();
-
     // returns true if still effected by status effect from other items or applied special effect
     private boolean isStillSpecialEffect(SpecialEffect special) {
         switch (special.getType()) {
@@ -717,20 +722,17 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // decrements the special duration left
     // if the duration is 0 after decrement, then set isSpecial value to 0
     // if the value < 0, do nothing, permanent special
-    public ArrayList<SpecialEffect> decrSpecialDuration() {
-        ArrayList<SpecialEffect> removedSpecials = new ArrayList<>();
+    public void decrSpecialDuration() {
         int i = 0;
         while (i < specialList.size()) {
             SpecialEffect special = specialList.get(i);
             special.decrementDuration();
             if (special.getDuration() == 0) {
                 removeInputSpecial(special);
-                removedSpecials.add(special);
             } else {
                 i++;
             }
         }
-        return removedSpecials;
     }
 
     // change the value of isSpecial boolean value
@@ -756,9 +758,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
 
     // ** Dot effects **
-
-    // list of Dots applied to character
-    ArrayList<Dot> dotList = new ArrayList<>();
 
     /**
      * Finds the correct method to call to check if the dot effect is still applied to character.
@@ -986,24 +985,20 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     /**
      * Applies the effect of the Dot and decrements the remaining duration of the dot. If the duration == 0, then
      * remove from the dotList.
-     * @return  The Dots that were removed from dotList.
      */
-    public ArrayList<Dot> applyDots() {
-        ArrayList<Dot> dotsRemoved = new ArrayList<>();
+    public void applyDots() {
         int i = 0;
-        // remove any dot if duration == 0, adding to dotsRemoved to return
+        // remove any dot if duration == 0
         while (i < dotList.size()) {
             Dot dot = dotList.get(i);
             findDotToApply(dot.getType());
             dot.decrementDuration();
             if (dot.getDuration() == 0) {
                 dotList.remove(i);
-                dotsRemoved.add(dot);
             } else {
                 i++;
             }
         }
-        return dotsRemoved;
     }
 
     /**
@@ -1386,10 +1381,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return drawableIconDeadResID;
     }
 
-    public ArrayList<Dot> getDotList() {
+    public ObservableArrayList<Dot> getDotList() {
         return dotList;
     }
-    public ArrayList<SpecialEffect> getSpecialList() {
+    public ObservableArrayList<SpecialEffect> getSpecialList() {
         return specialList;
     }
     public List<TempBar> getTempHealthList() {
@@ -1398,10 +1393,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public List<TempBar> getTempManaList() {
         return tempManaList;
     }
-    public List<TempStat> getStatIncreaseList() {
+    public ObservableArrayList<TempStat> getStatIncreaseList() {
         return statIncreaseList;
     }
-    public List<TempStat> getStatDecreaseList() {
+    public ObservableArrayList<TempStat> getStatDecreaseList() {
         return statDecreaseList;
     }
 

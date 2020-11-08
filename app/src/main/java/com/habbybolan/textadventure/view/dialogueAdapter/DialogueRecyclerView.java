@@ -185,14 +185,14 @@ public class DialogueRecyclerView {
     // dialogue for adding Dot Effects
     private void setDotListener() {
         // observed whenever CharacterViewModel observes change in dotList
-        characterVM.getDotObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+        characterVM.getDotList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
             public void onChanged(ObservableList sender) {}
             @Override
             public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
             @Override
             public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
-                Dot dot = characterVM.getDotObserver().get(positionStart);
+                Dot dot = characterVM.getDotList().get(positionStart);
                 if (dot != null) {
                     EffectDialogue effectDialogue = new EffectDialogue(dot.getType(), dot.getDuration(), dot.getIcon(), dot.getIsIndefinite());
                     adapter.addNewDialogue(effectDialogue);
@@ -207,14 +207,14 @@ public class DialogueRecyclerView {
     // dialogue for adding Special Effects
     private void setSpecialListener() {
         // observed whenever CharacterViewModel observes change in dotList
-        characterVM.getSpecialObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+        characterVM.getSpecialList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
             public void onChanged(ObservableList sender) {}
             @Override
             public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
             @Override
             public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
-                SpecialEffect specialEffect = characterVM.getSpecialObserver().get(positionStart);
+                SpecialEffect specialEffect = characterVM.getSpecialList().get(positionStart);
                 if (specialEffect != null) {
                     EffectDialogue effectDialogue = new EffectDialogue(specialEffect.getType(), specialEffect.getDuration(), specialEffect.getIcon(), specialEffect.getIsIndefinite());
                     adapter.addNewDialogue(effectDialogue);

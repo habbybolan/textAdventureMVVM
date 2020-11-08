@@ -219,64 +219,64 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             SpecialEffect special;
             if (item.getIsConfuse()) {
                 special = new SpecialEffect(SpecialEffect.CONFUSE);
-                if (!character.removeInputSpecial(special)) specialObserver.remove(special);
+                character.removeInputSpecial(special);
 
 
             }
             if (item.getIsStun()) {
                 special = new SpecialEffect(SpecialEffect.STUN);
-                if (!character.removeInputSpecial(special)) specialObserver.remove(special);
+                character.removeInputSpecial(special);
 
 
             }
             if (item.getIsSilence()) {
                 special = new SpecialEffect(SpecialEffect.SILENCE);
-                if (!character.removeInputSpecial(special)) specialObserver.remove(special);
+                character.removeInputSpecial(special);
 
 
             }
             if (item.getIsInvisible()) {
                 special = new SpecialEffect(SpecialEffect.INVISIBILITY);
-                if (!character.removeInputSpecial(special)) specialObserver.remove(special);
+                character.removeInputSpecial(special);
 
 
             }
             if (item.getIsInvincible()) {
                 special = new SpecialEffect(SpecialEffect.INVINCIBILITY);
-                if (!character.removeInputSpecial(special)) specialObserver.remove(special);
+                character.removeInputSpecial(special);
 
             }
             // DOT changes
             Dot dot;
             if (item.getIsFire()) {
                 dot = new Dot(Dot.FIRE, true);
-                if (!character.removeInputDot(dot)) dotObserver.remove(dot);
+                character.removeInputDot(dot);
 
 
             }
             if (item.getIsBleed()) {
                 dot = new Dot(Dot.BLEED, true);
-                if (!character.removeInputDot(dot)) dotObserver.remove(dot);
+                character.removeInputDot(dot);
 
             }
             if (item.getIsPoison()) {
                 dot = new Dot(Dot.FIRE, true);
-                if (!character.removeInputDot(dot)) dotObserver.remove(dot);
+                character.removeInputDot(dot);
 
             }
             if (item.getIsFrostBurn()) {
                 dot = new Dot(Dot.FROSTBURN, true);
-                if (!character.removeInputDot(dot)) dotObserver.remove(dot);
+                character.removeInputDot(dot);
 
             }
             if (item.getIsHealthDot()) {
                 dot = new Dot(Dot.HEALTH_DOT, true);
-                if (!character.removeInputDot(dot)) dotObserver.remove(dot);
+                character.removeInputDot(dot);
 
             }
             if (item.getIsManaDot()) {
                 dot = new Dot(Dot.MANA_DOT, true);
-                if (!character.removeInputDot(dot)) dotObserver.remove(dot);
+                character.removeInputDot(dot);
 
             }
         }
@@ -308,49 +308,49 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             SpecialEffect special;
             if (item.getIsConfuse()) {
                 special = new SpecialEffect(SpecialEffect.CONFUSE);
-                if (character.addNewSpecial(special)) specialObserver.add(special);
+                character.addNewSpecial(special);
             }
             if (item.getIsStun()) {
                 special = new SpecialEffect(SpecialEffect.STUN);
-                if (character.addNewSpecial(special)) specialObserver.add(special);
+                character.addNewSpecial(special);
             }
             if (item.getIsSilence()) {
                 special = new SpecialEffect(SpecialEffect.SILENCE);
-                if (character.addNewSpecial(special)) specialObserver.add(special);
+                character.addNewSpecial(special);
             }
             if (item.getIsInvisible()) {
                 special = new SpecialEffect(SpecialEffect.INVISIBILITY);
-                if (character.addNewSpecial(special)) specialObserver.add(special);
+                character.addNewSpecial(special);
             }
             if (item.getIsInvincible()) {
                 special = new SpecialEffect(SpecialEffect.INVINCIBILITY);
-                if (character.addNewSpecial(special)) specialObserver.add(special);
+                character.addNewSpecial(special);
             }
             // DOT changes
             Dot dot;
             if (item.getIsFire()) {
                 dot = new Dot(Dot.FIRE, true);
-                if (character.addNewDot(dot)) dotObserver.add(dot);
+                character.addNewDot(dot);
             }
             if (item.getIsBleed()) {
                 dot = new Dot(Dot.BLEED, true);
-                if (character.addNewDot(dot)) dotObserver.add(dot);
+                character.addNewDot(dot);
             }
             if (item.getIsPoison()) {
                 dot = new Dot(Dot.POISON, true);
-                if (character.addNewDot(dot)) dotObserver.add(dot);
+                character.addNewDot(dot);
             }
             if (item.getIsFrostBurn()) {
                 dot = new Dot(Dot.FROSTBURN, true);
-                if (character.addNewDot(dot)) dotObserver.add(dot);
+                character.addNewDot(dot);
             }
             if (item.getIsHealthDot()) {
                 dot = new Dot(Dot.HEALTH_DOT, true);
-                if (character.addNewDot(dot)) dotObserver.add(dot);
+                character.addNewDot(dot);
             }
             if (item.getIsManaDot()) {
                 dot = new Dot(Dot.MANA_DOT, true);
-                if (character.addNewDot(dot)) dotObserver.add(dot);
+                character.addNewDot(dot);
             }
         }
         return true;

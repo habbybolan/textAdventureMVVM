@@ -7,9 +7,10 @@
             name="characterVM"
             type="com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel" />
     </data>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context=".view.characterfragment.CharacterFragment">
 
@@ -22,7 +23,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/items_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/inventory"
@@ -51,7 +53,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/weapons_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/weapons"
@@ -81,7 +84,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/abilities_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/abilities"
@@ -220,81 +224,75 @@
                     app:layout_constraintTop_toBottomOf="@+id/constitution" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/effects_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <RelativeLayout
+                android:id="@+id/effects_linear_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:layout_marginBottom="30dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <LinearLayout
-                    android:id="@+id/effects_linear_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="60dp"
-                    android:layout_marginBottom="30dp"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:id="@+id/dotLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_side_inside_scroll"
+                    android:layout_alignParentStart="true"
+                    android:orientation="vertical">
 
-                    <LinearLayout
-                        android:id="@+id/dotLayout"
-                        android:layout_width="208dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="top"
+                    <TextView
+                        android:id="@+id/dots"
+                        android:layout_width="128dp"
+                        android:layout_height="24dp"
+                        android:text="@string/dot_plural"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextView
-                            android:id="@+id/dots"
-                            android:layout_width="128dp"
-                            android:layout_height="24dp"
-                            android:text="@string/dot_plural"
-                            android:gravity="center"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_dots"
-                            android:layout_marginTop="15dp"
-                            android:layout_gravity="center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/specialLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/specials"
-                            android:layout_width="128dp"
-                            android:layout_height="24dp"
-                            android:text="@string/special_plural"
-                            android:gravity="center"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_special_effects"
-                            android:layout_marginTop="15dp"
-                            android:layout_gravity="center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_dots"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="15dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                <LinearLayout
+                    android:id="@+id/specialLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_side_inside_scroll"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/specials"
+                        android:layout_width="128dp"
+                        android:layout_height="24dp"
+                        android:gravity="center"
+                        android:text="@string/special_plural"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_special_effects"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="15dp" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
