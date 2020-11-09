@@ -7,12 +7,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentCheckBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CheckViewModel;
 
 import org.json.JSONException;
@@ -25,8 +24,6 @@ import org.json.JSONException;
 public class CheckFragment extends EncounterDialogueFragment implements EncounterFragment {
 
     private static CheckFragment instance = null;
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
     private CheckViewModel checkVM;
     private FragmentCheckBinding checkBinding;
     private DialogueRecyclerView rv;
@@ -41,13 +38,6 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainGameVM = MainGameViewModel.getInstance();
-        characterVM = CharacterViewModel.getInstance();
-        try {
-            checkVM = new CheckViewModel(getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -55,13 +45,18 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         checkBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_check, container, false);
+        return checkBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        checkVM = new ViewModelProvider(this).get(CheckViewModel.class);
         try {
             // create dialogue recyclerView to show actions happening
             rv = setUpEncounterBeginning(checkVM, this, checkBinding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return checkBinding.getRoot();
     }
 
     @Override

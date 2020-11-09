@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
@@ -22,8 +23,6 @@ import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
 import com.habbybolan.textadventure.view.inventoryinfo.SellInformationActivity;
 import com.habbybolan.textadventure.view.shopgrid.BuyGridAdapter;
 import com.habbybolan.textadventure.view.shopgrid.SellGridAdapter;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.ShopViewModel;
 
 import org.json.JSONException;
@@ -34,13 +33,11 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
 
 
     private FragmentShopBinding shopBinding;
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
     private ShopViewModel shopVM;
     private DialogueRecyclerView rv;
 
-    SellGridAdapter sellGridAdapter;
-    BuyGridAdapter buyGridAdapter;
+    private SellGridAdapter sellGridAdapter;
+    private BuyGridAdapter buyGridAdapter;
 
     private static ShopFragment instance = null;
 
@@ -67,13 +64,6 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainGameVM = MainGameViewModel.getInstance();
-        characterVM = CharacterViewModel.getInstance();
-        try {
-            shopVM = new ShopViewModel(getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -81,12 +71,17 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
                              Bundle savedInstanceState) {
         shopBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_shop, container, false);
         shopBinding.setShopVM(shopVM);
+        return shopBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        shopVM = new ViewModelProvider(this).get(ShopViewModel.class);
         try {
             rv = setUpEncounterBeginning(shopVM, this, shopBinding.dialogueRV);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return shopBinding.getRoot();
     }
 
     @Override
@@ -231,6 +226,7 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
     public void sellInventory(int position) {
         shopVM.sellInventory(position);
         sellGridAdapter.updateSellGrid();
+        buyGridAdapter.updateBuyGrid();
     }
 
     /**

@@ -465,6 +465,7 @@ public class Character extends CharacterEntity {
     private void noWeaponCheck() {
         if (getNumWeapons() == 0) {
             weapons.add(new Weapon());
+            numWeapons++;
         }
     }
 
@@ -488,6 +489,7 @@ public class Character extends CharacterEntity {
     private void defaultWeaponCheck() {
         if (getNumWeapons() == 1 && weapons.get(0).isDefaultWeapon()) {
             weapons.remove(0);
+            numWeapons--;
         }
     }
 

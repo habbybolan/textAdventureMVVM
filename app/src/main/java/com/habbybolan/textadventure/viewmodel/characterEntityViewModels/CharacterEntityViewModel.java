@@ -189,6 +189,12 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     // ** Weapons **
 
     // apply the attack from the attacker
+
+    /**
+     * Apply the attack from the attacker.
+     * @param attack        The CharacterEntity using the attack.
+     * @param attacker      The CharacterEntity who the attack is being used on.
+     */
     public void applyAttack(Attack attack, CharacterEntity attacker) {
         Random random = new Random();
         // get a random amount of damage given a range
@@ -201,7 +207,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             applyAbility(specialAttack.getAbility(), attacker);
         }
         if (specialAttack.getAoe() > 0) {
-            characterEntity.doAoeStuff(); // todo: aoe
+            // todo: aoe
+            characterEntity.doAoeStuff();
         }
         if (specialAttack.getDamageMin() != 0) {
             // get a random amount of damage given a range

@@ -9,6 +9,7 @@ import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
@@ -19,22 +20,14 @@ import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.RandomBenefitViewModel;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Gives the player a random Inventory object reward.
  */
 public class RandomBenefitFragment extends EncounterDialogueFragment implements EncounterFragment{
-
-
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
 
     private FragmentRandomBenefitBinding benefitBinding;
     private RandomBenefitViewModel benefitVM;
@@ -49,11 +42,6 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            benefitVM = new RandomBenefitViewModel(mainGameVM, characterVM, encounter, getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -61,14 +49,17 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         benefitBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_random_benefit, container, false);
+        return benefitBinding.getRoot();
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        benefitVM = new ViewModelProvider(this).get(RandomBenefitViewModel.class);
         try {
             rv = setUpEncounterBeginning(benefitVM, this, benefitBinding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        return benefitBinding.getRoot();
     }
 
     // checks which state the trap encounter is in and starts that new state
@@ -106,6 +97,7 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
                     e.printStackTrace();
                 }
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
             }
         });
     }

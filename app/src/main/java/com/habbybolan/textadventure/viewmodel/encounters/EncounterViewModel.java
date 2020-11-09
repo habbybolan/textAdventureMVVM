@@ -1,6 +1,12 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
 import androidx.databinding.ObservableField;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.habbybolan.textadventure.model.dialogue.CombatActionDialogue;
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
@@ -27,12 +33,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-/*
-View Model that all encounter view models extend
- - implements all of the shared functionality between the encounter view models,
-    including dialogue shown (and first dialogue state), state changes, and saving methods to implement
+/**
+ * ViewModel that all encounter viewModels extends.
+ * Implements all of the shared functionality between the encounter view models,
+ * including dialogue shown (and first dialogue state), state changes, and saving methods to implement
  */
-public abstract class EncounterViewModel {
+public abstract class EncounterViewModel extends AndroidViewModel {
 
     // key values for JSON to save encounter
     public static String ENCOUNTER_TYPE = "encounter_type";
@@ -48,7 +54,6 @@ public abstract class EncounterViewModel {
     static String BUY_COST = "buy_cost";
 
 
-
     // types of encounters that are values for the key ENCOUNTER_TYPE
     static String TYPE_CHOICE_BENEFIT = MainGameViewModel.CHOICE_BENEFIT_TYPE;
     static String TYPE_RANDOM_BENEFIT = MainGameViewModel.RANDOM_BENEFIT_TYPE;
@@ -57,32 +62,58 @@ public abstract class EncounterViewModel {
     static String TYPE_SHOP = MainGameViewModel.SHOP_TYPE;
     static String TYPE_CHOICE = MainGameViewModel.CHOICE_TYPE;
 
-    // states
+    Application application;
+    MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
+    CharacterViewModel characterVM = CharacterViewModel.getInstance();
+    JSONObject encounter;
 
-    ObservableField<Integer> stateIndex = new ObservableField<>();
-    public ObservableField<Integer> getStateIndex() {
-        return stateIndex;
-    }
-    // increment the state index to next state
-    public void incrementStateIndex() {
-        Integer state = stateIndex.get();
-        if (state != null) {
-            int newState = ++state;
-            stateIndex.set(newState);
+    // states
+    private final MutableLiveData<Integer> stateIndex = new MutableLiveData<>(0);
+
+    public EncounterViewModel(@NonNull Application application) {
+        super(application);
+        this.application = application;
+        encounter = mainGameVM.getEncounter().getEncounterJSON();
+        try {
+            setDialogueRemainingInDialogueState(encounter);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
-    public int getStateIndexValue() {
-        Integer stateIndex = getStateIndex().get();
-        if (stateIndex != null) return stateIndex;
-        throw new NullPointerException();
+
+    public LiveData<Integer> getStateIndex() {
+        return stateIndex;
     }
+
+    void setStateIndex(int stateIndex) {
+        this.stateIndex.setValue(stateIndex);
+    }
+
+    /**
+     * Get the value of the stateIndex liveData
+     * @return  The int value of the stateIndex liveData
+     */
+    public int getStateIndexValue() {
+        if (stateIndex.getValue() != null)
+            return stateIndex.getValue();
+        // stateIndex liveData should not be returning null
+        throw new IllegalArgumentException();
+
+    }
+
+    // increment the state index to next state
+    public void incrementStateIndex() {
+        int state = getStateIndexValue();
+        stateIndex.setValue(++state);
+    }
+
     // goto the the saved state if one is saved, otherwise start at beginning
     public void gotoBeginningState() throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         if (!isSaved) // if no save, then go to dialogue state normally
-            stateIndex.set(1);
+            stateIndex.setValue(1);
         else { // there is a save, goto saved state
-            stateIndex.set(mainGameVM.getSavedEncounter().getInt("state"));
+            stateIndex.setValue(mainGameVM.getSavedEncounter().getInt("state"));
         }
     }
 
@@ -132,7 +163,7 @@ public abstract class EncounterViewModel {
      * @param encounter         The encounter JSONObject gathered from outdoor_encounters asset String file
      * @throws JSONException    if problem with JSON string formatting
      */
-    void setDialogueRemainingInDialogueState(JSONObject encounter) throws JSONException {
+    private void setDialogueRemainingInDialogueState(JSONObject encounter) throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         if (mainGameVM.getSavedEncounter() != null) {
             setIsSaved(true);

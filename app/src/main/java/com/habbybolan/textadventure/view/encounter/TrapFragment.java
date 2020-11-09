@@ -8,6 +8,7 @@ import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
@@ -15,21 +16,17 @@ import com.habbybolan.textadventure.databinding.FragmentTrapBinding;
 import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
-import com.habbybolan.textadventure.viewmodel.encounters.TrapEncounterViewModel;
+import com.habbybolan.textadventure.viewmodel.encounters.TrapViewModel;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class TrapFragment extends EncounterDialogueFragment implements EncounterFragment{
 
     private FragmentTrapBinding trapBinder;
-    private TrapEncounterViewModel trapVM;
+    private TrapViewModel trapVM;
 
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
     private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
     private DialogueRecyclerView rv;
 
 
@@ -42,11 +39,6 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            trapVM = new TrapEncounterViewModel(encounter, getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -54,13 +46,17 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         trapBinder = DataBindingUtil.inflate(inflater, R.layout.fragment_trap, container,false);
+        return trapBinder.getRoot();
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        trapVM = new ViewModelProvider(this).get(TrapViewModel.class);
         try {
             rv = setUpEncounterBeginning(trapVM, this, trapBinder.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return trapBinder.getRoot();
     }
 
     // checks which state the trap encounter is in and starts that new state
@@ -68,17 +64,17 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
     public void checkState(int state) {
         switch(state) {
             // first state
-            case TrapEncounterViewModel.firstState:
+            case TrapViewModel.firstState:
                 trapBinder.layoutBtnOptions.removeAllViews();
                 dialogueState(trapVM, trapBinder.layoutBtnOptions);
                 break;
                 // second state
-            case TrapEncounterViewModel.secondState:
+            case TrapViewModel.secondState:
                 trapBinder.layoutBtnOptions.removeAllViews();
                 beforeTrapState();
                 break;
                 // last state
-            case TrapEncounterViewModel.thirdState:
+            case TrapViewModel.thirdState:
                 trapBinder.layoutBtnOptions.removeAllViews();
                 endState();
                 break;

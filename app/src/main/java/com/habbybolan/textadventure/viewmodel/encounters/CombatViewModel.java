@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
+import android.app.Application;
 import android.content.Context;
 
 import androidx.databinding.ObservableField;
@@ -18,8 +19,6 @@ import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 
 import org.json.JSONArray;
@@ -33,10 +32,7 @@ import java.util.concurrent.ExecutionException;
 View model to hold data of the combat encounter
  */
 public class CombatViewModel extends EncounterViewModel {
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
-    private JSONObject encounter;
-    private Context context;
+
     private CombatModel combatModel;
 
     public static final int firstState = 1;
@@ -62,12 +58,8 @@ public class CombatViewModel extends EncounterViewModel {
     private Action selectedAction;
 
     // combat View Model constructor
-    public CombatViewModel(JSONObject encounter, Context context) throws JSONException {
-        setDialogueRemainingInDialogueState(encounter);
-        mainGameVM = MainGameViewModel.getInstance();
-        characterVM = CharacterViewModel.getInstance();
-        this.encounter = encounter;
-        this.context = context;
+    public CombatViewModel(Application application) {
+        super(application);
         combatModel = new CombatModel();
     }
 
@@ -106,7 +98,7 @@ public class CombatViewModel extends EncounterViewModel {
         JSONArray typeArray = fightObject.getJSONArray("type");
         // ID associated with the enemy
         int ID = 2;
-        DatabaseAdapter db = new DatabaseAdapter(context);
+        DatabaseAdapter db = new DatabaseAdapter(application);
         for (int i = 0; i < typeArray.length(); i++) {
             Enemy enemy = db.getEnemy(typeArray.getString(i), 1, characterVM.getCharacter().getNumStatPoints());
             enemies.add(new EnemyViewModel(enemy));
@@ -144,7 +136,7 @@ public class CombatViewModel extends EncounterViewModel {
 
     // go directly to the end state
     private void gotoEndState() {
-        stateIndex.set(sixthState);
+        setStateIndex(sixthState);
     }
 
     /**
@@ -153,12 +145,12 @@ public class CombatViewModel extends EncounterViewModel {
      */
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(context);
+        SaveDataLocally save = new SaveDataLocally(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_COMBAT);
             encounterData.put(ENCOUNTER, encounter);
-            encounterData.put(STATE, stateIndex.get());
+            encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // convert the inventory to JSON and store if one exists
             if (inventoryToRetrieve != null) encounterData.put(INVENTORY, inventoryToRetrieve.serializeToJSON());
@@ -520,10 +512,10 @@ public class CombatViewModel extends EncounterViewModel {
     public void setFirstTurn() {
         if (combatOrderCurr.get(0).getIsCharacter()) {
             // state 4 corresponds to character turn
-            stateIndex.set(fourthState);
+            setStateIndex(fourthState);
         } else {
             // state 5 corresponds to enemy turn
-            stateIndex.set(fifthState);
+            setStateIndex(fifthState);
         }
     }
 
@@ -552,10 +544,10 @@ public class CombatViewModel extends EncounterViewModel {
             if (isCombatInProgress()) {
                 if (isCharacterTurn()) {
                     // state 4 corresponds to character turn
-                    stateIndex.set(fourthState);
+                    setStateIndex(fourthState);
                 } else {
                     // state 5 corresponds to enemy turn
-                    stateIndex.set(fifthState);
+                    setStateIndex(fifthState);
                 }
             }
         }
@@ -572,7 +564,7 @@ public class CombatViewModel extends EncounterViewModel {
             }
         }
         setReward();
-        stateIndex.set(sixthState);
+        setStateIndex(sixthState);
         return false;
     }
 

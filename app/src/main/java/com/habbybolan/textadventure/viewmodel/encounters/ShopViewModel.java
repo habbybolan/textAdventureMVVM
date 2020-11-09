@@ -1,6 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
-import android.content.Context;
+import android.app.Application;
 
 import com.habbybolan.textadventure.model.GridModel;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
@@ -12,8 +12,6 @@ import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,11 +35,6 @@ public class ShopViewModel extends EncounterViewModel  {
     private final double chanceForWeapons = 0.2;
     private final double chanceForAbilities = 0.1;
 
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter;
-    private Context context;
-
     private ArrayList<GridModel> listGridModelBuy = new ArrayList<>();
 
     private ArrayList<Item> itemsToBuy = new ArrayList<>();
@@ -50,20 +43,18 @@ public class ShopViewModel extends EncounterViewModel  {
 
     private ArrayList<GridModel> listGridModelSell = new ArrayList<>();
 
-    public ShopViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getEncounter().getEncounterJSON();
-        setDialogueRemainingInDialogueState(encounter);
-        this.context = context;
+    public ShopViewModel(Application application) {
+        super(application);
     }
 
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(context);
+        SaveDataLocally save = new SaveDataLocally(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_SHOP);
             encounterData.put(ENCOUNTER, encounter);
-            encounterData.put(STATE, stateIndex.get());
+            encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // store all DialogueTypes converted to JSON
             JSONArray JSONDialogue = new JSONArray();
@@ -180,7 +171,7 @@ public class ShopViewModel extends EncounterViewModel  {
             Random rand = new Random();
             double shopType = rand.nextInt(fullPercent);
             // set up and open database
-            DatabaseAdapter dbh = new DatabaseAdapter(context);
+            DatabaseAdapter dbh = new DatabaseAdapter(application);
             // Get the type of shop
             if (shopType < fullPercent * chanceForItems) {
                 // create shop of random items (5 items)
@@ -230,7 +221,10 @@ public class ShopViewModel extends EncounterViewModel  {
      */
     public void sellInventory(int position) {
         GridModel gridModel = listGridModelSell.get(position);
+        // remove from sell list
         listGridModelSell.remove(position);
+        // add to buy list
+        listGridModelBuy.add(gridModel.buySoldInventory());
         characterVM.removeInventory(gridModel.getInventory());
         // add cost to character for selling
         characterVM.goldChange(gridModel.getCost());
@@ -240,11 +234,14 @@ public class ShopViewModel extends EncounterViewModel  {
      * Uses the index position to remove the GridModel from ListGridModelBuy and add to listGridModel sell, and add to player character inventory. Also spend
      * the gold cost associated with the Inventory object, successfully buying if the player character has enough gold. Return true if able to buy item.
      * @param position  Index of the GridModel object in listGridModelBuy.
+     * @return          True if the item was successfully bought.
      */
     public boolean buyInventory(int position) {
         GridModel gridModel = listGridModelBuy.get(position);
         if (characterVM.getCharacter().getGold() >= gridModel.getCost()) {
+            // remove from buy list
             listGridModelBuy.remove(position);
+            // add to sell list
             listGridModelSell.add(gridModel);
             characterVM.addNewInventory(gridModel.getInventory());
             // remove cost from character for buying

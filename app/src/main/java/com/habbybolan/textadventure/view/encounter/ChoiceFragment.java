@@ -5,14 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentChoiceBinding;
 import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.ChoiceViewModel;
 
@@ -23,8 +24,7 @@ import org.json.JSONException;
  */
 public class ChoiceFragment extends EncounterDialogueFragment implements EncounterFragment {
 
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
+    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
     private ChoiceViewModel choiceViewModel;
     private FragmentChoiceBinding choiceBinding;
 
@@ -32,9 +32,7 @@ public class ChoiceFragment extends EncounterDialogueFragment implements Encount
 
     private static ShopFragment instance = null;
 
-    public ChoiceFragment() {
-        // Required empty public constructor
-    }
+    public ChoiceFragment() {}
 
     public static ShopFragment getInstance() {
         if (instance == null) throw new AssertionError("Create instance first");
@@ -48,26 +46,23 @@ public class ChoiceFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainGameVM = MainGameViewModel.getInstance();
-        characterVM = CharacterViewModel.getInstance();
-        try {
-            choiceViewModel = new ChoiceViewModel(getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         choiceBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_choice, container, false);
-        choiceBinding.setChoiceVM(choiceViewModel);
+        return choiceBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        choiceViewModel = new ViewModelProvider(this).get(ChoiceViewModel.class);
         try {
             rv = setUpEncounterBeginning(choiceViewModel, this, choiceBinding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return choiceBinding.getRoot();
     }
 
     @Override

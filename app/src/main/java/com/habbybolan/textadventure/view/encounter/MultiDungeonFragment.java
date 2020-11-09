@@ -6,15 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentMultiDungeonBinding;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.MultiDungeonViewModel;
 
 import org.json.JSONException;
@@ -27,8 +27,6 @@ import org.json.JSONException;
 public class MultiDungeonFragment  extends EncounterDialogueFragment implements EncounterFragment {
 
     private FragmentMultiDungeonBinding multiDungeonBinding;
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
     private MultiDungeonViewModel multiDungeonVM;
     private DialogueRecyclerView rv;
 
@@ -58,13 +56,6 @@ public class MultiDungeonFragment  extends EncounterDialogueFragment implements 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainGameVM = MainGameViewModel.getInstance();
-        characterVM = CharacterViewModel.getInstance();
-        try {
-            multiDungeonVM = new MultiDungeonViewModel(getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -72,14 +63,18 @@ public class MultiDungeonFragment  extends EncounterDialogueFragment implements 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         multiDungeonBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_multi_dungeon, container, false);
+        return multiDungeonBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        multiDungeonVM = new ViewModelProvider(requireActivity()).get(MultiDungeonViewModel.class);
         try {
             rv = setUpEncounterBeginning(multiDungeonVM, this, multiDungeonBinding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return multiDungeonBinding.getRoot();
     }
-
 
     @Override
     public void checkState(int state) {

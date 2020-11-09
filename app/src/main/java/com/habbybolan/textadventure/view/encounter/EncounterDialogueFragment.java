@@ -4,8 +4,8 @@ import android.view.View;
 import android.widget.GridLayout;
 
 import androidx.databinding.Observable;
-import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
@@ -13,6 +13,7 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
 
 import org.json.JSONException;
@@ -21,9 +22,12 @@ import org.json.JSONObject;
 /*
 deals with the functionality and UI of the dialogue and state switching of a fragment
  */
-class EncounterDialogueFragment extends Fragment {
+public class EncounterDialogueFragment extends Fragment {
 
     private static final String DIALOGUE_CONTINUE = "dialogue_continue";
+
+    MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
+    CharacterViewModel characterVM = CharacterViewModel.getInstance();
 
     /**
      * deals with adding dialogue to the dialogue recycler viewer, calling the necessary method through a callback
@@ -109,19 +113,19 @@ class EncounterDialogueFragment extends Fragment {
 
     /**
      * A listener that calls checkState method of the current encounter to go to the proper View state when the state index value is changed
-     * @param stateIndex    The index of the View state that is next to display
      * @param vm            View Model of the current encounter
      * @param fragment      The fragment of the current encounter, associated with the vm
      */
-    private void stateListener(ObservableField<Integer> stateIndex, final EncounterViewModel vm, final EncounterFragment fragment) {
-        final Observable.OnPropertyChangedCallback callback = new Observable.OnPropertyChangedCallback() {
+    private void stateListener(final EncounterViewModel vm, final EncounterFragment fragment) {
+        // observe stateIndex and call checkState to enter the new UI state
+        vm.getStateIndex().observe(this, new Observer<Integer>() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
+            public void onChanged(Integer integer) {
+                // new UI state to enter
                 int state = vm.getStateIndexValue();
                 fragment.checkState(state);
             }
-        };
-        stateIndex.addOnPropertyChangedCallback(callback);
+        });
     }
 
     /**
@@ -136,7 +140,7 @@ class EncounterDialogueFragment extends Fragment {
         // set up Recycler Viewer that holds all dialogue
         DialogueRecyclerView dialogueRV = new DialogueRecyclerView(getContext(), rv, viewModel.getDialogueList());
         setUpDialogueRV(dialogueRV, viewModel);
-        stateListener(viewModel.getStateIndex(), viewModel, fragment);
+        stateListener(viewModel, fragment);
         // called after stateLister set up, signalling first state to enter
         viewModel.gotoBeginningState();
         return dialogueRV;

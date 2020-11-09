@@ -1,10 +1,9 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
-import android.content.Context;
+import android.app.Application;
 
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
@@ -19,24 +18,18 @@ public class CheckViewModel extends EncounterViewModel {
     public static final int firstState = 1;
     public static final int secondState = 2;
 
-    private JSONObject encounter;
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private Context context;
-
-    public CheckViewModel(Context context) throws JSONException {
-        encounter = mainGameVM.getEncounter().getEncounterJSON();
-        setDialogueRemainingInDialogueState(encounter);
-        this.context = context;
+    public CheckViewModel(Application application) {
+        super(application);
     }
 
     @Override
     void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(context);
+        SaveDataLocally save = new SaveDataLocally(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_CHOICE);
             encounterData.put(ENCOUNTER, encounter);
-            encounterData.put(STATE, stateIndex.get());
+            encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // store all DialogueTypes converted to JSON
             JSONArray JSONDialogue = new JSONArray();

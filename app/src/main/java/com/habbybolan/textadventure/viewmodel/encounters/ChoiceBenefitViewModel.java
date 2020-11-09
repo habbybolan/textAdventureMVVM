@@ -1,6 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
-import android.content.Context;
+import android.app.Application;
 
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.effects.Effect;
@@ -12,8 +12,6 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,11 +21,6 @@ import java.util.ArrayList;
 
 public class ChoiceBenefitViewModel extends EncounterViewModel {
 
-
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
-    private Context context;
-    private JSONObject encounter;
     private ChoiceBenefitModel choiceBenefitModel;
 
     public static final int firstState = 1;
@@ -36,13 +29,9 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
 
     private Inventory inventoryToRetrieve = null;
     
-    public ChoiceBenefitViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
-        setDialogueRemainingInDialogueState(encounter);
-        this.mainGameVM = mainGameVM;
-        this.characterVM = characterVM;
-        this.encounter = encounter;
-        this.context = context;
-        choiceBenefitModel = new ChoiceBenefitModel(context);
+    public ChoiceBenefitViewModel(Application application) {
+        super(application);
+        choiceBenefitModel = new ChoiceBenefitModel(application);
     }
 
     // sets the saved dialogue list and inventory item to retrieve if there is one
@@ -60,12 +49,12 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
 
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(context);
+        SaveDataLocally save = new SaveDataLocally(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_CHOICE_BENEFIT);
             encounterData.put(ENCOUNTER, encounter);
-            encounterData.put(STATE, stateIndex.get());
+            encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // convert the inventory to JSON and store if one exists
             if (isInventoryToRetrieve()) encounterData.put(INVENTORY, inventoryToRetrieve.serializeToJSON());

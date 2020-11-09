@@ -149,7 +149,7 @@ public class MainGameActivity extends AppCompatActivity {
                         .beginTransaction()
                         .setCustomAnimations(R.anim.enter_from_bottom, R.anim.exit_to_top)
                         .replace(R.id.fragment_container_game, choiceBenefitFragment)
-                        .commitAllowingStateLoss();
+                        .commit();
                 break;
             case MainGameViewModel.RANDOM_BENEFIT_TYPE:
                 RandomBenefitFragment randomBenefitFragment = RandomBenefitFragment.newInstance();
@@ -182,7 +182,6 @@ public class MainGameActivity extends AppCompatActivity {
 
     // disable the back button
     @Override
-    public void onBackPressed() {
-    }
+    public void onBackPressed() {}
 
 }

@@ -13,6 +13,7 @@ import android.widget.PopupWindow;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.Observable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
@@ -30,13 +31,11 @@ import com.habbybolan.textadventure.view.InventoryListAdapter.WeaponListRecycler
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 
@@ -52,9 +51,6 @@ fragment for combat encounter
  */
 public class CombatFragment extends EncounterDialogueFragment implements EncounterFragment {
 
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
     private FragmentCombatBinding combatBinding;
     private CombatViewModel combatVM;
     private DialogueRecyclerView rv;
@@ -67,9 +63,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     private CombatOrderAdapter nextListAdapter;
     private CombatOrderAdapter lastListAdapter;
 
-    private CombatFragment() {
-        // Required empty public constructor
-    }
+    private CombatFragment() {}
 
     public static CombatFragment newInstance() {
         return new CombatFragment();
@@ -78,13 +72,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            mainGameVM = MainGameViewModel.getInstance();
-            characterVM = CharacterViewModel.getInstance();
-            combatVM = new CombatViewModel(encounter, getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        characterVM = CharacterViewModel.getInstance();
     }
 
     @Override
@@ -93,13 +81,17 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         // Inflate the layout for this fragment
         combatBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_combat, container, false);
         combatBinding.setCharacterVM(characterVM);
+        return combatBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        combatVM = new ViewModelProvider(this).get(CombatViewModel.class);
         try {
             rv = setUpEncounterBeginning(combatVM, this, combatBinding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        return combatBinding.getRoot();
     }
 
     /**
@@ -416,6 +408,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
         intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, combatVM.serializeInventory(object));
         startActivity(intent);
+        getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
     }
 
     /**

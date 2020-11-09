@@ -45,6 +45,7 @@ public abstract class InventoryInfoDisplay extends AppCompatActivity {
      * Otherwise, normal button functionality.
      */
     public void backButtonFunctionality() {
+        // at the first information screen, go back to game on back pressed.
         if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
             finish();
             overridePendingTransition(R.anim.fade_in, R.anim.exit_to_right);

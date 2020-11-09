@@ -17,6 +17,15 @@ public class GridModel {
         imageID = inventory.getPictureResource();
     }
 
+    /**
+     * Increase the price of gridModel inventory item that was sold so buying again is more expensive.
+     * @return  The new GridModel with updated price.
+     */
+    public GridModel buySoldInventory() {
+        cost *= 2;
+        return this;
+    }
+
 
 
     public int getImageID() {

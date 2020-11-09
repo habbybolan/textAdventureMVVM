@@ -6,8 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentCombatDungeonBinding;
@@ -20,14 +21,10 @@ import com.habbybolan.textadventure.viewmodel.encounters.CombatDungeonViewModel;
 import org.json.JSONException;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link CombatDungeonFragment#newInstance} factory method to
- * create an instance of this fragment.
+
  */
 public class CombatDungeonFragment extends EncounterDialogueFragment implements EncounterFragment {
 
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
     private CombatDungeonViewModel combatDungeonVM;
     private FragmentCombatDungeonBinding combatDungeonBinding;
 
@@ -35,9 +32,7 @@ public class CombatDungeonFragment extends EncounterDialogueFragment implements 
 
     private static CombatDungeonFragment instance = null;
 
-    public CombatDungeonFragment() {
-        // Required empty public constructor
-    }
+    public CombatDungeonFragment() {}
 
     public static CombatDungeonFragment getInstance() {
         if (instance == null) throw new AssertionError("Create instance first");
@@ -54,11 +49,6 @@ public class CombatDungeonFragment extends EncounterDialogueFragment implements 
         super.onCreate(savedInstanceState);
         mainGameVM = MainGameViewModel.getInstance();
         characterVM = CharacterViewModel.getInstance();
-        try {
-            combatDungeonVM = new CombatDungeonViewModel(getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -66,12 +56,17 @@ public class CombatDungeonFragment extends EncounterDialogueFragment implements 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         combatDungeonBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_combat_dungeon, container, false);
+        return combatDungeonBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        combatDungeonVM = new ViewModelProvider(this).get(CombatDungeonViewModel.class);
         try {
             rv = setUpEncounterBeginning(combatDungeonVM, this, combatDungeonBinding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return combatDungeonBinding.getRoot();
     }
 
     @Override

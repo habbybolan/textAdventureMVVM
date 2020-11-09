@@ -23,8 +23,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/items_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/inventory"
@@ -53,8 +52,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/weapons_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/weapons"
@@ -84,8 +82,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/abilities_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/abilities"

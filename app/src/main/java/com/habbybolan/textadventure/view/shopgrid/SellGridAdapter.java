@@ -53,7 +53,6 @@ public class SellGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         ImageGridSellBinding binding;
         SellGridAdapter.ViewHolder holder;
         if (convertView == null) {

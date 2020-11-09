@@ -1,6 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
-import android.content.Context;
+import android.app.Application;
 
 import com.habbybolan.textadventure.model.dialogue.Dialogue;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
@@ -8,7 +8,6 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.encounter.TrapModel;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
@@ -17,24 +16,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class TrapEncounterViewModel extends EncounterViewModel {
+public class TrapViewModel extends EncounterViewModel {
     public static final int firstState = 1;
     public static final int secondState = 2;
     public static final int thirdState = 3;
 
-    private CharacterViewModel characterVM;
-    private MainGameViewModel mainGameVM;
     private TrapModel trapModel;
 
-    private JSONObject encounter;
-    private Context context;
-
-    public TrapEncounterViewModel(JSONObject encounter, Context context) throws JSONException {
-        setDialogueRemainingInDialogueState(encounter);
-        mainGameVM = MainGameViewModel.getInstance();
-        characterVM = CharacterViewModel.getInstance();
-        this.encounter = encounter;
-        this.context = context;
+    public TrapViewModel(Application application) {
+        super(application);
         trapModel = new TrapModel(characterVM);
     }
 
@@ -42,15 +32,14 @@ public class TrapEncounterViewModel extends EncounterViewModel {
         return characterVM;
     }
 
-
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(context);
+        SaveDataLocally save = new SaveDataLocally(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_TRAP);
             encounterData.put(ENCOUNTER, encounter);
-            encounterData.put(STATE, stateIndex.get());
+            encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // store all DialogueTypes converted to JSON
             JSONArray JSONDialogue = new JSONArray();

@@ -7,12 +7,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentBreakBinding;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.BreakViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CheckViewModel;
 
@@ -23,8 +22,6 @@ import org.json.JSONException;
  */
 public class BreakFragment extends EncounterDialogueFragment implements EncounterFragment {
 
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
     private FragmentBreakBinding binding;
     private DialogueRecyclerView rv;
     private BreakViewModel breakVM;
@@ -39,13 +36,6 @@ public class BreakFragment extends EncounterDialogueFragment implements Encounte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainGameVM = MainGameViewModel.getInstance();
-        characterVM = CharacterViewModel.getInstance();
-        try {
-            breakVM = new BreakViewModel(getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -53,12 +43,17 @@ public class BreakFragment extends EncounterDialogueFragment implements Encounte
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_break, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        breakVM = new ViewModelProvider(this).get(BreakViewModel.class);
         try {
             rv = setUpEncounterBeginning(breakVM, this, binding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return binding.getRoot();
     }
 
     @Override

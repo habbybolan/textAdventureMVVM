@@ -1,6 +1,6 @@
 package com.habbybolan.textadventure.viewmodel.encounters;
 
-import android.content.Context;
+import android.app.Application;
 
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
@@ -9,8 +9,6 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,11 +19,6 @@ import java.util.ArrayList;
 
 public class RandomBenefitViewModel extends EncounterViewModel {
 
-
-    private MainGameViewModel mainGameVM;
-    private CharacterViewModel characterVM;
-    private JSONObject encounter;
-    private Context context;
     private RandomBenefitModel randomBenefitModel;
 
     public static final int firstState = 1;
@@ -33,23 +26,19 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     private Inventory inventoryToRetrieve = null;
 
-    public RandomBenefitViewModel(MainGameViewModel mainGameVM, CharacterViewModel characterVM, JSONObject encounter, Context context) throws JSONException {
-        setDialogueRemainingInDialogueState(encounter);
-        this.mainGameVM = mainGameVM;
-        this.characterVM = characterVM;
-        this.encounter = encounter;
-        this.context = context;
+    public RandomBenefitViewModel(Application application) {
+        super(application);
         randomBenefitModel = new RandomBenefitModel();
     }
 
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(context);
+        SaveDataLocally save = new SaveDataLocally(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_RANDOM_BENEFIT);
             encounterData.put(ENCOUNTER, encounter);
-            encounterData.put(STATE, stateIndex.get());
+            encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // convert the inventory to JSON and store if one exists
             if (inventoryToRetrieve != null) encounterData.put(INVENTORY, inventoryToRetrieve.serializeToJSON());
@@ -81,7 +70,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     // finds a random Inventory loot
     public void setTangible() {
-        inventoryToRetrieve = randomBenefitModel.getRandomInventory(context, characterVM.getEncounterState());
+        inventoryToRetrieve = randomBenefitModel.getRandomInventory(application, characterVM.getEncounterState());
     }
 
     // if space in inventory, return true and add inventory object to inventory, otherwise return false

@@ -9,6 +9,7 @@ import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
@@ -20,12 +21,9 @@ import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
-import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.ChoiceBenefitViewModel;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * gives the character a choice of a:
@@ -35,9 +33,6 @@ import org.json.JSONObject;
  */
 public class ChoiceBenefitFragment extends EncounterDialogueFragment implements EncounterFragment {
 
-    private MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-    private CharacterViewModel characterVM = CharacterViewModel.getInstance();
-    private JSONObject encounter = mainGameVM.getEncounter().getEncounterJSON();
     private FragmentChoiceBenefitBinding benefitBinding;
     private ChoiceBenefitViewModel benefitVM;
     private DialogueRecyclerView rv;
@@ -51,11 +46,6 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            benefitVM = new ChoiceBenefitViewModel(mainGameVM, characterVM, encounter, getActivity());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -63,14 +53,18 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         benefitBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_choice_benefit, container, false);
+        // create state listener and go into first state
+        return benefitBinding.getRoot();
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        benefitVM = new ViewModelProvider(this).get(ChoiceBenefitViewModel.class);
         try {
             rv = setUpEncounterBeginning(benefitVM, this, benefitBinding.rvDialogue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        // create state listener and go into first state
-        return benefitBinding.getRoot();
     }
 
     @Override
@@ -150,6 +144,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
                     e.printStackTrace();
                 }
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
             }
         });
     }
