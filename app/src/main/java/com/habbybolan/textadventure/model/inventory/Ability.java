@@ -33,7 +33,7 @@ public class Ability extends Action {
     private boolean isSilence = false; // makes the target unable to use abilities
     private boolean isInvisible = false;
 
-    // if it's a buff (for teammates) or not
+    // if it's a buff (for teammates / self)
     private boolean isBuff = false;
 
     // damage over times
@@ -78,6 +78,9 @@ public class Ability extends Action {
     private int spdDecrease = 0;
     private int evadeDecrease = 0;
     private int blockDecrease = 0;
+
+    private boolean isIntScaled = false;
+    private boolean isStrScaled = false;
 
     private int pictureResource;
 
@@ -161,6 +164,8 @@ public class Ability extends Action {
             tier = JSONAbility.getInt(TIER);
             abilityDescription = JSONAbility.getString(DESCRIPTION);
             pictureResource = JSONAbility.getInt(IMAGE_RESOURCE);
+            isIntScaled = JSONAbility.getBoolean(INT_SCALED);
+            isStrScaled = JSONAbility.getBoolean(STR_SCALED);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -314,6 +319,11 @@ public class Ability extends Action {
         // tier
         int tierColIndex = cursor.getColumnIndex(TIER);
         setTier(cursor.getInt(tierColIndex));
+        // scaling
+        int intScalingColIndex = cursor.getColumnIndex(INT_SCALED);
+        isIntScaled = cursor.getInt(intScalingColIndex) == 1;
+        int strScalingColIndex = cursor.getColumnIndex(STR_SCALED);
+        isStrScaled = cursor.getInt(strScalingColIndex) == 1;
     }
 
 
@@ -612,6 +622,12 @@ public class Ability extends Action {
     public int getCost() {
         return cost;
     }
+    public boolean getIsStrScaled() {
+        return isStrScaled;
+    }
+    public boolean getIsIntScaled() {
+        return isIntScaled;
+    }
 
 
     @Override
@@ -674,6 +690,9 @@ public class Ability extends Action {
         JSONInventory.put(TIER, tier);
         JSONInventory.put(DESCRIPTION, abilityDescription);
         JSONInventory.put(IMAGE_RESOURCE, pictureResource);
+        // scaling
+        JSONInventory.put(INT_SCALED, isIntScaled);
+        JSONInventory.put(STR_SCALED, isStrScaled);
         return JSONInventory;
     }
 
@@ -736,6 +755,8 @@ public class Ability extends Action {
     public static final String TEMP_EXTRA_HEALTH = "temp_extra_health";
     public static final String TIER = "tier";
     public static final String DESCRIPTION = "description";
+    public static final String STR_SCALED = "str_scaled";
+    public static final String INT_SCALED = "int_scaled";
     // image resource
     public static final String IMAGE_RESOURCE = "image_resource";
 

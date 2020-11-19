@@ -155,6 +155,7 @@ public class SaveDataLocally {
                 JSONArray itemsArray = new JSONArray();
                 itemsArray.put(context.getString(R.string.Starting_Item));
                 jsonClassObject.put("items", itemsArray);
+                jsonClassObject.put("gold", context.getString(R.string.Starting_Gold));
 
             } catch (JSONException e) {
                 e.printStackTrace();

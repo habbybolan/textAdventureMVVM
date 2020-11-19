@@ -1,6 +1,6 @@
 package com.habbybolan.textadventure.viewmodel;
 
-import android.content.Context;
+import android.app.Application;
 import android.view.View;
 
 import androidx.databinding.BaseObservable;
@@ -84,7 +84,7 @@ public class MainGameViewModel extends BaseObservable {
 
 
     private CharacterViewModel characterVM;
-    private Context context;
+    private Application application;
 
     private JSONObject savedEncounter;
 
@@ -102,15 +102,15 @@ public class MainGameViewModel extends BaseObservable {
     }
 
     // private constructor only accessed from initiation
-    private MainGameViewModel(Context context, CharacterViewModel characterVM) {
+    private MainGameViewModel(Application application, CharacterViewModel characterVM) {
         this.characterVM = characterVM;
-        this.context = context;
+        this.application = application;
     }
 
     // must be initialized before getting the instance
-    public static MainGameViewModel init(Context context, CharacterViewModel characterVM) {
+    public static MainGameViewModel init(Application application, CharacterViewModel characterVM) {
         if (instance != null) throw new AssertionError("Already Initialized");
-        instance = new MainGameViewModel(context, characterVM);
+        instance = new MainGameViewModel(application, characterVM);
         return instance;
     }
 
@@ -130,7 +130,7 @@ public class MainGameViewModel extends BaseObservable {
          * @throws JSONException    If problem in JSON encounter formatting.
      */
     public void openGameEncounter() throws JSONException {
-        SaveDataLocally save = new SaveDataLocally(context);
+        SaveDataLocally save = new SaveDataLocally(application);
         JSONObject prevSave = save.readSavedEncounter();
         if (prevSave != null) {
             // if a saved encounter exists, then go into it
@@ -227,7 +227,7 @@ public class MainGameViewModel extends BaseObservable {
      * Creates a new random outdoor encounter and saves it to JSONEncounter local field.
      */
     private void createNewOutdoorEncounter() {
-        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
+        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(application);
         // get a random encounter from jsonFileReader
         try {
             encounter = new Encounter(jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type));
@@ -238,7 +238,7 @@ public class MainGameViewModel extends BaseObservable {
     }
 
     private void createNewBreakEncounter() throws JSONException {
-        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
+        JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(application);
         // get a random encounter from jsonFileReader
         try {
             encounter = new Encounter(jsonAssetFileReader.getRandomBreakEncounter());
@@ -270,7 +270,7 @@ public class MainGameViewModel extends BaseObservable {
             createRewardEncounter();
         } else {
             // otherwise, continue with multi dungeon encounters
-            JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
+            JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(application);
             // get a random encounter from jsonFileReader for multi dungeon
             try {
                 encounter = new Encounter(jsonAssetFileReader.getRandomMultiDungeonEncounter());
@@ -299,7 +299,7 @@ public class MainGameViewModel extends BaseObservable {
                 encounter = new Encounter(shopModel.createShopEncounter(dialogue));
             } else {
                 // otherwise, create a normal random combat encounter.
-                JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(context);
+                JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(application);
                 // get a random encounter from jsonFileReader for multi dungeon
                 try {
                     encounter = new Encounter(jsonAssetFileReader.getRandomCombatDungeonEncounter());
@@ -321,6 +321,7 @@ public class MainGameViewModel extends BaseObservable {
      */
     private void applyAfterEncounterActions() {
         characterVM.applyDots();
+        // todo: overwrite savedEncounter when entering new encounter instead of setting to null - could cause game loss
         savedEncounter = null;
         // todo: decrement stat and bar durations
         //characterVM.decrementStatChangeDuration();
@@ -333,6 +334,7 @@ public class MainGameViewModel extends BaseObservable {
      * Run a check for any class specific checks that occur between encounters.
      */
     private void classSpecificCheck() {
+        // todo:
     }
 
 
@@ -340,7 +342,7 @@ public class MainGameViewModel extends BaseObservable {
     public int getGameFragmentVisible() {
         return gameFragmentVisible;
     }
-    public void setGameState(int gameFragmentVisible) {
+    private void setGameState(int gameFragmentVisible) {
         this.gameFragmentVisible = gameFragmentVisible;
         notifyPropertyChanged(BR.gameFragmentVisible);
     }
@@ -349,7 +351,7 @@ public class MainGameViewModel extends BaseObservable {
     public int getCharacterFragmentVisible() {
         return characterFragmentVisible;
     }
-    public void setCharacterState(int characterFragmentVisible) {
+    private void setCharacterState(int characterFragmentVisible) {
         this.characterFragmentVisible = characterFragmentVisible;
         notifyPropertyChanged(BR.characterFragmentVisible);
     }

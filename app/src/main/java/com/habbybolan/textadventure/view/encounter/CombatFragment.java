@@ -259,33 +259,48 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 onItemCategoryClick();
             }
         });
+        // set weapons as the first selected
+        onWeaponCategoryClick();
     }
 
     /**
-     * on weapon category button pressed
+     * On weapon category button pressed, display recyclerView of weapon actions.
+     * Set the weapon category button as pressed, other categories as not pressed.
      */
     private void onWeaponCategoryClick() {
         combatBinding.rvWeapons.setVisibility(View.VISIBLE);
         combatBinding.rvAbilities.setVisibility(View.GONE);
         combatBinding.rvItems.setVisibility(View.GONE);
+        combatBinding.rvCategoryWeapons.setSelected(true);
+        combatBinding.rvCategoryItems.setSelected(false);
+        combatBinding.rvCategoryAbilities.setSelected(false);
+
     }
 
     /**
-     * on ability category button pressed
+     * On ability category button pressed, display recyclerView of ability actions.
+     * Set the ability category button as pressed, other categories as not pressed.
      */
     private void onAbilityCategoryClick() {
         combatBinding.rvWeapons.setVisibility(View.GONE);
         combatBinding.rvAbilities.setVisibility(View.VISIBLE);
         combatBinding.rvItems.setVisibility(View.GONE);
+        combatBinding.rvCategoryWeapons.setSelected(false);
+        combatBinding.rvCategoryItems.setSelected(false);
+        combatBinding.rvCategoryAbilities.setSelected(true);
     }
 
     /**
-     * on item category button pressed
+     * On item category button pressed, display recyclerView of item actions.
+     * Set the item category button as pressed, other categories as not pressed.
      */
     private void onItemCategoryClick() {
         combatBinding.rvWeapons.setVisibility(View.GONE);
         combatBinding.rvAbilities.setVisibility(View.GONE);
         combatBinding.rvItems.setVisibility(View.VISIBLE);
+        combatBinding.rvCategoryWeapons.setSelected(false);
+        combatBinding.rvCategoryItems.setSelected(true);
+        combatBinding.rvCategoryAbilities.setSelected(false);
     }
 
     /**
@@ -295,6 +310,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         final int sizeDP = getResources().getDimensionPixelSize(R.dimen.combat_enemy_action_icon_size);
         for (EnemyViewModel enemyVM : combatVM.getEnemies()) {
             ImageView enemyIconSelectable = new ImageView(getContext());
+            enemyIconSelectable.setElevation(getActivity().getResources().getDimension(R.dimen.action_icon_elevation));
             // converted value from dp to int for layoutParam
             ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(sizeDP, sizeDP);
             enemyIconSelectable.setLayoutParams(params);
@@ -360,7 +376,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 weaponRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
             }
-
             @Override
             public void onInfoClick(Inventory object) {
                 InventoryActivity(object);
@@ -375,7 +390,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 abilityRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
             }
-
             @Override
             public void onInfoClick(Inventory object) {
                 InventoryActivity(object);
@@ -390,7 +404,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 abilityRV.unSelectIfOneSelected();
                 weaponRV.unSelectIfOneSelected();
             }
-
             @Override
             public void onInfoClick(Inventory object) {
                 InventoryActivity(object);

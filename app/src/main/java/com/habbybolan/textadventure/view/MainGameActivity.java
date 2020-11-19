@@ -45,7 +45,7 @@ public class MainGameActivity extends AppCompatActivity {
         // if viewModels not yet initiated, so initiate them
         if (!CharacterViewModel.isInitiated()) {
             characterViewModel = CharacterViewModel.init(getApplicationContext());
-            mainGameViewModel = MainGameViewModel.init(getApplicationContext(), characterViewModel);
+            mainGameViewModel = MainGameViewModel.init(getApplication(), characterViewModel);
         } else {
             characterViewModel = CharacterViewModel.getInstance();
             mainGameViewModel = MainGameViewModel.getInstance();

@@ -18,15 +18,6 @@ public class SellGridAdapter extends BaseAdapter {
 
     private ArrayList<GridModel> listGridModel;
 
-    private static SellGridAdapter adapterInstance;
-
-    static SellGridAdapter getInstance(ArrayList<GridModel> listGridModel) {
-        if (adapterInstance == null) {
-            adapterInstance = new SellGridAdapter(listGridModel);
-        }
-        return adapterInstance;
-    }
-
     public SellGridAdapter(ArrayList<GridModel> listGridModel) {
         this.listGridModel = listGridModel;
     }

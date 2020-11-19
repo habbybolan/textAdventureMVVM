@@ -6,9 +6,8 @@ import com.habbybolan.textadventure.model.GridModel;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryFactory;
 import com.habbybolan.textadventure.model.inventory.Item;
-import com.habbybolan.textadventure.model.inventory.weapon.Attack;
-import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
@@ -105,33 +104,8 @@ public class ShopViewModel extends EncounterViewModel  {
         JSONArray buyArray = mainGameVM.getSavedEncounter().getJSONArray(BUY_LIST);
         for (int i = 0; i < buyArray.length(); i++) {
             JSONObject gridObject = buyArray.getJSONObject(i);
-            GridModel gridModel = new GridModel(getInventoryFromJSON(gridObject.getString(BUY_INVENTORY)), gridObject.getInt(BUY_COST));
+            GridModel gridModel = new GridModel(InventoryFactory.createInventory(gridObject.getString(BUY_INVENTORY)), gridObject.getInt(BUY_COST));
             listGridModelBuy.add(gridModel);
-        }
-    }
-
-    /**
-     * Helper for creating the inventory object from a JSON String
-     * @param invString         JSON String to be converted into an Inventory object
-     * @return                  The Inventory object from invString
-     * @throws JSONException    if formatting error in JSON String
-     */
-    private Inventory getInventoryFromJSON(String invString) throws JSONException {
-        JSONObject object = new JSONObject(invString);
-        String type = object.getString(Inventory.INVENTORY_TYPE);
-        switch (type) {
-            case Inventory.TYPE_ABILITY:
-                return new Ability(invString);
-            case Inventory.TYPE_ITEM:
-                return new Item(invString);
-            case Inventory.TYPE_WEAPON:
-                return new Weapon(invString);
-            case Inventory.TYPE_ATTACK:
-                return new Attack(invString);
-            case Inventory.TYPE_S_ATTACK:
-                return new SpecialAttack(invString);
-            default:
-                throw new IllegalArgumentException();
         }
     }
 
@@ -223,11 +197,12 @@ public class ShopViewModel extends EncounterViewModel  {
         GridModel gridModel = listGridModelSell.get(position);
         // remove from sell list
         listGridModelSell.remove(position);
-        // add to buy list
-        listGridModelBuy.add(gridModel.buySoldInventory());
-        characterVM.removeInventory(gridModel.getInventory());
         // add cost to character for selling
         characterVM.goldChange(gridModel.getCost());
+        // add to buy list
+        listGridModelBuy.add(gridModel.buySoldInventory());
+        // remove from inventory
+        characterVM.removeInventory(gridModel.getInventory());
     }
 
     /**

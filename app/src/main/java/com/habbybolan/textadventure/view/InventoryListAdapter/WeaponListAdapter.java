@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
+import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.databinding.WeaponListDetailsBinding;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
@@ -45,22 +46,26 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
         holder.binding.attackContainer.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         holder.binding.sAttackContainer.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
 
+        // bindings for the inflated inventory_snippet layout inside weapon_list_details snippet
+        InventorySnippetBinding attackBinding = holder.binding.attackSnippet;
+        InventorySnippetBinding sAttackBinding = holder.binding.sAttackSnippet;
+
         if (isExpanded) {
             previousExpandedPosition = position;
             if (selectedPosition == 0) {
-                holder.binding.txtName.setTextColor(Color.RED);
-                holder.binding.txtNameSAttack.setTextColor(Color.BLACK);
+                attackBinding.txtName.setTextColor(Color.RED);
+                sAttackBinding.txtName.setTextColor(Color.BLACK);
             }
             else if (selectedPosition == 1) {
-                holder.binding.txtName.setTextColor(Color.BLACK);
-                holder.binding.txtNameSAttack.setTextColor(Color.RED);
+                attackBinding.txtName.setTextColor(Color.BLACK);
+                sAttackBinding.txtName.setTextColor(Color.RED);
             } else {
-                holder.binding.txtName.setTextColor(Color.BLACK);
-                holder.binding.txtNameSAttack.setTextColor(Color.BLACK);
+                attackBinding.txtName.setTextColor(Color.BLACK);
+                sAttackBinding.txtName.setTextColor(Color.BLACK);
             }
         } else {
-            holder.binding.txtName.setTextColor(Color.BLACK);
-            holder.binding.txtNameSAttack.setTextColor(Color.BLACK);
+            attackBinding.txtName.setTextColor(Color.BLACK);
+            sAttackBinding.txtName.setTextColor(Color.BLACK);
         }
 
         holder.binding.weaponContainer.setOnClickListener(new View.OnClickListener() {
@@ -72,6 +77,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
             }
         });
 
+        // get all resources to set into the views
         String weaponName = weapons.get(position).getName();
         int weaponIconResource = weapons.get(position).getPictureResource();
         String attackName = weapons.get(position).getAttack().getName();
@@ -86,12 +92,21 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
         WeaponListDetailsBinding binding;
         InventoryClickListener inventoryClickListener;
 
+        // bindings for the inflated inventory_snippet layout inside weapon_list_details snippet
+        InventorySnippetBinding attackBinding;
+        InventorySnippetBinding sAttackBinding;
+
         ViewHolder(final WeaponListDetailsBinding binding, final InventoryClickListener inventoryClickListener, final WeaponListAdapter adapter) {
             super(binding.getRoot());
             this.binding = binding;
             this.inventoryClickListener = inventoryClickListener;
 
-            binding.txtName.setOnClickListener(new View.OnClickListener() {
+            // bindings for the inflated inventory_snippet layout inside weapon_list_details snippet
+            attackBinding = binding.attackSnippet;
+            sAttackBinding = binding.sAttackSnippet;
+
+            // selected attack
+            attackBinding.txtName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     adapter.selectedPosition = 0;
@@ -99,15 +114,16 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
                     adapter.notifyDataSetChanged();
                 }
             });
-
-            binding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+            // selected attack info button
+            attackBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     inventoryClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getAttack());
                 }
             });
 
-            binding.txtNameSAttack.setOnClickListener(new View.OnClickListener() {
+            // selected special attack
+            sAttackBinding.txtName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     adapter.notifyItemChanged(adapter.selectedPosition);
@@ -116,8 +132,8 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
                     adapter.notifyItemChanged(getAdapterPosition());
                 }
             });
-
-            binding.inventoryInfoSAttack.setOnClickListener(new View.OnClickListener() {
+            // selected special attack info button
+            sAttackBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     inventoryClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getSpecialAttack());
@@ -128,10 +144,10 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
         void bind(String weaponName, int weaponIconResource, String attackName, int attackIconResource, String sAttackName, int sAttackIconResource) {
             binding.setWeaponIconResource(weaponIconResource);
             binding.setWeaponName(weaponName);
-            binding.setAttackIconResource(attackIconResource);
-            binding.setAttackName(attackName);
-            binding.setSAttackIconResource(sAttackIconResource);
-            binding.setSAttackName(sAttackName);
+            attackBinding.setInventoryPic(attackIconResource);
+            attackBinding.setInventoryName(attackName);
+            sAttackBinding.setInventoryPic(sAttackIconResource);
+            sAttackBinding.setInventoryName(sAttackName);
             binding.executePendingBindings();
         }
     }

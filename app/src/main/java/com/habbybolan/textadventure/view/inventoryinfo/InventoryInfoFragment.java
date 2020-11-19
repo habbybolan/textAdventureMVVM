@@ -56,8 +56,10 @@ public class InventoryInfoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
+            // get the saved, bundled inventory string
             inventoryString = savedInstanceState.getString(INVENTORY_ARG);
         } else {
+            // otherwise, no save exists, so retrieve the inventory string from the viewModel
             inventoryString = inventoryInfoVM.getInventoryString();
         }
     }

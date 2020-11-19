@@ -332,8 +332,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // decrement the duration of all temp incr stat durations
-    public ArrayList<TempStat> decrementTempStatIncrDuration() {
-        ArrayList<TempStat> tempStats = new ArrayList<>();
+    public void decrementTempStatIncrDuration() {
         for (int i = 0; i < statIncreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
             int duration = statIncreaseList.get(i).getDuration();
@@ -341,17 +340,14 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             // if duration is 0 after decrement, remove the stat change
             if (duration-1 == 0) {
                 TempStat tempStat = statIncreaseList.get(i);
-                tempStats.remove(tempStat);
                 statIncreaseList.remove(i);
                 i--;
                 undoStatIncrease(tempStat);
             }
         }
-        return tempStats;
     }
     // decrement the duration of all temp decr stat durations
-    public ArrayList<TempStat> decrementTempStatDecrDuration() {
-        ArrayList<TempStat> tempStats = new ArrayList<>();
+    public void decrementTempStatDecrDuration() {
         for (int i = 0; i < statDecreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
             int duration = statDecreaseList.get(i).getDuration();
@@ -359,13 +355,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             // if duration is 0 after decrement, remove the stat change
             if (duration-1 == 0) {
                 TempStat tempStat = statDecreaseList.get(i);
-                tempStats.remove(tempStat);
                 statDecreaseList.remove(i);
                 i--;
                 undoStatDecrease(tempStat);
             }
         }
-        return tempStats;
     }
 
     // undo a stat increase

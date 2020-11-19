@@ -215,7 +215,8 @@ public abstract class EncounterViewModel extends AndroidViewModel {
      * @throws JSONException    if formatting error in jsonObject JSON string
      */
     private DialogueType JSONObjectToDialogueType(JSONObject jsonObject) throws JSONException {
-        switch (jsonObject.getString(DialogueType.DIALOGUE_TYPE)) {
+        String type = jsonObject.getString(DialogueType.DIALOGUE_TYPE);
+        switch (type) {
             case DialogueType.TYPE_DIALOGUE:
                 return new Dialogue(jsonObject.getString(DialogueType.DIALOGUE));
             case DialogueType.TYPE_EFFECT:
@@ -243,14 +244,12 @@ public abstract class EncounterViewModel extends AndroidViewModel {
             case DialogueType.TYPE_EXP:
                 return new ExpDialogue(jsonObject.getInt(DialogueType.AMOUNT));
             default:
-                throw new IllegalArgumentException("Incorrect dialogue key");
+                throw new IllegalArgumentException(type + " is not a type listed in the switch.");
         }
     }
 
-    // saved encounter
-
     /**
-     * get the saved Inventory Object from the json
+     * Get the saved Inventory Object from the json if there is one.
      * @return                  The saved inventory Object if one exists, otherwise return null.
      * @throws JSONException    For JSON formatting error in serialized Inventory object.
      */
@@ -262,11 +261,9 @@ public abstract class EncounterViewModel extends AndroidViewModel {
             if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_ABILITY)) {
                 // saved Inventory object is an Ability
                 return new Ability(inventory.toString());
-
             } else if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_ITEM)) {
                 // saved Inventory object is an Item
                 return new Item(inventory.toString());
-
             } else if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_WEAPON)) {
                 // otherwise, saved Inventory object is a Weapon
                 return new Weapon(inventory.toString());
@@ -288,6 +285,7 @@ public abstract class EncounterViewModel extends AndroidViewModel {
     }
 
     private boolean isSaved = false;
+    // notify there is a saved encounter to enter
     public void setIsSaved(boolean isSaved) {
         this.isSaved = isSaved;
     }

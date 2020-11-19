@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.databinding.AbilityItemListDetailsBinding;
+import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        AbilityItemListDetailsBinding bindingDialogue = DataBindingUtil.inflate(layoutInflater, R.layout.ability_item_list_details, parent, false);
+        InventorySnippetBinding bindingDialogue = DataBindingUtil.inflate(layoutInflater, R.layout.inventory_snippet, parent, false);
         return new AbilityItemListAdapter.ViewHolder(bindingDialogue, inventoryClickListener, this);
     }
 
@@ -50,10 +50,10 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        AbilityItemListDetailsBinding binding;
+        InventorySnippetBinding binding;
         InventoryClickListener inventoryClickListener;
 
-        ViewHolder(final AbilityItemListDetailsBinding binding, final InventoryClickListener inventoryClickListener, final AbilityItemListAdapter adapter) {
+        ViewHolder(final InventorySnippetBinding binding, final InventoryClickListener inventoryClickListener, final AbilityItemListAdapter adapter) {
             super(binding.getRoot());
             this.binding = binding;
             this.inventoryClickListener = inventoryClickListener;
@@ -77,8 +77,8 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
         }
 
         void bind(String name, int iconResource) {
-            binding.setIconResource(iconResource);
-            binding.setName(name);
+            binding.setInventoryPic(iconResource);
+            binding.setInventoryName(name);
             binding.executePendingBindings();
         }
     }

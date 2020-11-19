@@ -108,74 +108,62 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrIncrease());
             characterEntity.addNewStatIncrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatIncrObserver.add(tempStat);
         }
         if (ability.getIntIncrease() != 0) {
             tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntIncrease());
             characterEntity.addNewStatIncrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatIncrObserver.add(tempStat);
         }
         if (ability.getConIncrease() != 0) {
             tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConIncrease());
             characterEntity.addNewStatIncrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatIncrObserver.add(tempStat);
         }
         if (ability.getSpdIncrease() != 0) {
             tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdIncrease());
             characterEntity.addNewStatIncrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatIncrObserver.add(tempStat);
         }
         if (ability.getEvadeIncrease() != 0) {
             tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeIncrease());
             characterEntity.addNewStatIncrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatIncrObserver.add(tempStat);
         }
         if (ability.getBlockIncrease() != 0) {
             tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockIncrease());
             characterEntity.addNewStatIncrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatIncrObserver.add(tempStat);
         }
         // stat decreases
         if (ability.getStrDecrease() != 0) {
             tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrDecrease());
             characterEntity.addNewStatDecrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatDecrObserver.add(tempStat);
         }
         if (ability.getIntDecrease() != 0) {
             tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntDecrease());
             characterEntity.addNewStatDecrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatDecrObserver.add(tempStat);
         }
         if (ability.getConDecrease() != 0) {
             tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConDecrease());
             characterEntity.addNewStatDecrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatDecrObserver.add(tempStat);
         }
         if (ability.getSpdDecrease() != 0) {
             tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdDecrease());
             characterEntity.addNewStatDecrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatDecrObserver.add(tempStat);
         }
         if (ability.getEvadeDecrease() != 0) {
             tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeDecrease());
             characterEntity.addNewStatDecrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatDecrObserver.add(tempStat);
         }
         if (ability.getBlockDecrease() != 0) {
             tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockDecrease());
             characterEntity.addNewStatDecrease(tempStat);
             notifyStatChange(tempStat);
-            tempStatDecrObserver.add(tempStat);
         }
         // temp extra health
         TempBar tempBar;
@@ -257,14 +245,12 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     // STATS
 
     public ObservableArrayList<TempStat> getTempStatIncrObserver() {
-        return tempStatIncrObserver;
+        return characterEntity.getStatIncreaseList();
     }
-    private ObservableArrayList<TempStat> tempStatIncrObserver = new ObservableArrayList<>();
 
     public ObservableArrayList<TempStat> getTempStatDecrObserver() {
-        return tempStatDecrObserver;
+        return characterEntity.getStatDecreaseList();
     }
-    private ObservableArrayList<TempStat> tempStatDecrObserver = new ObservableArrayList<>();
 
     // Observer for when the stat value changes
     public ObservableField<TempStat>  getUpdateAllStatChange() {
@@ -276,10 +262,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     public void addInputStat(TempStat tempStat) {
         if (tempStat.getAmount() > 0) {
             characterEntity.addNewStatIncrease(tempStat);
-            tempStatIncrObserver.add(tempStat);
         } else {
             characterEntity.addNewStatDecrease(tempStat);
-            tempStatDecrObserver.add(tempStat);
         }
         notifyStatChange(tempStat);
     }
@@ -346,16 +330,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
 
     // decrement the temp incr and decr stat durations
     public void decrementTempStatDuration() {
-        ArrayList<TempStat> statIncrRemoved = characterEntity.decrementTempStatIncrDuration();
-        for (TempStat tempStat : statIncrRemoved) {
-            tempStatIncrObserver.remove(tempStat);
-            notifyStatChange(tempStat);
-        }
-        ArrayList<TempStat> statDecrRemoved = characterEntity.decrementTempStatDecrDuration();
-        for (TempStat tempStat : statDecrRemoved) {
-            tempStatDecrObserver.remove(tempStat);
-            notifyStatChange(tempStat);
-        }
+        characterEntity.decrementTempStatIncrDuration();
+        characterEntity.decrementTempStatDecrDuration();
     }
 
     // BARS

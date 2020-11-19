@@ -114,6 +114,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
             }
         });
 
+
         // gain inventory item button
         String tempText = "Temp. Increase";
         DefaultButtonDetailsBinding bindingTemp = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, tempText, getActivity());

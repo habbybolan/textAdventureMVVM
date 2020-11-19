@@ -245,24 +245,42 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
 
 
     /**
-     *  Sets up the button to swap between the sell and buy gridViews
+     *  Sets up the button to swap between the sell and buy gridViews.
      */
     private void setUpSellBuyBtn() {
         shopBinding.btnSell.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shopBinding.gridBuy.setVisibility(View.GONE);
-                shopBinding.gridSell.setVisibility(View.VISIBLE);
+                onSellBtnClick();
             }
         });
 
         shopBinding.btnBuy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shopBinding.gridSell.setVisibility(View.GONE);
-                shopBinding.gridBuy.setVisibility(View.VISIBLE);
+                onBuyBtnClick();
             }
         });
+        onBuyBtnClick();
+    }
+
+    /**
+     * Set Buy grid as visible and set Buy button as selected so it stays pressed.
+     */
+    private void onBuyBtnClick() {
+        shopBinding.gridBuy.setVisibility(View.VISIBLE);
+        shopBinding.btnBuy.setSelected(true);
+        shopBinding.gridSell.setVisibility(View.GONE);
+        shopBinding.btnSell.setSelected(false);
+    }
+    /**
+     * Set Sell grid as visible and set Sell button as selected so it stays pressed.
+     */
+    private void onSellBtnClick() {
+        shopBinding.gridSell.setVisibility(View.VISIBLE);
+        shopBinding.btnSell.setSelected(true);
+        shopBinding.gridBuy.setVisibility(View.GONE);
+        shopBinding.btnBuy.setSelected(false);
     }
 
     @Override

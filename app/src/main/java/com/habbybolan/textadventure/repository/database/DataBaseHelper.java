@@ -69,7 +69,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     // Open the database, so we can query it
-    public boolean openDataBase() throws SQLException {
+    boolean openDataBase() throws SQLException {
         // Log.v("DB_PATH", DB_FILE.getAbsolutePath());
         mDataBase = SQLiteDatabase.openDatabase(DB_PATH, null, SQLiteDatabase.OPEN_READONLY);
         // mDataBase = SQLiteDatabase.openDatabase(DB_FILE, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);

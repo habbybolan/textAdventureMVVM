@@ -75,6 +75,7 @@
                     android:layout_width="@dimen/combat_character_action_icon_size"
                     android:layout_height="@dimen/combat_character_action_icon_size"
                     android:layout_gravity="center"
+                    android:elevation="@dimen/action_icon_elevation"
                     app:imageResource="@{characterVM.drawableResID}"/>
 
                 <LinearLayout
@@ -87,25 +88,19 @@
 
                     <Button
                         android:id="@+id/rv_category_weapons"
-                        style="@style/DefaultButton"
-                        android:layout_width="@dimen/default_btn_width"
-                        android:layout_height="@dimen/default_btn_height"
+                        style="@style/DefaultToggleButton"
                         android:text="@string/category_weapons_option"
                         android:textSize="@dimen/txt_size_medium" />
 
                     <Button
                         android:id="@+id/rv_category_abilities"
-                        style="@style/DefaultButton"
-                        android:layout_width="@dimen/default_btn_width"
-                        android:layout_height="@dimen/default_btn_height"
+                        style="@style/DefaultToggleButton"
                         android:text="@string/category_abilities_option"
                         android:textSize="@dimen/txt_size_medium" />
 
                     <Button
                         android:id="@+id/rv_category_items"
-                        style="@style/DefaultButton"
-                        android:layout_width="@dimen/default_btn_width"
-                        android:layout_height="@dimen/default_btn_height"
+                        style="@style/DefaultToggleButton"
                         android:text="@string/category_items_option"
                         android:textSize="@dimen/txt_size_medium" />
 
@@ -120,22 +115,21 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_weapons"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="visible" />
+                        android:layout_height="wrap_content" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_abilities"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_items"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
                 </RelativeLayout>
 
@@ -150,6 +144,7 @@
                         android:layout_width="@dimen/default_btn_width"
                         android:layout_height="@dimen/default_btn_height"
                         android:visibility="gone"
+                        android:layout_marginTop="5dp"
                         android:textSize="@dimen/txt_size_medium"
                         android:text="@string/btn_run">
                     </Button>

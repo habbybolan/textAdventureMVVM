@@ -95,12 +95,10 @@ public class JsonAssetFileReader {
                 // encounterTemp: encounter data to retrieve, store and return
                 JSONObject encounterTemp = jsonArray.getJSONObject(location);
                 jsonArray = encounterTemp.getJSONArray(location_type);
-                // get a random type of encounter // todo: control the weighting of the randomness for the type of encounter
-                //encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
 
                 // get random outdoor encounter with weighting
-                //encounterTemp = jsonArray.getJSONObject(Outdoor.getRandomEncounter());
-                encounterTemp = jsonArray.getJSONObject(Outdoor.SHOP);
+                encounterTemp = jsonArray.getJSONObject(Outdoor.getRandomEncounter());
+                //encounterTemp = jsonArray.getJSONObject(Outdoor.COMBAT);
 
                 // put type into encounter
                 String type = encounterTemp.getString(TYPE);

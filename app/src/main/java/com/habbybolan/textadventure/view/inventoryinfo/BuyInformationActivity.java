@@ -22,6 +22,7 @@ public class BuyInformationActivity extends InventoryInfoDisplay {
 
     private int position;
     ActivityBuyInformationBinding binding;
+    private final PopupWindow popupWindow = new PopupWindow();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +58,18 @@ public class BuyInformationActivity extends InventoryInfoDisplay {
      */
     public void confirmBuy(View view) {
         if (!ShopFragment.getInstance().buyInventory(position))
-            CustomPopupWindow.setTempMessage("You don't have enough gold.", this, new PopupWindow(), binding.shopBuyContainer);
+            CustomPopupWindow.setTempMessage("You don't have enough gold.", this, popupWindow, binding.shopBuyContainer);
         else {
             finish();
             overridePendingTransition(R.anim.fade_in, R.anim.exit_to_right);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (popupWindow.isShowing())
+            popupWindow.dismiss();
     }
 
 

@@ -58,10 +58,6 @@ public abstract class Effect implements Comparable<Effect>{
                 || getType().equals(EVASION) || getType().equals(BLOCK);
     }
 
-    public boolean isTempBar() {
-        return getType().equals(TEMP_HEALTH) || getType().equals(TEMP_MANA);
-    }
-
     // returns the drawable resource ID for the icon
     abstract int getIcon();
 }

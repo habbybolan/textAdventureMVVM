@@ -42,7 +42,6 @@ public class CombatViewModel extends EncounterViewModel {
     public static final int fifthState = 5;
     public static final int sixthState = 6;
 
-
     // inventory reward able to retrieve at the end of the encounter
     private Inventory inventoryToRetrieve = null;
 

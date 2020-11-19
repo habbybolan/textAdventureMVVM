@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:rowCount="2"
-                android:columnCount="2">
+                android:columnCount="3">
             </GridLayout>
 
             <androidx.recyclerview.widget.RecyclerView
