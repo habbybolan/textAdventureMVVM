@@ -68,15 +68,19 @@ public class DialogueRecyclerView {
         setExpListener();
     }
 
-    // Dialogue for adding basic String text
+    // Dialogue listeners for player character
+
+    /**
+     * Dialogue for adding basic String text
+     * @param dialogue  Simple text dialogue to display
+     */
     public void addDialogue(Dialogue dialogue) {
         adapter.addNewDialogue(dialogue);
     }
-    // Dialogue for adding combat actions from enemies and character
-    public void addNewCombatDialogue(CombatActionDialogue dialogue) {
-        adapter.addNewDialogue(dialogue);
-    }
-    // Dialogue for adding new Item
+
+    /**
+     *  Dialogue for adding new Item
+     */
     private void setItemListener() {
         Observable.OnPropertyChangedCallback callBackItemAdd = new Observable.OnPropertyChangedCallback() {
             @Override
@@ -102,7 +106,10 @@ public class DialogueRecyclerView {
         };
         characterVM.getItemObserverRemove().addOnPropertyChangedCallback(callBackItemRemove);
     }
-    // Dialogue for adding new Weapon
+
+    /**
+     *  Dialogue for adding new Weapon
+     */
     private void setWeaponListener() {
         Observable.OnPropertyChangedCallback callBackWeaponAdd = new Observable.OnPropertyChangedCallback() {
             @Override
@@ -128,7 +135,10 @@ public class DialogueRecyclerView {
         };
         characterVM.getWeaponObserverRemove().addOnPropertyChangedCallback(callBackWeaponRemove);
     }
-    // Dialogue for adding new Ability scroll
+
+    /**
+     *  Dialogue for adding new Ability scroll
+     */
     private void setAbilityListener() {
         Observable.OnPropertyChangedCallback callBackAbilityAdd = new Observable.OnPropertyChangedCallback() {
             @Override
@@ -156,7 +166,10 @@ public class DialogueRecyclerView {
 
 
     }
-    // listener for change in health
+
+    /**
+     *  listener for change in health
+     */
     private void setHealthListener() {
         Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
             @Override
@@ -169,7 +182,10 @@ public class DialogueRecyclerView {
         };
         characterVM.getHealthObserve().addOnPropertyChangedCallback(callBack);
     }
-    // listener for change in health
+
+    /**
+     *  listener for change in health
+     */
     private void setManaListener() {
         Observable.OnPropertyChangedCallback callBack = new Observable.OnPropertyChangedCallback() {
             @Override
@@ -182,7 +198,10 @@ public class DialogueRecyclerView {
         };
         characterVM.getManaObserve().addOnPropertyChangedCallback(callBack);
     }
-    // dialogue for adding Dot Effects
+
+    /**
+     *  dialogue for adding Dot Effects
+     */
     private void setDotListener() {
         // observed whenever CharacterViewModel observes change in dotList
         characterVM.getDotList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
@@ -204,7 +223,10 @@ public class DialogueRecyclerView {
             public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
         });
     }
-    // dialogue for adding Special Effects
+
+    /**
+     *  dialogue for adding Special Effects
+     */
     private void setSpecialListener() {
         // observed whenever CharacterViewModel observes change in dotList
         characterVM.getSpecialList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
@@ -226,7 +248,10 @@ public class DialogueRecyclerView {
             public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
         });
     }
-    // Dialogue for adding new stats
+
+    /**
+     *  Dialogue for adding new stats
+     */
     private void setTempStatListener() {
         // observed whenever CharacterViewModel observes change in statIncrList
         characterVM.getTempStatIncrObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
@@ -268,7 +293,10 @@ public class DialogueRecyclerView {
             public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
         });
     }
-    // Dialogue for adding temp Mana/health increases
+
+    /**
+     *  Dialogue for adding temp Mana/health increases
+     */
     private void setBarListener() {
         // observed whenever CharacterViewModel observes change in dotList
         characterVM.getBarObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
@@ -290,7 +318,10 @@ public class DialogueRecyclerView {
             public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
         });
     }
-    // Dialogue for changing stat
+
+    /**
+     *  Dialogue for changing stat
+     */
     private void setStatListener() {
         // observer for when stat is decreased
         Observable.OnPropertyChangedCallback callBackDecr = new Observable.OnPropertyChangedCallback() {
@@ -305,7 +336,10 @@ public class DialogueRecyclerView {
         };
         characterVM.getUpdateAllStatChange().addOnPropertyChangedCallback(callBackDecr);
     }
-    // Dialogue for gold change
+
+    /**
+     *  Dialogue for gold change
+     */
     private void setGoldListener() {
         // observe when gold changed
         Observable.OnPropertyChangedCallback callBackGold = new Observable.OnPropertyChangedCallback() {
@@ -318,7 +352,10 @@ public class DialogueRecyclerView {
         };
         characterVM.getGoldObserve().addOnPropertyChangedCallback(callBackGold);
     }
-    // Dialogue for gold change
+
+    /**
+     *  Dialogue for gold change
+     */
     private void setExpListener() {
         // observe when gold changed
         Observable.OnPropertyChangedCallback callBackExp = new Observable.OnPropertyChangedCallback() {
@@ -332,10 +369,20 @@ public class DialogueRecyclerView {
         characterVM.getExpObserve().addOnPropertyChangedCallback(callBackExp);
     }
 
+    /**
+     *  Dialogue for adding combat actions from enemies and character
+     * @param dialogue  String dialogue to display an attacker and target
+     */
+    public void addNewCombatDialogue(CombatActionDialogue dialogue) {
+        adapter.addNewDialogue(dialogue);
+    }
+
     public ArrayList<DialogueType> getDialogueList() {
         return adapter.getDialogueList();
     }
 
+    // Dialogue listener for enemies
+    // todo:
 
     private ArrayList<EnemyViewModel> enemyViewModels;
     public void addEnemyDialogue(ArrayList<EnemyViewModel> enemyViewModels) {

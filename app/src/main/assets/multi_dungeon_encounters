@@ -42,7 +42,7 @@
                             "next":{"dialogue":"With only a second to react, time comes to a halt as you decide your next action."}}
                         ],
             "fail":{"dialogue":"You weren't fast enough. The unknown object hits you in the head and you fall to the ground, everything going black in an instant.",
-                    "debuff":[{"debuff":"stun", "duration":"1"}, {"debuff":"bleed"}]},
+                    "debuff":[{"debuff":"bleed"}]},
             "success":"jumping to the side, you are able to just barely avoid a large branch that smashes into the ground, creating a ripple through the surrounding leaves."
             },
 

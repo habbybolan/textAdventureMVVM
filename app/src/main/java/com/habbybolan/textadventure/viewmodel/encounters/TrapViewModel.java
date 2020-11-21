@@ -86,12 +86,10 @@ public class TrapViewModel extends EncounterViewModel {
         for (int i = 0; i < debuffs.length(); i++) {
             JSONObject debuff = debuffs.getJSONObject(i);
             String debuffType = debuff.getString("debuff");
+            if (SpecialEffect.isSpecial(debuffType)) throw new IllegalArgumentException("Can't have special effects applied from traps");
             if (Dot.isDot(debuffType)) {
                 // debuff is a Dot
                 characterVM.addInputDot(new Dot(debuffType, false));
-            } else if (SpecialEffect.isSpecial(debuffType)) {
-                // debuff is a special effect
-                characterVM.addInputSpecial(new SpecialEffect(debuffType, debuff.getInt("duration")));
             } else {
                 // otherwise, debuff is direct damage
                 characterVM.damageCharacterEntity(debuff.getInt("damage"));

@@ -235,6 +235,7 @@ public class SaveDataLocally {
         String fileName = context.getResources().getString(R.string.fileEncounter);
         String jsonString = objectToSave.toString();
         try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
+            fos.write("".getBytes());
             fos.write(jsonString.getBytes());
         } catch (IOException e) {
             e.printStackTrace();

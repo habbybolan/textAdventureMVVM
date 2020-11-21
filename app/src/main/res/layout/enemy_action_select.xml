@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="enemyVM"
+            type="com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel" />
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/enemy_icon"
+            android:layout_width="@dimen/combat_enemy_action_icon_size"
+            android:layout_height="@dimen/combat_enemy_action_icon_size"
+            app:imageResource="@{enemyVM.drawableResID}"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/enemy_icon"
+            android:layout_alignEnd="@+id/enemy_icon"
+            android:layout_alignStart="@+id/enemy_icon"
+            android:gravity="center" 
+            app:current="@{enemyVM.health}"
+            app:max="@{enemyVM.maxHealth}"/>
+
+    </RelativeLayout>
+</layout>

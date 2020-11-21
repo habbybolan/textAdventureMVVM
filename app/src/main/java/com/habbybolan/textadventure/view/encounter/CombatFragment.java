@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
 import androidx.annotation.NonNull;
@@ -18,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
+import com.habbybolan.textadventure.databinding.EnemyActionSelectBinding;
 import com.habbybolan.textadventure.databinding.FragmentCombatBinding;
-import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.inventory.Action;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
@@ -31,6 +29,7 @@ import com.habbybolan.textadventure.view.InventoryListAdapter.WeaponListRecycler
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
 import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
@@ -89,6 +88,9 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
         combatVM = new ViewModelProvider(this).get(CombatViewModel.class);
         try {
             rv = setUpEncounterBeginning(combatVM, this, combatBinding.rvDialogue);
+            initiateCombatInfo();
+            // test
+            combatVM.getEnemies().get(0).getEnemy().serializeToJSON();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -146,6 +148,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 characterVM.setStateInventoryObserver(false);
                 // character turn state
                 isCharacterViewsEnabled(true);
+                combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
                 characterTurnState();
                 break;
             case CombatViewModel.fifthState:
@@ -153,6 +156,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 characterVM.setStateInventoryObserver(false);
                 // enemy turn state
                 isCharacterViewsEnabled(false);
+                combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
                 enemyTurnState();
                 break;
             case CombatViewModel.sixthState:
@@ -165,8 +169,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 endState();
                 break;
         }
-        // set the isSaved to false to signal that the save has been retrieved
-        combatVM.setIsSaved(false);
     }
 
     // UI before combat, asking player to enter combat or attempt to escape
@@ -307,33 +309,31 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      * creates the icons for the enemies that will be selected for applying the character action
      */
     private void setActionSelect() {
-        final int sizeDP = getResources().getDimensionPixelSize(R.dimen.combat_enemy_action_icon_size);
         for (EnemyViewModel enemyVM : combatVM.getEnemies()) {
-            ImageView enemyIconSelectable = new ImageView(getContext());
-            enemyIconSelectable.setElevation(getActivity().getResources().getDimension(R.dimen.action_icon_elevation));
-            // converted value from dp to int for layoutParam
-            ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(sizeDP, sizeDP);
-            enemyIconSelectable.setLayoutParams(params);
-            enemyIconSelectable.setTag(enemyVM.getEnemy());
+            View view = getLayoutInflater().inflate(R.layout.enemy_action_select, null);
+            EnemyActionSelectBinding binding = DataBindingUtil.bind(view);
+            // set up enemy action icon values
+            binding.setEnemyVM(enemyVM);
 
-            enemyIconSelectable.setImageResource(enemyVM.getEnemy().getDrawableResID());
+            // store viewModel of enemy to be used inside clicker
+            binding.enemyIcon.setTag(enemyVM);
             // on click, use the selected action
-            enemyIconSelectable.setOnClickListener(new View.OnClickListener() {
+            binding.enemyIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     v.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.icon_action_target));
                     // perform action
-                    characterActionOnClick((CharacterEntity) v.getTag());
+                    characterActionOnClick((EnemyViewModel) v.getTag());
                 }
             });
-            combatBinding.enemyActionIcons.addView(enemyIconSelectable);
+            combatBinding.enemyActionIcons.addView(view);
         }
         combatBinding.characterActionIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 v.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.icon_action_target));
                 // perform action
-                characterActionOnClick(characterVM.getCharacter());
+                characterActionOnClick(characterVM);
             }
         });
     }
@@ -342,13 +342,13 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      * Helper for performing character action on icon click, or displaying action error message.
      * @param target    The CharacterEntity action is used on
      */
-    private void characterActionOnClick(CharacterEntity target) {
+    private void characterActionOnClick(CharacterEntityViewModel target) {
         if (combatVM.characterAction(target)) {
             // action is valid and performed, so update the combat ordering
             notifyCombatOrderNextTurn();
         } else {
             // otherwise the action failed, get the error message from combatVM and display with popup window
-            String error = combatVM.getActionError(target);
+            String error = combatVM.getActionError(target.getCharacterEntity());
             CustomPopupWindow.setTempMessage(error, getContext(), new PopupWindow(), combatBinding.container);
         }
     }
@@ -358,8 +358,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      * is also started here based on the CharacterEntity in the front of the combat ordering by calling setFirstTurn.
      */
     private void startCombatState() {
-        combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
-        initiateCombatInfo();
         combatVM.setFirstTurn();
     }
 

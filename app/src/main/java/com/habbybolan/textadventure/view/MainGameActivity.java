@@ -1,6 +1,7 @@
 package com.habbybolan.textadventure.view;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,6 +55,8 @@ public class MainGameActivity extends AppCompatActivity {
         mainGameBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_game);
         mainGameBinding.setMainGameViewModel(mainGameViewModel);
         mainGameBinding.setCharacterViewModel(characterViewModel);
+        // game fragment shows first, select its category button
+        mainGameBinding.btnGame.setSelected(true);
 
         CharacterFragment characterFragment = new CharacterFragment(characterViewModel);
         getSupportFragmentManager()
@@ -177,6 +180,30 @@ public class MainGameActivity extends AppCompatActivity {
                 break;
             default: //  shouldn't reach here
                 throw new IllegalArgumentException("No encounter of " + encounterType);
+        }
+    }
+
+    /**
+     * Clicker for btn_character to swap to character fragment
+     * @param v Button view
+     */
+    public void characterButtonClick(View v) {
+        if (mainGameViewModel.isCharacterFragmentGone()) {
+            mainGameViewModel.gotoCharacterFragment();
+            mainGameBinding.btnCharacter.setSelected(true);
+            mainGameBinding.btnGame.setSelected(false);
+        }
+    }
+
+    /**
+     * Clicker for btn_game to swap to game fragment
+     * @param v button view
+     */
+    public void gameButtonClick(View v) {
+        if (mainGameViewModel.isGameFragmentGone()) {
+            mainGameViewModel.gotoGameFragment();
+            mainGameBinding.btnCharacter.setSelected(false);
+            mainGameBinding.btnGame.setSelected(true);
         }
     }
 

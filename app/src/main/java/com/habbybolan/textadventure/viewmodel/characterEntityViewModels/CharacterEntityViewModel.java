@@ -22,6 +22,7 @@ import java.util.Random;
 
 public abstract class CharacterEntityViewModel extends BaseObservable {
 
+    // The player character or Enemy Character
     CharacterEntity characterEntity;
 
     // ** Abilities **
@@ -94,12 +95,12 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         // direct heal/mana
         if (ability.getHealMin() != 0) {
             int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
-            int healthChanged = characterEntity.increaseHealth(randHealthChange);
+            int healthChanged = characterEntity.changeHealthCurr(randHealthChange);
             notifyChangeHealth(healthChanged);
         }
         if (ability.getManaMin() != 0) {
             int randManaChange = rand.nextInt(ability.getManaMax() - ability.getManaMin()) + ability.getManaMin();
-            int manaChanged = characterEntity.changeMana(randManaChange);
+            int manaChanged = characterEntity.changeManaCurr(randManaChange);
             notifyChangeMana(manaChanged);
         }
         // stat increases
@@ -432,8 +433,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         return healthObserve;
     }
     @Bindable
-    public String getHealth() {
-        return String.valueOf(characterEntity.getHealth());
+    public int getHealth() {
+        return characterEntity.getHealth();
     }
     // set the new health
     public void setHealth(int health) {
@@ -462,8 +463,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         return manaObserve;
     }
     @Bindable
-    public String getMana() {
-        return String.valueOf(characterEntity.getMana());
+    public int getMana() {
+        return characterEntity.getMana();
     }
     public void setMana(int mana) {
         // observe mana changes
@@ -677,5 +678,30 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         updateAllStatChange.set(new TempStat(Effect.BLOCK, block - characterEntity.getBlock()));
         characterEntity.setBlock(block);
         notifyPropertyChanged(BR.block);
+    }
+
+    public CharacterEntity getCharacterEntity() {
+        return characterEntity;
+    }
+    public boolean getIsCharacter() {
+        return characterEntity.getIsCharacter();
+    }
+    public boolean getIsAlive() {
+        return characterEntity.getIsAlive();
+    }
+    public void decrCooldowns() {
+        characterEntity.decrCooldowns();
+    }
+    public int getDrawableResID() {
+        return characterEntity.getDrawableResID();
+    }
+    public int getDrawableDeadResID() {
+        return characterEntity.getDrawableDeadResID();
+    }
+    public int getDrawableIconResID() {
+        return characterEntity.getDrawableIconResID();
+    }
+    public int getDrawableIconDeadResID() {
+        return characterEntity.getDrawableIconDeadResID();
     }
 }

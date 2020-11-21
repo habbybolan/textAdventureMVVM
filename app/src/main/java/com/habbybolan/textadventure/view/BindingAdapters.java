@@ -31,10 +31,16 @@ public class BindingAdapters {
         view.setText(builder);
     }
 
+    @BindingAdapter(value = {"current", "max"})
+    public static void currMaxDialogue(TextView view, int current, int max) {
+        String text = current +  "/" + max;
+        view.setText(text);
+    }
+
     // turns a int into a String
-    @BindingAdapter(value = {"value"})
-    public static void intToString(TextView view, int value) {
-        String text = String.valueOf(value);
+    @BindingAdapter(value = {"val"})
+    public static void intToString(TextView view, int val) {
+        String text = String.valueOf(val);
         view.setText(text);
     }
 

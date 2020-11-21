@@ -110,7 +110,7 @@ public abstract class EncounterViewModel extends AndroidViewModel {
     // goto the the saved state if one is saved, otherwise start at beginning
     public void gotoBeginningState() throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-        if (!isSaved) // if no save, then go to dialogue state normally
+        if (!mainGameVM.getIsSaved()) // if no save, then go to dialogue state normally
             stateIndex.setValue(1);
         else { // there is a save, goto saved state
             stateIndex.setValue(mainGameVM.getSavedEncounter().getInt("state"));
@@ -165,8 +165,7 @@ public abstract class EncounterViewModel extends AndroidViewModel {
      */
     private void setDialogueRemainingInDialogueState(JSONObject encounter) throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-        if (mainGameVM.getSavedEncounter() != null) {
-            setIsSaved(true);
+        if (mainGameVM.getIsSaved()) {
             // first state dialogue to be iterated over
             if (mainGameVM.getSavedEncounter().has(DIALOGUE_REMAINING))
                 setFirstStateJSON(mainGameVM.getSavedEncounter().getJSONObject(DIALOGUE_REMAINING));
@@ -283,14 +282,8 @@ public abstract class EncounterViewModel extends AndroidViewModel {
         CharacterViewModel.getInstance().saveCharacter();
         saveEncounter(rv.getDialogueList());
     }
-
-    private boolean isSaved = false;
-    // notify there is a saved encounter to enter
-    public void setIsSaved(boolean isSaved) {
-        this.isSaved = isSaved;
-    }
     public boolean getIsSaved() {
-        return isSaved;
+        return mainGameVM.getIsSaved();
     }
     // saved the necessary data of fragment to retrieve it
     abstract void saveEncounter(ArrayList<DialogueType> dialogueList);

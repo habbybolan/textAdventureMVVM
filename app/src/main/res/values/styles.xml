@@ -18,10 +18,10 @@
         <item name="paddingStart">10dp</item>
     </style>
 
-    <style name="DefaultToggleButton" parent="android:style/Widget.Button">
-        <item name="android:background">@drawable/custom_default_toggle_button</item>
-        <item name="android:layout_width">@dimen/default_btn_width</item>
-        <item name="android:layout_height">@dimen/default_btn_height</item>
+    <style name="DefaultCategoryButton" parent="android:style/Widget.Button">
+        <item name="android:background">@drawable/custom_default_category_button</item>
+        <item name="android:layout_width">@dimen/default_category_btn_width</item>
+        <item name="android:layout_height">@dimen/default_category_btn_height</item>
         <item name="android:paddingLeft">10dp</item>
         <item name="android:paddingRight">10dp</item>
     </style>

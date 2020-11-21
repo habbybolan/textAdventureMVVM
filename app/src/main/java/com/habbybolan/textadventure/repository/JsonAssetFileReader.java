@@ -98,7 +98,6 @@ public class JsonAssetFileReader {
 
                 // get random outdoor encounter with weighting
                 encounterTemp = jsonArray.getJSONObject(Outdoor.getRandomEncounter());
-                //encounterTemp = jsonArray.getJSONObject(Outdoor.COMBAT);
 
                 // put type into encounter
                 String type = encounterTemp.getString(TYPE);

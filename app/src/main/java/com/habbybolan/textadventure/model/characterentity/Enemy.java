@@ -8,11 +8,7 @@ import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
-import com.habbybolan.textadventure.model.inventory.Item;
-import com.habbybolan.textadventure.model.inventory.weapon.Attack;
-import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,14 +42,6 @@ public class Enemy extends CharacterEntity {
     public static final String CON_PERCENT = "con_percent";
     public static final String SPD_PERCENT = "spd_percent";
     public static final String TIER = "tier";
-
-
-
-
-
-    // Character info
-    private Weapon weapon;
-    // temp extra health
 
 
     private ArrayList<Ability> abilities = new ArrayList<>();
@@ -111,7 +99,9 @@ public class Enemy extends CharacterEntity {
         constitution = numStatPoints * (conPercent / 100);
         speed = numStatPoints * (spdPercent / 100);
         this.abilities = abilities;
-        this.weapon = weapon;
+        weapons.add(weapon);
+        health = 1;
+        maxHealth = 1;
         setDrawables(type);
     }
 
@@ -205,12 +195,11 @@ public class Enemy extends CharacterEntity {
             }
             // weapons
             JSONArray weaponsArray = enemyObject.getJSONArray("weapons");
-            numWeapons = 0;
+            numWeapons = 1;
             for (int i = 0; i < weaponsArray.length(); i++) {
                 String weaponString = weaponsArray.getString(i);
                 weapons.add(new Weapon(weaponString));
                 numWeapons++;
-
             }
 
             // DOTS
@@ -297,36 +286,6 @@ public class Enemy extends CharacterEntity {
         drawableDeadResID = R.drawable.skeleton_dead;
     }
 
-
-    // ** ITEMS **
-
-    // use the ability attached to the item
-    public void applyItem(Item item, CharacterEntity attacker) {
-        if (item.getAbility() == null) throw new IllegalArgumentException();
-        applyAbility(item.getAbility(), attacker);
-    }
-
-    // ** WEAPONS **
-
-    // apply the attack from the attacker
-    public void applyAttack(Attack attack, CharacterEntity attacker) {
-        Random random = new Random();
-        int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
-        damageTarget(damage);
-    }
-    // apply the special attack from the attacker
-    public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
-        if (specialAttack.getAbility() != null) {
-            applyAbility(specialAttack.getAbility(), attacker);
-        }
-        if (specialAttack.getAoe() > 0) {
-            doAoeStuff(); // todo: aoe
-        }
-        if (specialAttack.getDamageMin() != 0) {
-            damageTarget(getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax()));
-        }
-    }
-
     // returns a random action for the enemy to perform
     public Inventory getRandomAction() {
         // action can be either attack, special attack, ability 1, or ability 2
@@ -336,10 +295,10 @@ public class Enemy extends CharacterEntity {
         switch (actionNum) {
             case 0:
                 // weapon attack
-                return weapon.getAttack();
+                return weapons.get(0).getAttack();
             case 1:
                 // weapon special attack
-                return weapon.getSpecialAttack();
+                return weapons.get(0).getSpecialAttack();
             case 2:
                 // ability 1
                 return abilities.get(0);
@@ -349,52 +308,10 @@ public class Enemy extends CharacterEntity {
         }
     }
 
-    // ***ABILITIES**
-
-    // apply ability to enemy from attacker
-    public void applyAbility(Ability ability, CharacterEntity attacker) {
-        CharacterViewModel characterVM = CharacterViewModel.getInstance();
-        // todo: scale with Intelligence
-        if (ability.getMinDamage() != 0) damageTarget(getRandomAmount(ability.getMinDamage(), ability.getMaxDamage()));
-        if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
-        // specials
-        if (ability.getIsConfuse()) addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration()));
-        if (ability.getIsStun()) addNewSpecial(new SpecialEffect(SpecialEffect.STUN, ability.getDuration()));
-        if (ability.getIsInvincibility()) addNewSpecial(new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration()));
-        if (ability.getIsSilence()) addNewSpecial(new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration()));
-        if (ability.getIsInvisible()) addNewSpecial(new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration()));
-        // DOT
-        if (ability.getIsFire()) addNewDot(new Dot(Dot.FIRE, false));
-        if (ability.getIsPoison()) addNewDot(new Dot(Dot.POISON, false));
-        if (ability.getIsBleed()) addNewDot(new Dot(Dot.BLEED, false));
-        if (ability.getIsFrostBurn()) addNewDot(new Dot(Dot.FROSTBURN, false));
-        if (ability.getIsHealDot()) addNewDot(new Dot(Dot.HEALTH_DOT, false));
-        if (ability.getIsManaDot()) addNewDot(new Dot(Dot.MANA_DOT, false));
-        // direct heal/mana
-        if (ability.getHealMin() != 0) increaseHealth(getRandomAmount(ability.getHealMin(), ability.getHealMax()));
-        if (ability.getManaMin() != 0) changeMana(getRandomAmount(ability.getManaMin(), ability.getManaMax()));
-        // stat increases
-        if (ability.getStrIncrease() != 0) addNewStatIncrease(new TempStat(STR, ability.getDuration(), ability.getStrIncrease()));
-        if (ability.getIntIncrease() != 0) addNewStatIncrease(new TempStat(INT, ability.getDuration(), ability.getIntIncrease()));
-        if (ability.getConIncrease() != 0) addNewStatIncrease(new TempStat(CON, ability.getDuration(), ability.getConIncrease()));
-        if (ability.getSpdIncrease() != 0) addNewStatIncrease(new TempStat(SPD, ability.getDuration(), ability.getSpdIncrease()));
-        if (ability.getEvadeIncrease() != 0) addNewStatIncrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeIncrease()));
-        if (ability.getBlockIncrease() != 0) addNewStatIncrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockIncrease()));
-        // stat decreases
-        if (ability.getStrDecrease() != 0) addNewStatDecrease(new TempStat(STR, ability.getDuration(), ability.getStrDecrease()));
-        if (ability.getIntDecrease() != 0) addNewStatDecrease(new TempStat(INT, ability.getDuration(), ability.getIntDecrease()));
-        if (ability.getConDecrease() != 0) addNewStatDecrease(new TempStat(CON, ability.getDuration(), ability.getConDecrease()));
-        if (ability.getSpdDecrease() != 0) addNewStatDecrease(new TempStat(SPD, ability.getDuration(), ability.getSpdDecrease()));
-        if (ability.getEvadeDecrease() != 0) addNewStatDecrease(new TempStat(EVASION, ability.getDuration(), ability.getEvadeDecrease()));
-        if (ability.getBlockDecrease() != 0) addNewStatDecrease(new TempStat(BLOCK, ability.getDuration(), ability.getBlockDecrease()));
-        // temp extra health
-        if (ability.getTempExtraHealth() != 0) addNewTempExtraHealthMana(new TempBar(TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth()));
-    }
-
     // decrement the cooldown on all abilities w/ cooldown >0
     public void decrCooldowns() {
         // check the ability in special attack if it exists
-        weapon.getSpecialAttack().decrementCooldownCurr();
+        weapons.get(0).getSpecialAttack().decrementCooldownCurr();
         for (int i = 0; i < abilities.size(); i++) {
             abilities.get(i).decrementCooldownCurr();
         }
@@ -532,5 +449,8 @@ public class Enemy extends CharacterEntity {
     }
     public int getDifficulty() {
         return difficulty;
+    }
+    public void setID(int ID) {
+        this.ID = ID;
     }
 }

@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.CombatOrderDetailsBinding;
-import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 
 import java.util.ArrayList;
 
 public class CombatOrderAdapter extends RecyclerView.Adapter<CombatOrderAdapter.ViewHolder> {
     // list holding the character and all enemies in the combat encounter
-    private ArrayList<CharacterEntity> allEntities;
+    private ArrayList<CharacterEntityViewModel> allEntities;
 
-    public CombatOrderAdapter(ArrayList<CharacterEntity> allEntities) {
+    public CombatOrderAdapter(ArrayList<CharacterEntityViewModel> allEntities) {
         this.allEntities = allEntities;
     }
 
@@ -31,7 +31,7 @@ public class CombatOrderAdapter extends RecyclerView.Adapter<CombatOrderAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull CombatOrderAdapter.ViewHolder holder, int position) {
-        CharacterEntity entity = allEntities.get(position);
+        CharacterEntityViewModel entity = allEntities.get(position);
         if (entity.getIsAlive()) {
             // show alive icon
             holder.bind(entity.getDrawableResID());

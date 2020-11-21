@@ -88,19 +88,19 @@
 
                     <Button
                         android:id="@+id/rv_category_weapons"
-                        style="@style/DefaultToggleButton"
+                        style="@style/DefaultCategoryButton"
                         android:text="@string/category_weapons_option"
                         android:textSize="@dimen/txt_size_medium" />
 
                     <Button
                         android:id="@+id/rv_category_abilities"
-                        style="@style/DefaultToggleButton"
+                        style="@style/DefaultCategoryButton"
                         android:text="@string/category_abilities_option"
                         android:textSize="@dimen/txt_size_medium" />
 
                     <Button
                         android:id="@+id/rv_category_items"
-                        style="@style/DefaultToggleButton"
+                        style="@style/DefaultCategoryButton"
                         android:text="@string/category_items_option"
                         android:textSize="@dimen/txt_size_medium" />
 

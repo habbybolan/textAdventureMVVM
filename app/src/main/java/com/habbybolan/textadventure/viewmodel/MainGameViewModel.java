@@ -173,7 +173,6 @@ public class MainGameViewModel extends BaseObservable {
         }
     }
 
-
     /**
      * Starts a specified encounter from specifiedEncounter JSON.
      * @param specifiedEncounter    The encounter to start relating to the JSON.
@@ -356,28 +355,51 @@ public class MainGameViewModel extends BaseObservable {
         notifyPropertyChanged(BR.characterFragmentVisible);
     }
 
-    // makes the game fragment the visible one
+    /**
+     * Set game fragment field to visible and character fragment gone
+     */
     public void gotoGameFragment() {
-        if (gameFragmentVisible != View.VISIBLE) {
-            setCharacterState(View.GONE);
-            setGameState(View.VISIBLE);
-        }
+        setCharacterState(View.GONE);
+        setGameState(View.VISIBLE);
     }
 
-    // makes the character fragment the visible one
+    /**
+     * Find if game fragment is currently set to gone.
+     * @return  True if game fragment is gone
+     */
+    public boolean isGameFragmentGone() {
+        return gameFragmentVisible != View.VISIBLE;
+    }
+
+
+    /**
+     * Set character fragment field to visible and game fragment gone
+     */
     public void gotoCharacterFragment() {
-        if (characterFragmentVisible != View.VISIBLE) {
-            setCharacterState(View.VISIBLE);
-            setGameState(View.GONE);
-        }
+        setCharacterState(View.VISIBLE);
+        setGameState(View.GONE);
     }
 
+    /**
+     * Find if character fragment is currently set to gone.
+     * @return  True if character fragment is gone
+     */
+    public boolean isCharacterFragmentGone() {
+        return characterFragmentVisible != View.VISIBLE;
+    }
     public Encounter getEncounter() {
         return encounterObservable.get();
     }
 
     public JSONObject getSavedEncounter() {
         return savedEncounter;
+    }
+
+    /**
+     * @return  True if a saved game exists
+     */
+    public boolean getIsSaved() {
+        return (savedEncounter != null);
     }
 
 }

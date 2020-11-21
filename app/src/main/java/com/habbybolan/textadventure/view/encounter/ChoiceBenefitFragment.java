@@ -86,8 +86,6 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
                 endState();
                 break;
         }
-        // set the isSaved to false to signal that the save has been retrieved
-        benefitVM.setIsSaved(false);
     }
 
     // state to choose the dialogue

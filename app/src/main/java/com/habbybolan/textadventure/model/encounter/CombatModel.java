@@ -3,13 +3,13 @@ package com.habbybolan.textadventure.model.encounter;
 import android.content.Context;
 
 import com.habbybolan.textadventure.model.characterentity.Character;
-import com.habbybolan.textadventure.model.characterentity.CharacterEntity;
 import com.habbybolan.textadventure.model.characterentity.Enemy;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -31,12 +31,12 @@ public class CombatModel {
 
     // helper for setCombatOrdering - bubble sort to sort both lists
     // index = 0 if setting up initial combat ordering, 1 if re-sorting the combat ordering
-    public void sortCombatOrdering(int index, ArrayList<CharacterEntity> combatOrder) {
+    public void sortCombatOrdering(int index, ArrayList<CharacterEntityViewModel> combatOrder) {
         // bubble sort combat ordering
         for (int i = index; i < combatOrder.size() - 1; i++) {
             for (int j = index; j < combatOrder.size() - i - 1 + index; j++) {
                 if (combatOrder.get(j).getSpeed() < combatOrder.get(j + 1).getSpeed()) {
-                    CharacterEntity temp = combatOrder.get(j + 1);
+                    CharacterEntityViewModel temp = combatOrder.get(j + 1);
                     combatOrder.set(j + 1, combatOrder.get(j));
                     combatOrder.set(j, temp);
                 }
@@ -51,8 +51,8 @@ public class CombatModel {
      * @param combatOrderNext       The next 'round' of characterEntities in the combat order list. The second arrayList on the combat Order.
      * @param combatOrderLast       The last 'round' of characterEntities in the combat order list. The third arrayList on the combat Order.
      */
-    public void moveEntityToBackOfCombatOrder(ArrayList<CharacterEntity> combatOrderCurr, ArrayList<CharacterEntity> combatOrderNext, ArrayList<CharacterEntity> combatOrderLast) {
-        CharacterEntity tempEntity = combatOrderCurr.get(0);
+    public void moveEntityToBackOfCombatOrder(ArrayList<CharacterEntityViewModel> combatOrderCurr, ArrayList<CharacterEntityViewModel> combatOrderNext, ArrayList<CharacterEntityViewModel> combatOrderLast) {
+        CharacterEntityViewModel tempEntity = combatOrderCurr.get(0);
         combatOrderCurr.remove(0);
         combatOrderLast.add(tempEntity);
 

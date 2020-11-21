@@ -207,11 +207,11 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             // bar changes
             if (item.getHealthChange() != 0) {
                 // health and max health altered
-                notifyChangeHealth(character.changeHealth(-item.getHealthChange()));
+                notifyChangeHealth(character.changeHealthMax(-item.getHealthChange()));
             }
             if (item.getManaChange() != 0) {
                 setMaxMana(character.getMaxMana() - item.getManaChange());
-                character.changeMana(-item.getManaChange());
+                character.changeManaMax(-item.getManaChange());
                 // max mana altered
                 notifyChangeMana(-item.getManaChange());
             }
@@ -296,11 +296,11 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             // bar changes
             if (item.getHealthChange() != 0) {
                 // health and max health altered
-                notifyChangeHealth(character.changeHealth(item.getHealthChange()));
+                notifyChangeHealth(character.changeHealthMax(item.getHealthChange()));
             }
             if (item.getManaChange() != 0) {
                 setMaxMana(character.getMaxMana() + item.getManaChange());
-                character.changeMana(item.getManaChange());
+                character.changeManaMax(item.getManaChange());
                 // max mana altered
                 notifyChangeMana(item.getManaChange());
             }
@@ -411,10 +411,10 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         // health/mana
         if (item.getHealthChange() != 0) {
             // health and max health altered
-            notifyChangeHealth(character.changeHealth(item.getHealthChange()));
+            notifyChangeHealth(character.changeHealthCurr(item.getHealthChange()));
         }
         if (item.getManaChange() != 0) {
-            int manaChange = character.changeMana(item.getManaChange());
+            int manaChange = character.changeManaCurr(item.getManaChange());
             // only mana altered
             notifyChangeMana(manaChange);
         }
@@ -451,24 +451,28 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     }
 
 
-    public void setPermBarIncr(TempBar tempBar) {
+    /**
+     * Set an indefinite increase to health or mana
+     * @param tempBar   TempBar object to apply to health or mana change
+     */
+    public void setIndefiniteBarIncr(TempBar tempBar) {
         if (tempBar.getType().equals(TempBar.TEMP_HEALTH)) {
-            setPermHealthIncr(tempBar);
+            setIndefiniteHealthIncr(tempBar);
         } else {
-            setPermManaIncr(tempBar);
+            setIndefiniteManaIncr(tempBar);
         }
     }
-    // set a permanent health increase
-    private void setPermHealthIncr(TempBar tempBar) {
+    // set an indefinite health increase (max and curr health change)
+    private void setIndefiniteHealthIncr(TempBar tempBar) {
         setMaxHealth(getMaxHealth() + tempBar.getAmount());
-        character.increaseHealth(tempBar.getAmount());
+        character.changeHealthMax(tempBar.getAmount());
         // max health changed
         notifyChangeHealth(tempBar.getAmount());
     }
-    // set a permanent mana increase
-    private void setPermManaIncr(TempBar tempBar) {
+    // set an indefinite mana increase (max and curr mana change)
+    private void setIndefiniteManaIncr(TempBar tempBar) {
         setMaxMana(getMaxMana() + tempBar.getAmount());
-        character.changeMana(tempBar.getAmount());
+        character.changeManaMax(tempBar.getAmount());
         // max mana altered
         notifyChangeMana(tempBar.getAmount());
     }

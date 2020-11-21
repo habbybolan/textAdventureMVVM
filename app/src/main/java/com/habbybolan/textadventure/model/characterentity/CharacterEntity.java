@@ -125,11 +125,14 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     // *** Damage ***
 
-    // check any buffs or protections that characterEntity has
-    // remove the damage amount from target health if no protection
-    // or remove target's temporary extra health and direct health if any overflow of damage
+    /**
+     * Damage the character by damage amount. If there are any shields, damage the shields with the
+     * smalled current duration. Otherwise, damage the Character entities health directly.
+     * @param damage    The amount to damage characterEntity by
+     * @return          The amount of direct health damage
+     */
     public int damageTarget(int damage) {
-        if (damage < 0) throw new IllegalArgumentException();
+        if (damage < 0) throw new IllegalArgumentException(damage + " needs to be a positive integer");
         int prevHealth = health;
         int overFlow = 0; // keeps track of damage if it gets rid of all tempExtraHealth
         if ((getTempExtraHealth() - damage) < 0) {
@@ -148,8 +151,12 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return health - prevHealth;
     }
 
-    // returns a random damage number between damageMin and damageMax
-    // apply any additional strength the user has to the damage
+    /**
+     * Get a number between damageMin and damageMax to simulate random dice roll.
+     * @param min   The min damage role
+     * @param max   The max damage role
+     * @return      A value between (inclusive) min and max
+     */
     public int getRandomAmount(int min, int max) {
         int damageDifference = max - min;
         Random rand  = new Random();
@@ -157,20 +164,26 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return damageRoll + min + getStrength();
     }
 
-    // returns amount to change heal entity by and change
-    public int increaseHealth(int amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+    /**
+     *  Returns amount to heal entity by. Does not affect the max health.
+     * @param amount    Amount to heal character entity by
+     * @return          The amount of health character entity changed by
+     */
+    public int changeHealthCurr(int amount) {
+        if (amount < 0) throw new IllegalArgumentException(amount + " needs to be a positive integer");
         int prevHealth = health;
-        if (amount + health >= maxHealth) health = maxHealth;
-        else health = health+amount;
-        return health-prevHealth;
+        if (amount + health > maxHealth) health = maxHealth;
+        else health = health + amount;
+        return health - prevHealth;
     }
 
-    // changes the direct health and max health by a certain amount
-        // not used for taking damage or heals
-        // used for indefinite/permanent health changes
-        // returns health change if any
-    public int changeHealth(int amount) {
+    /**
+     * Changes the current health and max health by a certain amount, positive or negative.
+     * Not used for taking damage or heals. Use for indefinite/permanent health change.
+     * @param amount    Amount to heal character entity by
+     * @return          The amount of health character entity changed by
+     */
+    public int changeHealthMax(int amount) {
         int tempHealth = health;
         maxHealth += amount;
         if (amount > 0)
@@ -182,8 +195,29 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return health - tempHealth;
     }
 
-    // returns amount to recover mana of entity for
-    public int changeMana(int amount) {
+    /**
+     * Change current and max mana by an amount and return change.
+     * @param amount    Amount to recover mana for character entity
+     * @return          The amount of mana changed for current mana
+     */
+    public int changeManaMax(int amount) {
+        int tempMana = mana;
+        maxMana += amount;
+        if (amount > 0)
+            mana += amount;
+        else {
+            if (mana > maxMana)
+                mana = maxMana;
+        }
+        return mana - tempMana;
+    }
+
+    /**
+     * Change current and max mana by an amount and return change.
+     * @param amount    Amount to recover mana for character entity
+     * @return          The amount of mana changed for current mana
+     */
+    public int changeManaCurr(int amount) {
         int prevMana = mana;
         if (amount + mana > maxMana) mana = maxMana;
         else if (amount + mana < 0) mana = 0;
@@ -201,8 +235,9 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public static final String EVASION = "Evasion";
     public static final String BLOCK = "Block";
 
-    // updates all the stat's main value, given its new baseStat, statIncrease, and statDecrease
-        // helper for when statIncrease/statDecrease changes
+    /** Updates all the stat's main value, given its new baseStat, statIncrease, and statDecrease.
+     * Helper for when statIncrease/statDecrease changes.
+     */
     private void updateStats() {
         // update STR
         setStrength(getStrIncrease() + getStrDecrease() + getStrBase());
@@ -224,15 +259,21 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         if (getBlock() < 0) setBlock(0);
     }
 
-    // add a new stat increase - can stack these, each stat increase represented as the list inside a list
+    /**
+     *  Add a new stat increase to the list
+     * @param tempStat  The new stat increase to add to the list
+     */
     public void addNewStatIncrease(TempStat tempStat) {
         statIncreaseList.add(tempStat);
         findStatToIncrease(tempStat);
         updateStats();
     }
 
-    // apply the stat increase to statIncrease and stat values
-        // helper for addNewStatIncrease
+    /**
+     * Add the stat increase to statIncrease list and apply the changes to the state fields.
+     * Helper for addNewStateIncrease for finding the proper stat field to change.
+     * @param tempStat  The stat to add to the list and alter stat field by.
+     */
     private void findStatToIncrease(TempStat tempStat) {
         final int amount = tempStat.getAmount();
         switch (tempStat.getType()) {
@@ -258,15 +299,21 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         findStatToAlter(tempStat);
     }
 
-    // add a new stat decrease - can stack these, each stat decrease represented as the list inside a list
-    // if the decrease goes less than 0 of a stat, then reduce the amount that the stat is decreased
+    /**
+     *  Add a new stat decrease to the list
+     * @param tempStat  The new stat decrease to add to the list
+     */
     public void addNewStatDecrease(TempStat tempStat) {
         statDecreaseList.add(tempStat);
         findStatToDecrease(tempStat);
         updateStats();
     }
 
-    // apply the stat decrease to statDecrease and stat values
+    /**
+     * Add the stat decrease to statDecrease list and apply the changes to the state fields.
+     * Helper for addNewStateDecrease for finding the proper stat field to change.
+     * @param tempStat  The stat to add to the list and alter stat field by.
+     */
     private void findStatToDecrease(TempStat tempStat) {
         final int amount = tempStat.getAmount();
         switch (tempStat.getType()) {
@@ -292,8 +339,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         findStatToAlter(tempStat);
     }
 
-    // alter the stat amount, given it's new statIncrease or statDecrease
-        // helper for changes stat field value
+    /**
+     * Alter the correct stat field amount given the tempStat type and value
+     * @param tempStat  The stat object to be applied to character.
+     */
     private void findStatToAlter(TempStat tempStat) {
         switch (tempStat.getType()) {
             case STR:
@@ -325,13 +374,20 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     // decrement the time remaining for the stat change
     // if the duration reaches 0 after decrement, reverse the change and remove from appropriate statChange list
+
+    /**
+     * Decrement the time remaining for the stat change in both increase and decrease list.
+     * If the duration decrements to 0, then remove from list and update the character stat fields.
+     */
     public void decrementTempStatDuration() {
         decrementTempStatIncrDuration();
         decrementTempStatDecrDuration();
         updateStats();
     }
 
-    // decrement the duration of all temp incr stat durations
+    /**
+     *  Decrement the duration of all temp incr stat durations.
+     */
     public void decrementTempStatIncrDuration() {
         for (int i = 0; i < statIncreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
@@ -346,7 +402,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             }
         }
     }
-    // decrement the duration of all temp decr stat durations
+
+    /**
+     *  decrement the duration of all temp decr stat durations
+     */
     public void decrementTempStatDecrDuration() {
         for (int i = 0; i < statDecreaseList.size(); i++) {
             // get the duration of the stat change at index i and decrement
@@ -362,8 +421,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         }
     }
 
-    // undo a stat increase
-        // helper for decrementStatChangeDuration()
+    /**
+     * Undo the stat increase associated to tempState type, by amount inside tempState.
+     * @param tempStat  Stat object to undo effects
+     */
     private void undoStatIncrease(TempStat tempStat) {
         final int amount = tempStat.getAmount();
         switch (tempStat.getType()) {
@@ -389,8 +450,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         findStatToAlter(tempStat);
     }
 
-    // undo a stat decrease
-        // helper for decrementStatChangeDuration()
+    /**
+     * Undo the stat decrease associated to tempState type, by amount inside tempState.
+     * @param tempStat  Stat object to undo effects
+     */
     private void undoStatDecrease(TempStat tempStat) {
         final int amount = tempStat.getAmount();
         switch (tempStat.getType()) {
@@ -426,6 +489,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public ArrayList<TempBar> removeZeroTempHealthList() {
         return removeZeroTempBarList(tempHealthList);
     }
+
+    /**
+     * Add temp temp extra health to list and apply to character.
+     * @param tempExtraHealth   TempExtraHealth object to add to list and apply to character.
+     */
     public void addTempHealthList(TempBar tempExtraHealth) {
         tempHealthList.add(tempExtraHealth);
         // update the changes to tempHealthList
@@ -439,6 +507,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public void removeZeroTempManaList() {
         removeZeroTempBarList(tempManaList);
     }
+    /**
+     * Add temp temp extra mana to list and apply to character.
+     * @param tempExtraMana   TempExtraHealth object to add to list and apply to character.
+     */
     public void addTempManaList(TempBar tempExtraMana) {
         tempManaList.add(tempExtraMana);
         // apply changes to tempManaList
@@ -446,7 +518,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         maxMana = maxMana + tempExtraMana.getAmount();
     }
 
-    // helper for removeZeroTempManaList and removeZeroTempHealthList
+    /**
+     * removes and tempBar object from the tempList that have reaches 0 duration.
+     * @param tempList  Temp bar list to remove any 0 durations
+     * @return          The temp extra bars that were removed
+     */
     private ArrayList<TempBar> removeZeroTempBarList(List<TempBar> tempList) {
         int index = 0;
         ArrayList<TempBar> tempBars = new ArrayList<>();
@@ -695,8 +771,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return isChanged;
     }
 
-    // check if the special is active on the enemy
-    // active returns 1, otherwise 0
+    /**
+     * Check if the special is active on te CharacterEntity
+     * @param special   The special type to check
+     * @return          True if the special is applied to CharacterEntity.
+     */
     public boolean checkSpecials(String special) {
         switch (special) {
             case SpecialEffect.STUN:
@@ -713,15 +792,17 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         throw new IllegalArgumentException();
     }
 
-    // decrements the special duration left
-    // if the duration is 0 after decrement, then set isSpecial value to 0
-    // if the value < 0, do nothing, permanent special
+    /**
+     * Decrement the special objects duration of inside specialList.
+     * If duration reaches 0 after decrementing, then remove from list and apply changes.
+     */
     public void decrSpecialDuration() {
         int i = 0;
         while (i < specialList.size()) {
             SpecialEffect special = specialList.get(i);
             special.decrementDuration();
             if (special.getDuration() == 0) {
+                // removes from list and applies changes
                 removeInputSpecial(special);
             } else {
                 i++;
@@ -729,7 +810,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         }
     }
 
-    // change the value of isSpecial boolean value
+    /**
+     * Change the value of isSpecial boolean value corresponding to the special type.
+     * @param special   The special type that corresponds to a boolean to switch.
+     */
     public void alterIsSpecial(String special) {
         switch (special) {
             case SpecialEffect.STUN:
@@ -1039,10 +1123,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         damageTarget(Dot.FROSTBURN_DAMAGE);
     }
     public void applyHealthDot() {
-        increaseHealth(Dot.HEAL_DOT_AMOUNT);
+        changeHealthCurr(Dot.HEAL_DOT_AMOUNT);
     }
     public void applyManaDot() {
-        changeMana(Dot.MANA_DOT_AMOUNT);
+        changeManaCurr(Dot.MANA_DOT_AMOUNT);
     }
 
 
