@@ -76,8 +76,12 @@
     },
 
     {"type":"random_benefit",
-        "encounters":[
-            {"dialogue":[{"dialogue":"A small glint underneath some leaves appears."}]}
-        ]
-    }
+    		    "encounters":[
+    		        {"dialogue":[{"dialogue":"A small glint underneath some leaves appears.",
+    		                        "next":{"dialogue":"As you push away the leaves, you find an item that a traveller must have unknowingly dropped."}}
+    		                    ],
+    		        "numRewards":"1"}
+    		    ]
+
+    		}
 ]}

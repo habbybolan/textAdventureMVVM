@@ -7,6 +7,10 @@ import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
+/**
+ * Creates the info string of an Inventory Object to display
+ */
+
 public class InventoryInfoModel {
 
     public InventoryInfoModel() {}

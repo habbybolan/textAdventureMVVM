@@ -10,7 +10,7 @@
             type="String" />
     </data>
     <RelativeLayout
-        android:id="@+id/attack_snippet"
+        android:id="@+id/inventory_snippet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/action_back"

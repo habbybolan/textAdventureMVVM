@@ -85,6 +85,7 @@
     <string name="stat_plural">Stats</string>
 
     <string name='pick_up_inventory'>Pick Up</string>
+    <string name="leave_inventory">Leave</string>
 
     <string name='continue_dialogue'>Continue</string>
 

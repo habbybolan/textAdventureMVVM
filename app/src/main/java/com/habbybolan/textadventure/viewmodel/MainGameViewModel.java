@@ -12,6 +12,7 @@ import com.habbybolan.textadventure.model.MainGameModel;
 import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.encounter.Encounter;
 import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
+import com.habbybolan.textadventure.model.encounter.RandomBenefitModelBuilder;
 import com.habbybolan.textadventure.model.encounter.ShopModel;
 import com.habbybolan.textadventure.model.locations.CombatDungeon;
 import com.habbybolan.textadventure.model.locations.MultiDungeon;
@@ -79,9 +80,6 @@ public class MainGameViewModel extends BaseObservable {
     final public static String QUEST_TYPE = "quest";
     final public static String CHECK_TYPE = "check";
     final public static String BREAK_TYPE = "break";
-
-    private MainGameModel mainGameModel = new MainGameModel();
-
 
     private CharacterViewModel characterVM;
     private Application application;
@@ -152,7 +150,7 @@ public class MainGameViewModel extends BaseObservable {
         try {
             switch (characterVM.getEncounterState()) {
                 case OUTDOOR_STATE:
-                    if (mainGameModel.breakEncounterCheck()) {
+                    if (MainGameModel.breakEncounterCheck()) {
                         // Enter break encounter
                         createNewBreakEncounter();
                     } else {
@@ -188,7 +186,7 @@ public class MainGameViewModel extends BaseObservable {
      */
     public void startMultiDungeon() throws JSONException {
         // set the size of the dungeon
-        characterVM.setDungeonCounter(MultiDungeon.getMultiDungeonLength());
+        characterVM.setDungeonData(MultiDungeon.getMultiDungeonLength(), MainGameModel.getDungeonTier(MULTI_DUNGEON_TYPE, characterVM.getDistance()));
         characterVM.setStateToMultiDungeon();
         createNewMultiDungeonEncounter();
     }
@@ -198,7 +196,7 @@ public class MainGameViewModel extends BaseObservable {
      */
     public void startCombatDungeon() throws JSONException {
         // set the size of the dungeon
-        characterVM.setDungeonCounter(CombatDungeon.getCombatDungeonLength());
+        characterVM.setDungeonData(CombatDungeon.getCombatDungeonLength(), MainGameModel.getDungeonTier(COMBAT_DUNGEON_TYPE, characterVM.getDistance()));
         characterVM.setStateToCombatDungeon();
         createNewCombatDungeonEncounter();
     }
@@ -236,7 +234,7 @@ public class MainGameViewModel extends BaseObservable {
         setEncounterObservable(encounter);
     }
 
-    private void createNewBreakEncounter() throws JSONException {
+    private void createNewBreakEncounter() {
         JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(application);
         // get a random encounter from jsonFileReader
         try {
@@ -250,11 +248,9 @@ public class MainGameViewModel extends BaseObservable {
     /**
      * Creates a random_benefit_encounter with set JSON data.
      */
-    private void createRewardEncounter() throws JSONException {
+    private void createRewardEncounter(RandomBenefitModel randomBenefitModel) throws JSONException {
         // create and set the JSON data and update the new encounter type to start the encounter
-        RandomBenefitModel rbModel = new RandomBenefitModel();
-        String[] dialogue = {"1", "2", "You have reached the end of the dungeon. Claim your prize"};
-        encounter = new Encounter(rbModel.createRandomBenefitEncounter(dialogue));
+        encounter = new Encounter(randomBenefitModel.createRandomBenefitEncounter());
         setEncounterObservable(encounter);
     }
 
@@ -262,11 +258,18 @@ public class MainGameViewModel extends BaseObservable {
      * Continue with the multi dungeon encounters, finding a random multi dungeon encounter to enter.
      */
     public void createNewMultiDungeonEncounter() throws JSONException {
-        if (mainGameModel.isDungeonOver(characterVM)) {
+        if (MainGameModel.isDungeonOver(characterVM)) {
             // set the state to being outdoors
             characterVM.setStateToOutdoor();
+            String[] dialogue = new String[]{"1", "2", "You have reached the end of the multi dungeon. Claim your prize"};
+            RandomBenefitModel randomBenefitModel = new RandomBenefitModelBuilder(dialogue)
+                    .setTier(characterVM.getDungeonTier())
+                    .setNumRewards(1)
+                    .setExpReward()
+                    .setGoldReward()
+                    .build();
             // if the dungeon counter reaches 0, then enter a reward state and leave the dungeon
-            createRewardEncounter();
+            createRewardEncounter(randomBenefitModel);
         } else {
             // otherwise, continue with multi dungeon encounters
             JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(application);
@@ -284,11 +287,18 @@ public class MainGameViewModel extends BaseObservable {
      * Creates a new random dungeon encounter, finding a random combat dungeon encounter to enter.
      */
     private void createNewCombatDungeonEncounter() throws JSONException {
-        if (mainGameModel.isDungeonOver(characterVM)) {
+        if (MainGameModel.isDungeonOver(characterVM)) {
             // set the state to being outdoors
             characterVM.setStateToOutdoor();
+            String[] dialogue = new String[]{"1", "2", "You have reached the end of the combat dungeon. Claim your prize"};
+            RandomBenefitModel randomBenefitModel = new RandomBenefitModelBuilder(dialogue)
+                    .setTier(characterVM.getDungeonTier())
+                    .setNumRewards(1)
+                    .setExpReward()
+                    .setGoldReward()
+                    .build();
             // if the dungeon counter reaches 0, then enter a reward state and leave the dungeon
-            createRewardEncounter();
+            createRewardEncounter(randomBenefitModel);
         } else {
             // otherwise, continue with multi dungeon encounters
             if (characterVM.getDungeonCounter() == characterVM.getDungeonLength()/2) {

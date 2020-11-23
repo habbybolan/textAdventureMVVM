@@ -1,6 +1,5 @@
 package com.habbybolan.textadventure.view.encounter;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,16 +15,17 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentRandomBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
+import com.habbybolan.textadventure.view.inventoryinfo.CreateInventoryInfoActivity;
 import com.habbybolan.textadventure.viewmodel.encounters.RandomBenefitViewModel;
 
 import org.json.JSONException;
 
 /**
  * Gives the player a random Inventory object reward.
+ * If manually creating encounter, use RandomBenefitModel to create the encounter JSON.
  */
 public class RandomBenefitFragment extends EncounterDialogueFragment implements EncounterFragment{
 
@@ -67,75 +67,100 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
     public void checkState(int state) {
         switch(state) {
             // first state
-            case RandomBenefitViewModel.firstState:
+            case RandomBenefitViewModel.dialogueState:
                 benefitBinding.layoutBtnOptions.removeAllViews();
                 dialogueState(benefitVM, benefitBinding.layoutBtnOptions);
                 break;
-            // last state
-            case RandomBenefitViewModel.secondState:
+            // reward state
+            case RandomBenefitViewModel.ExpGoldRewardState:
+                benefitBinding.layoutBtnOptions.removeAllViews();
+                setExpGoldRewards();
+                break;
+            case RandomBenefitViewModel.inventoryRewardState:
+                benefitBinding.frameInventorySnippet.setVisibility(View.VISIBLE);
+                setInventoryRewards();
+                break;
+                // last state
+            case RandomBenefitViewModel.endState:
+                benefitBinding.frameInventorySnippet.setVisibility(View.GONE);
                 benefitBinding.layoutBtnOptions.removeAllViews();
                 endState();
                 break;
+
         }
     }
 
-    // inventory snippet of new Inventory object to retrieve
-    private void setUpInventorySnippet(final Inventory inventoryToRetrieve) {
-        View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
-        InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
+    /**
+     * Sets the gold and exp rewards if there are any.
+     */
+    private void setExpGoldRewards() {
+        benefitVM.createExpReward();
+        benefitVM.createGoldReward();
+        benefitVM.incrementStateIndex();
+    }
 
-        snippetBinding.setInventoryName(inventoryToRetrieve.getName());
-        snippetBinding.setInventoryPic(inventoryToRetrieve.getPictureResource());
-        benefitBinding.frameInventorySnippet.addView(view);
-        snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+    /**
+     * Sets the Inventory rewards. Separate from gold and exp rewards so when the saved encounter is created again,
+     * The gold and exp rewards won't double up.
+     * As each Inventory rewards is taken/left, removed from inventoryRewards so it can't taken again.
+     */
+    private void setInventoryRewards() {
+        // create the rewards
+        benefitVM.createInventoryReward();
+        // display the first reward
+        displayNewReward();
+
+        // clicker and button for picking up the reward
+        String pickUpText = getResources().getString(R.string.pick_up_inventory);
+        DefaultButtonDetailsBinding bindingPickUp = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, pickUpText, getActivity());
+        bindingPickUp.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
-                try {
-                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventoryToRetrieve.serializeToJSON().toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (!benefitVM.addNewInventory()) {
+                    CustomPopupWindow.setTempMessage(benefitVM.getFullMessageString(), getContext(), new PopupWindow(), benefitBinding.benefitContainer);
+                } else {
+                    displayNewReward();
                 }
-                startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
+            }
+        });
+
+        // clicker and button for leaving reward
+        String leaveText = getResources().getString(R.string.leave_inventory);
+        DefaultButtonDetailsBinding bindingLeave = ButtonInflaters.setDefaultButton(benefitBinding.layoutBtnOptions, leaveText, getActivity());
+        bindingLeave.btnDefault.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                benefitVM.removeTopRewardAndContinue();
+                displayNewReward();
             }
         });
     }
 
-    // third and final state
-        // set up the button to leave the encounter and to pick up item
+    /**
+     * Display the next Inventory inventory reward using inventory_snippet.
+     */
+    private void displayNewReward() {
+        if (benefitVM.isMoreRewards()) {
+            final Inventory inventory = benefitVM.getNextInventory();
+            InventorySnippetBinding snippetBinding = benefitBinding.snippetBinding;
+            snippetBinding.setInventoryName(benefitVM.getNextInventoryName());
+            snippetBinding.setInventoryPic(benefitVM.getNextInventoryPicResource());
+            snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), inventory);
+                }
+            });
+        }
+    }
+
+    /**
+     * Final end state to leave the encounter.
+     */
     @Override
     public void endState() {
-        benefitVM.setTangible();
         // set up button to leave
         setLeaveButton(benefitBinding.layoutBtnOptions);
-        // set up button to receive reward if one exists
-        setReceiveInventory();
-    }
-
-    // helper for create button to receive Inventory reward if one exists and display it
-    private void setReceiveInventory() {
-        // popup window for error message to use
-        setUpInventorySnippet(benefitVM.getInventoryToRetrieve());
-        final View viewPickUp = getLayoutInflater().inflate(R.layout.default_button_details, null);
-        DefaultButtonDetailsBinding defaultBindingPickUp = DataBindingUtil.bind(viewPickUp);
-        String permText = "Pick Up";
-        defaultBindingPickUp.setTitle(permText);
-        defaultBindingPickUp.btnDefault.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!benefitVM.addNewInventory(benefitVM.getInventoryToRetrieve()))
-                    // Inventory full, display popup window message
-                    CustomPopupWindow.setTempMessage(benefitVM.getFullMessageString(benefitVM.getInventoryToRetrieve()), getContext(), new PopupWindow(), benefitBinding.benefitContainer);
-                else {
-                    // remove the button to pick up Inventory reward
-                    benefitBinding.layoutBtnOptions.removeView(viewPickUp);
-                    // remove reward so that it can't be saved to storage as it's already taken
-                    benefitVM.removeInventoryToRetrieve();
-                }
-            }
-        });
-        benefitBinding.layoutBtnOptions.addView(viewPickUp);
     }
 
     @Override

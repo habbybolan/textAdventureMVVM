@@ -19,10 +19,8 @@ import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.model.dialogue.StatDialogue;
 import com.habbybolan.textadventure.model.dialogue.TempStatDialogue;
-import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
-import com.habbybolan.textadventure.model.inventory.Item;
-import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.model.inventory.InventoryFactory;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -32,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * ViewModel that all encounter viewModels extends.
@@ -252,26 +251,35 @@ public abstract class EncounterViewModel extends AndroidViewModel {
      * @return                  The saved inventory Object if one exists, otherwise return null.
      * @throws JSONException    For JSON formatting error in serialized Inventory object.
      */
-    Inventory setSavedInventory() throws JSONException {
+    Inventory setSingleSavedInventory() throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         // check if an inventory value has been stored
         if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
-            JSONObject inventory = mainGameVM.getSavedEncounter().getJSONObject(INVENTORY);
-            if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_ABILITY)) {
-                // saved Inventory object is an Ability
-                return new Ability(inventory.toString());
-            } else if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_ITEM)) {
-                // saved Inventory object is an Item
-                return new Item(inventory.toString());
-            } else if (inventory.getString(Inventory.TYPE).equals(Inventory.TYPE_WEAPON)) {
-                // otherwise, saved Inventory object is a Weapon
-                return new Weapon(inventory.toString());
-            } else {
-                throw new IllegalArgumentException(inventory.getString(Inventory.TYPE) + " is not a correct Inventory type");
+            String inventory = mainGameVM.getSavedEncounter().getString(INVENTORY);
+            return InventoryFactory.createInventory(inventory);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the array of saved inventory objects from JSON if it exists
+     * @return                  The saved inventory Object if one exists, otherwise return null.
+     * @throws JSONException    For JSON formatting error in serialized Inventory object.
+     */
+    Stack<Inventory> setMultiSavedInventory() throws JSONException {
+        Stack<Inventory> inventoryReward = new Stack<>();
+        MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
+        // check if an inventory value has been stored
+        if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
+            JSONArray inventoryArray = mainGameVM.getSavedEncounter().getJSONArray(INVENTORY);
+            for (int i = 0; i < inventoryArray.length(); i++) {
+                inventoryReward.add(InventoryFactory.createInventory(inventoryArray.getString(i)));
             }
         } else {
             return null;
         }
+        return inventoryReward;
     }
 
     /**

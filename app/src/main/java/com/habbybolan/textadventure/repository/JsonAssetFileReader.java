@@ -6,6 +6,7 @@ Loads and Reads JSON files in the assets folder in the background thread
 
 import android.content.Context;
 
+import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
 import com.habbybolan.textadventure.model.locations.CombatDungeon;
 import com.habbybolan.textadventure.model.locations.MultiDungeon;
 import com.habbybolan.textadventure.model.locations.Outdoor;
@@ -228,8 +229,11 @@ public class JsonAssetFileReader {
             case Outdoor.TRAP_TYPE:
                 trapEncounter(encounterTemp, encounter);
                 break;
-            case Outdoor.SHOP_TYPE: case Outdoor.CHOICE_BENEFIT_TYPE: case Outdoor.RANDOM_BENEFIT_TYPE:
-                shopRandomChoiceEncounter(encounterTemp, encounter);
+            case Outdoor.SHOP_TYPE: case Outdoor.CHOICE_BENEFIT_TYPE:
+                shopChoiceEncounter(encounterTemp, encounter);
+                break;
+            case Outdoor.RANDOM_BENEFIT_TYPE:
+                randomBenefitEncounter(encounterTemp, encounter);
                 break;
             default: //  shouldn't reach here
                 throw new IllegalArgumentException(type + " not a valid encounter type");
@@ -254,7 +258,7 @@ public class JsonAssetFileReader {
                 trapEncounter(encounterTemp, encounter);
                 break;
             case MultiDungeon.SHOP_TYPE: case MultiDungeon.CHOICE_BENEFIT_TYPE: case MultiDungeon.RANDOM_BENEFIT_TYPE:
-                shopRandomChoiceEncounter(encounterTemp, encounter);
+                shopChoiceEncounter(encounterTemp, encounter);
                 break;
             default: //  shouldn't reach here
                 throw new IllegalArgumentException(type + " not a valid encounter type");
@@ -329,7 +333,7 @@ public class JsonAssetFileReader {
 
     /**
      *  Helper method for retrieving and storing the shop, random benefit, and choice benefit encounter JSON data.
-     *  {"type":"random_benefit",
+     *  {"type":"...",
      *  "dialogue":{...}
      *  }
      *
@@ -337,21 +341,23 @@ public class JsonAssetFileReader {
      * @param encounter         object to put parsed object in
      * @throws JSONException    JSON formatting error
      */
-    private void shopRandomChoiceEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+    private void shopChoiceEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
         // get a random dialogue from that encounter specific
         encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
     }
 
     /**
-     * helper method for retrieving and storing the Quest encounter JSON data
+     * {"type":"random_benefit",
+     * "dialogue":{...},
+     * numRewards:x}
+     *
+     * @param encounterTemp     object to parse
+     * @param encounter         object to put parsed object in
      */
-    private void questEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
-        // todo: quest JSON encounter parser
-        String type = encounterTemp.getString(TYPE);
-        JSONArray jsonArray = encounterTemp.getJSONArray(type);
-        encounterTemp = jsonArray.getJSONObject(getRandomJsonArrayIndex(jsonArray));
-        encounterTemp.put(SUB_TYPE, type);
-        encounter.put(ENCOUNTER, encounterTemp);
+    private void randomBenefitEncounter(JSONObject encounterTemp, JSONObject encounter) throws JSONException {
+        // get a random dialogue from that encounter specific
+        encounter.put(DIALOGUE, getRandomDialogue(encounterTemp));
+        encounter.put(RandomBenefitModel.NUM_REWARDS, encounterTemp.getInt(RandomBenefitModel.NUM_REWARDS));
     }
 
     /**

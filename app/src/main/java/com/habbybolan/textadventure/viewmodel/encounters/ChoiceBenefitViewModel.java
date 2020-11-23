@@ -40,7 +40,7 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
         try {
             if (getIsSaved()) {
                 setDialogueList(mainGameVM);
-                inventoryToRetrieve = setSavedInventory();
+                inventoryToRetrieve = setSingleSavedInventory();
             }
         } catch(JSONException e) {
             e.printStackTrace();

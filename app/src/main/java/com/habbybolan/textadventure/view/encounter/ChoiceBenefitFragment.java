@@ -1,6 +1,5 @@
 package com.habbybolan.textadventure.view.encounter;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +18,7 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
+import com.habbybolan.textadventure.view.inventoryinfo.CreateInventoryInfoActivity;
 import com.habbybolan.textadventure.viewmodel.encounters.ChoiceBenefitViewModel;
 
 import org.json.JSONException;
@@ -136,14 +134,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
         snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
-                try {
-                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventoryToRetrieve.serializeToJSON().toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
+                CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), inventoryToRetrieve);
             }
         });
     }

@@ -209,7 +209,7 @@ public class CombatViewModel extends EncounterViewModel {
         try {
             if (getIsSaved()) {
                 setDialogueList(mainGameVM);
-                inventoryToRetrieve = setSavedInventory();
+                inventoryToRetrieve = setSingleSavedInventory();
                 retrieveEnemies();
                 retrieveCombatOrdering();
             }

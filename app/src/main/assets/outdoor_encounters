@@ -149,74 +149,10 @@
 		    "encounters":[
 		        {"dialogue":[{"dialogue":"A small glint underneath some leaves appears.",
 		                        "next":{"dialogue":"As you push away the leaves, you find an item that a traveller must have unknowingly dropped."}}
-
-		        ]}
+		                    ],
+		        "numRewards":"3"}
 		    ]
 
-		},
-
-		{"type":"quest",
-			"encounters":[
-                {"type":"deliver",
-                "deliver":[
-                    {"dialogue":"deliver 1",
-                    "item_name":"item 1",
-                    "conversation":{"dialogue":"1",
-                                    "next":{"dialogue":"2",
-                                            "next":{"dialogue":"3"}
-                                            }
-                                    },
-                     "accept_dialogue":"Thanks for accepting",
-                     "decline_dialogue":"declined"
-                    },
-                   {"dialogue":"deliver 2",
-                   "item_name":"item 2",
-                   "conversation":{"dialogue":"1",
-                                   "next":{"dialogue":"2",
-                                           "next":{"dialogue":"3"}
-                                           }
-                                   },
-                    "accept_dialogue":"Thanks for accepting",
-                    "decline_dialogue":"You leave the man and continue on your path"
-                   }
-                 ]},
-                {"type":"combat",
-                    "combat":[
-                    {"dialogue":"combat 1",
-                    "conversation":{"dialogue":"6",
-                                "next":{"dialogue":"7",
-                                        "next":{"dialogue":"8"}
-                                        }
-                                },
-                    "combat":{
-                            "dialogue":"A bony hand breaks through the ground and grabs you by the ankle.",
-                            "fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]},
-                            "next":{"type":"end",
-                                    "dialogue":"You reached the end of the thing."
-                                    }
-                            },
-                    "accept_dialogue":"Thanks for accepting",
-                    "decline_dialogue":"You leave the man and continue on your path"
-                    },
-                    {"dialogue":"combat 2",
-                    "conversation":{"dialogue":"9",
-                                "next":{"dialogue":"10",
-                                        "next":{"dialogue":"11"}
-                                        }
-                                },
-                    "combat":{
-                            "dialogue":"A bony hand breaks through the ground and grabs you by the ankle.",
-                            "deliver_accepted_dialogue":"Thank you.",
-                            "fight":{"enemyType":["spider", "spider"], "type":["normal","normal"]},
-                            "next":{"type":"end",
-                                    "dialogue":"You reached the end of the thing."
-                                    }
-                            },
-                    "accept_dialogue":"Thanks for accepting",
-                    "decline_dialogue":"You leave the man and continue on your path"
-                    }
-                ]}
-            ]
 		}
 	]},
 

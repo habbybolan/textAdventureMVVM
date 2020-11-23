@@ -58,6 +58,8 @@ public class Character extends CharacterEntity {
     private int dungeonCounter = 0;
     // the original number of dungeon encounters to enter
     private int dungeonLength = 0;
+    // The tier of the dungeon
+    private int dungeonTier = 0;
 
     public final static int OUTDOOR_STATE = 0;
     public final static int MULTI_DUNGEON_STATE = 1;
@@ -76,6 +78,8 @@ public class Character extends CharacterEntity {
                 dungeonCounter = characterObject.getInt("dungeonCounter");
             if (characterObject.has("dungeonLength"))
                 dungeonLength = characterObject.getInt("dungeonLength");
+            if (characterObject.has("dungeonTier"))
+                dungeonTier = characterObject.getInt("dungeonTier");
             // stats
             if (characterObject.has("str")) strength = characterObject.getInt("str");
             if (characterObject.has("strBase")) strBase = characterObject.getInt("strBase");
@@ -306,6 +310,7 @@ public class Character extends CharacterEntity {
         JSONCharacter.put("distance", distance);
         JSONCharacter.put("dungeonCounter", dungeonCounter);
         JSONCharacter.put("dungeonLength", dungeonLength);
+        JSONCharacter.put("dungeonTier", dungeonTier);
 
         JSONCharacter.put("str", strength); // str
         JSONCharacter.put("strBase", strBase); // base str
@@ -640,10 +645,16 @@ public class Character extends CharacterEntity {
         this.dungeonCounter = dungeonCounter;
         dungeonLength = dungeonCounter;
     }
+    public void setDungeonTier(int dungeonTier) {
+        this.dungeonTier = dungeonTier;
+    }
     public void decrementDungeonCounter() {
         dungeonCounter--;
     }
     public int getDungeonLength() {
         return dungeonLength;
+    }
+    public int getDungeonTier() {
+        return dungeonTier;
     }
 }

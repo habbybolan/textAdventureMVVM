@@ -80,19 +80,17 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     /**
      * Add a new inventory, calling the proper method to add the Ability, Item, or Weapon
      * @param inventory The Inventory object to be added.
+     * @return          True if the Inventory object was added, false otherwise
      */
-    public void addNewInventory(Inventory inventory) {
+    public boolean addNewInventory(Inventory inventory) {
         String type = inventory.getType();
         switch (type) {
             case Inventory.TYPE_ABILITY:
-                addAbility((Ability) inventory);
-                break;
+                return addAbility((Ability) inventory);
             case Inventory.TYPE_ITEM:
-                addItem((Item) inventory);
-                break;
+                return addItem((Item) inventory);
             case Inventory.TYPE_WEAPON:
-                addWeapon((Weapon) inventory);
-                break;
+                return addWeapon((Weapon) inventory);
             default:
                 throw new IllegalArgumentException("Inventory object not a Weapon, Ability, or Item");
         }
@@ -561,11 +559,15 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         character.incrementDistance();
         notifyPropertyChanged(BR.distance);
     }
-    public void setDungeonCounter(int counter) {
+    public void setDungeonData(int counter, int dungeonTier) {
         character.setDungeonCounter(counter);
+        character.setDungeonTier(dungeonTier);
     }
     public int getDungeonCounter() {
         return character.getDungeonCounter();
+    }
+    public int getDungeonTier() {
+        return character.getDungeonTier();
     }
     public void decrementDungeonCounter() {
         character.decrementDungeonCounter();

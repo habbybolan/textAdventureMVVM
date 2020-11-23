@@ -28,7 +28,7 @@ public class MainGameModel {
      * Calculated if the dungeon turn counter has reached 0 to signal the dungeon is finished.
      * @return  True if the dungeon is over. False otherwise.
      */
-    public boolean isDungeonOver(CharacterViewModel characterVM) {
+    public static boolean isDungeonOver(CharacterViewModel characterVM) {
         characterVM.decrementDungeonCounter();
         return characterVM.getDungeonCounter() == 0;
     }
@@ -37,11 +37,23 @@ public class MainGameModel {
      * Break encounter check that will signal to enter a break encounter or not.
      * @return  true if break encounter check passes.
      */
-    public boolean breakEncounterCheck() {
+    public static boolean breakEncounterCheck() {
         Random rand = new Random();
         int val = rand.nextInt(100);
         // chance to enter break encounter
         // TODO: what chance for break encounter?
         return val < 0;
+    }
+
+    /**
+     * Create a tier for the dungeon given its type and the distance the player character has gone. Longer the distance,
+     * higher the tier of the dungeon that's possible.
+     * @param dungeonType   The type of the dungeon
+     * @param distance      The distance the player character has travelled
+     * @return              A tier for the dungeon
+     */
+    public static int getDungeonTier(String dungeonType, int distance) {
+        // todo: create tier based on dungeonType and distance
+        return 1;
     }
 }

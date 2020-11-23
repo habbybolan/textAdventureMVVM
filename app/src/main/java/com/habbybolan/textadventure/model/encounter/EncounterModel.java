@@ -10,7 +10,7 @@ abstract class EncounterModel {
      * @param dialogue  The arrayList of dialogue lines to add to the dialogue object.
      * @return          The JSONObject of the dialogue.
      */
-    JSONObject createDialogue(String[] dialogue) throws JSONException {
+    static JSONObject createDialogue(String[] dialogue) throws JSONException {
         JSONObject dialogueJSON = new JSONObject();
         dialogueJSON.put("dialogue", dialogue[0]);
         // store dialogue to be displayed
@@ -24,7 +24,7 @@ abstract class EncounterModel {
      * @param dialogue          ArrayList holding all dialogue strings.
      * @param dialogueJSON      The current Dialogue JSONObject nested inside the main JSONObject
      */
-    private void nextDialogue(int i, String[] dialogue, JSONObject dialogueJSON) throws JSONException {
+    private static void nextDialogue(int i, String[] dialogue, JSONObject dialogueJSON) throws JSONException {
         if (i < dialogue.length) {
             JSONObject tempDialogueJSON = new JSONObject();
             tempDialogueJSON.put("dialogue", dialogue[i]);

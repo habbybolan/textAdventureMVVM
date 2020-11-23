@@ -1,6 +1,5 @@
 package com.habbybolan.textadventure.view.encounter;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +26,7 @@ import com.habbybolan.textadventure.view.InventoryListAdapter.InventoryClickList
 import com.habbybolan.textadventure.view.InventoryListAdapter.ItemListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.WeaponListRecyclerView;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoActivity;
-import com.habbybolan.textadventure.view.inventoryinfo.InventoryInfoFragment;
+import com.habbybolan.textadventure.view.inventoryinfo.CreateInventoryInfoActivity;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
@@ -416,10 +414,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      * @param object    Inventory used as an action whose information will be displayed.
      */
     private void InventoryActivity(Inventory object) {
-        Intent intent = new Intent(getContext(), InventoryInfoActivity.class);
-        intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, combatVM.serializeInventory(object));
-        startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
+        CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), object);
     }
 
     /**
