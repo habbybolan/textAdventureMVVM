@@ -11,13 +11,14 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
+import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public abstract class CharacterEntityViewModel extends BaseObservable {
@@ -27,21 +28,17 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
 
     // ** Abilities **
 
-    // Observable for adding and deleting abilities and updating RecyclerView in CharacterFragment
-    private ObservableField<Ability> abilityObserverAdd = new ObservableField<>();
-    public ObservableField<Ability> getAbilityObserverAdd() {
-        return abilityObserverAdd;
-    }
-    private ObservableField<Ability> abilityObserverRemove = new ObservableField<>();
-    public ObservableField<Ability> getAbilityObserverRemove() {
-        return abilityObserverRemove;
-    }
     // applies the ability from the attacker
     public void applyAbility(Ability ability, CharacterEntity attacker) {
-        // todo: use attacker stats to alter ability effectiveness
         Random rand = new Random();
+
         if (ability.getMinDamage() != 0) {
-            notifyChangeHealth(characterEntity.damageTarget(characterEntity.getRandomAmount(ability.getMinDamage(), ability.getMaxDamage())));
+            int damage =  rand.nextInt(ability.getMaxDamage() - ability.getMinDamage()) + ability.getMinDamage();
+            if (ability.getIsStrScaled())
+                damage += attacker.getStrength();
+            if (ability.getIsIntScaled())
+                damage += attacker.getIntelligence();
+            characterEntity.damageTarget(damage);
         }
         if (ability.getDamageAoe() != 0) characterEntity.doAoeStuff(); // todo: aoe
         // specials
@@ -95,13 +92,12 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         // direct heal/mana
         if (ability.getHealMin() != 0) {
             int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
-            int healthChanged = characterEntity.changeHealthCurr(randHealthChange);
-            notifyChangeHealth(healthChanged);
+            characterEntity.changeHealthCurr(randHealthChange);
         }
         if (ability.getManaMin() != 0) {
             int randManaChange = rand.nextInt(ability.getManaMax() - ability.getManaMin()) + ability.getManaMin();
-            int manaChanged = characterEntity.changeManaCurr(randManaChange);
-            notifyChangeMana(manaChanged);
+            characterEntity.changeManaCurr(randManaChange);
+            notifyChangeMana();
         }
         // stat increases
         TempStat tempStat;
@@ -169,9 +165,11 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         // temp extra health
         TempBar tempBar;
         if (ability.getTempExtraHealth() != 0) {
-            tempBar = new TempBar(TempBar.TEMP_HEALTH, ability.getDuration(), ability.getTempExtraHealth());
-            barObserver.add(tempBar);
+            tempBar = TempBarFactory.createTempHealth(ability.getDuration(), ability.getTempExtraHealth());
+            characterEntity.addTempHealthList(tempBar);
         }
+        notifyChangeHealth();
+        notifyChangeMana();
         ability.setActionUsed();
     }
 
@@ -188,7 +186,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         Random random = new Random();
         // get a random amount of damage given a range
         int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
-        notifyChangeHealth(characterEntity.damageTarget(damage));
+        characterEntity.damageTarget(damage);
+        notifyChangeHealth();
     }
     // apply the special attack from the attacker
     public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
@@ -202,7 +201,8 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         if (specialAttack.getDamageMin() != 0) {
             // get a random amount of damage given a range
             int damage = characterEntity.getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax());
-            notifyChangeHealth(characterEntity.damageTarget(damage));
+            characterEntity.damageTarget(damage);
+            notifyChangeHealth();
         }
         specialAttack.setActionUsed();
     }
@@ -222,6 +222,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
      */
     public void applyDots() {
         characterEntity.applyDots();
+        notifyChangeHealth();
     }
 
     // ** Special Effects **
@@ -239,6 +240,13 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
      */
     public void decrSpecialDuration() {
         characterEntity.decrSpecialDuration();
+    }
+
+    /**
+     * Removes all special effects on character.
+     */
+    public void removeAllSpecialEffects() {
+        characterEntity.removeAllSpecialEffects();
     }
 
     // ** Stat Changes **
@@ -339,98 +347,42 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
 
     // direct damage applied to player character
     public void damageCharacterEntity(int damageAmount) {
-        notifyChangeHealth(characterEntity.damageTarget(damageAmount));
-    }
-
-    private ObservableArrayList<TempBar> barObserver = new ObservableArrayList<>();
-    public ObservableArrayList<TempBar> getBarObserver() {
-        return barObserver;
+        characterEntity.damageTarget(damageAmount);
+        notifyChangeHealth();
     }
 
     // decrement both the health and mana temp extra bars and observe any changes
     public void decrementTempExtraDuration() {
-        decrementTempExtraHealthDuration();
-        decrementTempExtraManaDuration();
-    }
-    // decrement the temp extra health duration and observe any changes
-    private void decrementTempExtraHealthDuration() {
-        int health = characterEntity.getHealth();
-        ArrayList<TempBar> tempBarsRemoved = characterEntity.decrementTempExtraHealthDuration();
-        int healthChange = characterEntity.getHealth() - health;
-        for (TempBar tempBar : tempBarsRemoved) {
-            barObserver.remove(tempBar);
-        }
-        if (healthChange != 0) notifyChangeHealth(healthChange);
-    }
-    // decrement the temp extra mana duration and observe any changes
-    private void decrementTempExtraManaDuration() {
-        int mana = characterEntity.getMana();
-        ArrayList<TempBar> tempBarsRemoved = characterEntity.decrementTempExtraManaDuration();
-        int manaChange = characterEntity.getMana() - mana;
-        for (TempBar tempBar : tempBarsRemoved) {
-            barObserver.remove(tempBar);
-        }
-        if (manaChange != 0) notifyChangeMana(manaChange);
+        characterEntity.decrementTempExtraDuration();
     }
 
     // given tempBar, add it to either TempExtraHealth or TempExtraMana list depending on type
-    public void addTempHealthMana(TempBar tempBar) {
+    public void addNewTempBar(TempBar tempBar) {
+        characterEntity.addNewTempExtraHealthMana(tempBar);
         if (tempBar.getType().equals(TempBar.TEMP_HEALTH)) {
-            addTempHealthList(tempBar);
+            notifyPropertyChanged(BR.health);
+            notifyPropertyChanged(BR.maxHealth);
         } else {
-            addTempManaList(tempBar);
+            notifyPropertyChanged(BR.mana);
+            notifyPropertyChanged(BR.maxMana);
         }
-        barObserver.add(tempBar);
     }
 
-    public List<TempBar> getTempHealthList() {
+    public ObservableArrayList<TempBar> getHealthList() {
         return characterEntity.getTempHealthList();
     }
-    public void removeZeroTempHealthList() {
-        ArrayList<TempBar> tempBarsRemoved = characterEntity.removeZeroTempHealthList();
-        for (TempBar tempBar : tempBarsRemoved) {
-            barObserver.remove(tempBar);
-        }
-    }
-    public void addTempHealthList(TempBar tempExtraHealth) {
-        characterEntity.addTempHealthList(tempExtraHealth);
-        notifyPropertyChanged(BR.health);
-        notifyPropertyChanged(BR.maxHealth);
-    }
-    public int getTempExtraHealth() {
-        return characterEntity.getTempExtraHealth();
-    }
-    public void setTempExtraHealth(int tempExtraHealth) {
-        characterEntity.setTempExtraHealth(tempExtraHealth);
-    }
 
-    public List<TempBar> getTempManaList() {
+    public ObservableArrayList<TempBar> getManaList() {
         return characterEntity.getTempManaList();
     }
-    public void removeZeroTempManaList() {
-        characterEntity.removeZeroTempManaList();
-    }
-    public void addTempManaList(TempBar tempExtraMana) {
-        characterEntity.addTempManaList(tempExtraMana);
-        notifyPropertyChanged(BR.mana);
-        notifyPropertyChanged(BR.maxMana);
-    }
-    public int getTempExtraMana() {
-        return characterEntity.getTempExtraMana();
-    }
-    public void setTempExtraMana(int tempExtraMana) {
-        characterEntity.setTempExtraMana(tempExtraMana);
-    }
+
 
     // ** CHANGES**
 
     // Health mana changes
 
-    @Bindable
-    private
-    ObservableField<Integer> healthObserve = new ObservableField<>();
     public ObservableField<Integer> getHealthObserve() {
-        return healthObserve;
+        return characterEntity.healthObserve;
     }
     @Bindable
     public int getHealth() {
@@ -438,15 +390,12 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     }
     // set the new health
     public void setHealth(int health) {
-        // observe the health change
-        healthObserve.set(new Integer(health - characterEntity.getHealth()));
         // apply the change
         characterEntity.setHealth(health);
         notifyPropertyChanged(BR.health);
     }
     // notify healthChange to changeHealth
-    public void notifyChangeHealth(int changeHealth) {
-        healthObserve.set(new Integer(changeHealth));
+    public void notifyChangeHealth() {
         notifyPropertyChanged(BR.health);
         notifyPropertyChanged(BR.maxHealth);
     }
@@ -458,24 +407,20 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         characterEntity.setMaxHealth(maxHealth);
     }
 
-    private ObservableField<Integer> manaObserve = new ObservableField<>();
     public ObservableField<Integer> getManaObserve() {
-        return manaObserve;
+        return characterEntity.manaObserve;
     }
     @Bindable
     public int getMana() {
         return characterEntity.getMana();
     }
     public void setMana(int mana) {
-        // observe mana changes
-        manaObserve.set(new Integer(mana - characterEntity.getMana()));
         // apply the change
         characterEntity.setMana(mana);
         notifyPropertyChanged(BR.mana);
     }
     // notify manaChange to changeMana
-    public void notifyChangeMana(int changeMana) {
-        manaObserve.set(new Integer(changeMana));
+    public void notifyChangeMana() {
         notifyPropertyChanged(BR.mana);
         notifyPropertyChanged(BR.maxMana);
     }
@@ -678,6 +623,17 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         updateAllStatChange.set(new TempStat(Effect.BLOCK, block - characterEntity.getBlock()));
         characterEntity.setBlock(block);
         notifyPropertyChanged(BR.block);
+    }
+
+    public ObservableArrayList<Ability> getAbilities() {
+        return characterEntity.getAbilities();
+    }
+    public ArrayList<Weapon> getWeapons() {
+        return characterEntity.getWeapons();
+    }
+
+    public boolean isEnoughMana(int amount) {
+        return characterEntity.isEnoughMana(amount);
     }
 
     public CharacterEntity getCharacterEntity() {

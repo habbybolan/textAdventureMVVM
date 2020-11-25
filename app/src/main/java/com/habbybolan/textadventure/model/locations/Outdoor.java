@@ -2,6 +2,8 @@ package com.habbybolan.textadventure.model.locations;
 
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 
+import java.util.Random;
+
 public class Outdoor {
 
     final public static int COMBAT_DUNGEON = 0;
@@ -46,8 +48,6 @@ public class Outdoor {
      * @return  An outdoor encounter int value corresponding to its index placement in a JSONArray
      */
     public static int getRandomEncounter() {
-        return RANDOM_BENEFIT;
-        /*
         Random rand = new Random();
         int val = rand.nextInt(100);
         if (isBetween(COMBAT_DUNGEON_LOWER, COMBAT_DUNGEON_LOWER + COMBAT_DUNGEON_PERCENT, val))
@@ -65,7 +65,7 @@ public class Outdoor {
         else if (isBetween(CHOICE_BENEFIT_LOWER, CHOICE_BENEFIT_LOWER + CHOICE_BENEFIT_PERCENT, val))
             return CHOICE_BENEFIT;
         else
-            return RANDOM_BENEFIT;*/
+            return RANDOM_BENEFIT;
     }
 
     /**

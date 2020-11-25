@@ -3,7 +3,7 @@ package com.habbybolan.textadventure.model.encounter;
 import android.content.Context;
 
 import com.habbybolan.textadventure.model.effects.Effect;
-import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
@@ -45,9 +45,9 @@ public class ChoiceBenefitModel {
             case 5: // Block
                 return new TempStat(TempStat.BLOCK, 10, 50);
             case 6: // Health
-                return new TempBar(TempBar.TEMP_HEALTH, 10, 50);
+                return TempBarFactory.createTempHealth(10, 50);
             default:
-                return new TempBar(TempBar.TEMP_MANA, 10, 50);
+                return TempBarFactory.createTempMana(10, 50);
         }
     }
 
@@ -70,9 +70,9 @@ public class ChoiceBenefitModel {
             case 5: // Block
                 return new TempStat(TempStat.BLOCK, 10);
             case 6: // Health
-                return new TempBar(TempBar.TEMP_HEALTH, 10);
+                return TempBarFactory.createIndefiniteHealth(10);
             default:
-                return new TempBar(TempBar.TEMP_MANA, 10);
+                return TempBarFactory.createIndefiniteMana(10);
         }
     }
 

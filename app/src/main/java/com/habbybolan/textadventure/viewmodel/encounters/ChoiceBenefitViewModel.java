@@ -107,7 +107,7 @@ public class ChoiceBenefitViewModel extends EncounterViewModel {
             characterVM.addInputStat((TempStat) effect);
         } else {
             // otherwise add the permanent heath/mana increase
-            characterVM.addTempHealthMana((TempBar) effect);
+            characterVM.addNewTempBar((TempBar) effect);
         }
     }
 

@@ -174,8 +174,7 @@ public abstract class EncounterViewModel extends AndroidViewModel {
         }
     }
 
-        // dialogueList
-
+    // dialogueList
     private ArrayList<DialogueType> dialogueList = new ArrayList<>();
 
     /**

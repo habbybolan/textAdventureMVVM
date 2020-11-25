@@ -1,6 +1,7 @@
 package com.habbybolan.textadventure.model.characterentity;
 
 import androidx.databinding.ObservableArrayList;
+import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
@@ -77,9 +78,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     protected int mana;
     protected int maxMana;
 
-    protected int tempExtraHealth = 0;
-    protected int tempExtraMana = 0;
-
     protected int numAbilities;
     protected int numWeapons;
     protected int numItems;
@@ -94,21 +92,32 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     protected int drawableIconDeadResID;
 
     // Inventory
-    protected ArrayList<Ability> abilities = new ArrayList<>();
-    protected ArrayList<Weapon> weapons = new ArrayList<>();
-    protected ArrayList<Item> items = new ArrayList<>();
+    protected ObservableArrayList<Ability> abilities = new ObservableArrayList<>();
+    protected ObservableArrayList<Weapon> weapons = new ObservableArrayList<>();
+    protected ObservableArrayList<Item> items = new ObservableArrayList<>();
 
-    // keep track of special duration left <name, duration> sorted by duration
+    // List of special effects applied to character
     ObservableArrayList<SpecialEffect> specialList = new ObservableArrayList<>();
-
     // list of Dots applied to character
     ObservableArrayList<Dot> dotList = new ObservableArrayList<>();
-
-    // keep track of stat increases - list<ArrayList<stat, duration, amount>> sorted by duration
+    // keep track of stat increases
     ObservableArrayList<TempStat> statIncreaseList = new ObservableArrayList<>();
-
-    // keep track of stat decreases - list<ArrayList<stat, duration, amount>> sorted by duration
+    // keep track of stat decreases
     ObservableArrayList<TempStat> statDecreaseList = new ObservableArrayList<>();
+
+    // keeps track of the most recent health change to display
+    public ObservableField<Integer> healthObserve = new ObservableField<>();
+    // keeps track of the most recent mana change to display
+    public ObservableField<Integer> manaObserve = new ObservableField<>();
+
+    public static final String TEMP_HEALTH = "Temporary health";
+    public static final String TEMP_MANA = "Temporary mana";
+
+    // keep track of temp health increase
+    ObservableArrayList<TempBar> tempHealthList = new ObservableArrayList<>();
+
+    // keep track of temp mana increase
+    ObservableArrayList<TempBar> tempManaList = new ObservableArrayList<>();
 
     // decrement all ability cooldowns
     public abstract void decrCooldowns();
@@ -129,26 +138,77 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
      * Damage the character by damage amount. If there are any shields, damage the shields with the
      * smalled current duration. Otherwise, damage the Character entities health directly.
      * @param damage    The amount to damage characterEntity by
-     * @return          The amount of direct health damage
      */
-    public int damageTarget(int damage) {
+    public void damageTarget(int damage) {
         if (damage < 0) throw new IllegalArgumentException(damage + " needs to be a positive integer");
         int prevHealth = health;
-        int overFlow = 0; // keeps track of damage if it gets rid of all tempExtraHealth
-        if ((getTempExtraHealth() - damage) < 0) {
-            overFlow = Math.abs(getTempExtraHealth() - damage);
+        // deplete all tempExtraHealth list until empty or all damage applied
+        while (!tempHealthList.isEmpty() && damage > 0) {
+            if (tempHealthList.get(0).getAmount() <= damage) {
+                // Remove the front temp extra buff since it contains less health than the damage to do
+                damage -= tempHealthList.get(0).getAmount();
+                tempHealthList.remove(0);
+            } else {
+                // otherwise, temp health is more than damage, only deplete the temp health
+                depleteTempExtraHealth(damage);
+            }
         }
-        // if the target has some temporary extra health, do damage to that first
-        if (getTempExtraHealth() > 0) {
-            depleteTempExtraHealth(damage);
+        // any leftover damage will be the amount that depleted all temp extra health.
+        // apply leftover damage to direct health.
+        if (damage > 0) {
+            health -= damage;
+            if (health <= 0) {
+                health = 0;
+                isAlive = false;
+            }
         }
-        // direct health takes damage if any overFlow from tempHealth
-        health -= overFlow;
-        if (health < 0) {
-            health = 0;
-            isAlive = false;
+        setHealthChange(health - prevHealth);
+    }
+
+    /**
+     * Deplete the mana by manaToDeplete and return the value that the direct mana has depleted. Goes through Temp extra mana first
+     * before depleting direct mana.
+     * @param manaToDeplete     The amount of mana to deplete
+     * @return                  True if Character Entity mana was sufficient
+     */
+    public boolean useMana(int manaToDeplete) {
+        if (manaToDeplete < 0) throw new IllegalArgumentException(manaToDeplete + " needs to be a positive integer");
+        if (!isEnoughMana(manaToDeplete)) return false;
+        int prevMana = mana;
+        // deplete all tempExtraMana list until empty or all mana depletion applied
+        while (!tempManaList.isEmpty() && manaToDeplete > 0) {
+            if (tempManaList.get(0).getAmount() <= manaToDeplete) {
+                // Remove the front temp extra buff since it contains less mana than the mana to deplete
+                manaToDeplete -= tempManaList.get(0).getAmount();
+                tempManaList.remove(0);
+            } else {
+                // otherwise, temp mana is more than damage, only deplete the temp health
+                depleteTempExtraMana(manaToDeplete);
+            }
         }
-        return health - prevHealth;
+        // any leftover mana will be the amount that depleted all temp extra mana.
+        // apply leftover mana to direct mana.
+        if (manaToDeplete > 0) {
+            mana -= manaToDeplete;
+            if (mana <= 0) {
+                health = 0;
+                isAlive = false;
+            }
+        }
+        setManaChange(mana - prevMana);
+        return true;
+    }
+
+    /**
+     * @param manaToDeplete     The amount of mana to test to deplete
+     * @return                  True if there is >= direct and temp extra mana compared to manaToDeplete
+     */
+    public boolean isEnoughMana(int manaToDeplete) {
+        int tempExtraMana = mana;
+        for (TempBar tempBar : tempManaList) {
+            tempExtraMana += tempBar.getAmount();
+        }
+        return tempExtraMana >= manaToDeplete;
     }
 
     /**
@@ -167,23 +227,21 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     /**
      *  Returns amount to heal entity by. Does not affect the max health.
      * @param amount    Amount to heal character entity by
-     * @return          The amount of health character entity changed by
      */
-    public int changeHealthCurr(int amount) {
+    public void changeHealthCurr(int amount) {
         if (amount < 0) throw new IllegalArgumentException(amount + " needs to be a positive integer");
         int prevHealth = health;
         if (amount + health > maxHealth) health = maxHealth;
         else health = health + amount;
-        return health - prevHealth;
+        setHealthChange(health - prevHealth);
     }
 
     /**
      * Changes the current health and max health by a certain amount, positive or negative.
      * Not used for taking damage or heals. Use for indefinite/permanent health change.
      * @param amount    Amount to heal character entity by
-     * @return          The amount of health character entity changed by
      */
-    public int changeHealthMax(int amount) {
+    public void changeHealthMax(int amount) {
         int tempHealth = health;
         maxHealth += amount;
         if (amount > 0)
@@ -192,15 +250,14 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             if (health > maxHealth)
                 health = maxHealth;
         }
-        return health - tempHealth;
+        setHealthChange(health - tempHealth);
     }
 
     /**
-     * Change current and max mana by an amount and return change.
+     * Change current and max mana by an amount.
      * @param amount    Amount to recover mana for character entity
-     * @return          The amount of mana changed for current mana
      */
-    public int changeManaMax(int amount) {
+    public void changeManaMax(int amount) {
         int tempMana = mana;
         maxMana += amount;
         if (amount > 0)
@@ -209,22 +266,28 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             if (mana > maxMana)
                 mana = maxMana;
         }
-        return mana - tempMana;
+        setManaChange(mana - tempMana);
     }
 
     /**
-     * Change current and max mana by an amount and return change.
+     * Change current and max mana by an amount.
      * @param amount    Amount to recover mana for character entity
-     * @return          The amount of mana changed for current mana
      */
-    public int changeManaCurr(int amount) {
+    public void changeManaCurr(int amount) {
         int prevMana = mana;
         if (amount + mana > maxMana) mana = maxMana;
         else if (amount + mana < 0) mana = 0;
         else mana = mana+amount;
-        return mana - prevMana;
+        setManaChange(mana - prevMana);
     }
 
+    private void setManaChange(int amount) {
+        manaObserve.set(new Integer(amount));
+    }
+
+    private void setHealthChange(int amount) {
+        healthObserve.set(new Integer(amount));
+    }
 
     // *** STATS ***
 
@@ -480,12 +543,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // BARS
-
-    public static final String TEMP_HEALTH = "Temporary health";
-    public static final String TEMP_MANA = "Temporary mana";
-
-    // keep track of temp health increase - list<ArrayList<duration, amount>> sorted by duration
-    List<TempBar> tempHealthList = new ArrayList<>();
     public ArrayList<TempBar> removeZeroTempHealthList() {
         return removeZeroTempBarList(tempHealthList);
     }
@@ -501,9 +558,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         maxHealth = maxHealth + tempExtraHealth.getAmount();
     }
 
-
-    // keep track of temp mana increase - list<ArrayList<duration, amount>> sorted by duration
-    List<TempBar> tempManaList = new ArrayList<>();
     public void removeZeroTempManaList() {
         removeZeroTempBarList(tempManaList);
     }
@@ -556,10 +610,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     // update tempExtraHealth/Mana value
     public void addNewTempExtraHealthMana(TempBar tempBar) {
         if (tempBar.getType().equals(TEMP_HEALTH)) {
-            setTempExtraHealth(getTempExtraHealth() + tempBar.getAmount());
             tempHealthList.add(tempBar);
         } else {
-            setTempExtraMana(getTempExtraMana() + tempBar.getAmount());
             tempManaList.add(tempBar);
         }
     }
@@ -575,7 +627,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // helper for depleteTempExtraHealth/Mana to deplete and/or remove extra amount from array indices
-    private void depleteTempExtra(int amount, List<TempBar> list) {
+    private void depleteTempExtra(int amount, ObservableArrayList<TempBar> list) {
         // loop through all indices of list and remove element if more amount to deplete than amount left over
         // looking at index 0 as the list is sorted from from smallest duration left to largest
         final int index = 0;
@@ -599,16 +651,15 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         decrementTempExtraManaDuration();
     }
 
-    public ArrayList<TempBar> decrementTempExtraHealthDuration() {
-        return decrementTemp(tempHealthList);
+    public void decrementTempExtraHealthDuration() {
+        decrementTemp(tempHealthList);
     }
-    public ArrayList<TempBar> decrementTempExtraManaDuration() {
-        return decrementTemp(tempManaList);
+    public void decrementTempExtraManaDuration() {
+        decrementTemp(tempManaList);
     }
 
     // decrement the duration of an arrayList, removing it if it reaches duration 0
-    private ArrayList<TempBar> decrementTemp(List<TempBar> list) {
-        ArrayList<TempBar> tempBarsRemoved = new ArrayList<>();
+    private void decrementTemp(List<TempBar> list) {
         int index = 0;
         // iterate over all tempHealthList elements, decrementing the duration value, removing if duration = 0;
         while (index < list.size()) {
@@ -616,11 +667,9 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             if (list.get(index).getDuration() > 0) {
                 index++;
             } else {
-                tempBarsRemoved.add(list.get(index));
                 list.remove(index);
             }
         }
-        return tempBarsRemoved;
     }
 
     // ***AOE***
@@ -811,6 +860,13 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     /**
+     * Removes all special effects
+     */
+    public void removeAllSpecialEffects() {
+        specialList.clear();
+    }
+
+    /**
      * Change the value of isSpecial boolean value corresponding to the special type.
      * @param special   The special type that corresponds to a boolean to switch.
      */
@@ -963,7 +1019,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return stillManaDot;
     }
 
-
     /**
      * Remove a specific dot from dotList. Find if the effect of the dot is still applied to the character
      * through an indefinite means.
@@ -1109,23 +1164,23 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // status application of damage over times
-    public void applyFire() {
+    private void applyFire() {
         damageTarget(Dot.FIRE_DAMAGE);
     }
-    public void applyPoison() {
+    private void applyPoison() {
         damageTarget(Dot.POISON_DAMAGE);
     }
-    public void applyBleed() {
+    private void applyBleed() {
         damageTarget(Dot.BLEED_DAMAGE);
     }
-    public void applyFrostBurn() {
+    private void applyFrostBurn() {
         addNewSpecial(new SpecialEffect(SpecialEffect.STUN, Dot.FROSTBURN_DURATION));
         damageTarget(Dot.FROSTBURN_DAMAGE);
     }
-    public void applyHealthDot() {
+    private void applyHealthDot() {
         changeHealthCurr(Dot.HEAL_DOT_AMOUNT);
     }
-    public void applyManaDot() {
+    private void applyManaDot() {
         changeManaCurr(Dot.MANA_DOT_AMOUNT);
     }
 
@@ -1185,31 +1240,19 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public int getNumWeapons() {
         return numWeapons;
     }
-    public ArrayList<Ability> getAbilities() {
+    public ObservableArrayList<Ability> getAbilities() {
         return abilities;
     }
-    public ArrayList<Weapon> getWeapons() {
+    public ObservableArrayList<Weapon> getWeapons() {
         return weapons;
     }
-    public ArrayList<Item> getItems() {
+    public ObservableArrayList<Item> getItems() {
         return items;
     }
     public boolean isCharacter() {
         return true;
     }
     // ** bars **
-    public int getTempExtraHealth() {
-        return tempExtraHealth;
-    }
-    public int getTempExtraMana() {
-        return tempExtraMana;
-    }
-    public void setTempExtraHealth(int tempExtraHealth) {
-        this.tempExtraHealth = tempExtraHealth;
-    }
-    public void setTempExtraMana(int tempExtraMana) {
-        this.tempExtraMana = tempExtraMana;
-    }
 
     public int getHealth() {
         return health;
@@ -1225,6 +1268,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     public void setHealth(int health) {
+        // observe the health change
+        healthObserve.set(new Integer(health - this.health));
         this.health = health;
         if (health == 0) isAlive = false;
     }
@@ -1232,6 +1277,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         this.maxHealth = maxHealth;
     }
     public void setMana(int mana) {
+        // observe mana changes
+        manaObserve.set(new Integer(mana - this.mana));
         this.mana = mana;
     }
     public void setMaxMana(int maxMana) {
@@ -1465,10 +1512,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public ObservableArrayList<SpecialEffect> getSpecialList() {
         return specialList;
     }
-    public List<TempBar> getTempHealthList() {
+    public ObservableArrayList<TempBar> getTempHealthList() {
         return tempHealthList;
     }
-    public List<TempBar> getTempManaList() {
+    public ObservableArrayList<TempBar> getTempManaList() {
         return tempManaList;
     }
     public ObservableArrayList<TempStat> getStatIncreaseList() {

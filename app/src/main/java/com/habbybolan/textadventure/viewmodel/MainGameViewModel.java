@@ -146,7 +146,7 @@ public class MainGameViewModel extends BaseObservable {
      *  stored in the character, it will start an encounter associated with the that state.
      */
     public void gotoNextRandomEncounter() {
-        applyAfterEncounterActions();
+        characterVM.afterEncounter();
         try {
             switch (characterVM.getEncounterState()) {
                 case OUTDOOR_STATE:
@@ -175,8 +175,8 @@ public class MainGameViewModel extends BaseObservable {
      * Starts a specified encounter from specifiedEncounter JSON.
      * @param specifiedEncounter    The encounter to start relating to the JSON.
      */
-    public void gotoSpecifiedEncounter(JSONObject specifiedEncounter) throws JSONException {
-        applyAfterEncounterActions();
+    public void gotoSpecifiedEncounter(JSONObject specifiedEncounter) {
+        characterVM.afterEncounter();
         encounter = new Encounter(specifiedEncounter);
         setEncounterObservable(encounter);
     }
@@ -215,7 +215,7 @@ public class MainGameViewModel extends BaseObservable {
         // create a check JSONObject that only holds
         //      {"type":"check",
         //      "dialogue":{"Continue in the dungeon?"}}
-        // and set as encounter
+        // JSONObject and set as encounter
         encounter = new Encounter(check);
         setEncounterObservable(encounter);
     }
@@ -225,7 +225,7 @@ public class MainGameViewModel extends BaseObservable {
      */
     private void createNewOutdoorEncounter() {
         JsonAssetFileReader jsonAssetFileReader = new JsonAssetFileReader(application);
-        // get a random encounter from jsonFileReader
+        // get a random encounter from JsonFileReader
         try {
             encounter = new Encounter(jsonAssetFileReader.getRandomOutdoorEncounter(location, location_type));
         } catch (Exception e) {
@@ -322,29 +322,19 @@ public class MainGameViewModel extends BaseObservable {
     }
 
     /**
-     * Helper to apply necessary actions after an encounter ends, including:
+     * Helper to apply necessary actions before encounter starts, including:
      *  applying and decrementing dot effects applied to character
      *  decrementing special effects applied to character
      *  decrementing stat and tempExtra changes applied to character
      *  setting the savedEncounter to null
      */
-    private void applyAfterEncounterActions() {
-        characterVM.applyDots();
+    public void applyBeforeEncounter() {
         // todo: overwrite savedEncounter when entering new encounter instead of setting to null - could cause game loss
         savedEncounter = null;
-        // todo: decrement stat and bar durations
-        //characterVM.decrementStatChangeDuration();
-        //characterVM.decrementTempExtraDuration();
-        characterVM.decrSpecialDuration();
-        classSpecificCheck();
+        characterVM.applyBeforeEncounter();
     }
 
-    /**
-     * Run a check for any class specific checks that occur between encounters.
-     */
-    private void classSpecificCheck() {
-        // todo:
-    }
+
 
 
     @Bindable

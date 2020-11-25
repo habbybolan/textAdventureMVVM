@@ -120,30 +120,16 @@ public class CharacterViewModel extends CharacterEntityViewModel {
 
         // Abilities
 
-    // Observable for adding and deleting abilities and updating RecyclerView in CharacterFragment
-    private ObservableField<Ability> abilityObserverAdd = new ObservableField<>();
-    public ObservableField<Ability> getAbilityObserverAdd() {
-        return abilityObserverAdd;
-    }
-    private ObservableField<Ability> abilityObserverRemove = new ObservableField<>();
-    public ObservableField<Ability> getAbilityObserverRemove() {
-        return abilityObserverRemove;
-    }
     public void removeAbility(Ability ability) {
         character.removeAbility(ability);
-        abilityObserverRemove.set(ability);
     }
     public boolean addAbility(Ability ability) {
         if (character.getNumAbilities() >= Character.MAX_ABILITIES) return false;
         character.addAbility(ability);
-        abilityObserverAdd.set(ability);
         return true;
     }
     public void removeAbilityAtIndex(int index) {
-        abilityObserverRemove.set(character.removeAbilityAtIndex(index));
-    }
-    public ArrayList<Ability> getAbilities() {
-        return character.getAbilities();
+        character.removeAbilityAtIndex(index);
     }
 
         // Weapons
@@ -156,9 +142,6 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     private ObservableField<Weapon> weaponObserverRemove = new ObservableField<>();
     public ObservableField<Weapon> getWeaponObserverRemove() {
         return weaponObserverRemove;
-    }
-    public ArrayList<Weapon> getWeapons() {
-        return character.getWeapons();
     }
     public void removeWeapon(Weapon weapon) {
         character.removeWeapon(weapon);
@@ -205,44 +188,35 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             // bar changes
             if (item.getHealthChange() != 0) {
                 // health and max health altered
-                notifyChangeHealth(character.changeHealthMax(-item.getHealthChange()));
+                character.changeHealthMax(-item.getHealthChange());
+                notifyChangeHealth();
             }
             if (item.getManaChange() != 0) {
                 setMaxMana(character.getMaxMana() - item.getManaChange());
                 character.changeManaMax(-item.getManaChange());
-                // max mana altered
-                notifyChangeMana(-item.getManaChange());
+                notifyChangeMana();
             }
             // special changes
             SpecialEffect special;
             if (item.getIsConfuse()) {
                 special = new SpecialEffect(SpecialEffect.CONFUSE);
                 character.removeInputSpecial(special);
-
-
             }
             if (item.getIsStun()) {
                 special = new SpecialEffect(SpecialEffect.STUN);
                 character.removeInputSpecial(special);
-
-
             }
             if (item.getIsSilence()) {
                 special = new SpecialEffect(SpecialEffect.SILENCE);
                 character.removeInputSpecial(special);
-
-
             }
             if (item.getIsInvisible()) {
                 special = new SpecialEffect(SpecialEffect.INVISIBILITY);
                 character.removeInputSpecial(special);
-
-
             }
             if (item.getIsInvincible()) {
                 special = new SpecialEffect(SpecialEffect.INVINCIBILITY);
                 character.removeInputSpecial(special);
-
             }
             // DOT changes
             Dot dot;
@@ -294,13 +268,12 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             // bar changes
             if (item.getHealthChange() != 0) {
                 // health and max health altered
-                notifyChangeHealth(character.changeHealthMax(item.getHealthChange()));
+                character.changeHealthMax(item.getHealthChange());
+                notifyChangeHealth();
             }
             if (item.getManaChange() != 0) {
-                setMaxMana(character.getMaxMana() + item.getManaChange());
                 character.changeManaMax(item.getManaChange());
-                // max mana altered
-                notifyChangeMana(item.getManaChange());
+                notifyChangeMana();
             }
             // special changes
             SpecialEffect special;
@@ -409,12 +382,13 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         // health/mana
         if (item.getHealthChange() != 0) {
             // health and max health altered
-            notifyChangeHealth(character.changeHealthCurr(item.getHealthChange()));
+            character.changeHealthCurr(item.getHealthChange());
+            notifyChangeHealth();
         }
         if (item.getManaChange() != 0) {
-            int manaChange = character.changeManaCurr(item.getManaChange());
+            character.changeManaCurr(item.getManaChange());
             // only mana altered
-            notifyChangeMana(manaChange);
+            notifyChangeMana();
         }
         // specials
         if (item.getIsConfuse()) character.addNewSpecial(new SpecialEffect(SpecialEffect.CONFUSE, item.getDuration()));
@@ -462,17 +436,15 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     }
     // set an indefinite health increase (max and curr health change)
     private void setIndefiniteHealthIncr(TempBar tempBar) {
-        setMaxHealth(getMaxHealth() + tempBar.getAmount());
         character.changeHealthMax(tempBar.getAmount());
         // max health changed
-        notifyChangeHealth(tempBar.getAmount());
+        notifyChangeHealth();
     }
     // set an indefinite mana increase (max and curr mana change)
     private void setIndefiniteManaIncr(TempBar tempBar) {
-        setMaxMana(getMaxMana() + tempBar.getAmount());
         character.changeManaMax(tempBar.getAmount());
         // max mana altered
-        notifyChangeMana(tempBar.getAmount());
+        notifyChangeMana();
     }
 
 
@@ -512,6 +484,51 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         character.addExp(amount);
         notifyPropertyChanged(BR.exp);
         expObserve.set(new Integer(amount));
+    }
+
+    /**
+     * Apply all necessary actions to character before new encounter starts
+     */
+    public void applyBeforeEncounter() {
+        applyDots();
+        decrementStatChangeDuration();
+        decrementTempExtraDuration();
+        classSpecificCheck();
+    }
+
+    private void decrementStatChangeDuration() {
+        characterEntity.decrementTempStatDuration();
+    }
+
+    /**
+     * Run a check for any class specific checks that occur between encounters.
+     */
+    private void classSpecificCheck() {
+        // todo:
+    }
+
+    /**
+     * Actions on character to apply after an encounter is over.
+     * Removes the special effects applied, as well as resetting all action cooldowns to 0.
+     */
+    public void afterEncounter() {
+        resetWeaponCooldowns();
+        resetAbilityCooldowns();
+        resetItemCooldowns();
+        // after encounters, remove all special effects applied.
+        removeAllSpecialEffects();
+    }
+
+    private void resetItemCooldowns() {
+        character.resetItemCooldown();
+    }
+
+    private void resetAbilityCooldowns() {
+        character.resetAbilityCooldowns();
+    }
+
+    private void resetWeaponCooldowns() {
+        character.resetWeaponCooldown();
     }
 
 

@@ -5,6 +5,7 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
@@ -236,11 +237,10 @@ public class Enemy extends CharacterEntity {
                     JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
                     int duration = tempHealth.getInt(0);
                     int amount = tempHealth.getInt(1);
-                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
+                    TempBar tempBar = TempBarFactory.createTempHealth(duration, amount);
                     tempHealthList.add(tempBar);
                 }
             }
-            if (enemyObject.has("tempExtraHealth")) tempExtraHealth = enemyObject.getInt("tempExtraHealth");
             // tempMana
             if (enemyObject.has("tempManaList")) {
                 JSONArray tempManaArray = enemyObject.getJSONArray("tempManaList");
@@ -248,11 +248,10 @@ public class Enemy extends CharacterEntity {
                     JSONArray tempMana = (JSONArray) tempManaArray.get(i);
                     int duration = tempMana.getInt(0);
                     int amount = tempMana.getInt(1);
-                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
+                    TempBar tempBar = TempBarFactory.createTempMana(duration, amount);
                     tempManaList.add(tempBar);
                 }
             }
-            if (enemyObject.has("tempExtraMana")) tempExtraHealth = enemyObject.getInt("tempExtraMana");
             // stat Increase
             if (enemyObject.has("statIncreaseList")) {
                 JSONArray statIncreaseArray = enemyObject.getJSONArray("statIncreaseList");
@@ -383,7 +382,6 @@ public class Enemy extends CharacterEntity {
         }
         JSONEnemy.put("specialList", specialArray);
         // temp health
-        JSONEnemy.put("tempExtraHealth", tempExtraHealth);
         JSONArray tempHealthArray = new JSONArray(); // <key, value>
         for (int i = 0; i < tempHealthList.size(); i++) {
             JSONArray tempHealth = new JSONArray(); // <duration, amount>
@@ -392,9 +390,7 @@ public class Enemy extends CharacterEntity {
             tempHealthArray.put(tempHealth);
         }
         JSONEnemy.put("tempHealthList", tempHealthArray);
-        JSONEnemy.put("tempExtraHealth", tempExtraHealth);
         // temp mana
-        JSONEnemy.put("tempExtraMana", tempExtraMana);
         JSONArray tempManaArray = new JSONArray(); // <key, value>
         for (int i = 0; i < tempManaList.size(); i++) {
             JSONArray tempMana = new JSONArray(); // <duration, amount>
@@ -403,7 +399,6 @@ public class Enemy extends CharacterEntity {
             tempManaArray.put(tempMana);
         }
         JSONEnemy.put("tempManaList", tempManaArray);
-        JSONEnemy.put("tempExtraMana", tempExtraMana);
         // stat increase
         JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
         for (int i = 0; i < statIncreaseList.size(); i++) {

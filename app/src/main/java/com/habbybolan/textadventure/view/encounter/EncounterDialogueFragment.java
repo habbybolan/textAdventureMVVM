@@ -53,6 +53,7 @@ public class EncounterDialogueFragment extends Fragment {
      * @param gridLayout    The button layout to add the continue button to
      */
     void dialogueState(final EncounterViewModel vm, GridLayout gridLayout) {
+        mainGameVM.applyBeforeEncounter();
         try {
             JSONObject dialogue = vm.getFirstStateJSON();
             // if there is only 1 dialogue snippet, then don't create a 'continue' button

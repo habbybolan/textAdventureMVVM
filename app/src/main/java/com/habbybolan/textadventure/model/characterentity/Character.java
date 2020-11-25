@@ -7,6 +7,7 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
@@ -183,11 +184,10 @@ public class Character extends CharacterEntity {
                     JSONArray tempHealth = (JSONArray) tempHealthArray.get(i);
                     int duration = tempHealth.getInt(0);
                     int amount = tempHealth.getInt(1);
-                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_HEALTH, duration, amount);
+                    TempBar tempBar = TempBarFactory.createTempHealth(duration, amount);
                     tempHealthList.add(tempBar);
                 }
             }
-            if (characterObject.has("tempExtraHealth")) tempExtraHealth = characterObject.getInt("tempExtraHealth");
             // tempMana
             if (characterObject.has("tempManaList")) {
                 JSONArray tempManaArray = characterObject.getJSONArray("tempManaList");
@@ -195,11 +195,10 @@ public class Character extends CharacterEntity {
                     JSONArray tempMana = (JSONArray) tempManaArray.get(i);
                     int duration = tempMana.getInt(0);
                     int amount = tempMana.getInt(1);
-                    TempBar tempBar = new TempBar(CharacterEntity.TEMP_MANA, duration, amount);
+                    TempBar tempBar = TempBarFactory.createTempMana(duration, amount);
                     tempManaList.add(tempBar);
                 }
             }
-            if (characterObject.has("tempExtraMana")) tempExtraHealth = characterObject.getInt("tempExtraMana");
             // stat Increase
             if (characterObject.has("statIncreaseList")) {
                 JSONArray statIncreaseArray = characterObject.getJSONArray("statIncreaseList");
@@ -377,7 +376,6 @@ public class Character extends CharacterEntity {
         }
         JSONCharacter.put("specialList", specialArray);
         // temp health
-        JSONCharacter.put("tempExtraHealth", tempExtraHealth);
         JSONArray tempHealthArray = new JSONArray(); // <key, value>
         for (int i = 0; i < tempHealthList.size(); i++) {
             JSONArray tempHealth = new JSONArray(); // <duration, amount>
@@ -386,9 +384,7 @@ public class Character extends CharacterEntity {
             tempHealthArray.put(tempHealth);
         }
         JSONCharacter.put("tempHealthList", tempHealthArray);
-        JSONCharacter.put("tempExtraHealth", tempExtraHealth);
         // temp mana
-        JSONCharacter.put("tempExtraMana", tempExtraMana);
         JSONArray tempManaArray = new JSONArray(); // <key, value>
         for (int i = 0; i < tempManaList.size(); i++) {
             JSONArray tempMana = new JSONArray(); // <duration, amount>
@@ -397,7 +393,6 @@ public class Character extends CharacterEntity {
             tempManaArray.put(tempMana);
         }
         JSONCharacter.put("tempManaList", tempManaArray);
-        JSONCharacter.put("tempExtraMana", tempExtraMana);
         // stat increase
         JSONArray statIncreaseArray = new JSONArray(); // <stat, duration, amount>
         for (int i = 0; i < statIncreaseList.size(); i++) {
@@ -581,6 +576,36 @@ public class Character extends CharacterEntity {
         if (items.size() != MAX_ITEMS) {
             items.add(item);
             numItems++;
+        }
+    }
+
+    // resets
+
+    /**
+     * Resets all ability cooldowns to 0, ready for use again.
+     */
+    public void resetAbilityCooldowns() {
+        for (Ability ability : abilities) {
+            ability.resetCooldown();
+        }
+    }
+
+    /**
+     * Resets all Weapon special attack cooldowns to 0, ready for use again.
+     */
+    public void resetWeaponCooldown() {
+        for (Weapon weapon : weapons) {
+            // attacks don't have cooldowns, only special attacks
+            weapon.getSpecialAttack().resetCooldown();
+        }
+    }
+
+    /**
+     * Resets all Item ability cooldowns to 0, ready for use again.
+     */
+    public void resetItemCooldown() {
+        for (Item item : items) {
+            item.getAbility().resetCooldown();
         }
     }
 

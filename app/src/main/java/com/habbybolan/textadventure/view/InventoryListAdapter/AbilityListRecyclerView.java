@@ -2,7 +2,7 @@ package com.habbybolan.textadventure.view.InventoryListAdapter;
 
 import android.content.Context;
 
-import androidx.databinding.Observable;
+import androidx.databinding.ObservableList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,26 +29,28 @@ public class AbilityListRecyclerView implements InventoryListRecyclerView{
 
     @Override
     public void setInventoryListeners() {
-        // listener for when an ability is added to character
-        Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
+
+        // observed whenever changes in character abilities
+        characterVM.getAbilities().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
                 adapter.updateChange();
             }
-        };
-        characterVM.getAbilityObserverAdd().addOnPropertyChangedCallback(callbackAdd);
-        // listener for when an ability is removed from character
-        Observable.OnPropertyChangedCallback callbackRemove = new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                Ability ability = characterVM.getAbilityObserverRemove().get();
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {
+                Ability ability = (Ability) sender.get(positionStart);
                 if (ability != null) {
                     combatVM.checkIfRemovedInventoryIsSelected(ability);
                     adapter.updateChange();
                 }
             }
-        };
-        characterVM.getAbilityObserverRemove().addOnPropertyChangedCallback(callbackRemove);
+        });
     }
 
     // if there is a selected index stored, then remove and update all elements

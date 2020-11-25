@@ -17,6 +17,13 @@ public abstract class Action implements Inventory {
         if (cooldownCurr > 0) cooldownCurr--;
     }
 
+    /**
+     * Sets the cooldown to 0, making it ready for use again
+     */
+    public void resetCooldown() {
+        cooldownCurr = 0;
+    }
+
     public int getCooldownCurr() {
         return cooldownCurr;
     }

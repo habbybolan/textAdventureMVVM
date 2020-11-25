@@ -69,7 +69,7 @@ public class DatabaseAdapter {
         }
     }
 
-    private void open() throws SQLException {
+    void open() throws SQLException {
         try {
             mDbHelper.openDataBase();
             mDbHelper.close();

@@ -140,29 +140,26 @@ public class DialogueRecyclerView {
      *  Dialogue for adding new Ability scroll
      */
     private void setAbilityListener() {
-        Observable.OnPropertyChangedCallback callBackAbilityAdd = new Observable.OnPropertyChangedCallback() {
+        // observed whenever changes in character abilities
+        characterVM.getAbilities().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                Ability ability = characterVM.getAbilityObserverAdd().get();
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
+                Ability ability = (Ability) sender.get(positionStart);
                 if (ability != null) {
                     InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), Inventory.TYPE_ABILITY, true);
                     adapter.addNewDialogue(inventoryDialogue);
                 }
             }
-        };
-        characterVM.getAbilityObserverAdd().addOnPropertyChangedCallback(callBackAbilityAdd);
-
-        Observable.OnPropertyChangedCallback callBackAbilityRemove = new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                Ability ability = characterVM.getAbilityObserverRemove().get();
-                if (ability != null) {
-                    InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), Inventory.TYPE_ABILITY, false);
-                    adapter.addNewDialogue(inventoryDialogue);
-                }
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {
             }
-        };
-        characterVM.getAbilityObserverRemove().addOnPropertyChangedCallback(callBackAbilityRemove);
+        });
 
 
     }
@@ -298,15 +295,36 @@ public class DialogueRecyclerView {
      *  Dialogue for adding temp Mana/health increases
      */
     private void setBarListener() {
-        // observed whenever CharacterViewModel observes change in dotList
-        characterVM.getBarObserver().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+
+        // observed whenever CharacterViewModel observes change in TempHealthList
+        characterVM.getHealthList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
             public void onChanged(ObservableList sender) {}
             @Override
             public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
             @Override
             public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
-                TempBar tempBar = characterVM.getBarObserver().get(positionStart);
+                TempBar tempBar = characterVM.getHealthList().get(positionStart);
+                if (tempBar != null) {
+                    TempStatDialogue tempStatDialogue = new TempStatDialogue(tempBar.getType(), tempBar.getAmount(), tempBar.getDuration());
+                    adapter.addNewDialogue(tempStatDialogue);
+                }
+            }
+            @Override
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {}
+        });
+
+        // observed whenever CharacterViewModel observes change in TempManaList
+        characterVM.getManaList().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+            @Override
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
+                TempBar tempBar = characterVM.getManaList().get(positionStart);
                 if (tempBar != null) {
                     TempStatDialogue tempStatDialogue = new TempStatDialogue(tempBar.getType(), tempBar.getAmount(), tempBar.getDuration());
                     adapter.addNewDialogue(tempStatDialogue);

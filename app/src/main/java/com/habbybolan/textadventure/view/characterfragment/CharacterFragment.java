@@ -64,22 +64,23 @@ public class CharacterFragment extends Fragment {
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // listener for when an ability is added to character
-        Observable.OnPropertyChangedCallback callbackAdd = new Observable.OnPropertyChangedCallback() {
+        // observed whenever changes in character abilities
+        characterVM.getAbilities().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
+            public void onChanged(ObservableList sender) {}
+            @Override
+            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
+            @Override
+            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
                 adapter.updateAbilityChange();
             }
-        };
-        characterVM.getAbilityObserverAdd().addOnPropertyChangedCallback(callbackAdd);
-        // listener for when an ability is removed from character
-        Observable.OnPropertyChangedCallback callbackRemove = new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
+            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
+            @Override
+            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {
                 adapter.updateAbilityChange();
             }
-        };
-        characterVM.getAbilityObserverRemove().addOnPropertyChangedCallback(callbackRemove);
+        });
     }
 
     private void setUpWeaponRecyclerViewer() {
