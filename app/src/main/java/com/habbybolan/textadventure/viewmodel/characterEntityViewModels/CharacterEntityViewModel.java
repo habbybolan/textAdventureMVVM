@@ -11,7 +11,6 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
-import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
@@ -19,7 +18,6 @@ import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public abstract class CharacterEntityViewModel extends BaseObservable {
 
@@ -28,146 +26,14 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
 
     // ** Abilities **
 
-    // applies the ability from the attacker
+    /**
+     * Apply the ability from the attacker to this characterEntity
+     * @param ability       The Ability to attack this characterEntity with
+     * @param attacker      The CharacterEntity using the ability
+     */
     public void applyAbility(Ability ability, CharacterEntity attacker) {
-        Random rand = new Random();
-
-        if (ability.getMinDamage() != 0) {
-            int damage =  rand.nextInt(ability.getMaxDamage() - ability.getMinDamage()) + ability.getMinDamage();
-            if (ability.getIsStrScaled())
-                damage += attacker.getStrength();
-            if (ability.getIsIntScaled())
-                damage += attacker.getIntelligence();
-            characterEntity.damageTarget(damage);
-        }
-        if (ability.getDamageAoe() != 0) characterEntity.doAoeStuff(); // todo: aoe
-        // specials
-        SpecialEffect special;
-        if (ability.getIsConfuse()) {
-            special = new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration());
-            characterEntity.addNewSpecial(special);
-        }
-        if (ability.getIsStun()) {
-            special = new SpecialEffect(SpecialEffect.STUN, ability.getDuration());
-            characterEntity.addNewSpecial(special);
-        }
-        if (ability.getIsInvincibility()) {
-            special = new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration());
-            characterEntity.addNewSpecial(special);
-        }
-        if (ability.getIsSilence()) {
-            special = new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration());
-            characterEntity.addNewSpecial(special);
-        }
-        if (ability.getIsInvisible()) {
-            special = new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration());
-            characterEntity.addNewSpecial(special);
-        }
-        // DOT
-        Dot dot;
-        if (ability.getIsFire()) {
-            dot = new Dot(Dot.FIRE, false);
-            characterEntity.addNewDot(dot);
-        }
-        if (ability.getIsPoison()) {
-            dot = new Dot(Dot.POISON, false);
-            characterEntity.addNewDot(dot);
-        }
-        if (ability.getIsBleed()) {
-            dot = new Dot(Dot.BLEED, false);
-            characterEntity.addNewDot(dot);
-        }
-        if (ability.getIsFrostBurn()) {
-            dot = new Dot(Dot.FROSTBURN, false);
-            characterEntity.addNewDot(dot);
-        }
-        if (ability.getIsHealDot()) {
-            dot = new Dot(Dot.HEALTH_DOT, false);
-            characterEntity.addNewDot(dot);
-        }
-        if (ability.getIsManaDot()) {
-            dot = new Dot(Dot.MANA_DOT, false);
-            characterEntity.addNewDot(dot);
-        }
-        // direct heal/mana
-        if (ability.getHealMin() != 0) {
-            int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
-            characterEntity.changeHealthCurr(randHealthChange);
-        }
-        if (ability.getManaMin() != 0) {
-            int randManaChange = rand.nextInt(ability.getManaMax() - ability.getManaMin()) + ability.getManaMin();
-            characterEntity.changeManaCurr(randManaChange);
-            notifyChangeMana();
-        }
-        // stat increases
-        TempStat tempStat;
-        if (ability.getStrIncrease() != 0) {
-            tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrIncrease());
-            characterEntity.addNewStatIncrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getIntIncrease() != 0) {
-            tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntIncrease());
-            characterEntity.addNewStatIncrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getConIncrease() != 0) {
-            tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConIncrease());
-            characterEntity.addNewStatIncrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getSpdIncrease() != 0) {
-            tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdIncrease());
-            characterEntity.addNewStatIncrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getEvadeIncrease() != 0) {
-            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeIncrease());
-            characterEntity.addNewStatIncrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getBlockIncrease() != 0) {
-            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockIncrease());
-            characterEntity.addNewStatIncrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        // stat decreases
-        if (ability.getStrDecrease() != 0) {
-            tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrDecrease());
-            characterEntity.addNewStatDecrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getIntDecrease() != 0) {
-            tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntDecrease());
-            characterEntity.addNewStatDecrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getConDecrease() != 0) {
-            tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConDecrease());
-            characterEntity.addNewStatDecrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getSpdDecrease() != 0) {
-            tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdDecrease());
-            characterEntity.addNewStatDecrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getEvadeDecrease() != 0) {
-            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeDecrease());
-            characterEntity.addNewStatDecrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        if (ability.getBlockDecrease() != 0) {
-            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockDecrease());
-            characterEntity.addNewStatDecrease(tempStat);
-            notifyStatChange(tempStat);
-        }
-        // temp extra health
-        TempBar tempBar;
-        if (ability.getTempExtraHealth() != 0) {
-            tempBar = TempBarFactory.createTempHealth(ability.getDuration(), ability.getTempExtraHealth());
-            characterEntity.addTempHealthList(tempBar);
-        }
+        characterEntity.applyAbility(ability, attacker);
+        notifyStatChange();
         notifyChangeHealth();
         notifyChangeMana();
         ability.setActionUsed();
@@ -178,33 +44,26 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     // apply the attack from the attacker
 
     /**
-     * Apply the attack from the attacker.
-     * @param attack        The CharacterEntity using the attack.
-     * @param attacker      The CharacterEntity who the attack is being used on.
+     * Apply the attack from the attacker to this characterEntity
+     * @param attack        The attack to attack this characterEntity with
+     * @param attacker      The CharacterEntity using the attack
      */
     public void applyAttack(Attack attack, CharacterEntity attacker) {
-        Random random = new Random();
-        // get a random amount of damage given a range
-        int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
-        characterEntity.damageTarget(damage);
+        characterEntity.applyAttack(attack, attacker);
         notifyChangeHealth();
+        notifyChangeMana();
     }
-    // apply the special attack from the attacker
+
+    /**
+     * Apply the special Attack from the attacker to this characterEntity
+     * @param specialAttack     The special attack to attack this characterEntity with
+     * @param attacker          The attacker using the special attack
+     */
     public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
-        if (specialAttack.getAbility() != null) {
-            applyAbility(specialAttack.getAbility(), attacker);
-        }
-        if (specialAttack.getAoe() > 0) {
-            // todo: aoe
-            characterEntity.doAoeStuff();
-        }
-        if (specialAttack.getDamageMin() != 0) {
-            // get a random amount of damage given a range
-            int damage = characterEntity.getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax());
-            characterEntity.damageTarget(damage);
-            notifyChangeHealth();
-        }
+        characterEntity.applySpecialAttack(specialAttack, attacker);
         specialAttack.setActionUsed();
+        notifyChangeHealth();
+        notifyChangeMana();
     }
 
     // ** Dot Effects **
@@ -274,36 +133,23 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         } else {
             characterEntity.addNewStatDecrease(tempStat);
         }
-        notifyStatChange(tempStat);
+        notifyStatChange();
     }
 
-    private void notifyStatChange(TempStat tempStat) {
-        switch (tempStat.getType()) {
-            case TempStat.STR:
-                notifyPropertyChanged(BR.strength);
-                notifyPropertyChanged(BR.strBase);
-                break;
-            case TempStat.INT:
-                notifyPropertyChanged(BR.intelligence);
-                notifyPropertyChanged(BR.intBase);
-                break;
-            case TempStat.CON:
-                notifyPropertyChanged(BR.constitution);
-                notifyPropertyChanged(BR.conBase);
-                break;
-            case TempStat.SPD:
-                notifyPropertyChanged(BR.speed);
-                notifyPropertyChanged(BR.spdBase);
-                break;
-            case TempStat.EVASION:
-                notifyPropertyChanged(BR.evasion);
-                notifyPropertyChanged(BR.evasionBase);
-                break;
-            case TempStat.BLOCK:
-                notifyPropertyChanged(BR.block);
-                notifyPropertyChanged(BR.blockBase);
-                break;
-        }
+    private void notifyStatChange() {
+        notifyPropertyChanged(BR.strength);
+        notifyPropertyChanged(BR.strBase);
+        notifyPropertyChanged(BR.intelligence);
+        notifyPropertyChanged(BR.intBase);
+        notifyPropertyChanged(BR.constitution);
+        notifyPropertyChanged(BR.conBase);
+        notifyPropertyChanged(BR.speed);
+        notifyPropertyChanged(BR.spdBase);
+        notifyPropertyChanged(BR.evasion);
+        notifyPropertyChanged(BR.evasionBase);
+        notifyPropertyChanged(BR.block);
+        notifyPropertyChanged(BR.blockBase);
+
     }
 
     // given a Stat object, find the correct base value to change

@@ -29,6 +29,10 @@ public class SaveDataLocally {
     }
 
     // todo: memory leaks and static - can't be static
+
+    /**
+     * Saves a new character into local storage by creating its JSONString and storing it.
+     */
     public class saveNewCharacterLocally extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -55,11 +59,14 @@ public class SaveDataLocally {
                     jsonClassObject.put("spd", context.getString(R.string.Wizard_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Wizard_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
-                    abilitiesArray.put(context.getString(R.string.Wizard_Start_Ability)); // starts with one ability
+                    abilitiesArray.put(context.getResources().getInteger(R.integer.Wizard_Start_Ability)); // starts with one ability
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
-                    weaponsArray.put(context.getString(R.string.Wizard_Start_Weapon)); // starts with one weapon
+                    weaponsArray.put(context.getResources().getInteger(R.integer.Wizard_Start_Weapon)); // starts with one weapon
                     jsonClassObject.put("weapons", weaponsArray);
+                    JSONArray itemsArray = new JSONArray();
+                    itemsArray.put(context.getResources().getInteger(R.integer.Wizard_Start_Item));
+                    jsonClassObject.put("items", itemsArray);
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -82,11 +89,14 @@ public class SaveDataLocally {
                     jsonClassObject.put("spd", context.getString(R.string.Paladin_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Paladin_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
-                    abilitiesArray.put(context.getString(R.string.Paladin_Start_Ability)); // starts with one ability
+                    abilitiesArray.put(context.getResources().getInteger(R.integer.Paladin_Start_Ability)); // starts with one ability
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
-                    weaponsArray.put(context.getString(R.string.Paladin_Start_Weapon)); // starts with one weapon
+                    weaponsArray.put(context.getResources().getInteger(R.integer.Paladin_Start_Weapon)); // starts with one weapon
                     jsonClassObject.put("weapons", weaponsArray);
+                    JSONArray itemsArray = new JSONArray();
+                    itemsArray.put(context.getResources().getInteger(R.integer.Paladin_Start_Item));
+                    jsonClassObject.put("items", itemsArray);
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -109,11 +119,14 @@ public class SaveDataLocally {
                     jsonClassObject.put("spd", context.getString(R.string.Archer_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Archer_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
-                    abilitiesArray.put(context.getString(R.string.Archer_Start_Ability)); // starts with one ability
+                    abilitiesArray.put(context.getResources().getInteger(R.integer.Archer_Start_Ability)); // starts with one ability
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
-                    weaponsArray.put(context.getString(R.string.Archer_Start_Weapon)); // starts with one weapon
+                    weaponsArray.put(context.getResources().getInteger(R.integer.Archer_Start_Weapon)); // starts with one weapon
                     jsonClassObject.put("weapons", weaponsArray);
+                    JSONArray itemsArray = new JSONArray();
+                    itemsArray.put(context.getResources().getInteger(R.integer.Archer_Start_Item));
+                    jsonClassObject.put("items", itemsArray);
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -136,11 +149,14 @@ public class SaveDataLocally {
                     jsonClassObject.put("spd", context.getString(R.string.Warrior_Start_Spd)); // spd
                     jsonClassObject.put("spdBase", context.getString(R.string.Warrior_Start_Spd)); // base spd
                     JSONArray abilitiesArray = new JSONArray();
-                    abilitiesArray.put(context.getString(R.string.Warrior_Start_Ability)); // starts with one ability
+                    abilitiesArray.put(context.getResources().getInteger(R.integer.Warrior_Start_Ability)); // starts with one ability
                     jsonClassObject.put("abilities", abilitiesArray);
                     JSONArray weaponsArray = new JSONArray();
-                    weaponsArray.put(context.getString(R.string.Warrior_Start_Weapon)); // starts with one weapon
+                    weaponsArray.put(context.getResources().getInteger(R.integer.Warrior_Start_Weapon)); // starts with one weapon
                     jsonClassObject.put("weapons", weaponsArray);
+                    JSONArray itemsArray = new JSONArray();
+                    itemsArray.put(context.getResources().getInteger(R.integer.Warrior_Start_Item));
+                    jsonClassObject.put("items", itemsArray);
                     // bars
                     jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
                     jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
@@ -152,9 +168,6 @@ public class SaveDataLocally {
             }
             // this info is consistent for all starting characters
             try {
-                JSONArray itemsArray = new JSONArray();
-                itemsArray.put(context.getString(R.string.Starting_Item));
-                jsonClassObject.put("items", itemsArray);
                 jsonClassObject.put("gold", context.getString(R.string.Starting_Gold));
 
             } catch (JSONException e) {
@@ -308,39 +321,6 @@ public class SaveDataLocally {
         File file = new File(context.getResources().getString(R.string.fileEncounter));
         if (file.delete())
             System.out.println("Previous encounters deleted");
-    }
-
-
-
-
-    // todo: saves incorrectly - fix this
-    public void saveEncounter(String encounter) throws JSONException {
-        /*String filename = context.getResources().getString(R.string.fileEncounter);
-        FileOutputStream fOut;
-        JSONObject jsonObject;
-        JSONArray jsonArray;
-        if (!readSavedEncounter(context).equals("")) {
-            jsonObject = new JSONObject(readAllEncounters(context));
-            jsonArray = jsonObject.getJSONArray("encounters");
-            jsonArray.put(encounter);
-            jsonObject.remove("encounters");
-        } else {
-            jsonObject = new JSONObject();
-            jsonArray = new JSONArray();
-            jsonArray.put(encounter);
-            jsonObject.remove("encounters");
-        }
-        jsonObject.put("encounters", jsonArray);
-        jsonArray.put(encounter);
-
-        try {
-            fOut = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            fOut.write(jsonObject.toString().getBytes());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 }
 

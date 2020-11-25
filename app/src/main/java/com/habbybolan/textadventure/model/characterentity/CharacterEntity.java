@@ -7,9 +7,12 @@ import com.habbybolan.textadventure.model.effects.Dot;
 import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
+import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
+import com.habbybolan.textadventure.model.inventory.weapon.Attack;
+import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
 import org.json.JSONException;
@@ -1185,6 +1188,182 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
 
+    // ** Apply actions to characterEntity
+
+    public void applyAbility(Ability ability, CharacterEntity attacker) {
+        Random rand = new Random();
+
+        if (ability.getMinDamage() != 0) {
+            int damage = rand.nextInt(ability.getMaxDamage() - ability.getMinDamage()) + ability.getMinDamage();
+            if (ability.getIsStrScaled())
+                damage += attacker.strength;
+            if (ability.getIsIntScaled())
+                damage += attacker.intelligence;
+            damageTarget(damage);
+        }
+        if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
+        // specials
+        SpecialEffect special;
+        if (ability.getIsConfuse()) {
+            special = new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration());
+            addNewSpecial(special);
+        }
+        if (ability.getIsStun()) {
+            special = new SpecialEffect(SpecialEffect.STUN, ability.getDuration());
+            addNewSpecial(special);
+        }
+        if (ability.getIsInvincibility()) {
+            special = new SpecialEffect(SpecialEffect.INVINCIBILITY, ability.getDuration());
+            addNewSpecial(special);
+        }
+        if (ability.getIsSilence()) {
+            special = new SpecialEffect(SpecialEffect.SILENCE, ability.getDuration());
+            addNewSpecial(special);
+        }
+        if (ability.getIsInvisible()) {
+            special = new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration());
+            addNewSpecial(special);
+        }
+        // DOT
+        Dot dot;
+        if (ability.getIsFire()) {
+            dot = new Dot(Dot.FIRE, false);
+            addNewDot(dot);
+        }
+        if (ability.getIsPoison()) {
+            dot = new Dot(Dot.POISON, false);
+            addNewDot(dot);
+        }
+        if (ability.getIsBleed()) {
+            dot = new Dot(Dot.BLEED, false);
+            addNewDot(dot);
+        }
+        if (ability.getIsFrostBurn()) {
+            dot = new Dot(Dot.FROSTBURN, false);
+            addNewDot(dot);
+        }
+        if (ability.getIsHealDot()) {
+            dot = new Dot(Dot.HEALTH_DOT, false);
+            addNewDot(dot);
+        }
+        if (ability.getIsManaDot()) {
+            dot = new Dot(Dot.MANA_DOT, false);
+            addNewDot(dot);
+        }
+        // direct heal/mana
+        if (ability.getHealMin() != 0) {
+            int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
+            changeHealthCurr(randHealthChange);
+        }
+        if (ability.getManaMin() != 0) {
+            int randManaChange = rand.nextInt(ability.getManaMax() - ability.getManaMin()) + ability.getManaMin();
+            changeManaCurr(randManaChange);
+        }
+        // stat increases
+        TempStat tempStat;
+        if (ability.getStrIncrease() != 0) {
+            tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrIncrease());
+            addNewStatIncrease(tempStat);
+        }
+        if (ability.getIntIncrease() != 0) {
+            tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntIncrease());
+            addNewStatIncrease(tempStat);
+        }
+        if (ability.getConIncrease() != 0) {
+            tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConIncrease());
+            addNewStatIncrease(tempStat);
+        }
+        if (ability.getSpdIncrease() != 0) {
+            tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdIncrease());
+            addNewStatIncrease(tempStat);
+        }
+        if (ability.getEvadeIncrease() != 0) {
+            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeIncrease());
+            addNewStatIncrease(tempStat);
+        }
+        if (ability.getBlockIncrease() != 0) {
+            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockIncrease());
+            addNewStatIncrease(tempStat);
+        }
+        // stat decreases
+        if (ability.getStrDecrease() != 0) {
+            tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrDecrease());
+            addNewStatDecrease(tempStat);
+        }
+        if (ability.getIntDecrease() != 0) {
+            tempStat = new TempStat(TempStat.INT, ability.getDuration(), ability.getIntDecrease());
+            addNewStatDecrease(tempStat);
+            ;
+        }
+        if (ability.getConDecrease() != 0) {
+            tempStat = new TempStat(TempStat.CON, ability.getDuration(), ability.getConDecrease());
+            addNewStatDecrease(tempStat);
+        }
+        if (ability.getSpdDecrease() != 0) {
+            tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdDecrease());
+            addNewStatDecrease(tempStat);
+        }
+        if (ability.getEvadeDecrease() != 0) {
+            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeDecrease());
+            addNewStatDecrease(tempStat);
+        }
+        if (ability.getBlockDecrease() != 0) {
+            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockDecrease());
+            addNewStatDecrease(tempStat);
+        }
+        // temp extra health
+        TempBar tempBar;
+        if (ability.getTempExtraHealth() != 0) {
+            tempBar = TempBarFactory.createTempHealth(ability.getDuration(), ability.getTempExtraHealth());
+            addTempHealthList(tempBar);
+        }
+    }
+
+    public void applyAttack(Attack attack, CharacterEntity attacker) {
+        Random random = new Random();
+        // get a random amount of damage given a range
+        int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
+        // if the attacker is a character, check if the attack's weapon is specified to the correct attack class
+        if (attacker.isCharacter) {
+            Character characterAttacker = (Character) attacker;
+            // if weapon is not class specific, divide the damage by half
+            if (!characterAttacker.isCorrectClassSpecificWeapon(attack.getParentWeapon()))
+                damage = damageForIncorrectClassWeapon(damage);
+        }
+        damageTarget(damage);
+    }
+
+    public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
+        if (specialAttack.getAbility() != null) {
+            applyAbility(specialAttack.getAbility(), attacker);
+        }
+        if (specialAttack.getAoe() > 0) {
+            // todo: aoe
+            doAoeStuff();
+        }
+        if (specialAttack.getDamageMin() != 0) {
+            // get a random amount of damage given a range
+            int damage = getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax());
+            if (attacker.isCharacter) {
+                Character characterAttacker = (Character) attacker;
+                // if weapon is not class specific, divide the damage by half
+                if (!characterAttacker.isCorrectClassSpecificWeapon(specialAttack.getParentWeapon()))
+                    damage = damageForIncorrectClassWeapon(damage);
+            }
+            damageTarget(damage);
+        }
+        specialAttack.setActionUsed();
+    }
+
+    /**
+     * The reduced damage, called when the weapon used is not for the correct class.
+     * @param damage    The damage to reduce
+     * @return          The reduced damage
+     */
+    private int damageForIncorrectClassWeapon(int damage) {
+        damage /= 2;
+        return damage;
+    }
 
     // GETTERS AND SETTERS *****
 

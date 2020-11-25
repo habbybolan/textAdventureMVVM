@@ -4,8 +4,7 @@ import android.database.Cursor;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Action;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.repository.database.LootInventory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +16,7 @@ A special attack that represents one of two uses for a weapon
     // attacks can be abilities, or similar to attacks with a bit more effects, but has a cool down
     // each weapon is guaranteed to have one special attack
  */
-public class SpecialAttack extends Action {
+public class SpecialAttack extends WeaponAction {
 
     private String specialAttackName = "";
     private String specialAttackDescription = "Special Attack Description";
@@ -43,15 +42,49 @@ public class SpecialAttack extends Action {
     private int weaponWeight = 0; // affects the overall speed stat
 
     // constructor where database opened and closed elsewhere
-    public SpecialAttack(int specialAttackID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
-        this.specialAttackID = specialAttackID;
-        Cursor cursor = mDbHelper.getSpecialAttackCursorFromID(specialAttackID);
-        setVariables(cursor, mDbHelper);
+    public SpecialAttack(Cursor cursor, LootInventory lootInventory, Weapon parentInventory) throws ExecutionException, InterruptedException {
+        setVariables(cursor, lootInventory);
+        this.parentWeapon = parentInventory;
         setPictureResource();
     }
 
-    // takes a serialized JSON string of special attack object
+    /**
+     * Constructed from serialized special attack.
+     * Only use for getting info. Don't re-create an actual special Attack using this.
+     * @param stringSpecialAttack  The serialized Special Attack object
+     */
     public SpecialAttack(String stringSpecialAttack) {
+        try {
+            JSONObject JSONSpecialAttack = new JSONObject(stringSpecialAttack);
+            specialAttackName = JSONSpecialAttack.getString(S_ATTACK_NAME);
+            specialAttackID = JSONSpecialAttack.getInt(S_ATTACK_ID);
+            // ability
+            if (JSONSpecialAttack.has(ABILITY))
+                ability = new Ability(JSONSpecialAttack.getJSONObject(ABILITY).toString());
+            // damage
+            damageMin = JSONSpecialAttack.getInt(DAMAGE_MIN);
+            damageMax = JSONSpecialAttack.getInt(DAMAGE_MAX);
+            isRanged = JSONSpecialAttack.getBoolean(IS_RANGED);
+            aoe = JSONSpecialAttack.getInt(AOE);
+            splashDamageMin = JSONSpecialAttack.getInt(SPLASH_DAMAGE_MIN);
+            splashDamageMax = JSONSpecialAttack.getInt(SPLASH_DAMAGE_MAX);
+            // cooldown
+            cooldownCurr = JSONSpecialAttack.getInt(COOLDOWN_CURR);
+            cooldownMax = JSONSpecialAttack.getInt(COOLDOWN_MAX);
+            specialAttackDescription = JSONSpecialAttack.getString(DESCRIPTION);
+            pictureResource = JSONSpecialAttack.getInt(IMAGE_RESOURCE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+     /**
+     * Constructed from serialized special attack, and passed the parent weapon Special Attack is attached to.
+     * @param stringSpecialAttack  The serialized Special Attack object
+     * @param parentWeapon         The parent weapon to attach to Special Attack
+     */
+    SpecialAttack(String stringSpecialAttack, Weapon parentWeapon) {
+        this.parentWeapon = parentWeapon;
         try {
             JSONObject JSONSpecialAttack = new JSONObject(stringSpecialAttack);
             specialAttackName = JSONSpecialAttack.getString(S_ATTACK_NAME);
@@ -87,7 +120,7 @@ public class SpecialAttack extends Action {
         setPictureResource();
     }
 
-    private void setVariables(Cursor cursor, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
+    private void setVariables(Cursor cursor, LootInventory lootInventory) throws ExecutionException, InterruptedException {
         // set up special attack name
         int specialAttackNameColID = cursor.getColumnIndex(S_ATTACK_NAME);
         setSpecialAttackName(cursor.getString(specialAttackNameColID));
@@ -95,7 +128,7 @@ public class SpecialAttack extends Action {
         int abilityColID = cursor.getColumnIndex(ABILITY_ID);
         int abilityID = cursor.getInt(abilityColID);
         if (cursor.getInt(abilityColID) != 0) {
-            setAbility(new Ability(abilityID, mDbHelper));
+            setAbility(lootInventory.getAbilityFromID(abilityID));
         }
         // set up ranged boolean
         int isRangedColID = cursor.getColumnIndex(IS_RANGED);

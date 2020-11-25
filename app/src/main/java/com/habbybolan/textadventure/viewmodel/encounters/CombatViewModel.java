@@ -18,7 +18,7 @@ import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.repository.database.CreateEnemy;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 
@@ -98,13 +98,14 @@ public class CombatViewModel extends EncounterViewModel {
         JSONArray typeArray = fightObject.getJSONArray("type");
         // ID associated with the enemy
         int ID = 2;
-        DatabaseAdapter db = new DatabaseAdapter(application);
+        CreateEnemy createEnemy = new CreateEnemy(getApplication());
         for (int i = 0; i < typeArray.length(); i++) {
-            Enemy enemy = db.getEnemy(typeArray.getString(i), 1, characterVM.getCharacter().getNumStatPoints());
+            Enemy enemy = createEnemy.getEnemy(typeArray.getString(i), 1, characterVM.getCharacter().getNumStatPoints());
             enemy.setID(ID);
             enemies.add(new EnemyViewModel(enemy));
             ID++;
         }
+        createEnemy.closeDatabase();
         createCombatOrderLists();
     }
 
@@ -271,7 +272,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     /**
-     * helper for applying the character action to a CharacterEntity that was chosen
+     * Helper for applying the character action to a CharacterEntity that was chosen.
      * @param target    The target characterEntity to use the character selectedAction on.
      */
     private void applyCharacterAction(CharacterEntityViewModel target) {

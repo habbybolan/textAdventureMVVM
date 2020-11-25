@@ -12,13 +12,11 @@ import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.repository.database.LootInventory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Character object for the user's character they play. Only one created at any given time.
@@ -113,14 +111,14 @@ public class Character extends CharacterEntity {
             maxHealth = characterObject.getInt("maxHealth");
             mana = characterObject.getInt("mana");
             maxMana = characterObject.getInt("maxMana");
-            DatabaseAdapter db = new DatabaseAdapter(context);
+            LootInventory lootInventory = new LootInventory(context);
             // abilities
             numAbilities = 0;
             JSONArray abilitiesArray = characterObject.getJSONArray("abilities");
             for (int i= 0; i < abilitiesArray.length(); i++) {
                 String abilityString = abilitiesArray.getString(i);
                 if (isInventoryID(abilityString))
-                    abilities.add(new Ability(abilitiesArray.getInt(i), db));
+                    abilities.add(lootInventory.getAbilityFromID(abilitiesArray.getInt(i)));
                  else
                     abilities.add(new Ability(abilityString));
                  numAbilities++;
@@ -132,7 +130,7 @@ public class Character extends CharacterEntity {
             for (int i = 0; i < weaponsArray.length(); i++) {
                 String weaponString = weaponsArray.getString(i);
                 if (isInventoryID(weaponString))
-                    weapons.add(new Weapon(weaponsArray.getInt(i), db));
+                    weapons.add(lootInventory.getWeaponFromID(weaponsArray.getInt(i)));
                 else
                     weapons.add(new Weapon(weaponString));
                 numWeapons++;
@@ -144,11 +142,12 @@ public class Character extends CharacterEntity {
             for (int i = 0; i < itemsArray.length(); i++) {
                 String itemString = itemsArray.getString(i);
                 if (isInventoryID(itemString))
-                    items.add(new Item(itemsArray.getInt(i), db));
+                    items.add(lootInventory.getItemFromID(itemsArray.getInt(i)));
                 else
                     items.add(new Item(itemsArray.getJSONObject(i).toString()));
                 numItems++;
             }
+            lootInventory.closeDatabase();
 
             // DOTS
             if (characterObject.has(Effect.FIRE)) isFire = characterObject.getBoolean(Effect.FIRE);
@@ -224,7 +223,7 @@ public class Character extends CharacterEntity {
                 }
             }
 
-        } catch (JSONException | InterruptedException | ExecutionException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -605,7 +604,23 @@ public class Character extends CharacterEntity {
      */
     public void resetItemCooldown() {
         for (Item item : items) {
-            item.getAbility().resetCooldown();
+            if (item.hasAbility())
+                item.getAbility().resetCooldown();
+        }
+    }
+
+    public boolean isCorrectClassSpecificWeapon(Weapon weapon) {
+        switch (classType) {
+            case WIZARD_CLASS_TYPE:
+                return weapon.getIsWizardScaled();
+            case PALADIN_CLASS_TYPE:
+                return weapon.getIsPaladinScaled();
+            case WARRIOR_CLASS_TYPE:
+                return weapon.getIsWarriorScaled();
+            case ARCHER_CLASS_TYPE:
+                return weapon.getIsArcherScaled();
+            default:
+                throw new IllegalArgumentException(classType + " is an invalid classType");
         }
     }
 

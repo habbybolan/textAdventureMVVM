@@ -14,13 +14,13 @@ public class WeaponListRecyclerView implements InventoryListRecyclerView {
 
     private WeaponListAdapter adapter;
     private CharacterViewModel characterVM;
-    CombatViewModel combatVM;
+    private CombatViewModel combatVM;
 
-    public WeaponListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, InventoryClickListener inventoryClickListener) {
+    public WeaponListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, ActionClickListener actionClickListener) {
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         this.combatVM = combatVM;
-        adapter = new WeaponListAdapter(characterVM.getWeapons(), inventoryClickListener);
+        adapter = new WeaponListAdapter(characterVM.getWeapons(), actionClickListener);
         recyclerView.setAdapter(adapter);
         this.characterVM = characterVM;
         setInventoryListeners();

@@ -1,7 +1,5 @@
 package com.habbybolan.textadventure.model.inventory;
 
-import com.habbybolan.textadventure.model.inventory.weapon.Attack;
-import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
 import org.json.JSONException;
@@ -11,6 +9,7 @@ public class InventoryFactory {
 
     /**
      * Factory method to create an Inventory object from the inventoryString JSON String.
+     * Shouldn't call Attack and Special Attack from here. Need to attack the weapon to both WeaponActions
      * @param inventoryString   The serialized Inventory JSON string
      * @return                  The Inventory object created from the inventoryString
      */
@@ -29,10 +28,11 @@ public class InventoryFactory {
                 return new Item(inventoryString);
             case Inventory.TYPE_WEAPON:
                 return new Weapon(inventoryString);
+                /*
             case Inventory.TYPE_ATTACK:
                 return new Attack(inventoryString);
             case Inventory.TYPE_S_ATTACK:
-                return new SpecialAttack(inventoryString);
+                return new SpecialAttack(inventoryString);*/
             default:
                 throw new IllegalArgumentException(type + " is not a valid type");
         }

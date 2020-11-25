@@ -6,10 +6,9 @@ import com.habbybolan.textadventure.model.effects.Effect;
 import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Inventory;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.repository.database.LootInventory;
 
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 public class ChoiceBenefitModel {
 
@@ -79,24 +78,20 @@ public class ChoiceBenefitModel {
     // return new Inventory object to add to character inventory
     public Inventory getNewInventory() {
         Random rand = new Random();
-        DatabaseAdapter adapter = new DatabaseAdapter(context);
+        LootInventory lootInventory = new LootInventory(context);
         // randomly choose Inventory object, Weapon/Item/Ability
         int val = rand.nextInt(3);
         Inventory inventory = null;
-        try {
-            switch (val) {
-                case 0:
-                    inventory = adapter.getRandomWeapons(1).get(0);
-                    break;
-                case 1:
-                    inventory = adapter.getRandomAbilities(1).get(0);
-                    break;
-                case 2:
-                    inventory = adapter.getRandomItems(1).get(0);
-                    break;
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+        switch (val) {
+            case 0:
+                inventory = lootInventory.getRandomWeapon(1);
+                break;
+            case 1:
+                inventory = lootInventory.getRandomAbility(1);
+                break;
+            case 2:
+                inventory = lootInventory.getRandomItem(1);
+                break;
         }
         return inventory;
     }

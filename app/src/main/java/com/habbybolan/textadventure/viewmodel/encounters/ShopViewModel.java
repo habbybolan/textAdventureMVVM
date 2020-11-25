@@ -10,7 +10,7 @@ import com.habbybolan.textadventure.model.inventory.InventoryFactory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.repository.database.LootInventory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 /**
  * View Model that deals with the shop encounter data.
@@ -139,30 +138,30 @@ public class ShopViewModel extends EncounterViewModel  {
      * chanceForWeapons chance for random weapons (3-5)
      * chanceForAbilities chance for random abilities (2-4)
      */
-    public void setUpItemToBuy() throws ExecutionException, InterruptedException {
+    public void setUpItemToBuy() {
         if (listGridModelBuy.isEmpty()) {
             int fullPercent = 100;
             Random rand = new Random();
             double shopType = rand.nextInt(fullPercent);
             // set up and open database
-            DatabaseAdapter dbh = new DatabaseAdapter(application);
+            LootInventory lootInventory = new LootInventory(application);
             // Get the type of shop
             if (shopType < fullPercent * chanceForItems) {
                 // create shop of random items (5 items)
-                itemsToBuy = dbh.getRandomItems(5);
+                itemsToBuy = lootInventory.getRandomItems(1, 5);
             } else if (shopType < (fullPercent * chanceForItems) + (fullPercent * chanceForAll)) {
                 // create a shop full of all random (3 items, 2 weapons, 1 abilities)
-                itemsToBuy = dbh.getRandomItems(3);
-                weaponsToBuy = dbh.getRandomWeapons(2);
-                abilitiesToBuy = dbh.getRandomAbilities(1);
+                itemsToBuy = lootInventory.getRandomItems(1,3);
+                weaponsToBuy = lootInventory.getRandomWeapons(1,2);
+                abilitiesToBuy = lootInventory.getRandomAbilities(1,1);
             } else if (shopType < (fullPercent * chanceForItems) + (fullPercent * chanceForAll) + (fullPercent * chanceForWeapons)) {
                 // create a shop full of random weapons (5)
-                weaponsToBuy = dbh.getRandomWeapons(5);
+                weaponsToBuy = lootInventory.getRandomWeapons(1,5);
             } else {
                 // create a shop full of random abilities (4)
-                abilitiesToBuy = dbh.getRandomAbilities(4);
+                abilitiesToBuy = lootInventory.getRandomAbilities(1,4);
             }
-            dbh.close();
+            lootInventory.closeDatabase();
             setBuyGridModels();
         }
     }

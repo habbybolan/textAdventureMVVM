@@ -8,12 +8,11 @@ import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.repository.database.LootInventory;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 /*
 model that does the business logic of the combat encounter
@@ -99,110 +98,111 @@ public class CombatModel {
         int difficulty = getMeanDifficulty(enemies);
         Random rand = new Random();
         int inventoryRand = rand.nextInt(3);
-        DatabaseAdapter db = new DatabaseAdapter(context);
-        try {
-            switch (inventoryRand) {
-                case 0:
-                    // Weapon
-                    return getWeaponReward(difficulty, db);
-                case 1:
-                    // Ability
-                    return getAbilityReward(difficulty, db);
-                case 2:
-                    // Item
-                    return getItemReward(difficulty, db);
-                default:
-                    throw new IllegalArgumentException();
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+        LootInventory lootInventory = new LootInventory(context);
+        Inventory inventoryToReturn;
+        switch (inventoryRand) {
+            case 0:
+                // Weapon
+                inventoryToReturn = getWeaponReward(difficulty, lootInventory);
+                break;
+            case 1:
+                // Ability
+                inventoryToReturn = getAbilityReward(difficulty, lootInventory);
+                break;
+            case 2:
+                // Item
+                inventoryToReturn = getItemReward(difficulty, lootInventory);
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
-        throw new IllegalArgumentException();
+        lootInventory.closeDatabase();
+        return inventoryToReturn;
     }
 
     private final int TIER_CUTOFF = 2;
 
     // returns a weapon reward
-    private Weapon getWeaponReward(int difficulty, DatabaseAdapter db) throws ExecutionException, InterruptedException {
+    private Weapon getWeaponReward(int difficulty, LootInventory loot) {
         Random rand = new Random();
         int val = rand.nextInt(10);
         if (difficulty == 1) {
             // difficulty 1
             if (val > TIER_CUTOFF)
-                return db.getRandomWeaponOfTier(difficulty);
+                return loot.getRandomWeaponOfTier(difficulty);
             else
-                return db.getRandomWeaponOfTier(difficulty + 1);
+                return loot.getRandomWeaponOfTier(difficulty + 1);
         } else if (difficulty == 2) {
             // difficulty 2
             if (val > TIER_CUTOFF)
-                return db.getRandomWeaponOfTier(difficulty);
+                return loot.getRandomWeaponOfTier(difficulty);
             else
                 if (rand.nextInt(2) == 0)
-                    return db.getRandomWeaponOfTier(difficulty-1);
+                    return loot.getRandomWeaponOfTier(difficulty-1);
                 else
-                    return db.getRandomWeaponOfTier(difficulty+1);
+                    return loot.getRandomWeaponOfTier(difficulty+1);
         } else {
             // difficulty 3
             if (val > TIER_CUTOFF)
-                return db.getRandomWeaponOfTier(difficulty);
+                return loot.getRandomWeaponOfTier(difficulty);
             else
-                return db.getRandomWeaponOfTier(difficulty - 1);
+                return loot.getRandomWeaponOfTier(difficulty - 1);
         }
     }
 
     // returns a weapon reward
-    private Ability getAbilityReward(int difficulty, DatabaseAdapter db) throws ExecutionException, InterruptedException {
+    private Ability getAbilityReward(int difficulty, LootInventory lootInventory) {
         Random rand = new Random();
         int val = rand.nextInt(10);
         if (difficulty == 1) {
             // difficulty 1
             if (val > TIER_CUTOFF)
-                return db.getRandomAbilityOfTier(difficulty);
+                return lootInventory.getRandomAbilityOfTier(difficulty);
             else
-                return db.getRandomAbilityOfTier(difficulty + 1);
+                return lootInventory.getRandomAbilityOfTier(difficulty + 1);
         } else if (difficulty == 2) {
             // difficulty 2
             if (val > TIER_CUTOFF)
-                return db.getRandomAbilityOfTier(difficulty);
+                return lootInventory.getRandomAbilityOfTier(difficulty);
             else
             if (rand.nextInt(2) == 0)
-                return db.getRandomAbilityOfTier(difficulty-1);
+                return lootInventory.getRandomAbilityOfTier(difficulty-1);
             else
-                return db.getRandomAbilityOfTier(difficulty+1);
+                return lootInventory.getRandomAbilityOfTier(difficulty+1);
         } else {
             // difficulty 3
             if (val > TIER_CUTOFF)
-                return db.getRandomAbilityOfTier(difficulty);
+                return lootInventory.getRandomAbilityOfTier(difficulty);
             else
-                return db.getRandomAbilityOfTier(difficulty - 1);
+                return lootInventory.getRandomAbilityOfTier(difficulty - 1);
         }
     }
 
     // returns a weapon reward
-    private Item getItemReward(int difficulty, DatabaseAdapter db) throws ExecutionException, InterruptedException {
+    private Item getItemReward(int difficulty, LootInventory lootInventory) {
         Random rand = new Random();
         int val = rand.nextInt(10);
         if (difficulty == 1) {
             // difficulty 1
             if (val > TIER_CUTOFF)
-                return db.getRandomItemOfTier(difficulty);
+                return lootInventory.getRandomItemOfTier(difficulty);
             else
-                return db.getRandomItemOfTier(difficulty + 1);
+                return lootInventory.getRandomItemOfTier(difficulty + 1);
         } else if (difficulty == 2) {
             // difficulty 2
             if (val > TIER_CUTOFF)
-                return db.getRandomItemOfTier(difficulty);
+                return lootInventory.getRandomItemOfTier(difficulty);
             else
             if (rand.nextInt(2) == 0)
-                return db.getRandomItemOfTier(difficulty-1);
+                return lootInventory.getRandomItemOfTier(difficulty-1);
             else
-                return db.getRandomItemOfTier(difficulty+1);
+                return lootInventory.getRandomItemOfTier(difficulty+1);
         } else {
             // difficulty 3
             if (val > TIER_CUTOFF)
-                return db.getRandomItemOfTier(difficulty);
+                return lootInventory.getRandomItemOfTier(difficulty);
             else
-                return db.getRandomItemOfTier(difficulty - 1);
+                return lootInventory.getRandomItemOfTier(difficulty - 1);
         }
     }
 

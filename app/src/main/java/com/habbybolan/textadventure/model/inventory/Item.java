@@ -3,7 +3,7 @@ package com.habbybolan.textadventure.model.inventory;
 import android.database.Cursor;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
+import com.habbybolan.textadventure.repository.database.LootInventory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,18 +70,9 @@ public class Item extends Action {
 
     private int pictureResource;
 
-
     // constructor where database opened and closed elsewhere
-    public Item(int itemID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
-        this.itemID = itemID;
-        Cursor cursor = mDbHelper.getItemCursorFromID(itemID);
-        setVariables(mDbHelper, cursor);
-        setPictureResource();
-    }
-
-    // constructor where database opened and closed elsewhere
-    public Item(Cursor cursor, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
-        setVariables(mDbHelper, cursor);
+    public Item(Cursor cursor, LootInventory lootInventory) throws ExecutionException, InterruptedException {
+        setVariables(lootInventory, cursor);
         setPictureResource();
     }
 
@@ -203,7 +194,7 @@ public class Item extends Action {
     }
 
     // sets all the variables that describe the weapon
-    private void setVariables(DatabaseAdapter mDbHelper , Cursor cursor) throws ExecutionException, InterruptedException {
+    private void setVariables(LootInventory lootInventory , Cursor cursor) throws ExecutionException, InterruptedException {
         int itemColID = cursor.getColumnIndex(ITEM_ID);
         itemID = cursor.getInt(itemColID);
         // set up the item name
@@ -213,7 +204,7 @@ public class Item extends Action {
         int abilityColID = cursor.getColumnIndex(ABILITY_ID);
         int abilityID = cursor.getInt(abilityColID);
         if (cursor.getInt(abilityColID) != 0) {
-            Ability ability = new Ability(abilityID, mDbHelper);
+            Ability ability = lootInventory.getAbilityFromID(abilityID);
             setAbility(ability);
         }
 
@@ -467,6 +458,10 @@ public class Item extends Action {
     @Override
     public String getName() {
         return itemName;
+    }
+
+    public boolean hasAbility() {
+        return ability != null;
     }
 
     @Override

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.Action;
 
 import java.util.ArrayList;
 /*
@@ -19,15 +19,15 @@ adapter for Inventory objects inside list of combat encounter
  */
 public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemListAdapter.ViewHolder> {
 
-    private ArrayList<? extends Inventory> inventoryObjects;
-    private InventoryClickListener inventoryClickListener;
+    private ArrayList<? extends Action> inventoryObjects;
+    private ActionClickListener actionClickListener;
 
     // index of selected item, -1 if nothing selected
     private int selectedIndex = -1;
 
-    AbilityItemListAdapter(ArrayList<? extends Inventory> inventoryObjects, InventoryClickListener inventoryClickListener) {
+    AbilityItemListAdapter(ArrayList<? extends Action> inventoryObjects, ActionClickListener actionClickListener) {
         this.inventoryObjects = inventoryObjects;
-        this.inventoryClickListener = inventoryClickListener;
+        this.actionClickListener = actionClickListener;
     }
 
     @NonNull
@@ -35,7 +35,7 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         InventorySnippetBinding bindingDialogue = DataBindingUtil.inflate(layoutInflater, R.layout.inventory_snippet, parent, false);
-        return new AbilityItemListAdapter.ViewHolder(bindingDialogue, inventoryClickListener, this);
+        return new AbilityItemListAdapter.ViewHolder(bindingDialogue, actionClickListener, this);
     }
 
     @Override
@@ -51,12 +51,12 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         InventorySnippetBinding binding;
-        InventoryClickListener inventoryClickListener;
+        ActionClickListener actionClickListener;
 
-        ViewHolder(final InventorySnippetBinding binding, final InventoryClickListener inventoryClickListener, final AbilityItemListAdapter adapter) {
+        ViewHolder(final InventorySnippetBinding binding, final ActionClickListener actionClickListener, final AbilityItemListAdapter adapter) {
             super(binding.getRoot());
             this.binding = binding;
-            this.inventoryClickListener = inventoryClickListener;
+            this.actionClickListener = actionClickListener;
 
             binding.txtName.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -64,14 +64,14 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
                     adapter.notifyItemChanged(adapter.selectedIndex);
                     adapter.selectedIndex = getAdapterPosition();
                     adapter.notifyItemChanged(adapter.selectedIndex);
-                    inventoryClickListener.onClicked(adapter.inventoryObjects.get(getAdapterPosition()));
+                    actionClickListener.onClicked(adapter.inventoryObjects.get(getAdapterPosition()));
                 }
             });
 
             binding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    inventoryClickListener.onInfoClick(adapter.inventoryObjects.get(getAdapterPosition()));
+                    actionClickListener.onInfoClick(adapter.inventoryObjects.get(getAdapterPosition()));
                 }
             });
         }

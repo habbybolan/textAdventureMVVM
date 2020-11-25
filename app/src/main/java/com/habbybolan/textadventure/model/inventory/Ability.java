@@ -3,12 +3,9 @@ package com.habbybolan.textadventure.model.inventory;
 import android.database.Cursor;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 
 public class Ability extends Action {
 
@@ -90,15 +87,6 @@ public class Ability extends Action {
     // ID
     private int abilityID;
     static public final String table = "abilities";
-
-
-    // constructor to read database for ability
-    public Ability(int abilityID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
-        this.abilityID = abilityID;
-        Cursor cursor = mDbHelper.getAbilityCursorFromID(abilityID);
-        setVariables(cursor);
-        setPictureResource();
-    }
 
     // constructor to read database for ability
     public Ability(Cursor cursor) {

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.ViewHolder> {
 
     private ArrayList<Weapon> weapons;
-    private InventoryClickListener inventoryClickListener;
+    private ActionClickListener actionClickListener;
 
     // index of selected item, -1 if nothing selected
     private int mExpandedPosition = -1;
@@ -27,9 +27,9 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
 
     private int selectedPosition = -1;
 
-    WeaponListAdapter(ArrayList<Weapon> weapons, InventoryClickListener inventoryClickListener) {
+    WeaponListAdapter(ArrayList<Weapon> weapons, ActionClickListener actionClickListener) {
         this.weapons = weapons;
-        this.inventoryClickListener = inventoryClickListener;
+        this.actionClickListener = actionClickListener;
     }
 
     @NonNull
@@ -37,7 +37,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
     public WeaponListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         WeaponListDetailsBinding bindingDialogue = DataBindingUtil.inflate(layoutInflater, R.layout.weapon_list_details, parent, false);
-        return new WeaponListAdapter.ViewHolder(bindingDialogue, inventoryClickListener, this);
+        return new WeaponListAdapter.ViewHolder(bindingDialogue, actionClickListener, this);
     }
 
     @Override
@@ -90,16 +90,16 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         WeaponListDetailsBinding binding;
-        InventoryClickListener inventoryClickListener;
+        ActionClickListener actionClickListener;
 
         // bindings for the inflated inventory_snippet layout inside weapon_list_details snippet
         InventorySnippetBinding attackBinding;
         InventorySnippetBinding sAttackBinding;
 
-        ViewHolder(final WeaponListDetailsBinding binding, final InventoryClickListener inventoryClickListener, final WeaponListAdapter adapter) {
+        ViewHolder(final WeaponListDetailsBinding binding, final ActionClickListener actionClickListener, final WeaponListAdapter adapter) {
             super(binding.getRoot());
             this.binding = binding;
-            this.inventoryClickListener = inventoryClickListener;
+            this.actionClickListener = actionClickListener;
 
             // bindings for the inflated inventory_snippet layout inside weapon_list_details snippet
             attackBinding = binding.attackSnippet;
@@ -110,7 +110,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
                 @Override
                 public void onClick(View v) {
                     adapter.selectedPosition = 0;
-                    inventoryClickListener.onClicked(adapter.weapons.get(getAdapterPosition()).getAttack());
+                    actionClickListener.onClicked(adapter.weapons.get(getAdapterPosition()).getAttack());
                     adapter.notifyDataSetChanged();
                 }
             });
@@ -118,7 +118,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
             attackBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    inventoryClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getAttack());
+                    actionClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getAttack());
                 }
             });
 
@@ -128,7 +128,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
                 public void onClick(View v) {
                     adapter.notifyItemChanged(adapter.selectedPosition);
                     adapter.selectedPosition = 1;
-                    inventoryClickListener.onClicked(adapter.weapons.get(getAdapterPosition()).getSpecialAttack());
+                    actionClickListener.onClicked(adapter.weapons.get(getAdapterPosition()).getSpecialAttack());
                     adapter.notifyItemChanged(getAdapterPosition());
                 }
             });
@@ -136,7 +136,7 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
             sAttackBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    inventoryClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getSpecialAttack());
+                    actionClickListener.onInfoClick(adapter.weapons.get(getAdapterPosition()).getSpecialAttack());
                 }
             });
         }

@@ -6,7 +6,6 @@ import androidx.databinding.ObservableList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
 
@@ -17,11 +16,11 @@ public class AbilityListRecyclerView implements InventoryListRecyclerView{
     private CombatViewModel combatVM;
 
 
-    public AbilityListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, InventoryClickListener inventoryClickListener) {
+    public AbilityListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, ActionClickListener actionClickListener) {
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         this.combatVM = combatVM;
-        adapter = new AbilityItemListAdapter(characterVM.getAbilities(), inventoryClickListener);
+        adapter = new AbilityItemListAdapter(characterVM.getAbilities(), actionClickListener);
         recyclerView.setAdapter(adapter);
         this.characterVM = characterVM;
         setInventoryListeners();
@@ -44,11 +43,7 @@ public class AbilityListRecyclerView implements InventoryListRecyclerView{
             public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
             @Override
             public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {
-                Ability ability = (Ability) sender.get(positionStart);
-                if (ability != null) {
-                    combatVM.checkIfRemovedInventoryIsSelected(ability);
-                    adapter.updateChange();
-                }
+                adapter.updateChange();
             }
         });
     }

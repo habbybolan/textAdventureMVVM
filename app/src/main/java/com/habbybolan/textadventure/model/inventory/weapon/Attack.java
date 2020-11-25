@@ -3,20 +3,16 @@ package com.habbybolan.textadventure.model.inventory.weapon;
 import android.database.Cursor;
 
 import com.habbybolan.textadventure.R;
-import com.habbybolan.textadventure.model.inventory.Action;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 /*
 An attack that represents one of the two uses for a weapon
     // it is always a single target attack that costs no mana to use and has no cool down
     // each weapon is guaranteed to have one attack
  */
 
-public class Attack extends Action {
+public class Attack extends WeaponAction {
     private String attackName = "";
     private String attackDescription = "Attack Description";
     private int damageMin;
@@ -32,15 +28,38 @@ public class Attack extends Action {
     private int weaponWeight = 0; // affects the overall speed stat
 
     // constructor to read database for attack
-    public Attack(int attackID, DatabaseAdapter mDbHelper) throws ExecutionException, InterruptedException {
-        this.attackID = attackID;
-        Cursor cursor = mDbHelper.getAttackCursorFromID(attackID);
+    public Attack(Cursor cursor, Weapon parentInventory)  {
         setVariables(cursor);
+        this.parentWeapon = parentInventory;
         setPictureResource();
     }
 
-    // takes a serialized JSON string of Attack object
+    /**
+     * Constructed from serialized attack.
+     * Only use for getting info. Don't re-create an actual Attack using this.
+     * @param stringAttack  The serialized Attack object
+     */
     public Attack(String stringAttack) {
+        try {
+            JSONObject JSONAttack = new JSONObject(stringAttack);
+            attackName = JSONAttack.getString(ATTACK_NAME);
+            attackID = JSONAttack.getInt(ATTACK_ID);
+            damageMin = JSONAttack.getInt(DAMAGE_MIN);
+            damageMax = JSONAttack.getInt(DAMAGE_MAX);
+            isRanged = JSONAttack.getBoolean(IS_RANGED);
+            pictureResource = JSONAttack.getInt(IMAGE_RESOURCE);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Constructed from serialized attack, and passed the parent weapon Attack is attached to.
+     * @param stringAttack  The serialized Attack object
+     * @param parentWeapon  The parent weapon to attach to Attack
+     */
+    Attack(String stringAttack, Weapon parentWeapon) {
+        this.parentWeapon = parentWeapon;
         try {
             JSONObject JSONAttack = new JSONObject(stringAttack);
             attackName = JSONAttack.getString(ATTACK_NAME);
@@ -65,6 +84,8 @@ public class Attack extends Action {
     }
 
     private void setVariables(Cursor cursor) {
+        int attackIDColID = cursor.getColumnIndex(ATTACK_ID);
+        attackID = cursor.getInt(attackIDColID);
         // set up attack name
         int attackNameColID = cursor.getColumnIndex(ATTACK_NAME);
         setAttackName(cursor.getString(attackNameColID));

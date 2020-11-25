@@ -9,11 +9,10 @@ import com.habbybolan.textadventure.BR;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.inventory.Ability;
+import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.repository.database.DatabaseAdapter;
-
-import java.util.concurrent.ExecutionException;
+import com.habbybolan.textadventure.repository.database.LootInventory;
 
 /*
 viewModel that deals with the CharacterChoiceActivity UI data
@@ -42,12 +41,56 @@ public class CharacterChoiceViewModel extends BaseObservable {
 
     private int characterPortrait;
 
+    // Wizard starting inventory
+    private Ability wizardAbility;
+    private Weapon wizardWeapon;
+    private Item wizardItem;
+
+    // Warrior starting inventory
+    private Ability warriorAbility;
+    private Weapon warriorWeapon;
+    private Item warriorItem;
+
+    // Paladin starting inventory
+    private Ability paladinAbility;
+    private Weapon paladinWeapon;
+    private Item paladinItem;
+
+    // Archer starting inventory
+    private Ability archerAbility;
+    private Weapon archerWeapon;
+    private Item archerItem;
+
+
     // ApplicationContext
     private Context context;
 
     public CharacterChoiceViewModel(Context context) {
         this.context = context;
+        setUpStartingInventory();
         selectCharacter(wizard);
+    }
+
+    /**
+     * Sets up all starting Abilities, weapons, and items, stored in fields.
+     */
+    private void setUpStartingInventory() {
+        LootInventory lootInventory = new LootInventory(context);
+        wizardAbility = lootInventory.getAbilityFromID(context.getResources().getInteger(R.integer.Wizard_Start_Ability));
+        wizardWeapon = lootInventory.getWeaponFromID(context.getResources().getInteger(R.integer.Wizard_Start_Weapon));
+        wizardItem = lootInventory.getItemFromID(context.getResources().getInteger(R.integer.Wizard_Start_Item));
+
+        warriorAbility = lootInventory.getAbilityFromID(context.getResources().getInteger(R.integer.Warrior_Start_Ability));
+        warriorWeapon = lootInventory.getWeaponFromID(context.getResources().getInteger(R.integer.Warrior_Start_Weapon));
+        warriorItem = lootInventory.getItemFromID(context.getResources().getInteger(R.integer.Warrior_Start_Item));
+
+        paladinAbility = lootInventory.getAbilityFromID(context.getResources().getInteger(R.integer.Paladin_Start_Ability));
+        paladinWeapon = lootInventory.getWeaponFromID(context.getResources().getInteger(R.integer.Paladin_Start_Weapon));
+        paladinItem = lootInventory.getItemFromID(context.getResources().getInteger(R.integer.Paladin_Start_Item));
+
+        archerAbility = lootInventory.getAbilityFromID(context.getResources().getInteger(R.integer.Archer_Start_Ability));
+        archerWeapon = lootInventory.getWeaponFromID(context.getResources().getInteger(R.integer.Archer_Start_Weapon));
+        archerItem = lootInventory.getItemFromID(context.getResources().getInteger(R.integer.Archer_Start_Item));
     }
 
     // create and saves a new character given the class name
@@ -160,30 +203,26 @@ public class CharacterChoiceViewModel extends BaseObservable {
     }
 
     public void selectCharacter(String character) {
-        try {
-            switch (character) {
-                case wizard:
-                    changeToWizard();
-                    break;
-                case paladin:
-                    changeToPaladin();
-                    break;
-                case archer:
-                    changeToArcher();
-                    break;
-                case warrior:
-                    changeToWarrior();
-                    break;
-                default:
-                    throw new IllegalArgumentException();
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+        switch (character) {
+            case wizard:
+                changeToWizard();
+                break;
+            case paladin:
+                changeToPaladin();
+                break;
+            case archer:
+                changeToArcher();
+                break;
+            case warrior:
+                changeToWarrior();
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
     // helper to set up the views for the wizard
-    private void changeToWizard() throws ExecutionException, InterruptedException {
+    private void changeToWizard()  {
         className = wizard;
         setStrValue(R.string.Wizard_Start_Str);
         setIntValue(R.string.Wizard_Start_Int);
@@ -195,20 +234,14 @@ public class CharacterChoiceViewModel extends BaseObservable {
         int intValue = Integer.parseInt(context.getResources().getString(R.string.Wizard_Start_Int));
         setManaValue(String.valueOf(intValue * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA));
 
-        // database accesses
-        DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
-
-        Ability ability = new Ability(Integer.parseInt(context.getResources().getString(R.string.Wizard_Start_Ability)), mDbHelper);
-        setAbilityName(ability.getName());
-        Weapon weapon = new Weapon(Integer.parseInt(context.getResources().getString(R.string.Wizard_Start_Weapon)), mDbHelper);
-        setWeaponName(weapon.getName());
-        setAttackName(weapon.getAttack().getAttackName());
-        setSAttackName(weapon.getSpecialAttack().getSpecialAttackName());
-        mDbHelper.close();
+        setAbilityName(wizardAbility.getName());
+        setWeaponName(wizardWeapon.getName());
+        setAttackName(wizardWeapon.getAttack().getAttackName());
+        setSAttackName(wizardWeapon.getSpecialAttack().getSpecialAttackName());
     }
 
     // helper to set up the views for the Paladin
-    private void changeToPaladin() throws ExecutionException, InterruptedException {
+    private void changeToPaladin() {
         className = paladin;
         setStrValue(R.string.Paladin_Start_Str);
         setIntValue(R.string.Paladin_Start_Int);
@@ -220,20 +253,14 @@ public class CharacterChoiceViewModel extends BaseObservable {
         int intValue = Integer.parseInt(context.getResources().getString(R.string.Paladin_Start_Int));
         setManaValue(String.valueOf(intValue * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA));
 
-        // database accesses
-        DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
-
-        Ability ability = new Ability(Integer.parseInt(context.getResources().getString(R.string.Paladin_Start_Ability)), mDbHelper);
-        setAbilityName(ability.getName());
-        Weapon weapon = new Weapon(Integer.parseInt(context.getResources().getString(R.string.Paladin_Start_Weapon)), mDbHelper);
-        setWeaponName(weapon.getName());
-        setAttackName(weapon.getAttack().getAttackName());
-        setSAttackName(weapon.getSpecialAttack().getSpecialAttackName());
-        mDbHelper.close();
+        setAbilityName(paladinAbility.getName());
+        setWeaponName(paladinWeapon.getName());
+        setAttackName(paladinWeapon.getAttack().getAttackName());
+        setSAttackName(paladinWeapon.getSpecialAttack().getSpecialAttackName());
     }
 
     // helper to set up the views for the Archer
-    private void changeToArcher() throws ExecutionException, InterruptedException {
+    private void changeToArcher() {
         className = archer;
         setStrValue(R.string.Archer_Start_Str);
         setIntValue(R.string.Archer_Start_Int);
@@ -245,20 +272,14 @@ public class CharacterChoiceViewModel extends BaseObservable {
         int intValue = Integer.parseInt(context.getResources().getString(R.string.Archer_Start_Int));
         setManaValue(String.valueOf(intValue * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA));
 
-        // database accesses
-        DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
-
-        Ability ability = new Ability(Integer.parseInt(context.getResources().getString(R.string.Archer_Start_Ability)), mDbHelper);
-        setAbilityName(ability.getName());
-        Weapon weapon = new Weapon(Integer.parseInt(context.getResources().getString(R.string.Archer_Start_Weapon)), mDbHelper);
-        setWeaponName(weapon.getName());
-        setAttackName(weapon.getAttack().getAttackName());
-        setSAttackName(weapon.getSpecialAttack().getSpecialAttackName());
-        mDbHelper.close();
+        setAbilityName(archerAbility.getName());
+        setWeaponName(archerWeapon.getName());
+        setAttackName(archerWeapon.getAttack().getAttackName());
+        setSAttackName(archerWeapon.getSpecialAttack().getSpecialAttackName());
     }
 
     // helper to set up the views for the Warrior
-    private void changeToWarrior() throws ExecutionException, InterruptedException {
+    private void changeToWarrior() {
         className = warrior;
         setStrValue(R.string.Warrior_Start_Str);
         setIntValue(R.string.Warrior_Start_Int);
@@ -270,15 +291,9 @@ public class CharacterChoiceViewModel extends BaseObservable {
         int intValue = Integer.parseInt(context.getResources().getString(R.string.Warrior_Start_Int));
         setManaValue(String.valueOf(intValue * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA));
 
-        // database accesses
-        DatabaseAdapter mDbHelper = new DatabaseAdapter(context);
-
-        Ability ability = new Ability(Integer.parseInt(context.getResources().getString(R.string.Warrior_Start_Ability)), mDbHelper);
-        setAbilityName(ability.getName());
-        Weapon weapon = new Weapon(Integer.parseInt(context.getResources().getString(R.string.Warrior_Start_Weapon)), mDbHelper);
-        setWeaponName(weapon.getName());
-        setAttackName(weapon.getAttack().getAttackName());
-        setSAttackName(weapon.getSpecialAttack().getSpecialAttackName());
-        mDbHelper.close();
+        setAbilityName(warriorAbility.getName());
+        setWeaponName(warriorWeapon.getName());
+        setAttackName(warriorWeapon.getAttack().getAttackName());
+        setSAttackName(warriorWeapon.getSpecialAttack().getSpecialAttackName());
     }
 }

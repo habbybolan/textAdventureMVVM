@@ -18,7 +18,7 @@ public class ItemListRecyclerView implements InventoryListRecyclerView{
     ArrayList<Item> items = new ArrayList<>();;
     CombatViewModel combatVM;
 
-    public ItemListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, InventoryClickListener inventoryClickListener) {
+    public ItemListRecyclerView(Context context, RecyclerView recyclerView, CharacterViewModel characterVM, CombatViewModel combatVM, ActionClickListener actionClickListener) {
         // set the layout manager to position the items
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         this.combatVM = combatVM;
@@ -26,7 +26,7 @@ public class ItemListRecyclerView implements InventoryListRecyclerView{
         for (Item item : characterVM.getItems()) {
             if (isValidActionItem(item)) items.add(item);
         }
-        adapter = new AbilityItemListAdapter(items, inventoryClickListener);
+        adapter = new AbilityItemListAdapter(items, actionClickListener);
         recyclerView.setAdapter(adapter);
         this.characterVM = characterVM;
         setInventoryListeners();

@@ -22,7 +22,7 @@ import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
-import com.habbybolan.textadventure.view.InventoryListAdapter.InventoryClickListener;
+import com.habbybolan.textadventure.view.InventoryListAdapter.ActionClickListener;
 import com.habbybolan.textadventure.view.InventoryListAdapter.ItemListRecyclerView;
 import com.habbybolan.textadventure.view.InventoryListAdapter.WeaponListRecyclerView;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
@@ -364,44 +364,44 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      */
     private void setInventoryRecyclerViewers() {
         // clickers for saving selected inventory action and un-select others
-        abilityRV = new AbilityListRecyclerView(getContext(), combatBinding.rvAbilities, characterVM, combatVM, new InventoryClickListener() {
+        abilityRV = new AbilityListRecyclerView(getContext(), combatBinding.rvAbilities, characterVM, combatVM, new ActionClickListener() {
             @Override
-            public void onClicked(Inventory object) {
+            public void onClicked(Action object) {
                 // set selected action the selected Ability action
-                combatVM.setSelectedInventoryAction((Action) object);
+                combatVM.setSelectedInventoryAction(object);
                 weaponRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
             }
             @Override
-            public void onInfoClick(Inventory object) {
+            public void onInfoClick(Action object) {
                 InventoryActivity(object);
             }
         });
 
-        weaponRV = new WeaponListRecyclerView(getContext(), combatBinding.rvWeapons, characterVM, combatVM, new InventoryClickListener() {
+        weaponRV = new WeaponListRecyclerView(getContext(), combatBinding.rvWeapons, characterVM, combatVM, new ActionClickListener() {
             @Override
-            public void onClicked(Inventory object) {
+            public void onClicked(Action object) {
                 // set selected action the selected Weapon action
-                combatVM.setSelectedInventoryAction((Action) object);
+                combatVM.setSelectedInventoryAction(object);
                 abilityRV.unSelectIfOneSelected();
                 itemRV.unSelectIfOneSelected();
             }
             @Override
-            public void onInfoClick(Inventory object) {
+            public void onInfoClick(Action object) {
                 InventoryActivity(object);
             }
         });
 
-        itemRV = new ItemListRecyclerView(getContext(), combatBinding.rvItems, characterVM, combatVM, new InventoryClickListener() {
+        itemRV = new ItemListRecyclerView(getContext(), combatBinding.rvItems, characterVM, combatVM, new ActionClickListener() {
             @Override
-            public void onClicked(Inventory object) {
+            public void onClicked(Action object) {
                 // set selected action the selected Item action
-                combatVM.setSelectedInventoryAction((Action) object);
+                combatVM.setSelectedInventoryAction(object);
                 abilityRV.unSelectIfOneSelected();
                 weaponRV.unSelectIfOneSelected();
             }
             @Override
-            public void onInfoClick(Inventory object) {
+            public void onInfoClick(Action object) {
                 InventoryActivity(object);
             }
         });
