@@ -15,7 +15,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentShopBinding;
 import com.habbybolan.textadventure.model.GridModel;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.view.inventoryinfo.BuyInformationActivity;
@@ -180,9 +180,9 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getContext(), BuyInformationActivity.class);
                 GridModel gridModel = shopVM.getListGridModelBuy().get(position);
-                Inventory inventory = gridModel.getInventory();
+                InventoryEntity inventoryEntity = gridModel.getInventory();
                 try {
-                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventory.serializeToJSON().toString());
+                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventoryEntity.serializeToJSON().toString());
                     intent.putExtra(InventoryInfoFragment.COST, gridModel.getCost());
                     intent.putExtra(InventoryInfoFragment.POSITION, position);
                 } catch (JSONException e) {
@@ -205,9 +205,9 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getContext(), SellInformationActivity.class);
                 GridModel gridModel = shopVM.getListGridModelSell().get(position);
-                Inventory inventory = gridModel.getInventory();
+                InventoryEntity inventoryEntity = gridModel.getInventory();
                 try {
-                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventory.serializeToJSON().toString());
+                    intent.putExtra(InventoryInfoFragment.INVENTORY_SERIALIZED, inventoryEntity.serializeToJSON().toString());
                     intent.putExtra(InventoryInfoFragment.COST, gridModel.getCost());
                     intent.putExtra(InventoryInfoFragment.POSITION, position);
                 } catch (JSONException e) {

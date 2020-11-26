@@ -4,7 +4,7 @@ import androidx.databinding.ObservableField;
 
 import com.habbybolan.textadventure.model.InventoryInfoModel;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
@@ -37,7 +37,7 @@ public class InventoryInfoViewModel {
     }
 
 
-    public Inventory getInventory() {
+    public InventoryEntity getInventory() {
         return getInventoryFromString(inventoryInfoObservable.get());
     }
 
@@ -46,24 +46,24 @@ public class InventoryInfoViewModel {
     }
 
 
-    public Inventory getInventoryFromString(String inventoryString) {
+    public InventoryEntity getInventoryFromString(String inventoryString) {
         String type = "";
         try {
             JSONObject jsonObject = new JSONObject(inventoryString);
-            type = jsonObject.getString(Inventory.INVENTORY_TYPE);
+            type = jsonObject.getString(InventoryEntity.INVENTORY_TYPE);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         switch (type) {
-            case Inventory.TYPE_ABILITY:
+            case InventoryEntity.TYPE_ABILITY:
                 return new Ability(inventoryString);
-            case Inventory.TYPE_ITEM:
+            case InventoryEntity.TYPE_ITEM:
                 return new Item(inventoryString);
-            case Inventory.TYPE_WEAPON:
+            case InventoryEntity.TYPE_WEAPON:
                 return new Weapon(inventoryString);
-            case Inventory.TYPE_ATTACK:
+            case InventoryEntity.TYPE_ATTACK:
                 return new Attack(inventoryString);
-            case Inventory.TYPE_S_ATTACK:
+            case InventoryEntity.TYPE_S_ATTACK:
                 return new SpecialAttack(inventoryString);
             default:
                 throw new IllegalArgumentException();

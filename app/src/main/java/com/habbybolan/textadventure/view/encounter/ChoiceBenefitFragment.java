@@ -14,7 +14,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentChoiceBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
@@ -124,17 +124,17 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     }
 
     // inventory snippet of new Inventory object to retrieve
-    private void setUpInventorySnippet(final Inventory inventoryToRetrieve) {
+    private void setUpInventorySnippet(final InventoryEntity inventoryEntityToRetrieve) {
         final View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
         InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
 
-        snippetBinding.setInventoryName(inventoryToRetrieve.getName());
-        snippetBinding.setInventoryPic(inventoryToRetrieve.getPictureResource());
+        snippetBinding.setInventoryName(inventoryEntityToRetrieve.getName());
+        snippetBinding.setInventoryPic(inventoryEntityToRetrieve.getPictureResource());
         benefitBinding.frameInventorySnippet.addView(view);
         snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), inventoryToRetrieve);
+                CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), inventoryEntityToRetrieve);
             }
         });
     }
@@ -150,7 +150,7 @@ public class ChoiceBenefitFragment extends EncounterDialogueFragment implements 
     // helper for create button to receive Inventory reward if one exists
     private void setReceiveInventory() {
         // if an inventory reward exists, then create button for it
-        if (benefitVM.isInventoryToRetrieve()) {
+        if (benefitVM.getInventoryEntityToRetrieve()) {
             setUpInventorySnippet(benefitVM.getInventoryToRetrieve());
             final View viewPickUp = getLayoutInflater().inflate(R.layout.default_button_details, null);
             DefaultButtonDetailsBinding defaultBindingPickUp = DataBindingUtil.bind(viewPickUp);

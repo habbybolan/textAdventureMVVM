@@ -18,7 +18,7 @@ import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.EnemyActionSelectBinding;
 import com.habbybolan.textadventure.databinding.FragmentCombatBinding;
 import com.habbybolan.textadventure.model.inventory.Action;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.view.CombatOrderAdapter;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.InventoryListAdapter.AbilityListRecyclerView;
@@ -413,7 +413,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
      *  with the information activity to show necessary information of Inventory object clicked.
      * @param object    Inventory used as an action whose information will be displayed.
      */
-    private void InventoryActivity(Inventory object) {
+    private void InventoryActivity(InventoryEntity object) {
         CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), object);
     }
 

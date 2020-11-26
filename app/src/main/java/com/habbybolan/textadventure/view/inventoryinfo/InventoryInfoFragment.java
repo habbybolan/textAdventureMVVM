@@ -13,7 +13,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentInventoryInfoBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
@@ -84,17 +84,17 @@ public class InventoryInfoFragment extends Fragment {
      * Calls the proper method to set up the UI info on the specific stored inventory.
      */
     private void setInventory() {
-        Inventory inventory = inventoryInfoVM.getInventoryFromString(inventoryString);
-        if (inventory.isAbility())
-            setAbilityInfo((Ability) inventory);
-        else if (inventory.isItem())
-            setItemInfo((Item) inventory);
-        else if (inventory.isWeapon())
-            setWeaponInfo((Weapon) inventory);
-        else if (inventory.isAttack())
-            setAttackInfo((Attack) inventory);
-        else if (inventory.isSpecialAttack())
-            setSpecialAttackInfo((SpecialAttack) inventory);
+        InventoryEntity inventoryEntity = inventoryInfoVM.getInventoryFromString(inventoryString);
+        if (inventoryEntity.isAbility())
+            setAbilityInfo((Ability) inventoryEntity);
+        else if (inventoryEntity.isItem())
+            setItemInfo((Item) inventoryEntity);
+        else if (inventoryEntity.isWeapon())
+            setWeaponInfo((Weapon) inventoryEntity);
+        else if (inventoryEntity.isAttack())
+            setAttackInfo((Attack) inventoryEntity);
+        else if (inventoryEntity.isSpecialAttack())
+            setSpecialAttackInfo((SpecialAttack) inventoryEntity);
         else
             throw new IllegalArgumentException();
     }

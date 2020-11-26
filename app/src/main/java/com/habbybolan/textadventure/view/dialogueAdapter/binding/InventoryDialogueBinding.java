@@ -10,7 +10,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DialogueInventoryDetailsBinding;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.view.dialogueAdapter.DataBinder;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueAdapter;
 
@@ -49,7 +49,7 @@ public class InventoryDialogueBinding extends DataBinder<InventoryDialogueBindin
             String inventoryName = "";
             if (inventoryDialogue.getIsAdded()) inventoryName += "+1 " + inventoryDialogue.getName();
             else inventoryName += "-1 " + inventoryDialogue.getName();
-            if (inventoryDialogue.getType().equals(Inventory.TYPE_ABILITY)) inventoryName += " scroll";
+            if (inventoryDialogue.getType().equals(InventoryEntity.TYPE_ABILITY)) inventoryName += " scroll";
             binding.setInventoryName(inventoryName);
             binding.setInventoryPicture(inventoryDialogue.getImageResource());
             binding.executePendingBindings();

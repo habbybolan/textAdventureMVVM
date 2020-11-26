@@ -4,20 +4,16 @@ import android.app.Application;
 
 import com.habbybolan.textadventure.model.GridModel;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
-import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.InventoryFactory;
-import com.habbybolan.textadventure.model.inventory.Item;
-import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.repository.database.LootInventory;
+import com.habbybolan.textadventure.repository.database.ShopKeeperLoot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * View Model that deals with the shop encounter data.
@@ -28,16 +24,7 @@ public class ShopViewModel extends EncounterViewModel  {
     public static final int secondState = 2;
     public static final int thirdState = 3;
 
-    private final double chanceForItems = 0.4;
-    private final double chanceForAll = 0.3;
-    private final double chanceForWeapons = 0.2;
-    private final double chanceForAbilities = 0.1;
-
     private ArrayList<GridModel> listGridModelBuy = new ArrayList<>();
-
-    private ArrayList<Item> itemsToBuy = new ArrayList<>();
-    private ArrayList<Ability> abilitiesToBuy = new ArrayList<>();
-    private ArrayList<Weapon> weaponsToBuy = new ArrayList<>();
 
     private ArrayList<GridModel> listGridModelSell = new ArrayList<>();
 
@@ -109,60 +96,17 @@ public class ShopViewModel extends EncounterViewModel  {
     }
 
     /**
-     * Calls the helper on the 3 Inventory ArrayLists that hold the Inventory object that
-     * can be bought, converting them to a gridModel and storing into listGridModel
-     */
-    private void setBuyGridModels() {
-        addListToGridModelBuyList(itemsToBuy);
-        addListToGridModelBuyList(weaponsToBuy);
-        addListToGridModelBuyList(abilitiesToBuy);
-    }
-
-    /**
-     * Helper to add a single ArrayList of Inventory objects and converts them to GridModel objects and stores into
-     * ListGridModel.
-     * @param inventoryToBuy    The array to convert its elements into GridModel objects
-     */
-    private void addListToGridModelBuyList(ArrayList<? extends Inventory> inventoryToBuy) {
-        for (Inventory inventory : inventoryToBuy) {
-            GridModel gridModel = new GridModel(inventory, 5);
-            listGridModelBuy.add(gridModel);
-        }
-    }
-
-
-    /**
-     * sets up the list of items to buy
-     * chanceForItems chance for random set of items (3-5 items)
-     * chanceForAll chance for weapons/items/abilities (3-4 items, 1-2 weapons, 0-1 abilities)
-     * chanceForWeapons chance for random weapons (3-5)
-     * chanceForAbilities chance for random abilities (2-4)
+     * sets up the list of items to buy by placing inside listGridModelBuy. Opens database using ShopKeeperLoot that takes a tier to
+     * scale the rarity of loot.
      */
     public void setUpItemToBuy() {
+        // empty if no previous save was retrieved
         if (listGridModelBuy.isEmpty()) {
-            int fullPercent = 100;
-            Random rand = new Random();
-            double shopType = rand.nextInt(fullPercent);
-            // set up and open database
-            LootInventory lootInventory = new LootInventory(application);
-            // Get the type of shop
-            if (shopType < fullPercent * chanceForItems) {
-                // create shop of random items (5 items)
-                itemsToBuy = lootInventory.getRandomItems(1, 5);
-            } else if (shopType < (fullPercent * chanceForItems) + (fullPercent * chanceForAll)) {
-                // create a shop full of all random (3 items, 2 weapons, 1 abilities)
-                itemsToBuy = lootInventory.getRandomItems(1,3);
-                weaponsToBuy = lootInventory.getRandomWeapons(1,2);
-                abilitiesToBuy = lootInventory.getRandomAbilities(1,1);
-            } else if (shopType < (fullPercent * chanceForItems) + (fullPercent * chanceForAll) + (fullPercent * chanceForWeapons)) {
-                // create a shop full of random weapons (5)
-                weaponsToBuy = lootInventory.getRandomWeapons(1,5);
-            } else {
-                // create a shop full of random abilities (4)
-                abilitiesToBuy = lootInventory.getRandomAbilities(1,4);
-            }
-            lootInventory.closeDatabase();
-            setBuyGridModels();
+            // get data from database
+            ShopKeeperLoot shopKeeperLoot = new ShopKeeperLoot(application);
+            // todo: scale tier to distance
+            listGridModelBuy.addAll(shopKeeperLoot.inventoryToBuy(1));
+            shopKeeperLoot.closeDatabase();
         }
     }
 

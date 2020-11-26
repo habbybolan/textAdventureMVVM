@@ -7,7 +7,7 @@ import com.habbybolan.textadventure.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Ability extends Action {
+public class Ability extends Action implements Inventory {
 
     // ability
     private String abilityName = "";
@@ -604,6 +604,7 @@ public class Ability extends Action {
     public int getAbilityID() {
         return abilityID;
     }
+    @Override
     public int getTier() {
         return tier;
     }
@@ -690,7 +691,7 @@ public class Ability extends Action {
     }
     @Override
     public String getType() {
-        return Inventory.TYPE_ABILITY;
+        return InventoryEntity.TYPE_ABILITY;
     }
     @Override
     public String getName() {

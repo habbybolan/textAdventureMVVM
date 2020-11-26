@@ -23,7 +23,7 @@ import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
@@ -87,7 +87,7 @@ public class DialogueRecyclerView {
             public void onPropertyChanged(Observable sender, int propertyId) {
                 Item item = characterVM.getItemObserverAdd().get();
                 if (item != null) {
-                    InventoryDialogue inventoryDialogue = new InventoryDialogue(item.getName(), item.getPictureResource(), Inventory.TYPE_ITEM, true);
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(item.getName(), item.getPictureResource(), InventoryEntity.TYPE_ITEM, true);
                     adapter.addNewDialogue(inventoryDialogue);
                 }
             }
@@ -99,7 +99,7 @@ public class DialogueRecyclerView {
             public void onPropertyChanged(Observable sender, int propertyId) {
                 Item item = characterVM.getItemObserverRemove().get();
                 if (item != null) {
-                    InventoryDialogue inventoryDialogue = new InventoryDialogue(item.getName(), item.getPictureResource(), Inventory.TYPE_ITEM, false);
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(item.getName(), item.getPictureResource(), InventoryEntity.TYPE_ITEM, false);
                     adapter.addNewDialogue(inventoryDialogue);
                 }
             }
@@ -116,7 +116,7 @@ public class DialogueRecyclerView {
             public void onPropertyChanged(Observable sender, int propertyId) {
                 Weapon weapon = characterVM.getWeaponObserverAdd().get();
                 if (weapon != null) {
-                    InventoryDialogue inventoryDialogue = new InventoryDialogue(weapon.getName(), weapon.getPictureResource(), Inventory.TYPE_WEAPON, true);
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(weapon.getName(), weapon.getPictureResource(), InventoryEntity.TYPE_WEAPON, true);
                     adapter.addNewDialogue(inventoryDialogue);
                 }
             }
@@ -128,7 +128,7 @@ public class DialogueRecyclerView {
             public void onPropertyChanged(Observable sender, int propertyId) {
                 Weapon weapon = characterVM.getWeaponObserverRemove().get();
                 if (weapon != null) {
-                    InventoryDialogue inventoryDialogue = new InventoryDialogue(weapon.getName(), weapon.getPictureResource(), Inventory.TYPE_WEAPON, false);
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(weapon.getName(), weapon.getPictureResource(), InventoryEntity.TYPE_WEAPON, false);
                     adapter.addNewDialogue(inventoryDialogue);
                 }
             }
@@ -150,7 +150,7 @@ public class DialogueRecyclerView {
             public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
                 Ability ability = (Ability) sender.get(positionStart);
                 if (ability != null) {
-                    InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), Inventory.TYPE_ABILITY, true);
+                    InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), InventoryEntity.TYPE_ABILITY, true);
                     adapter.addNewDialogue(inventoryDialogue);
                 }
             }

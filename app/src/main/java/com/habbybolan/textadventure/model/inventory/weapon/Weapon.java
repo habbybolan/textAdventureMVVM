@@ -4,6 +4,7 @@ import android.database.Cursor;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.repository.database.LootInventory;
 
 import org.json.JSONException;
@@ -181,6 +182,7 @@ public class Weapon implements Inventory {
     public SpecialAttack getSpecialAttack() {
         return specialAttack;
     }
+    @Override
     public int getTier() {
         return tier;
     }
@@ -229,7 +231,7 @@ public class Weapon implements Inventory {
     }
     @Override
     public String getType() {
-        return Inventory.TYPE_WEAPON;
+        return InventoryEntity.TYPE_WEAPON;
     }
     @Override
     public String getName() {

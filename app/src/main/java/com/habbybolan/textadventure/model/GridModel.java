@@ -3,7 +3,7 @@ package com.habbybolan.textadventure.model;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 
 /*
-Object for the ID of an image view of one of the grid cells
+Object for Inventory Objects to sell/buy in shop encounter.
  */
 public class GridModel {
 
@@ -14,7 +14,7 @@ public class GridModel {
     public GridModel(Inventory inventory, int cost) {
         this.inventory = inventory;
         this.cost = cost;
-        imageID = inventory.getPictureResource();
+        imageID = this.inventory.getPictureResource();
     }
 
     /**

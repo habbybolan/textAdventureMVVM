@@ -3,7 +3,7 @@ package com.habbybolan.textadventure.model.encounter;
 import android.app.Application;
 import android.content.Context;
 
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.locations.Outdoor;
 import com.habbybolan.textadventure.repository.database.LootInventory;
 
@@ -42,25 +42,25 @@ public class RandomBenefitModel extends EncounterModel {
     }
 
     // finds a random Inventory loot
-    private static Inventory getRandomInventory(Context context) {
+    private static InventoryEntity getRandomInventory(Context context) {
         Random rand = new Random();
         LootInventory lootInventory = new LootInventory(context);
         // randomly choose Inventory object, Weapon/Item/Ability
         int val = rand.nextInt(3);
-        Inventory inventory = null;
+        InventoryEntity inventoryEntity = null;
         switch (val) {
             case 0:
-                inventory = lootInventory.getRandomWeapon(1);
+                inventoryEntity = lootInventory.getRandomWeapon(1);
                 break;
             case 1:
-                inventory = lootInventory.getRandomAbility(1);
+                inventoryEntity = lootInventory.getRandomAbility(1);
                 break;
             case 2:
-                inventory = lootInventory.getRandomItem(1);
+                inventoryEntity = lootInventory.getRandomItem(1);
                 break;
         }
         lootInventory.closeDatabase();
-        return inventory;
+        return inventoryEntity;
 
     }
 
@@ -116,12 +116,12 @@ public class RandomBenefitModel extends EncounterModel {
      * @param distance      The distance the player character has travelled
      * @return              a number of inventory rewards, specified by encounter.
      */
-    public static Stack<Inventory> getInventoryRewards(Application application, JSONObject encounter, int distance) throws JSONException {
-        Stack<Inventory> inventoryRewards = new Stack<>();
+    public static Stack<InventoryEntity> getInventoryRewards(Application application, JSONObject encounter, int distance) throws JSONException {
+        Stack<InventoryEntity> inventoryEntityRewards = new Stack<>();
         int numRewards = encounter.getInt(NUM_REWARDS);
         for (int i = 0; i < numRewards; i++) {
-            inventoryRewards.add(getRandomInventory(application));
+            inventoryEntityRewards.add(getRandomInventory(application));
         }
-        return inventoryRewards;
+        return inventoryEntityRewards;
     }
 }

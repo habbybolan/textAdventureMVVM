@@ -14,7 +14,7 @@ import com.habbybolan.textadventure.model.effects.SpecialEffect;
 import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
@@ -79,18 +79,18 @@ public class CharacterViewModel extends CharacterEntityViewModel {
 
     /**
      * Add a new inventory, calling the proper method to add the Ability, Item, or Weapon
-     * @param inventory The Inventory object to be added.
+     * @param inventoryEntity The Inventory object to be added.
      * @return          True if the Inventory object was added, false otherwise
      */
-    public boolean addNewInventory(Inventory inventory) {
-        String type = inventory.getType();
+    public boolean addNewInventory(InventoryEntity inventoryEntity) {
+        String type = inventoryEntity.getType();
         switch (type) {
-            case Inventory.TYPE_ABILITY:
-                return addAbility((Ability) inventory);
-            case Inventory.TYPE_ITEM:
-                return addItem((Item) inventory);
-            case Inventory.TYPE_WEAPON:
-                return addWeapon((Weapon) inventory);
+            case InventoryEntity.TYPE_ABILITY:
+                return addAbility((Ability) inventoryEntity);
+            case InventoryEntity.TYPE_ITEM:
+                return addItem((Item) inventoryEntity);
+            case InventoryEntity.TYPE_WEAPON:
+                return addWeapon((Weapon) inventoryEntity);
             default:
                 throw new IllegalArgumentException("Inventory object not a Weapon, Ability, or Item");
         }
@@ -98,19 +98,19 @@ public class CharacterViewModel extends CharacterEntityViewModel {
 
     /**
      * Remove an Inventory object from player character inventory
-     * @param inventory Inventory object to remove.
+     * @param inventoryEntity Inventory object to remove.
      */
-    public void removeInventory(Inventory inventory) {
-        String type = inventory.getType();
+    public void removeInventory(InventoryEntity inventoryEntity) {
+        String type = inventoryEntity.getType();
         switch (type) {
-            case Inventory.TYPE_ABILITY:
-                removeAbility((Ability) inventory);
+            case InventoryEntity.TYPE_ABILITY:
+                removeAbility((Ability) inventoryEntity);
                 break;
-            case Inventory.TYPE_ITEM:
-                removeItem((Item) inventory);
+            case InventoryEntity.TYPE_ITEM:
+                removeItem((Item) inventoryEntity);
                 break;
-            case Inventory.TYPE_WEAPON:
-                removeWeapon((Weapon) inventory);
+            case InventoryEntity.TYPE_WEAPON:
+                removeWeapon((Weapon) inventoryEntity);
                 break;
             default:
                 throw new IllegalArgumentException("Inventory object not a Weapon, Ability, or Item");

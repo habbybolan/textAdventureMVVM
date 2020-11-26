@@ -14,7 +14,7 @@ import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.DefaultButtonDetailsBinding;
 import com.habbybolan.textadventure.databinding.FragmentRandomBenefitBinding;
 import com.habbybolan.textadventure.databinding.InventorySnippetBinding;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.view.ButtonInflaters;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
@@ -141,14 +141,14 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
      */
     private void displayNewReward() {
         if (benefitVM.isMoreRewards()) {
-            final Inventory inventory = benefitVM.getNextInventory();
+            final InventoryEntity inventoryEntity = benefitVM.getNextInventory();
             InventorySnippetBinding snippetBinding = benefitBinding.snippetBinding;
             snippetBinding.setInventoryName(benefitVM.getNextInventoryName());
             snippetBinding.setInventoryPic(benefitVM.getNextInventoryPicResource());
             snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), inventory);
+                    CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), inventoryEntity);
                 }
             });
         }

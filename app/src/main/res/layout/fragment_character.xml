@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/inventory"
+                    android:id="@+id/inventoryEntity"
                     android:layout_width="111dp"
                     android:layout_height="31dp"
                     android:layout_marginStart="@dimen/character_frag_title"
@@ -45,7 +45,7 @@
                     android:layout_marginEnd="@dimen/character_frag_title"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/inventory" />
+                    app:layout_constraintTop_toBottomOf="@+id/inventoryEntity" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,6 +1,6 @@
 package com.habbybolan.textadventure.model.inventory;
 
-public abstract class Action implements Inventory {
+public abstract class Action implements InventoryEntity {
 
     protected int cooldownCurr = 0;
     protected int cooldownMax = 0;

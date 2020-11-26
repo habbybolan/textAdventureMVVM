@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 // create an item object that is copies from db.sqlite
 
-public class Item extends Action {
+public class Item extends Action implements Inventory {
 
 
     // todo: add negative effects to item database. [ex) adds +100 health but permanent confusion]
@@ -411,6 +411,7 @@ public class Item extends Action {
     public boolean getIsConsumable() {
         return isConsumable;
     }
+    @Override
     public int getTier() {
         return tier;
     }
@@ -453,7 +454,7 @@ public class Item extends Action {
     }
     @Override
     public String getType() {
-        return Inventory.TYPE_ITEM;
+        return InventoryEntity.TYPE_ITEM;
     }
     @Override
     public String getName() {

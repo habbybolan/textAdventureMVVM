@@ -5,7 +5,7 @@ import android.content.Context;
 import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.characterentity.Enemy;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 import com.habbybolan.textadventure.repository.database.LootInventory;
@@ -94,30 +94,30 @@ public class CombatModel {
         }
     }
     // Weapon/Ability/Item reward
-    public Inventory getInventoryReward(ArrayList<Enemy> enemies, Context context) {
+    public InventoryEntity getInventoryReward(ArrayList<Enemy> enemies, Context context) {
         int difficulty = getMeanDifficulty(enemies);
         Random rand = new Random();
         int inventoryRand = rand.nextInt(3);
         LootInventory lootInventory = new LootInventory(context);
-        Inventory inventoryToReturn;
+        InventoryEntity inventoryEntityToReturn;
         switch (inventoryRand) {
             case 0:
                 // Weapon
-                inventoryToReturn = getWeaponReward(difficulty, lootInventory);
+                inventoryEntityToReturn = getWeaponReward(difficulty, lootInventory);
                 break;
             case 1:
                 // Ability
-                inventoryToReturn = getAbilityReward(difficulty, lootInventory);
+                inventoryEntityToReturn = getAbilityReward(difficulty, lootInventory);
                 break;
             case 2:
                 // Item
-                inventoryToReturn = getItemReward(difficulty, lootInventory);
+                inventoryEntityToReturn = getItemReward(difficulty, lootInventory);
                 break;
             default:
                 throw new IllegalArgumentException();
         }
         lootInventory.closeDatabase();
-        return inventoryToReturn;
+        return inventoryEntityToReturn;
     }
 
     private final int TIER_CUTOFF = 2;

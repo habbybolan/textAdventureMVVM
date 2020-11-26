@@ -8,7 +8,7 @@ import com.habbybolan.textadventure.model.effects.TempBar;
 import com.habbybolan.textadventure.model.effects.TempBarFactory;
 import com.habbybolan.textadventure.model.effects.TempStat;
 import com.habbybolan.textadventure.model.inventory.Ability;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
 
 import org.json.JSONArray;
@@ -286,7 +286,7 @@ public class Enemy extends CharacterEntity {
     }
 
     // returns a random action for the enemy to perform
-    public Inventory getRandomAction() {
+    public InventoryEntity getRandomAction() {
         // action can be either attack, special attack, ability 1, or ability 2
         Random random = new Random();
         // todo: change to be able to account for multiple abilities

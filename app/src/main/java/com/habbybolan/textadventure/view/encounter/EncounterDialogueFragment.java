@@ -1,7 +1,7 @@
 package com.habbybolan.textadventure.view.encounter;
 
 import android.view.View;
-import android.widget.GridLayout;
+import android.view.ViewGroup;
 
 import androidx.databinding.Observable;
 import androidx.fragment.app.Fragment;
@@ -50,10 +50,9 @@ public class EncounterDialogueFragment extends Fragment {
      * start with either one dialogue line, or multiple. For the multiple, a continue button is created to go through
      * each line, calling firstDialogueState to deal with the actual text and moving on if no more lines left.
      * @param vm            The view model that deals with the current encounter
-     * @param gridLayout    The button layout to add the continue button to
+     * @param viewGroup    The button layout to add the continue button to
      */
-    void dialogueState(final EncounterViewModel vm, GridLayout gridLayout) {
-        mainGameVM.applyBeforeEncounter();
+    void dialogueState(final EncounterViewModel vm, ViewGroup viewGroup) {
         try {
             JSONObject dialogue = vm.getFirstStateJSON();
             // if there is only 1 dialogue snippet, then don't create a 'continue' button
@@ -64,7 +63,7 @@ public class EncounterDialogueFragment extends Fragment {
                 vm.firstDialogueState();
                 // set continue button to the default button view
                 String txtContinue = getResources().getString(R.string.continue_dialogue);
-                DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(gridLayout, txtContinue, getActivity());
+                DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(viewGroup, txtContinue, getActivity());
                 binding.btnDefault.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -76,8 +75,8 @@ public class EncounterDialogueFragment extends Fragment {
                     }
                 });
                 // sets the tag of the continue dialogue button so it could be removed by removeDialogueContinueButton()
-                int childCount = gridLayout.getChildCount();
-                gridLayout.getChildAt(childCount-1).setTag(DIALOGUE_CONTINUE);
+                int childCount = viewGroup.getChildCount();
+                viewGroup.getChildAt(childCount-1).setTag(DIALOGUE_CONTINUE);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -85,25 +84,25 @@ public class EncounterDialogueFragment extends Fragment {
     }
 
     /**
-     * Finds the view in gridLayout with tag == DIALOGUE_CONTINUE and removes it.
+     * Finds the view in view with tag == DIALOGUE_CONTINUE and removes it.
      * Used in cases where statically places views in the xml that are set to 'gone' should not be removed, only
      * the continue button for the dialogue.
-     * @param gridLayout    The layout holding the dialogue continue view to remove.
+     * @param viewGroup    The layout holding the dialogue continue view to remove.
      */
-    void removeDialogueContinueButton(GridLayout gridLayout) {
-        View view = gridLayout.findViewWithTag(DIALOGUE_CONTINUE);
-        gridLayout.removeView(view);
+    void removeDialogueContinueButton(ViewGroup viewGroup) {
+        View view = viewGroup.findViewWithTag(DIALOGUE_CONTINUE);
+        viewGroup.removeView(view);
     }
 
 
     /**
      * Helper for endState to set up the button to leave encounter. Pressing the leave button leaves the current encounter and signals to go to next
      * through the MainGameViewModel.
-     * @param gridLayout    The Grid layout to place the leave button inside.
+     * @param viewGroup    The Grid layout to place the leave button inside.
      */
-    void setLeaveButton(GridLayout gridLayout) {
+    void setLeaveButton(ViewGroup viewGroup) {
         String leaveText = getResources().getString(R.string.leave_encounter);
-        DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(gridLayout, leaveText, getActivity());
+        DefaultButtonDetailsBinding binding = ButtonInflaters.setDefaultButton(viewGroup, leaveText, getActivity());
         binding.btnDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

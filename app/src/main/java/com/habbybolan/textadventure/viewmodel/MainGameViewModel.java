@@ -146,6 +146,7 @@ public class MainGameViewModel extends BaseObservable {
      *  stored in the character, it will start an encounter associated with the that state.
      */
     public void gotoNextRandomEncounter() {
+        savedEncounter = null;
         characterVM.afterEncounter();
         try {
             switch (characterVM.getEncounterState()) {
@@ -326,16 +327,10 @@ public class MainGameViewModel extends BaseObservable {
      *  applying and decrementing dot effects applied to character
      *  decrementing special effects applied to character
      *  decrementing stat and tempExtra changes applied to character
-     *  setting the savedEncounter to null
      */
     public void applyBeforeEncounter() {
-        // todo: overwrite savedEncounter when entering new encounter instead of setting to null - could cause game loss
-        savedEncounter = null;
         characterVM.applyBeforeEncounter();
     }
-
-
-
 
     @Bindable
     public int getGameFragmentVisible() {

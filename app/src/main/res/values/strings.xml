@@ -24,27 +24,27 @@
 
     <string name="Wizard_Start_Str">0</string>
     <string name="Wizard_Start_Int">10</string>
-    <string name="Wizard_Start_Con">3</string>
-    <string name="Wizard_Start_Spd">4</string>
+    <string name="Wizard_Start_Con">0</string>
+    <string name="Wizard_Start_Spd">5</string>
 
-    <string name="Paladin_Start_Str">5</string>
-    <string name="Paladin_Start_Int">4</string>
+    <string name="Paladin_Start_Str">0</string>
+    <string name="Paladin_Start_Int">5</string>
     <string name="Paladin_Start_Con">10</string>
     <string name="Paladin_Start_Spd">0</string>
 
-    <string name="Archer_Start_Str">7</string>
-    <string name="Archer_Start_Int">5</string>
-    <string name="Archer_Start_Con">2</string>
-    <string name="Archer_Start_Spd">8</string>
+    <string name="Archer_Start_Str">5</string>
+    <string name="Archer_Start_Int">0</string>
+    <string name="Archer_Start_Con">0</string>
+    <string name="Archer_Start_Spd">10</string>
 
     <string name="Warrior_Start_Str">10</string>
     <string name="Warrior_Start_Int">0</string>
-    <string name="Warrior_Start_Con">6</string>
-    <string name="Warrior_Start_Spd">2</string>
+    <string name="Warrior_Start_Con">5</string>
+    <string name="Warrior_Start_Spd">0</string>
 
     <string name="full_on">You are full on </string>
     <string name="not_enough_gold">You do not have enough gold for that</string>
-    <string name="already_added">This is already added to your inventory</string>
+    <string name="already_added">This is already added to your inventoryEntity</string>
 
     <string name="abandon">Abandon</string>
     <string name='new_game'>New Game</string>

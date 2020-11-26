@@ -19,7 +19,7 @@ import com.habbybolan.textadventure.model.dialogue.InventoryDialogue;
 import com.habbybolan.textadventure.model.dialogue.ManaDialogue;
 import com.habbybolan.textadventure.model.dialogue.StatDialogue;
 import com.habbybolan.textadventure.model.dialogue.TempStatDialogue;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.InventoryFactory;
 import com.habbybolan.textadventure.view.dialogueAdapter.DialogueRecyclerView;
 import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
@@ -106,12 +106,19 @@ public abstract class EncounterViewModel extends AndroidViewModel {
         stateIndex.setValue(++state);
     }
 
-    // goto the the saved state if one is saved, otherwise start at beginning
+    /**
+     *  goto the the saved state if one is saved, otherwise start at beginning.
+     *  If nothing saved, then apply before encounter actions to apply to character and resetting saved game.
+     * @throws JSONException    If problem with parsing JSON encounter
+     */
     public void gotoBeginningState() throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
-        if (!mainGameVM.getIsSaved()) // if no save, then go to dialogue state normally
+        // if no save, then go to dialogue state normally
+        if (!mainGameVM.getIsSaved()) {
+            // apply before encounter if nothing saved. First time entering encounter
+            mainGameVM.applyBeforeEncounter();
             stateIndex.setValue(1);
-        else { // there is a save, goto saved state
+        } else { // there is a save, goto saved state
             stateIndex.setValue(mainGameVM.getSavedEncounter().getInt("state"));
         }
     }
@@ -250,7 +257,7 @@ public abstract class EncounterViewModel extends AndroidViewModel {
      * @return                  The saved inventory Object if one exists, otherwise return null.
      * @throws JSONException    For JSON formatting error in serialized Inventory object.
      */
-    Inventory setSingleSavedInventory() throws JSONException {
+    InventoryEntity setSingleSavedInventory() throws JSONException {
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         // check if an inventory value has been stored
         if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
@@ -266,19 +273,19 @@ public abstract class EncounterViewModel extends AndroidViewModel {
      * @return                  The saved inventory Object if one exists, otherwise return null.
      * @throws JSONException    For JSON formatting error in serialized Inventory object.
      */
-    Stack<Inventory> setMultiSavedInventory() throws JSONException {
-        Stack<Inventory> inventoryReward = new Stack<>();
+    Stack<InventoryEntity> setMultiSavedInventory() throws JSONException {
+        Stack<InventoryEntity> inventoryEntityReward = new Stack<>();
         MainGameViewModel mainGameVM = MainGameViewModel.getInstance();
         // check if an inventory value has been stored
         if (mainGameVM.getSavedEncounter().has(INVENTORY)) {
             JSONArray inventoryArray = mainGameVM.getSavedEncounter().getJSONArray(INVENTORY);
             for (int i = 0; i < inventoryArray.length(); i++) {
-                inventoryReward.add(InventoryFactory.createInventory(inventoryArray.getString(i)));
+                inventoryEntityReward.add(InventoryFactory.createInventory(inventoryArray.getString(i)));
             }
         } else {
             return null;
         }
-        return inventoryReward;
+        return inventoryEntityReward;
     }
 
     /**

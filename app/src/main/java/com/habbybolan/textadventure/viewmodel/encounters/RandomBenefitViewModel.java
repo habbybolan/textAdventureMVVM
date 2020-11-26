@@ -4,7 +4,7 @@ import android.app.Application;
 
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.repository.SaveDataLocally;
 
 import org.json.JSONArray;
@@ -22,7 +22,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
     public static final int inventoryRewardState = 3;
     public static final int endState = 4;
 
-    private Stack<Inventory> inventoryToRetrieve = null;
+    private Stack<InventoryEntity> inventoryEntityToRetrieve = null;
 
     public RandomBenefitViewModel(Application application) {
         super(application);
@@ -38,10 +38,10 @@ public class RandomBenefitViewModel extends EncounterViewModel {
             encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // convert the multiple inventory rewards to JSON and store if array is not null
-            if (inventoryToRetrieve != null) {
+            if (inventoryEntityToRetrieve != null) {
                 JSONArray inventoryRewardArray = new JSONArray();
-                for (Inventory inventory : inventoryToRetrieve) {
-                    inventoryRewardArray.put(inventory.serializeToJSON());
+                for (InventoryEntity inventoryEntity : inventoryEntityToRetrieve) {
+                    inventoryRewardArray.put(inventoryEntity.serializeToJSON());
                 }
                 encounterData.put(INVENTORY, inventoryRewardArray);
             }
@@ -63,7 +63,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
         try {
             if (getIsSaved()) {
                 setDialogueList(mainGameVM);
-                inventoryToRetrieve = setMultiSavedInventory();
+                inventoryEntityToRetrieve = setMultiSavedInventory();
             }
         } catch(JSONException e) {
             e.printStackTrace();
@@ -72,7 +72,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     // if space in inventory, return true and add inventory object to inventory, otherwise return false
     public boolean addNewInventory() {
-        if (characterVM.addNewInventory(inventoryToRetrieve.peek())) {
+        if (characterVM.addNewInventory(inventoryEntityToRetrieve.peek())) {
             removeTopRewardAndContinue();
             return true;
         }
@@ -81,9 +81,9 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     // return message for being full on inventory space
     public String getFullMessageString() {
-        if (inventoryToRetrieve.peek().getType().equals(Inventory.TYPE_ITEM)) {
+        if (inventoryEntityToRetrieve.peek().getType().equals(InventoryEntity.TYPE_ITEM)) {
             return "You are full on Items";
-        } else if (inventoryToRetrieve.peek().getType().equals(Inventory.TYPE_ABILITY)) {
+        } else if (inventoryEntityToRetrieve.peek().getType().equals(InventoryEntity.TYPE_ABILITY)) {
             return  "You are full on Ability Scrolls";
         } else {
             return "You are full on Weapons";
@@ -94,36 +94,36 @@ public class RandomBenefitViewModel extends EncounterViewModel {
      * Removes inventoryToRetrieve's top of the stack. If it is empty, goto next state.
      */
     public void removeTopRewardAndContinue() {
-        inventoryToRetrieve.pop();
-        if (inventoryToRetrieve.isEmpty()) incrementStateIndex();
+        inventoryEntityToRetrieve.pop();
+        if (inventoryEntityToRetrieve.isEmpty()) incrementStateIndex();
     }
 
     /**
      * @return  True if there are more rewards to gather.
      */
     public boolean isMoreRewards() {
-        return !inventoryToRetrieve.isEmpty();
+        return !inventoryEntityToRetrieve.isEmpty();
     }
 
     /**
      * @return  The name of the next Inventory reward.
      */
     public String getNextInventoryName() {
-        return inventoryToRetrieve.peek().getName();
+        return inventoryEntityToRetrieve.peek().getName();
     }
 
     /**
      * @return  The picture resource of the next Inventory reward.
      */
     public int getNextInventoryPicResource() {
-        return inventoryToRetrieve.peek().getPictureResource();
+        return inventoryEntityToRetrieve.peek().getPictureResource();
     }
 
     /**
      * @return  The next Inventory reward.
      */
-    public Inventory getNextInventory() {
-        return inventoryToRetrieve.peek();
+    public InventoryEntity getNextInventory() {
+        return inventoryEntityToRetrieve.peek();
     }
 
     /**
@@ -155,9 +155,9 @@ public class RandomBenefitViewModel extends EncounterViewModel {
      * If the inventoryToRetrieve is already populated, then this is a saved encounter, so use already populated stack.
      */
     public void createInventoryReward() {
-        if (inventoryToRetrieve == null) {
+        if (inventoryEntityToRetrieve == null) {
             try {
-                inventoryToRetrieve = RandomBenefitModel.getInventoryRewards(application, encounter, characterVM.getDistance());
+                inventoryEntityToRetrieve = RandomBenefitModel.getInventoryRewards(application, encounter, characterVM.getDistance());
             } catch (JSONException e) {
                 e.printStackTrace();
             }

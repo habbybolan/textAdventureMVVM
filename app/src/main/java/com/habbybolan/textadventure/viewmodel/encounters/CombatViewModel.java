@@ -13,7 +13,7 @@ import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.CombatModel;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Action;
-import com.habbybolan.textadventure.model.inventory.Inventory;
+import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
@@ -44,7 +44,7 @@ public class CombatViewModel extends EncounterViewModel {
     public static final int sixthState = 6;
 
     // inventory reward able to retrieve at the end of the encounter
-    private Inventory inventoryToRetrieve = null;
+    private InventoryEntity inventoryEntityToRetrieve = null;
 
     // if not empty, then holds the current combat ordering - order of who to attack next based
     //      on the stat speed for player character and enemies
@@ -87,7 +87,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // set selectedAction to null if the selected action associated to the inventory object is removed
-    public void checkIfRemovedInventoryIsSelected(Inventory removed) {
+    public void checkIfRemovedInventoryIsSelected(InventoryEntity removed) {
         selectedAction = removed.equals(selectedAction) ? null : selectedAction;
     }
 
@@ -153,7 +153,7 @@ public class CombatViewModel extends EncounterViewModel {
             encounterData.put(STATE, getStateIndexValue());
             if (getFirstStateJSON() != null) encounterData.put(DIALOGUE_REMAINING, getFirstStateJSON());
             // convert the inventory to JSON and store if one exists
-            if (inventoryToRetrieve != null) encounterData.put(INVENTORY, inventoryToRetrieve.serializeToJSON());
+            if (inventoryEntityToRetrieve != null) encounterData.put(INVENTORY, inventoryEntityToRetrieve.serializeToJSON());
             // store all DialogueTypes converted to JSON
             JSONArray JSONDialogue = new JSONArray();
             for (DialogueType dialogueType : dialogueList) {
@@ -210,7 +210,7 @@ public class CombatViewModel extends EncounterViewModel {
         try {
             if (getIsSaved()) {
                 setDialogueList(mainGameVM);
-                inventoryToRetrieve = setSingleSavedInventory();
+                inventoryEntityToRetrieve = setSingleSavedInventory();
                 retrieveEnemies();
                 retrieveCombatOrdering();
             }
@@ -280,16 +280,16 @@ public class CombatViewModel extends EncounterViewModel {
         String action = selectedAction.getName();
         // apply the selection action
         switch (selectedAction.getType()) {
-            case Inventory.TYPE_ABILITY:
+            case InventoryEntity.TYPE_ABILITY:
                 applyAbilityAction((Ability) selectedAction, target, characterVM);
                 break;
-            case Inventory.TYPE_ATTACK:
+            case InventoryEntity.TYPE_ATTACK:
                 applyAttackAction((Attack) selectedAction, target, characterVM);
                 break;
-            case Inventory.TYPE_S_ATTACK:
+            case InventoryEntity.TYPE_S_ATTACK:
                 applySpecialAttackAction((SpecialAttack) selectedAction, target, characterVM);
                 break;
-            case Inventory.TYPE_ITEM:
+            case InventoryEntity.TYPE_ITEM:
                 applyItemCharacterAction((Item) selectedAction, target);
                 break;
         }
@@ -396,7 +396,7 @@ public class CombatViewModel extends EncounterViewModel {
 
     // returns false if the item doesn't have an ability associated with it and it's being used on an enemy
     private boolean isValidAction(CharacterEntity target) {
-        if (selectedAction.getType().equals(Inventory.TYPE_ITEM)) {
+        if (selectedAction.getType().equals(InventoryEntity.TYPE_ITEM)) {
             Item item = (Item) selectedAction;
             // can't use an item on an enemy that has no ability
             return target.getIsCharacter() || item.getAbility() != null;
@@ -416,17 +416,17 @@ public class CombatViewModel extends EncounterViewModel {
     // apply a random enemy action
     private void randomEnemyAction(EnemyViewModel enemy) {
         CharacterEntityViewModel target = getRandomTarget();
-        Inventory action = enemy.getEnemy().getRandomAction();
+        InventoryEntity action = enemy.getEnemy().getRandomAction();
         switch (action.getType()) {
-            case Inventory.TYPE_ABILITY:
+            case InventoryEntity.TYPE_ABILITY:
                 // action is ability
                 applyAbilityAction((Ability) action, target, enemy);
                 break;
-            case Inventory.TYPE_ATTACK:
+            case InventoryEntity.TYPE_ATTACK:
                 applyAttackAction((Attack) action, target, enemy);
                 // action is attack
                 break;
-            case Inventory.TYPE_S_ATTACK:
+            case InventoryEntity.TYPE_S_ATTACK:
                 applySpecialAttackAction((SpecialAttack) action, target, enemy);
                 // action is special attack
                 break;
@@ -585,7 +585,7 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // serialized an inventory object into a JSON String
-    public String serializeInventory(Inventory object) {
+    public String serializeInventory(InventoryEntity object) {
         try {
             return object.serializeToJSON().toString();
         } catch (JSONException e) {
@@ -615,10 +615,10 @@ public class CombatViewModel extends EncounterViewModel {
         return enemiesList;
     }
     // Weapon/Ability/Item reward
-    public Inventory getInventoryReward(Context context) {
-        Inventory inventoryRewards = combatModel.getInventoryReward(getEnemiesList(), context);
+    public InventoryEntity getInventoryReward(Context context) {
+        InventoryEntity inventoryEntityRewards = combatModel.getInventoryReward(getEnemiesList(), context);
         // todo: apply the Inventory rewards to character
-        return inventoryRewards;
+        return inventoryEntityRewards;
     }
     public int getSizeCombatOrderCurr() {
         return combatOrderCurr.size();
