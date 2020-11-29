@@ -20,12 +20,14 @@ import java.util.ArrayList;
 public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterAbilityListAdapter.ViewHolder> {
 
     private ArrayList<Ability> abilities;
-    private CharacterListClickListener clickListener;
+    private CharacterListDropConsumeClickListener dropListener;
+    private CharacterListInfoClickListener infoClickListener;
     private CharacterViewModel characterVM;
 
-    CharacterAbilityListAdapter(ArrayList<Ability> abilities, CharacterViewModel characterVM, CharacterListClickListener clickListener) {
+    CharacterAbilityListAdapter(ArrayList<Ability> abilities, CharacterViewModel characterVM, CharacterListDropConsumeClickListener dropListener, CharacterListInfoClickListener infoClickListener) {
         this.abilities = abilities;
-        this.clickListener = clickListener;
+        this.dropListener = dropListener;
+        this.infoClickListener = infoClickListener;
         this.characterVM = characterVM;
     }
 
@@ -34,7 +36,7 @@ public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterA
     @Override
     public CharacterAbilityListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         CharacterAbilityListDetailsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.character_ability_list_details, parent, false);
-        return new ViewHolder(binding, clickListener, characterVM);
+        return new ViewHolder(binding, dropListener, infoClickListener, characterVM);
     }
 
     // set details of the views
@@ -46,19 +48,39 @@ public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterA
     }
 
     // create the views inside the recyclerViewer
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public CharacterAbilityListDetailsBinding binding;
-        CharacterListClickListener listener;
         CharacterViewModel characterVM;
 
-        ViewHolder(CharacterAbilityListDetailsBinding binding, CharacterListClickListener listener, CharacterViewModel characterVM) {
+        ViewHolder(CharacterAbilityListDetailsBinding binding, final CharacterListDropConsumeClickListener dropListener, final CharacterListInfoClickListener infoClickListener, CharacterViewModel characterVM) {
             super(binding.getRoot());
             this.binding = binding;
-            this.listener = listener;
             this.characterVM = characterVM;
 
-            binding.btnDropAbility.setOnClickListener(this);
-            binding.btnDropAbility.setOnLongClickListener(this);
+            // only displays a message to hold drop button if trying to remove
+            binding.btnDropAbility.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dropListener.onClick("Hold to drop ability scroll");
+                }
+            });
+
+            // deleted the inventory element if long click
+            binding.btnDropAbility.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    dropListener.onLongClicked(getAdapterPosition());
+                    return true;
+                }
+            });
+
+            // display info of Ability clicked
+            binding.infoAbility.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    infoClickListener.onClick(getAdapterPosition());
+                }
+            });
         }
 
         void bind(Object obj) {
@@ -86,18 +108,6 @@ public class CharacterAbilityListAdapter extends RecyclerView.Adapter<CharacterA
                 }
             };
             characterVM.getStateInventoryObserver().addOnPropertyChangedCallback(callbackAdd);
-        }
-
-        // only displays a message to hold drop button if trying to remove
-        @Override
-        public void onClick(View v) {
-            listener.onClick("Hold to drop ability scroll");
-        }
-        // deleted the inventory element if long click
-        @Override
-        public boolean onLongClick(View v) {
-            listener.onLongClicked(getAdapterPosition());
-            return true;
         }
     }
 

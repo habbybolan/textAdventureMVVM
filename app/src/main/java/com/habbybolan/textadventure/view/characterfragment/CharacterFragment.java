@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.FragmentCharacterBinding;
 import com.habbybolan.textadventure.view.CustomPopupWindow;
+import com.habbybolan.textadventure.view.inventoryinfo.CreateInventoryInfoActivity;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 public class CharacterFragment extends Fragment {
@@ -49,7 +50,7 @@ public class CharacterFragment extends Fragment {
 
     private void setUpAbilityRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvAbilityList;
-        final CharacterAbilityListAdapter adapter = new CharacterAbilityListAdapter(characterVM.getAbilities(), characterVM, new CharacterListClickListener() {
+        final CharacterAbilityListAdapter adapter = new CharacterAbilityListAdapter(characterVM.getAbilities(), characterVM, new CharacterListDropConsumeClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.removeAbilityAtIndex(index);
@@ -58,6 +59,11 @@ public class CharacterFragment extends Fragment {
             @Override
             public void onClick(String message) {
                 CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
+            }
+        }, new CharacterListInfoClickListener() {
+            @Override
+            public void onClick(int position) {
+                CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), characterVM.getAbilities().get(position));
             }
         });
         recyclerView.setAdapter(adapter);
@@ -85,7 +91,7 @@ public class CharacterFragment extends Fragment {
 
     private void setUpWeaponRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvWeaponList;
-        final CharacterWeaponListAdapter adapter = new CharacterWeaponListAdapter(characterVM.getWeapons(), characterVM, new CharacterListClickListener() {
+        final CharacterWeaponListAdapter adapter = new CharacterWeaponListAdapter(characterVM.getWeapons(), characterVM, new CharacterListDropConsumeClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.removeWeaponAtIndex(index);
@@ -94,6 +100,11 @@ public class CharacterFragment extends Fragment {
             @Override
             public void onClick(String message) {
                 CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
+            }
+        }, new CharacterListInfoClickListener() {
+            @Override
+            public void onClick(int position) {
+                CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), characterVM.getWeapons().get(position));
             }
         });
         recyclerView.setAdapter(adapter);
@@ -120,7 +131,7 @@ public class CharacterFragment extends Fragment {
 
     private void setUpItemRecyclerViewer() {
         RecyclerView recyclerView = characterBinding.rvItemList;
-        final CharacterItemListAdapter adapter = new CharacterItemListAdapter(characterVM.getItems(), characterVM,  new CharacterListClickListener() {
+        final CharacterItemListAdapter adapter = new CharacterItemListAdapter(characterVM.getItems(), characterVM,  new CharacterListDropConsumeClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.removeItemAtIndex(index);
@@ -130,7 +141,7 @@ public class CharacterFragment extends Fragment {
             public void onClick(String message) {
                 CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
             }
-        }, new CharacterListClickListener() {
+        }, new CharacterListDropConsumeClickListener() {
             @Override
             public void onLongClicked(int index) {
                 characterVM.consumeItemAtIndex(index);
@@ -139,6 +150,11 @@ public class CharacterFragment extends Fragment {
             @Override
             public void onClick(String message) {
                 CustomPopupWindow.setTempMessage(message, getContext(), new PopupWindow(), characterBinding.characterContainer);
+            }
+        }, new CharacterListInfoClickListener() {
+            @Override
+            public void onClick(int position) {
+                CreateInventoryInfoActivity.createInventoryInfoActivity(getActivity(), characterVM.getItems().get(position));
             }
         });
         recyclerView.setAdapter(adapter);

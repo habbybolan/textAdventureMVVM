@@ -31,12 +31,26 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
      * @param ability       The Ability to attack this characterEntity with
      * @param attacker      The CharacterEntity using the ability
      */
-    public void applyAbility(Ability ability, CharacterEntity attacker) {
+    public void applyAbility(Ability ability, CharacterEntity attacker, CharacterEntityViewModel enemyLeft, CharacterEntityViewModel enemyRight) {
         characterEntity.applyAbility(ability, attacker);
         notifyStatChange();
         notifyChangeHealth();
         notifyChangeMana();
         ability.setActionUsed();
+        if (enemyLeft != null) enemyLeft.applyAbilitySplash(ability, attacker);
+        if (enemyRight != null) enemyRight.applyAbilitySplash(ability, attacker);
+    }
+
+    /**
+     * Applies the splash damage and effects to this CharacterEntity.
+     * @param ability   The ability to apply the splash damage and effects from
+     * @param attacker  The CharacterEntity using the Ability
+     */
+    void applyAbilitySplash(Ability ability, CharacterEntity attacker) {
+        characterEntity.applyAbilitySplash(ability, attacker);
+        notifyStatChange();
+        notifyChangeHealth();
+        notifyChangeMana();
     }
 
     // ** Weapons **
@@ -59,9 +73,20 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
      * @param specialAttack     The special attack to attack this characterEntity with
      * @param attacker          The attacker using the special attack
      */
-    public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
+    public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker, CharacterEntityViewModel enemyLeft, CharacterEntityViewModel enemyRight) {
         characterEntity.applySpecialAttack(specialAttack, attacker);
+        notifyChangeHealth();
+        notifyChangeMana();
         specialAttack.setActionUsed();
+        if (enemyLeft != null) enemyLeft.applySpecialAttackSplash(specialAttack, attacker);
+        if (enemyRight != null) enemyRight.applySpecialAttackSplash(specialAttack, attacker);
+    }
+
+    /**
+     * Applies the splash damage
+     */
+    private void applySpecialAttackSplash(SpecialAttack specialAttack, CharacterEntity attacker) {
+        characterEntity.applySpecialAttackSplash(specialAttack, attacker);
         notifyChangeHealth();
         notifyChangeMana();
     }

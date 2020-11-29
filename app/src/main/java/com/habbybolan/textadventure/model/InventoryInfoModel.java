@@ -24,13 +24,12 @@ public class InventoryInfoModel {
             sb.append(formatLine("shields", ability.getTempExtraHealth()));
         if (ability.getMinDamage() > 0)
             sb.append(formatLineInterval("damage", ability.getMinDamage(), ability.getMaxDamage()));
-        if (ability.getDamageAoe() > 0) {
-            sb.append(formatLine("soe size", ability.getDamageAoe()));
+        if (ability.getSplashMin() > 0) {
             sb.append(formatLineInterval("Splash damage", ability.getSplashMin(), ability.getSplashMax()));
         }
         // specials
-        if (ability.getSpecialAoe() > 0)
-            sb.append(formatLine("special aoe size", ability.getSpecialAoe()));
+        if (ability.getSpecialAoe())
+            sb.append(formatLine("effect aoe", ability.getSpecialAoe()));
         if (ability.getIsConfuse()) sb.append(formatLine(Effect.CONFUSE, ability.getDuration()));
         if (ability.getIsStun()) sb.append(formatLine(Effect.STUN, ability.getDuration()));
         if (ability.getIsInvisible()) sb.append(formatLine(Effect.INVISIBILITY, ability.getDuration()));
@@ -113,8 +112,7 @@ public class InventoryInfoModel {
         StringBuilder sb = new StringBuilder();
         if (specialAttack.getIsRanged()) sb.append(formatLine("ranged"));
         sb.append(formatLineInterval("damage", specialAttack.getDamageMin(), specialAttack.getDamageMax()));
-        if (specialAttack.getAoe() > 0) {
-            sb.append(formatLine("number of targets", specialAttack.getAoe()));
+        if (specialAttack.getSplashDamageMin() > 0) {
             sb.append(formatLineInterval("splash damage", specialAttack.getSplashDamageMin(), specialAttack.getSplashDamageMax()));
             sb.append(formatLine("cooldown", specialAttack.getCooldownMax()));
         }

@@ -14,6 +14,7 @@ import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.Characte
 import java.util.ArrayList;
 
 public class CombatOrderAdapter extends RecyclerView.Adapter<CombatOrderAdapter.ViewHolder> {
+
     // list holding the character and all enemies in the combat encounter
     private ArrayList<CharacterEntityViewModel> allEntities;
 

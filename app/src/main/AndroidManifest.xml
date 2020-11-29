@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".view.deathscreen.DeathScreenActivity"></activity>
         <activity android:name=".view.inventoryinfo.InventoryInfoActivity" />
         <activity android:name=".view.characterchoice.CharacterChoiceActivity" />
         <activity android:name=".view.MainGameActivity" />

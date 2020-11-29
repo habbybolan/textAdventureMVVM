@@ -2,6 +2,7 @@ package com.habbybolan.textadventure.viewmodel.characterEntityViewModels;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.databinding.Bindable;
 import androidx.databinding.ObservableField;
@@ -17,7 +18,7 @@ import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.repository.LocallySavedFiles;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,11 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     private Character character;
     private Context context;
 
+    private static final String TAG = "CharacterViewModel";
+
     private static CharacterViewModel instance = null;
+
+    private ObservableField<Boolean> isPlayerDead = new ObservableField<>();
 
     // returns true if viewModel is initiated
     public static boolean isInitiated() {
@@ -44,7 +49,7 @@ public class CharacterViewModel extends CharacterEntityViewModel {
 
     // must be initialized before getting the instance
     public static CharacterViewModel init(Context context) {
-        if (instance != null) throw new AssertionError("Already Initialized");
+        if (instance != null) Log.w(TAG, "Recreating static Object");
         instance = new CharacterViewModel(context);
         return instance;
     }
@@ -52,9 +57,8 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     // private constructor only accessed from initiation
     private CharacterViewModel(Context context) {
         this.context = context;
-        SaveDataLocally save = new SaveDataLocally(context);
+        LocallySavedFiles save = new LocallySavedFiles(context);
         String characterData = save.readCharacterData();
-        // todo: set up ObservableArrayLists?
         character = new Character(characterData, context);
         this.characterEntity = character;
     }
@@ -70,9 +74,17 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         stateInventoryObserver.set(isDropConsume);
     }
 
+    public void setPlayerDead() {
+        isPlayerDead.set(true);
+    }
+
+    public ObservableField<Boolean> getIsPlayerDeadObserver() {
+        return isPlayerDead;
+    }
+
     // save character
     public void saveCharacter() {
-        SaveDataLocally save = new SaveDataLocally(context);
+        LocallySavedFiles save = new LocallySavedFiles(context);
         save.saveCharacterLocally(character);
     }
 
@@ -120,16 +132,27 @@ public class CharacterViewModel extends CharacterEntityViewModel {
 
         // Abilities
 
+    // Observable for adding and deleting abilities and updating RecyclerView in CharacterFragment
+    private ObservableField<Ability> abilityObserverAdd = new ObservableField<>();
+    public ObservableField<Ability> getAbilityObserverAdd() {
+        return abilityObserverAdd;
+    }
+    private ObservableField<Ability> abilityObserverRemove = new ObservableField<>();
+    public ObservableField<Ability> getAbilityObserverRemove() {
+        return abilityObserverRemove;
+    }
     public void removeAbility(Ability ability) {
         character.removeAbility(ability);
+        abilityObserverRemove.set(ability);
     }
     public boolean addAbility(Ability ability) {
         if (character.getNumAbilities() >= Character.MAX_ABILITIES) return false;
         character.addAbility(ability);
+        abilityObserverAdd.set(ability);
         return true;
     }
     public void removeAbilityAtIndex(int index) {
-        character.removeAbilityAtIndex(index);
+        abilityObserverRemove.set(character.removeAbilityAtIndex(index));
     }
 
         // Weapons
@@ -382,11 +405,11 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         // health/mana
         if (item.getHealthChange() != 0) {
             // health and max health altered
-            character.changeHealthCurr(item.getHealthChange());
+            character.increaseHealthCurr(item.getHealthChange());
             notifyChangeHealth();
         }
         if (item.getManaChange() != 0) {
-            character.changeManaCurr(item.getManaChange());
+            character.increaseManaCurr(item.getManaChange());
             // only mana altered
             notifyChangeMana();
         }
@@ -591,5 +614,11 @@ public class CharacterViewModel extends CharacterEntityViewModel {
     }
     public int getDungeonLength() {
         return character.getDungeonLength();
+    }
+    public String getClassType() {
+        return character.getClassType();
+    }
+    public int getNumStatPoints() {
+        return character.getNumStatPoints();
     }
 }

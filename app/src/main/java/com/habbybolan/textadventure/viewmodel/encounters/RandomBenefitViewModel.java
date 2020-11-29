@@ -5,7 +5,7 @@ import android.app.Application;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.encounter.RandomBenefitModel;
 import com.habbybolan.textadventure.model.inventory.InventoryEntity;
-import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.repository.LocallySavedFiles;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +30,7 @@ public class RandomBenefitViewModel extends EncounterViewModel {
 
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(application);
+        LocallySavedFiles save = new LocallySavedFiles(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_RANDOM_BENEFIT);

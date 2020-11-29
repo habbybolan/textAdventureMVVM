@@ -11,7 +11,7 @@ import com.habbybolan.textadventure.model.characterentity.Character;
 import com.habbybolan.textadventure.model.inventory.Ability;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
-import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.repository.LocallySavedFiles;
 import com.habbybolan.textadventure.repository.database.LootInventory;
 
 /*
@@ -95,7 +95,7 @@ public class CharacterChoiceViewModel extends BaseObservable {
 
     // create and saves a new character given the class name
     public void saveNewCharacter() {
-        SaveDataLocally save = new SaveDataLocally(context);
+        LocallySavedFiles save = new LocallySavedFiles(context);
         save.saveNewCharacterLocally(className);
     }
 

@@ -14,6 +14,7 @@ import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.model.inventory.weapon.Weapon;
+import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -165,6 +166,9 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
                 isAlive = false;
             }
         }
+        if (isCharacter && health == 0) {
+            CharacterViewModel.getInstance().setPlayerDead();
+        }
         setHealthChange(health - prevHealth);
     }
 
@@ -231,7 +235,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
      *  Returns amount to heal entity by. Does not affect the max health.
      * @param amount    Amount to heal character entity by
      */
-    public void changeHealthCurr(int amount) {
+    public void increaseHealthCurr(int amount) {
         if (amount < 0) throw new IllegalArgumentException(amount + " needs to be a positive integer");
         int prevHealth = health;
         if (amount + health > maxHealth) health = maxHealth;
@@ -245,6 +249,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
      * @param amount    Amount to heal character entity by
      */
     public void changeHealthMax(int amount) {
+        if (maxHealth + amount < 0) throw new IllegalArgumentException("Shouldn't be making maxHealth negative");
         int tempHealth = health;
         maxHealth += amount;
         if (amount > 0)
@@ -261,6 +266,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
      * @param amount    Amount to recover mana for character entity
      */
     public void changeManaMax(int amount) {
+        if (maxMana + amount < 0) throw new IllegalArgumentException("shouldn't be making maxMana negative");
         int tempMana = mana;
         maxMana += amount;
         if (amount > 0)
@@ -276,7 +282,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
      * Change current and max mana by an amount.
      * @param amount    Amount to recover mana for character entity
      */
-    public void changeManaCurr(int amount) {
+    public void increaseManaCurr(int amount) {
         int prevMana = mana;
         if (amount + mana > maxMana) mana = maxMana;
         else if (amount + mana < 0) mana = 0;
@@ -676,11 +682,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
 
     // ***AOE***
-
-    // todo: how to do AOE??
-    public void doAoeStuff() {
-
-    }
 
 
     // ***ABILITIES***
@@ -1181,10 +1182,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         damageTarget(Dot.FROSTBURN_DAMAGE);
     }
     private void applyHealthDot() {
-        changeHealthCurr(Dot.HEAL_DOT_AMOUNT);
+        increaseHealthCurr(Dot.HEAL_DOT_AMOUNT);
     }
     private void applyManaDot() {
-        changeManaCurr(Dot.MANA_DOT_AMOUNT);
+        increaseManaCurr(Dot.MANA_DOT_AMOUNT);
     }
 
 
@@ -1192,17 +1193,69 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     public void applyAbility(Ability ability, CharacterEntity attacker) {
         Random rand = new Random();
+        int damage = rand.nextInt(ability.getMaxDamage() - ability.getMinDamage()) + ability.getMinDamage();
+        damage = getScaledAbilityDamage(ability, attacker, damage);
+        damageTarget(damage);
+        // specials
+        applyAbilitySpecialEffect(ability);
+        // DOT
+        applyAbilityDots(ability);
+        // direct heal/mana
+        if (ability.getHealMin() != 0) {
+            int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
+            increaseHealthCurr(randHealthChange);
+        }
+        if (ability.getManaMin() != 0) {
+            int randManaChange = rand.nextInt(ability.getManaMax() - ability.getManaMin()) + ability.getManaMin();
+            increaseManaCurr(randManaChange);
+        }
+        // stat increases
+        applyAbilityStatIncrease(ability);
+        // stat decreases
+        applyAbilityStatDecrease(ability);
+        // temp extra health
+        TempBar tempBar;
+        if (ability.getTempExtraHealth() != 0) {
+            tempBar = TempBarFactory.createTempHealth(ability.getDuration(), ability.getTempExtraHealth());
+            addTempHealthList(tempBar);
+        }
+    }
 
+    /**
+     * Apply the splash damage of an ability, given the attacker
+     * @param ability   The ability splash damage to apply
+     * @param attacker  The attacker using the ability
+     */
+    public void applyAbilitySplash(Ability ability, CharacterEntity attacker) {
+        if (ability.getSplashMax() > 0) {
+            int damage = getRandomAmount(ability.getSplashMin(), ability.getSplashMax());
+            damage = getScaledAbilityDamage(ability, attacker, damage);
+            damageTarget(damage);
+        }
+        if (ability.getSpecialAoe()) {
+            applyAbilitySpecialEffect(ability);
+            applyAbilityDots(ability);
+        }
+    }
+
+    /**
+     * Scale the ability damage and apply based on the str and int of the CharacterEntity, given what the Ability scales off of.
+     */
+    private int getScaledAbilityDamage(Ability ability, CharacterEntity attacker, int damage) {
         if (ability.getMinDamage() != 0) {
-            int damage = rand.nextInt(ability.getMaxDamage() - ability.getMinDamage()) + ability.getMinDamage();
             if (ability.getIsStrScaled())
                 damage += attacker.strength;
             if (ability.getIsIntScaled())
                 damage += attacker.intelligence;
-            damageTarget(damage);
         }
-        if (ability.getDamageAoe() != 0) doAoeStuff(); // todo: aoe
-        // specials
+        return damage;
+    }
+
+    /**
+     * Apply the special effects from ability
+     * @param ability   Special Effects to apply
+     */
+    private void applyAbilitySpecialEffect(Ability ability) {
         SpecialEffect special;
         if (ability.getIsConfuse()) {
             special = new SpecialEffect(SpecialEffect.CONFUSE, ability.getDuration());
@@ -1224,7 +1277,13 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             special = new SpecialEffect(SpecialEffect.INVISIBILITY, ability.getDuration());
             addNewSpecial(special);
         }
-        // DOT
+    }
+
+    /**
+     * Apply the dots from ability
+     * @param ability   dots to apply
+     */
+    private void applyAbilityDots(Ability ability) {
         Dot dot;
         if (ability.getIsFire()) {
             dot = new Dot(Dot.FIRE, false);
@@ -1250,16 +1309,13 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             dot = new Dot(Dot.MANA_DOT, false);
             addNewDot(dot);
         }
-        // direct heal/mana
-        if (ability.getHealMin() != 0) {
-            int randHealthChange = rand.nextInt(ability.getHealMax() - ability.getHealMin()) + ability.getHealMin();
-            changeHealthCurr(randHealthChange);
-        }
-        if (ability.getManaMin() != 0) {
-            int randManaChange = rand.nextInt(ability.getManaMax() - ability.getManaMin()) + ability.getManaMin();
-            changeManaCurr(randManaChange);
-        }
-        // stat increases
+    }
+
+    /**
+     * Apply the stat increases from the ability
+     * @param ability   stat increases to apply
+     */
+    private void applyAbilityStatIncrease(Ability ability) {
         TempStat tempStat;
         if (ability.getStrIncrease() != 0) {
             tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrIncrease());
@@ -1285,7 +1341,14 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockIncrease());
             addNewStatIncrease(tempStat);
         }
-        // stat decreases
+    }
+
+    /**
+     * Apply the stat decreases from the ability
+     * @param ability   stat decreases to apply
+     */
+    private void applyAbilityStatDecrease(Ability ability) {
+        TempStat tempStat;
         if (ability.getStrDecrease() != 0) {
             tempStat = new TempStat(TempStat.STR, ability.getDuration(), ability.getStrDecrease());
             addNewStatDecrease(tempStat);
@@ -1311,48 +1374,70 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockDecrease());
             addNewStatDecrease(tempStat);
         }
-        // temp extra health
-        TempBar tempBar;
-        if (ability.getTempExtraHealth() != 0) {
-            tempBar = TempBarFactory.createTempHealth(ability.getDuration(), ability.getTempExtraHealth());
-            addTempHealthList(tempBar);
-        }
     }
 
+    /**
+     * Apply an attack from entity attacker
+     * @param attack    The attack to apply
+     * @param attacker  The entity using the attack
+     */
     public void applyAttack(Attack attack, CharacterEntity attacker) {
         Random random = new Random();
         // get a random amount of damage given a range
         int damage = random.nextInt(attack.getDamageMax() - attack.getDamageMin()) + attack.getDamageMin();
-        // if the attacker is a character, check if the attack's weapon is specified to the correct attack class
-        if (attacker.isCharacter) {
-            Character characterAttacker = (Character) attacker;
-            // if weapon is not class specific, divide the damage by half
-            if (!characterAttacker.isCorrectClassSpecificWeapon(attack.getParentWeapon()))
-                damage = damageForIncorrectClassWeapon(damage);
-        }
+        // check if correct weapon for class
+        damage = getDamageAfterCheckingClassWeapon(attacker, attack.getParentWeapon(), damage);
         damageTarget(damage);
     }
 
+    /**
+     * Apply A special attack from the attacker
+     * @param specialAttack the special attack to apply
+     * @param attacker      entity using the special attack
+     */
     public void applySpecialAttack(SpecialAttack specialAttack, CharacterEntity attacker) {
         if (specialAttack.getAbility() != null) {
             applyAbility(specialAttack.getAbility(), attacker);
         }
-        if (specialAttack.getAoe() > 0) {
-            // todo: aoe
-            doAoeStuff();
-        }
         if (specialAttack.getDamageMin() != 0) {
             // get a random amount of damage given a range
             int damage = getRandomAmount(specialAttack.getDamageMin(), specialAttack.getDamageMax());
-            if (attacker.isCharacter) {
-                Character characterAttacker = (Character) attacker;
-                // if weapon is not class specific, divide the damage by half
-                if (!characterAttacker.isCorrectClassSpecificWeapon(specialAttack.getParentWeapon()))
-                    damage = damageForIncorrectClassWeapon(damage);
-            }
+            // check if correct weapon for class
+            damage = getDamageAfterCheckingClassWeapon(attacker, specialAttack.getParentWeapon(), damage);
             damageTarget(damage);
         }
         specialAttack.setActionUsed();
+    }
+
+    /**
+     * Apply a special attack splash damage
+     * @param specialAttack     the special attack splash damage to apply
+     * @param attacker          The attack using the special attack
+     */
+    public void applySpecialAttackSplash(SpecialAttack specialAttack, CharacterEntity attacker) {
+        if (specialAttack.getSplashDamageMin() > 0) {
+            int damage = getRandomAmount(specialAttack.getSplashDamageMin(), specialAttack.getSplashDamageMax());
+            damage = getDamageAfterCheckingClassWeapon(attacker, specialAttack.getParentWeapon(), damage);
+            damageTarget(damage);
+        }
+    }
+
+    /**
+     * The damage stays the same if the weapon used is specific to the player character.
+     * If the CharacterEntity is an enemy, there is no change.
+     * If the weapon is not class specific, then halve the damage.
+     * @param attacker          The attacker entity to check. only matters if it's a player Character.
+     * @param weapon            The weapon to check if it is specific to the character class
+     * @return                  The same damage if the weapon is specific to player character, otherwise halve damage
+     */
+    private int getDamageAfterCheckingClassWeapon(CharacterEntity attacker, Weapon weapon, int damage) {
+        if (attacker.isCharacter) {
+            Character characterAttacker = (Character) attacker;
+            // if weapon is not class specific, divide the damage by half
+            if (!characterAttacker.isCorrectClassSpecificWeapon(weapon))
+                damage = damageForIncorrectClassWeapon(damage);
+        }
+        return damage;
     }
 
     /**

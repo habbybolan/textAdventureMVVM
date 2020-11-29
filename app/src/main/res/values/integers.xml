@@ -2,7 +2,7 @@
 <resources>
     <integer name="fragment_animation_duration">600</integer>
 
-    <integer name="Wizard_Start_Ability">3</integer>
+    <integer name="Wizard_Start_Ability">9</integer>
     <integer name="Warrior_Start_Ability">4</integer>
     <integer name="Paladin_Start_Ability">6</integer>
     <integer name="Archer_Start_Ability">5</integer>

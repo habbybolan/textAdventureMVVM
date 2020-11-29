@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" >
     <data>
         <variable
             name="weapon"
             type="com.habbybolan.textadventure.model.inventory.weapon.Weapon" />
+        <variable
+            name="view"
+            type="android.view.View" />
     </data>
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/weapon_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        <ImageButton
+            android:id="@+id/info_weapon"
+            android:layout_width="@dimen/inventory_info_icon_size"
+            android:layout_height="@dimen/inventory_info_icon_size"
+            android:background="@drawable/inventory_info"
+            android:layout_marginStart="@dimen/character_inventory_list_margin_start"
+            android:layout_marginTop="@dimen/character_inventory_list_margin_top"/>
 
         <TextView
             android:id="@+id/weapon_detail"
             android:layout_width="wrap_content"
+            android:layout_toEndOf="@+id/info_weapon"
             android:layout_height="24dp"
-            android:layout_below="@+id/weapon_label"
-            android:text="@{weapon.name}"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="11dp" />
+            android:layout_marginStart="@dimen/character_inventory_list_margin_start"
+            android:layout_marginTop="@dimen/character_inventory_list_margin_top"
+            android:text="@{weapon.name}" />
 
         <Button
             android:id="@+id/btn_drop_weapon"
@@ -33,6 +38,7 @@
             android:layout_marginTop="17dp"
             android:layout_marginEnd="0dp"
             android:background="@drawable/custom_drop_button"
+            android:visibility="@{weapon.isFist ? view.GONE : view.VISIBLE}"
             android:text="@string/drop_button"
             android:textSize="@dimen/txt_size_small" />
 

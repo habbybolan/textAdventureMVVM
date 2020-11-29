@@ -87,7 +87,7 @@ public class ShopKeeperLoot extends LootInventory {
      * @param inventoryType     The string inventory type
      * @return                  The base price of the Inventory object
      */
-    private int priceBase(String inventoryType, int tier) {
+    private static int priceBase(String inventoryType, int tier) {
         switch (inventoryType) {
             case InventoryEntity.TYPE_ABILITY:
                 switch (tier) {
@@ -125,5 +125,14 @@ public class ShopKeeperLoot extends LootInventory {
             default:
                 throw new IllegalArgumentException(inventoryType + " is not a valid inventory type");
         }
+    }
+
+    /**
+     * Gets the price of the Inventory item in character inventory to sell.
+     * @param inventory     The Inventory object to sell
+     * @return              The sell price of the inventory object.
+     */
+    public static int priceSell(Inventory inventory) {
+        return priceBase(inventory.getType(), inventory.getTier()) / 2;
     }
 }

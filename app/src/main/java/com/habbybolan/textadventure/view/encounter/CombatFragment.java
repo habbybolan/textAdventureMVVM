@@ -34,8 +34,6 @@ import com.habbybolan.textadventure.viewmodel.encounters.CombatViewModel;
 
 import org.json.JSONException;
 
-import java.util.concurrent.ExecutionException;
-
 /**
 fragment for combat encounter
     state 1: dialogue
@@ -111,7 +109,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             setActionSelect();
 
             setInventoryRecyclerViewers();
-        } catch (InterruptedException | ExecutionException | JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

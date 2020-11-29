@@ -108,6 +108,7 @@ public class DialogueAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         notifyItemInserted(0);
     }
 
+
     ArrayList<DialogueType> getDialogueList() {
         return dialogueList;
     }

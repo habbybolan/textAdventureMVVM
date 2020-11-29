@@ -6,7 +6,7 @@ import com.habbybolan.textadventure.model.GridModel;
 import com.habbybolan.textadventure.model.dialogue.DialogueType;
 import com.habbybolan.textadventure.model.inventory.Inventory;
 import com.habbybolan.textadventure.model.inventory.InventoryFactory;
-import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.repository.LocallySavedFiles;
 import com.habbybolan.textadventure.repository.database.ShopKeeperLoot;
 
 import org.json.JSONArray;
@@ -34,7 +34,7 @@ public class ShopViewModel extends EncounterViewModel  {
 
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(application);
+        LocallySavedFiles save = new LocallySavedFiles(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_SHOP);
@@ -113,11 +113,11 @@ public class ShopViewModel extends EncounterViewModel  {
     public void setSellList() {
         ArrayList<Inventory> listOfAllToSell = new ArrayList<>();
         if (characterVM.getCharacter().getNumWeapons() > 0)
-            listOfAllToSell.addAll(characterVM.getCharacter().getWeapons());
+            listOfAllToSell.addAll(characterVM.getWeapons());
         if (characterVM.getCharacter().getNumAbilities() > 0)
-            listOfAllToSell.addAll(characterVM.getCharacter().getAbilities());
+            listOfAllToSell.addAll(characterVM.getAbilities());
         if (characterVM.getCharacter().getNumItems() > 0)
-            listOfAllToSell.addAll(characterVM.getCharacter().getItems());
+            listOfAllToSell.addAll(characterVM.getItems());
         addListToGridModelSellList(listOfAllToSell);
     }
 
@@ -127,7 +127,7 @@ public class ShopViewModel extends EncounterViewModel  {
      */
     private void addListToGridModelSellList(ArrayList<Inventory> inventoryToSell) {
         for (Inventory inventory : inventoryToSell) {
-            GridModel gridModel = new GridModel(inventory, 5);
+            GridModel gridModel = new GridModel(inventory, ShopKeeperLoot.priceSell(inventory));
             listGridModelSell.add(gridModel);
         }
     }

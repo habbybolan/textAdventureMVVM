@@ -86,6 +86,13 @@ public class Weapon implements Inventory {
         pictureResource = R.drawable.sword;
     }
 
+    /**
+     * @return  True if the weapon is a default fist weapon
+     */
+    public boolean getIsFist() {
+        return weaponName.equals(DEFAULT_NAME);
+    }
+
     @Override
     public int getPictureResource() {
         return pictureResource;

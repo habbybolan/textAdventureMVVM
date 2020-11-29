@@ -140,24 +140,22 @@ public class DialogueRecyclerView {
      *  Dialogue for adding new Ability scroll
      */
     private void setAbilityListener() {
-        // observed whenever changes in character abilities
-        characterVM.getAbilities().addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+        // observe when new ability added to player character inventory
+        characterVM.getAbilityObserverAdd().addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onChanged(ObservableList sender) {}
-            @Override
-            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {}
-            @Override
-            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
-                Ability ability = (Ability) sender.get(positionStart);
-                if (ability != null) {
-                    InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), InventoryEntity.TYPE_ABILITY, true);
-                    adapter.addNewDialogue(inventoryDialogue);
-                }
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Ability ability = characterVM.getAbilityObserverAdd().get();
+                InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), ability.getType(), true);
+                adapter.addNewDialogue(inventoryDialogue);
             }
+        });
+        // observe when ability is removed from player character inventory
+        characterVM.getAbilityObserverRemove().addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {}
-            @Override
-            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Ability ability = characterVM.getAbilityObserverRemove().get();
+                InventoryDialogue inventoryDialogue = new InventoryDialogue(ability.getName(), ability.getPictureResource(), ability.getType(), false);
+                adapter.addNewDialogue(inventoryDialogue);
             }
         });
 

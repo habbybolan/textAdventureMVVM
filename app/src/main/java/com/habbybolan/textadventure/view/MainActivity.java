@@ -22,9 +22,7 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) getSupportActionBar().hide();
         ActivityMainBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        dataBinding.setViewModel(new MainActivityViewModel());
-
-        dataBinding.getViewModel().initiate(getApplicationContext());
+        dataBinding.setViewModel(new MainActivityViewModel(getApplicationContext()));
     }
 
     // starts a new game, sending user to choose their character

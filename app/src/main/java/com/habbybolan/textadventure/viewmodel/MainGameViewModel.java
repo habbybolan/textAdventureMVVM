@@ -1,6 +1,7 @@
 package com.habbybolan.textadventure.viewmodel;
 
 import android.app.Application;
+import android.util.Log;
 import android.view.View;
 
 import androidx.databinding.BaseObservable;
@@ -17,7 +18,7 @@ import com.habbybolan.textadventure.model.encounter.ShopModel;
 import com.habbybolan.textadventure.model.locations.CombatDungeon;
 import com.habbybolan.textadventure.model.locations.MultiDungeon;
 import com.habbybolan.textadventure.repository.JsonAssetFileReader;
-import com.habbybolan.textadventure.repository.SaveDataLocally;
+import com.habbybolan.textadventure.repository.LocallySavedFiles;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterViewModel;
 import com.habbybolan.textadventure.viewmodel.encounters.EncounterViewModel;
 
@@ -35,6 +36,8 @@ public class MainGameViewModel extends BaseObservable {
     // number of encounters the user has played
     private int encounterNumber = 0;
     private int turnCounter; // keeps track of the number of encounters/distance travelled
+
+    private static final String TAG = "MainGameViewModel";
 
     private int gameFragmentVisible = View.VISIBLE; // visibility of the game fragment
     private int characterFragmentVisible = View.GONE; // visibility of the character fragment
@@ -107,7 +110,7 @@ public class MainGameViewModel extends BaseObservable {
 
     // must be initialized before getting the instance
     public static MainGameViewModel init(Application application, CharacterViewModel characterVM) {
-        if (instance != null) throw new AssertionError("Already Initialized");
+        if (instance != null) Log.w(TAG, "Recreating static Object");
         instance = new MainGameViewModel(application, characterVM);
         return instance;
     }
@@ -128,7 +131,7 @@ public class MainGameViewModel extends BaseObservable {
          * @throws JSONException    If problem in JSON encounter formatting.
      */
     public void openGameEncounter() throws JSONException {
-        SaveDataLocally save = new SaveDataLocally(application);
+        LocallySavedFiles save = new LocallySavedFiles(application);
         JSONObject prevSave = save.readSavedEncounter();
         if (prevSave != null) {
             // if a saved encounter exists, then go into it

@@ -17,10 +17,9 @@ public class Ability extends Action implements Inventory {
     private int minDamage = 0;
     private int maxDamage = 0;
     // aoe
-    private int damageAoe = 0; // number of enemies hit by splash damage
     private int splashMin = 0;
     private int splashMax = 0;
-    private int specialAoe = 0; // numbers of enemies hit by special ability aoe
+    private boolean specialAoe = false; // numbers of enemies hit by special ability aoe
 
     // specials
     private boolean isConfuse = false; // gives confusion to target, making them attack random
@@ -106,11 +105,10 @@ public class Ability extends Action implements Inventory {
             // damage
             minDamage = JSONAbility.getInt(DAMAGE_MIN);
             maxDamage = JSONAbility.getInt(DAMAGE_MAX);
-            damageAoe = JSONAbility.getInt(DAMAGE_AOE);
             splashMin = JSONAbility.getInt(SPLASH_DAMAGE_MIN);
             splashMax = JSONAbility.getInt(SPLASH_DAMAGE_MAX);
             // specials
-            specialAoe = JSONAbility.getInt(SPECIAL_AOE);
+            specialAoe = JSONAbility.getBoolean(SPECIAL_AOE);
             isStun = JSONAbility.getBoolean(IS_STUN);
             isConfuse = JSONAbility.getBoolean(IS_CONFUSE);
             isInvisible = JSONAbility.getBoolean(IS_INVISIBLE);
@@ -227,15 +225,12 @@ public class Ability extends Action implements Inventory {
         setMinDamage(cursor.getInt(damageMinColIndex));
         int damageMaxColIndex = cursor.getColumnIndex(DAMAGE_MAX);
         setMaxDamage(cursor.getInt(damageMaxColIndex));
-        // set aoe
-        int damageAoeColIndex = cursor.getColumnIndex(DAMAGE_AOE);
-        setDamageAoe(cursor.getInt(damageAoeColIndex));
         int splashMinColIndex = cursor.getColumnIndex(SPLASH_DAMAGE_MIN);
         setSplashMin(cursor.getInt(splashMinColIndex));
         int splashMaxColIndex = cursor.getColumnIndex(SPLASH_DAMAGE_MAX);
         setSplashMax(cursor.getInt(splashMaxColIndex));
         int specialAoeColIndex = cursor.getColumnIndex(SPECIAL_AOE);
-        setSpecialAoe(cursor.getInt(specialAoeColIndex));
+        setSpecialAoe(cursor.getInt(specialAoeColIndex) == 1);
         // set specials
         int isStunColIndex = cursor.getColumnIndex(IS_STUN);
         setIsStun(cursor.getInt(isStunColIndex)==1);
@@ -329,10 +324,6 @@ public class Ability extends Action implements Inventory {
         this.maxDamage = maxDamage;
     }
 
-    public void setDamageAoe(int damageAoe) {
-        this.damageAoe = damageAoe;
-    }
-
     public void setSplashMin(int splashMin) {
         this.splashMin = splashMin;
     }
@@ -341,7 +332,7 @@ public class Ability extends Action implements Inventory {
         this.splashMax = splashMax;
     }
 
-    public void setSpecialAoe(int specialAoe) {
+    public void setSpecialAoe(boolean specialAoe) {
         this.specialAoe = specialAoe;
     }
 
@@ -490,16 +481,13 @@ public class Ability extends Action implements Inventory {
     public int getMaxDamage() {
         return maxDamage;
     }
-    public int getDamageAoe() {
-        return damageAoe;
-    }
     public int getSplashMin() {
         return splashMin;
     }
     public int getSplashMax() {
         return splashMax;
     }
-    public int getSpecialAoe() {
+    public boolean getSpecialAoe() {
         return specialAoe;
     }
     public boolean getIsConfuse() {
@@ -633,7 +621,6 @@ public class Ability extends Action implements Inventory {
         // damage
         JSONInventory.put(DAMAGE_MIN, minDamage);
         JSONInventory.put(DAMAGE_MAX, maxDamage);
-        JSONInventory.put(DAMAGE_AOE, damageAoe);
         JSONInventory.put(SPLASH_DAMAGE_MIN, splashMin);
         JSONInventory.put(SPLASH_DAMAGE_MAX, splashMax);
         // specials

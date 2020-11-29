@@ -293,8 +293,11 @@ public abstract class EncounterViewModel extends AndroidViewModel {
      * @param rv            The DialogueRecyclerView holding all dialogue data.
      */
     public void saveGame(DialogueRecyclerView rv) {
-        CharacterViewModel.getInstance().saveCharacter();
-        saveEncounter(rv.getDialogueList());
+        // only save if the character is alive
+        if (CharacterViewModel.getInstance().getCharacter().getIsAlive()) {
+            CharacterViewModel.getInstance().saveCharacter();
+            saveEncounter(rv.getDialogueList());
+        }
     }
     public boolean getIsSaved() {
         return mainGameVM.getIsSaved();

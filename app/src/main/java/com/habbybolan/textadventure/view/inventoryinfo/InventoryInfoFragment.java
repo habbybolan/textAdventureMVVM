@@ -113,6 +113,7 @@ public class InventoryInfoFragment extends Fragment {
             snippetBinding.setInventoryName(specialAttack.getAbility().getName());
             snippetBinding.setInventoryPic(specialAttack.getAbility().getAbilityID());
             binding.inventorySnippet.addView(view);
+            // clicker to go into new Ability fragment
             snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -147,6 +148,7 @@ public class InventoryInfoFragment extends Fragment {
             snippetBinding.setInventoryName(weapon.getAttack().getName());
             snippetBinding.setInventoryPic(weapon.getAttack().getPictureResource());
             binding.inventorySnippet.addView(view);
+            // clicker to go into new Attack fragment
             snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -165,6 +167,7 @@ public class InventoryInfoFragment extends Fragment {
             snippetBinding.setInventoryName(weapon.getSpecialAttack().getName());
             snippetBinding.setInventoryPic(weapon.getSpecialAttack().getPictureResource());
             binding.inventorySnippet.addView(view);
+            // clicker to go into new Special Attack fragment
             snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -192,6 +195,7 @@ public class InventoryInfoFragment extends Fragment {
             snippetBinding.setInventoryName(item.getAbility().getName());
             snippetBinding.setInventoryPic(item.getAbility().getAbilityID());
             binding.inventorySnippet.addView(view);
+            // clicker to go into new Ability fragment
             snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

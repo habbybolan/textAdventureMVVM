@@ -89,12 +89,4 @@ public class InventoryInfoViewModel {
     public String getSpecialAttackInfo(SpecialAttack specialAttack) {
         return InventoryInfoModel.getSpecialAttackInfo(specialAttack);
     }
-
-    private ObservableField<String> observeInventoryChange = new ObservableField<>();
-    public String getObserveInventoryChange() {
-        return String.valueOf(observeInventoryChange);
-    }
-    public void setObserveInventoryChange(String inventoryString) {
-
-    }
 }

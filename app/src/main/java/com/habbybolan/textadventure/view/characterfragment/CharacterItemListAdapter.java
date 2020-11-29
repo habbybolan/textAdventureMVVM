@@ -19,14 +19,16 @@ import java.util.ArrayList;
 
 public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItemListAdapter.ViewHolder> {
     private ArrayList<Item> items;
-    private CharacterListClickListener dropListener;
-    private CharacterListClickListener consumeListener;
+    private CharacterListDropConsumeClickListener dropListener;
+    private CharacterListDropConsumeClickListener consumeListener;
+    private CharacterListInfoClickListener infoListener;
     private CharacterViewModel characterVM;
 
-    public CharacterItemListAdapter(ArrayList<Item> items, CharacterViewModel characterVM, CharacterListClickListener dropListener, CharacterListClickListener consumeListener) {
+    public CharacterItemListAdapter(ArrayList<Item> items, CharacterViewModel characterVM, CharacterListDropConsumeClickListener dropListener, CharacterListDropConsumeClickListener consumeListener, CharacterListInfoClickListener infoListener) {
         this.items = items;
         this.dropListener = dropListener;
         this.consumeListener = consumeListener;
+        this.infoListener = infoListener;
         this.characterVM = characterVM;
     }
 
@@ -35,7 +37,7 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
     @Override
     public CharacterItemListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         CharacterItemListDetailsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.character_item_list_details, parent, false);
-        return new CharacterItemListAdapter.ViewHolder(binding, dropListener, consumeListener, characterVM);
+        return new CharacterItemListAdapter.ViewHolder(binding, dropListener, consumeListener, infoListener, characterVM);
     }
 
     // set details of the views
@@ -49,11 +51,11 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
     // create the views inside the recyclerViewer
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CharacterItemListDetailsBinding binding;
-        CharacterListClickListener dropListener;
-        CharacterListClickListener consumeListener;
+        CharacterListDropConsumeClickListener dropListener;
+        CharacterListDropConsumeClickListener consumeListener;
         CharacterViewModel characterVM;
 
-        ViewHolder(CharacterItemListDetailsBinding binding, final CharacterListClickListener dropListener, final CharacterListClickListener consumeListener, CharacterViewModel characterVM) {
+        ViewHolder(CharacterItemListDetailsBinding binding, final CharacterListDropConsumeClickListener dropListener, final CharacterListDropConsumeClickListener consumeListener, final CharacterListInfoClickListener infoListener, CharacterViewModel characterVM) {
             super(binding.getRoot());
             this.binding = binding;
             this.dropListener = dropListener;
@@ -69,6 +71,7 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
                     dropListener.onClick("Hold to drop item");
                 }
             });
+
             // deleted the inventory item if long click
             binding.btnDropItem.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -94,6 +97,14 @@ public class CharacterItemListAdapter extends RecyclerView.Adapter<CharacterItem
                 public boolean onLongClick(View v) {
                     consumeListener.onLongClicked(getAdapterPosition());
                     return true;
+                }
+            });
+
+            // image button to display info of weapon clicked
+            binding.infoItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    infoListener.onClick(getAdapterPosition());
                 }
             });
         }

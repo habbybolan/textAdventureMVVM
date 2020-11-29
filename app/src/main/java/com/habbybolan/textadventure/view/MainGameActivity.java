@@ -1,5 +1,6 @@
 package com.habbybolan.textadventure.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -11,6 +12,7 @@ import androidx.databinding.Observable;
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.databinding.ActivityMainGameBinding;
 import com.habbybolan.textadventure.view.characterfragment.CharacterFragment;
+import com.habbybolan.textadventure.view.deathscreen.DeathScreenActivity;
 import com.habbybolan.textadventure.view.encounter.BreakFragment;
 import com.habbybolan.textadventure.view.encounter.CheckFragment;
 import com.habbybolan.textadventure.view.encounter.ChoiceBenefitFragment;
@@ -44,14 +46,9 @@ public class MainGameActivity extends AppCompatActivity {
         ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) getSupportActionBar().hide();
         // if viewModels not yet initiated, so initiate them
-        if (!CharacterViewModel.isInitiated()) {
-            characterViewModel = CharacterViewModel.init(getApplicationContext());
-            mainGameViewModel = MainGameViewModel.init(getApplication(), characterViewModel);
-        } else {
-            characterViewModel = CharacterViewModel.getInstance();
-            mainGameViewModel = MainGameViewModel.getInstance();
-        }
-        characterDeathListener();
+        characterViewModel = CharacterViewModel.init(getApplication());
+        mainGameViewModel = MainGameViewModel.init(getApplication(), characterViewModel);
+        setDeathListener();
         mainGameBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_game);
         mainGameBinding.setMainGameViewModel(mainGameViewModel);
         mainGameBinding.setCharacterViewModel(characterViewModel);
@@ -74,11 +71,28 @@ public class MainGameActivity extends AppCompatActivity {
         }
     }
 
-    // listener for when the character reaches 0 health
-    private void characterDeathListener() {
-        // todo: death by observing health changes and checking if character is dead (<= 0 health)
+    /**
+     * Listener for when the player character dies.
+     */
+    private void setDeathListener() {
+        characterViewModel.getIsPlayerDeadObserver().addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                killPlayer();
+            }
+        });
     }
 
+    /**
+     * Called when the player character dies, notifying listener. (health reaches 0).
+     */
+    public void killPlayer() {
+        Intent intent = new Intent(this, DeathScreenActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+        //overridePendingTransition(R.anim.enter_from_right, R.anim.fade_out);
+        // todo: reroute main thread control flow to DeathScreenActivity
+    }
 
     // observed whenever MainGameViewModel changes the encounter, changing the fragment to the appropriate one
     private void observeEncounterChange() {

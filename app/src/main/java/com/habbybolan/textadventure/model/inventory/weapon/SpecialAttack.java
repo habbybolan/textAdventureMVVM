@@ -22,7 +22,6 @@ public class SpecialAttack extends WeaponAction {
     private String specialAttackDescription = "Special Attack Description";
     private Ability ability = null;
     private boolean isRanged = false;
-    private int aoe;
     private int splashDamageMin;
     private int splashDamageMax;
     private int damageMin;
@@ -65,7 +64,6 @@ public class SpecialAttack extends WeaponAction {
             damageMin = JSONSpecialAttack.getInt(DAMAGE_MIN);
             damageMax = JSONSpecialAttack.getInt(DAMAGE_MAX);
             isRanged = JSONSpecialAttack.getBoolean(IS_RANGED);
-            aoe = JSONSpecialAttack.getInt(AOE);
             splashDamageMin = JSONSpecialAttack.getInt(SPLASH_DAMAGE_MIN);
             splashDamageMax = JSONSpecialAttack.getInt(SPLASH_DAMAGE_MAX);
             // cooldown
@@ -96,7 +94,6 @@ public class SpecialAttack extends WeaponAction {
             damageMin = JSONSpecialAttack.getInt(DAMAGE_MIN);
             damageMax = JSONSpecialAttack.getInt(DAMAGE_MAX);
             isRanged = JSONSpecialAttack.getBoolean(IS_RANGED);
-            aoe = JSONSpecialAttack.getInt(AOE);
             splashDamageMin = JSONSpecialAttack.getInt(SPLASH_DAMAGE_MIN);
             splashDamageMax = JSONSpecialAttack.getInt(SPLASH_DAMAGE_MAX);
             // cooldown
@@ -135,7 +132,6 @@ public class SpecialAttack extends WeaponAction {
         setIsRanged(cursor.getInt(isRangedColID));
         // set up aoe (number of extra enemies hit with splash damage)
         int intAoeColID = cursor.getColumnIndex(AOE);
-        setAoe(cursor.getInt(intAoeColID));
         // set up splash damage min/max
         int splashDamageMinColID = cursor.getColumnIndex(SPLASH_DAMAGE_MIN);
         setSplashDamageMin(cursor.getInt(splashDamageMinColID));
@@ -167,9 +163,6 @@ public class SpecialAttack extends WeaponAction {
             this.isRanged = false;
 
     }
-    private void setAoe(int aoe) {
-        this.aoe = aoe;
-    }
     private void setSplashDamageMin(int splashDamageMin) {
         this.splashDamageMin = splashDamageMin;
     }
@@ -195,9 +188,6 @@ public class SpecialAttack extends WeaponAction {
     }
     public boolean getIsRanged() {
         return isRanged;
-    }
-    public int getAoe() {
-        return aoe;
     }
     public int getSplashDamageMin() {
         return splashDamageMin;
@@ -245,7 +235,6 @@ public class SpecialAttack extends WeaponAction {
         }
         // damage
         JSONInventory.put(IS_RANGED, isRanged);
-        JSONInventory.put(AOE, aoe);
         JSONInventory.put(SPLASH_DAMAGE_MIN, splashDamageMin);
         JSONInventory.put(SPLASH_DAMAGE_MAX, splashDamageMax);
         JSONInventory.put(DAMAGE_MIN, damageMin);

@@ -2,6 +2,7 @@ package com.habbybolan.textadventure.repository;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.habbybolan.textadventure.R;
 import com.habbybolan.textadventure.model.characterentity.Character;
@@ -21,10 +22,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 
-public class SaveDataLocally {
+public class LocallySavedFiles {
     Context context;
+    private final static String TAG = "MainActivity";
 
-    public SaveDataLocally(Context context) {
+    public LocallySavedFiles(Context context) {
         this.context = context;
     }
 
@@ -45,8 +47,6 @@ public class SaveDataLocally {
             if ((CharacterChoiceViewModel.wizard).equals(character[0])) {
                 try {
                     jsonClassObject.put("class", Character.WIZARD_CLASS_TYPE);
-                    jsonClassObject.put("encounterState", 0);
-                    jsonClassObject.put("distance", 0);
 
                     jsonClassObject.put("str", context.getString(R.string.Wizard_Start_Str)); // str
                     jsonClassObject.put("strBase", context.getString(R.string.Wizard_Start_Str)); // base str
@@ -168,6 +168,8 @@ public class SaveDataLocally {
             }
             // this info is consistent for all starting characters
             try {
+                jsonClassObject.put("encounterState", 0);
+                jsonClassObject.put("distance", 0);
                 jsonClassObject.put("gold", context.getString(R.string.Starting_Gold));
 
             } catch (JSONException e) {
@@ -211,8 +213,7 @@ public class SaveDataLocally {
             try {
                 fOut = context.openFileOutput(filename, Context.MODE_PRIVATE);
                 fOut.write(jsonClassObject.toString().getBytes());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                Log.i(TAG, "Character saved");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -250,6 +251,7 @@ public class SaveDataLocally {
         try (FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE)) {
             fos.write("".getBytes());
             fos.write(jsonString.getBytes());
+            Log.i(TAG, "Encounter saved");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -310,17 +312,35 @@ public class SaveDataLocally {
     }
 
     // deleted the character from local storage
-    private void deleteCharacter() {
-        File file = new File(context.getResources().getString(R.string.fileCharacter));
-        if (file.delete())
-            System.out.println("Character deleted");
+    public void deleteCharacter() {
+        File fileCharacter = new File(context.getFilesDir(), context.getResources().getString(R.string.fileCharacter));
+        if (fileExists(fileCharacter)) {
+            if (fileCharacter.delete()) {
+                Log.i(TAG, "Saved character deleted successfully");
+            }
+        }
     }
 
     // deletes the previous encounters from local storage
     private void deletePreviousEncounters() {
-        File file = new File(context.getResources().getString(R.string.fileEncounter));
-        if (file.delete())
-            System.out.println("Previous encounters deleted");
+        File fileEncounter = new File(context.getFilesDir(), context.getResources().getString(R.string.fileEncounter));
+        if (fileExists(fileEncounter)) {
+            if (fileEncounter.delete()) {
+                Log.i(TAG, "Saved encounter deleted successfully");
+            }
+        }
+    }
+
+    // returns true if a character exists
+    public boolean hasCharacter() {
+        File file = new File(context.getFilesDir(), context.getResources().getString(R.string.fileCharacter));
+        // if character data exists, bring up the continue fragment
+        return fileExists(file);
+    }
+
+    // return true if the file exists
+    private boolean fileExists(File file) {
+        return (file.exists());
     }
 }
 

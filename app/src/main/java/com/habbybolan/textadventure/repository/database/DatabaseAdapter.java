@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class DatabaseAdapter {
-    protected static final String TAG = "DataAdapter";
+    protected static final String TAG = "DatabaseAdapter";
 
     private final Context mContext;
     private SQLiteDatabase mDb;

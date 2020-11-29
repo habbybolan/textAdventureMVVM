@@ -17,8 +17,7 @@ import com.habbybolan.textadventure.model.inventory.InventoryEntity;
 import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
-import com.habbybolan.textadventure.repository.SaveDataLocally;
-import com.habbybolan.textadventure.repository.database.CreateEnemy;
+import com.habbybolan.textadventure.repository.LocallySavedFiles;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 
@@ -28,7 +27,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 /*
 View model to hold data of the combat encounter
  */
@@ -52,7 +50,7 @@ public class CombatViewModel extends EncounterViewModel {
     private ArrayList<CharacterEntityViewModel> combatOrderNext = new ArrayList<>();
     private ArrayList<CharacterEntityViewModel> combatOrderLast = new ArrayList<>();
 
-
+    // All enemies created for combat
     private ArrayList<EnemyViewModel> enemies = new ArrayList<>();
 
     private Action selectedAction;
@@ -92,20 +90,17 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     // creates the enemies and sets up the data for entering combat
-    public void createCombat() throws JSONException, ExecutionException, InterruptedException {
+    public void createCombat() throws JSONException {
         // create the enemies
         JSONObject fightObject = encounter.getJSONObject("fight");
         JSONArray typeArray = fightObject.getJSONArray("type");
         // ID associated with the enemy
-        int ID = 2;
-        CreateEnemy createEnemy = new CreateEnemy(getApplication());
+        int ID = 1;
         for (int i = 0; i < typeArray.length(); i++) {
-            Enemy enemy = createEnemy.getEnemy(typeArray.getString(i), 1, characterVM.getCharacter().getNumStatPoints());
-            enemy.setID(ID);
-            enemies.add(new EnemyViewModel(enemy));
+            EnemyViewModel enemyViewModel = new EnemyViewModel(typeArray.getString(i), 1, characterVM.getNumStatPoints(), ID, getApplication());
+            enemies.add(enemyViewModel);
             ID++;
         }
-        createEnemy.closeDatabase();
         createCombatOrderLists();
     }
 
@@ -145,7 +140,7 @@ public class CombatViewModel extends EncounterViewModel {
      */
     @Override
     public void saveEncounter(ArrayList<DialogueType> dialogueList) {
-        SaveDataLocally save = new SaveDataLocally(application);
+        LocallySavedFiles save = new LocallySavedFiles(application);
         JSONObject encounterData = new JSONObject();
         try {
             encounterData.put(ENCOUNTER_TYPE, TYPE_COMBAT);
@@ -226,8 +221,7 @@ public class CombatViewModel extends EncounterViewModel {
     private void retrieveEnemies() throws JSONException {
         JSONArray enemiesArray = mainGameVM.getSavedEncounter().getJSONArray(ENEMIES);
         for (int i = 0; i < enemiesArray.length(); i++) {
-            Enemy enemy = new Enemy(enemiesArray.getString(i));
-            enemies.add(new EnemyViewModel(enemy));
+            enemies.add(new EnemyViewModel(enemiesArray.getString(i)));
         }
     }
 
@@ -259,7 +253,7 @@ public class CombatViewModel extends EncounterViewModel {
      * @param ID            The ID associated with the CharacterEntity to put into the
      */
     private void addToCombatArray(ArrayList<CharacterEntityViewModel> combatList, int ID) {
-        if (ID == 1)
+        if (ID == 0)
             // if the ID is 1, then it must be player Character
             combatList.add(characterVM);
         else {
@@ -347,13 +341,51 @@ public class CombatViewModel extends EncounterViewModel {
     }
 
     /**
+     * Finds the Enemy to the left of the parameter enemy. Return null if no enemy to the left or if it's a player character.
+     * @param characterEntityViewModel  The enemy to look at to find any enemy to the left of it.
+     * @return                          The enemy to the left of enemyViewModel. null if none.
+     */
+    private EnemyViewModel getEnemyToLeft(CharacterEntityViewModel characterEntityViewModel) {
+        if (characterEntityViewModel.getIsCharacter())
+            // return null if it's a character
+            return null;
+        EnemyViewModel enemyViewModel = (EnemyViewModel) characterEntityViewModel;
+        int id = enemyViewModel.getID();
+        // since IDs are 1-n, with n enemies, then all have a left enemy except ID=1
+        if (id > 1)
+            return enemies.get((id-1)-1);
+        else
+            // otherwise, no left enemy.
+            return null;
+    }
+
+    /**
+     * Finds the Enemy to the right of the parameter enemy. Return null if no enemy to the right or if it's a player character
+     * @param characterEntityViewModel    The enemy to look at to find any enemy to the left of it.
+     * @return                  The enemy to the left of enemyViewModel. null if none.
+     */
+    private EnemyViewModel getEnemyToRight(CharacterEntityViewModel characterEntityViewModel) {
+        if (characterEntityViewModel.getIsCharacter())
+            // return null if it's a character
+            return null;
+        EnemyViewModel enemyViewModel = (EnemyViewModel) characterEntityViewModel;
+        int id = enemyViewModel.getID();
+        // since IDs are 1-n, with n enemies, then all have a right enemy except ID=n
+        if (id < enemies.size())
+            return enemies.get((id-1)+1);
+        else
+            // otherwise, no right enemy.
+            return null;
+    }
+
+    /**
      *  Helper to use selected ability action on target from attacker.
      * @param ability       The ability action to be used.
      * @param target        The target to use the ability action on.
      * @param attacker      The one using the ability action on the target
      */
     private void applyAbilityAction(Ability ability, CharacterEntityViewModel target, CharacterEntityViewModel attacker) {
-        target.applyAbility(ability, attacker.getCharacterEntity());
+        target.applyAbility(ability, attacker.getCharacterEntity(), getEnemyToLeft(target), getEnemyToRight(target));
         ability.setActionUsed();
     }
 
@@ -374,7 +406,7 @@ public class CombatViewModel extends EncounterViewModel {
      * @param attacker          The one using the special attack action on the target
      */
     private void applySpecialAttackAction(SpecialAttack specialAttack, CharacterEntityViewModel target, CharacterEntityViewModel attacker) {
-        target.applySpecialAttack(specialAttack, attacker.getCharacterEntity());
+        target.applySpecialAttack(specialAttack, attacker.getCharacterEntity(), getEnemyToLeft(target), getEnemyToRight(target));
         specialAttack.setActionUsed();
     }
 
@@ -387,9 +419,9 @@ public class CombatViewModel extends EncounterViewModel {
         CharacterEntity attacker = characterVM.getCharacter();
         if (target.getIsCharacter()) {
             if (item.getIsConsumable()) characterVM.consumeItem(item);
-            else characterVM.applyAbility(item.getAbility(), attacker);
+            else characterVM.applyAbility(item.getAbility(), attacker, getEnemyToLeft(target), getEnemyToRight(target));
         } else {
-            target.applyAbility(item.getAbility(), attacker);
+            target.applyAbility(item.getAbility(), attacker, getEnemyToLeft(target), getEnemyToRight(target));
         }
         item.setActionUsed();
     }
@@ -562,7 +594,6 @@ public class CombatViewModel extends EncounterViewModel {
         getExpReward();
         getGoldReward();
         // todo: inventory reward?
-        //Inventory inventoryReward = combatVM.getInventoryReward(getContext());
     }
 
     public ArrayList<CharacterEntityViewModel> getCombatOrderCurr() {
