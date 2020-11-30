@@ -29,29 +29,21 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     protected int intIncrease = 0;
     protected int conIncrease = 0;
     protected int spdIncrease = 0;
-    protected int evasionIncrease = 0;
-    protected int blockIncrease = 0;
 
     protected int strDecrease = 0;
     protected int intDecrease = 0;
     protected int conDecrease = 0;
     protected int spdDecrease = 0;
-    protected int evasionDecrease = 0;
-    protected int blockDecrease = 0;
 
     protected int strBase = 0;
     protected int intBase = 0;
     protected int conBase = 0;
     protected int spdBase = 0;
-    protected int evasionBase = 0;
-    protected int blockBase = 0;
     
     protected int strength = 0;
     protected int intelligence = 0;
     protected int constitution = 0;
     protected int speed = 0;
-    protected int evasion = 0;
-    protected int block = 0;
 
     int numStatPoints = 0;
     boolean isCharacter;
@@ -304,8 +296,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public static final String INT = "INT";
     public static final String CON = "CON";
     public static final String SPD = "SPD";
-    public static final String EVASION = "Evasion";
-    public static final String BLOCK = "Block";
 
     /** Updates all the stat's main value, given its new baseStat, statIncrease, and statDecrease.
      * Helper for when statIncrease/statDecrease changes.
@@ -323,12 +313,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         // update SPD
         setSpeed(getSpdIncrease() + getSpdDecrease() + getSpdBase());
         if (getSpeed() < 0) setSpeed(0);
-        // update Evasion
-        setEvasion(getEvasionIncrease() + getEvasionDecrease() + getEvasionBase());
-        if (getEvasion() < 0) setEvasion(0);
-        // update Block
-        setBlock(getBlockIncrease() + getBlockDecrease() + getBlockBase());
-        if (getBlock() < 0) setBlock(0);
     }
 
     /**
@@ -360,12 +344,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
                 break;
             case SPD:
                 setSpdIncrease(getSpdIncrease() + amount);
-                break;
-            case EVASION:
-                setEvasionIncrease(getEvasionIncrease() + amount);
-                break;
-            case BLOCK:
-                setBlockIncrease(getBlockIncrease() + amount);
                 break;
         }
         findStatToAlter(tempStat);
@@ -401,12 +379,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             case SPD:
                 setSpdDecrease(getSpdDecrease() + amount);
                 break;
-            case EVASION:
-                setEvasionDecrease(getEvasionDecrease() + amount);
-                break;
-            case BLOCK:
-                setBlockDecrease(getBlockDecrease() + amount);
-                break;
         }
         findStatToAlter(tempStat);
     }
@@ -432,14 +404,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             case SPD:
                 setSpeed((getSpdBase() + getSpdIncrease()) - getSpdDecrease());
                 if (getSpeed() < 0) setSpeed(0);
-                break;
-            case EVASION:
-                setEvasion((getEvasionBase() + getEvasionIncrease()) - getEvasionDecrease());
-                if (getEvasion() < 0) setEvasion(0);
-                break;
-            case BLOCK:
-                setBlock((getBlockBase() + getBlockIncrease()) - getBlockDecrease());
-                if (getBlock() < 0) setBlock(0);
                 break;
         }
     }
@@ -512,12 +476,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             case SPD:
                 setSpdIncrease(getSpdIncrease() - amount);
                 break;
-            case EVASION:
-                setEvasionIncrease(getEvasionIncrease() - amount);
-                break;
-            case BLOCK:
-                setBlockIncrease(getBlockIncrease() - amount);
-                break;
         }
         findStatToAlter(tempStat);
     }
@@ -540,12 +498,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
                 break;
             case SPD:
                 setSpdDecrease(getSpdDecrease() - amount);
-                break;
-            case EVASION:
-                setEvasionDecrease(getEvasionDecrease() - amount);
-                break;
-            case BLOCK:
-                setBlockDecrease(getBlockDecrease() - amount);
                 break;
         }
         findStatToAlter(tempStat);
@@ -1193,9 +1145,11 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     public void applyAbility(Ability ability, CharacterEntity attacker) {
         Random rand = new Random();
-        int damage = rand.nextInt(ability.getMaxDamage() - ability.getMinDamage()) + ability.getMinDamage();
-        damage = getScaledAbilityDamage(ability, attacker, damage);
-        damageTarget(damage);
+        if (ability.getMinDamage() > 0) {
+            int damage = rand.nextInt(ability.getMaxDamage() - ability.getMinDamage()) + ability.getMinDamage();
+            damage = getScaledAbilityDamage(ability, attacker, damage);
+            damageTarget(damage);
+        }
         // specials
         applyAbilitySpecialEffect(ability);
         // DOT
@@ -1333,14 +1287,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
             tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdIncrease());
             addNewStatIncrease(tempStat);
         }
-        if (ability.getEvadeIncrease() != 0) {
-            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeIncrease());
-            addNewStatIncrease(tempStat);
-        }
-        if (ability.getBlockIncrease() != 0) {
-            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockIncrease());
-            addNewStatIncrease(tempStat);
-        }
     }
 
     /**
@@ -1364,14 +1310,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         }
         if (ability.getSpdDecrease() != 0) {
             tempStat = new TempStat(TempStat.SPD, ability.getDuration(), ability.getSpdDecrease());
-            addNewStatDecrease(tempStat);
-        }
-        if (ability.getEvadeDecrease() != 0) {
-            tempStat = new TempStat(TempStat.EVASION, ability.getDuration(), ability.getEvadeDecrease());
-            addNewStatDecrease(tempStat);
-        }
-        if (ability.getBlockDecrease() != 0) {
-            tempStat = new TempStat(TempStat.BLOCK, ability.getDuration(), ability.getBlockDecrease());
             addNewStatDecrease(tempStat);
         }
     }
@@ -1598,12 +1536,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public int getSpdIncrease() {
         return spdIncrease;
     }
-    public int getEvasionIncrease() {
-        return evasionIncrease;
-    }
-    public int getBlockIncrease() {
-        return blockIncrease;
-    }
 
     public int getStrDecrease() {
         return strDecrease;
@@ -1616,12 +1548,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
     public int getSpdDecrease() {
         return spdDecrease;
-    }
-    public int getEvasionDecrease() {
-        return evasionDecrease;
-    }
-    public int getBlockDecrease() {
-        return blockDecrease;
     }
 
     public int getStrBase() {
@@ -1636,12 +1562,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public int getSpdBase() {
         return spdBase;
     }
-    public int getEvasionBase() {
-        return evasionBase;
-    }
-    public int getBlockBase() {
-        return blockBase;
-    }
 
     public void setStrIncrease(int strIncrease) {
         this.strIncrease = strIncrease;
@@ -1654,12 +1574,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
     public void setSpdIncrease(int spdIncrease) {
         this.spdIncrease = spdIncrease;
-    }
-    public void setEvasionIncrease(int evasionIncrease) {
-        this.evasionIncrease = evasionIncrease;
-    }
-    public void setBlockIncrease(int blockIncrease) {
-        this.blockIncrease = blockIncrease;
     }
 
     public void setStrDecrease(int strDecrease) {
@@ -1674,12 +1588,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     public void setSpdDecrease(int spdDecrease) {
         this.spdDecrease = spdDecrease;
     }
-    public void setEvasionDecrease(int evasionDecrease) {
-        this.evasionDecrease = evasionDecrease;
-    }
-    public void setBlockDecrease(int blockDecrease) {
-        this.blockDecrease = blockDecrease;
-    }
 
     public void setStrBase(int strBase) {
         this.strBase = strBase;
@@ -1692,12 +1600,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
     public void setSpdBase(int spdBase) {
         this.spdBase = spdBase;
-    }
-    public void setEvasionBase(int evasionBase) {
-        this.evasionBase = evasionBase;
-    }
-    public void setBlockBase(int blockBase) {
-        this.blockBase = blockBase;
     }
 
     public int getStrength() {
@@ -1725,10 +1627,10 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
         return spdDescription;
     }
     public int getEvasion() {
-        return evasion;
+        return speed;
     }
     public int getBlock() {
-        return block;
+        return constitution;
     }
 
     public void setStrength(int strength) {
@@ -1742,12 +1644,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
     public void setSpeed(int speed) {
         this.speed = speed;
-    }
-    public void setEvasion(int evasion) {
-        this.evasion = evasion;
-    }
-    public void setBlock(int block) {
-        this.block = block;
     }
 
     public boolean getIsAlive() {

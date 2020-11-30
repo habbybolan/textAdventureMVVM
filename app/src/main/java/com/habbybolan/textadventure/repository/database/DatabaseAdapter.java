@@ -145,6 +145,17 @@ public class DatabaseAdapter {
         return new queryDatabase().execute(sql).get();
     }
 
+    /**
+     * Get the Special Attack Ability from a specific id.
+     * @param id    The id of the Special attack ability
+     * @return      The cursor of the special attack ability
+     */
+    Cursor getSpecialAttackAbilityCursorFromID(int id) throws ExecutionException, InterruptedException {
+        String table = SpecialAttack.ability_table;
+        String sql = "SELECT * FROM " + table + " WHERE " + ABILITY_ID + " = " + id + " ORDER BY RANDOM() LIMIT " + 1;
+        return new queryDatabase().execute(sql).get();
+    }
+
     private Cursor getDataMultipleRandom(String table, int limit, int tier) throws ExecutionException, InterruptedException {
         String sql = "SELECT * FROM " + table + " WHERE " + "tier" + " = " + 1 + " ORDER BY RANDOM() LIMIT " + limit;
         return new queryDatabase().execute(sql).get();

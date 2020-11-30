@@ -55,4 +55,9 @@ public class WeaponListRecyclerView implements InventoryListRecyclerView {
     public void unSelectIfOneSelected() {
         adapter.unSelectIfOneSelected();
     }
+
+    @Override
+    public void disableAllViews(boolean isEnabled) {
+        adapter.disableAllViews(isEnabled);
+    }
 }

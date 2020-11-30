@@ -123,4 +123,10 @@ public class CombatDungeonFragment extends EncounterDialogueFragment implements 
             }
         });
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        saveGame(rv, combatDungeonVM);
+    }
 }

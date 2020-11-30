@@ -9,8 +9,6 @@ import com.habbybolan.textadventure.repository.database.LootInventory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.ExecutionException;
-
 /*
 A special attack that represents one of two uses for a weapon
     // attacks can be abilities, or similar to attacks with a bit more effects, but has a cool down
@@ -30,6 +28,7 @@ public class SpecialAttack extends WeaponAction {
     private int specialAttackID;
 
     public static final String table = "s_attacks";
+    public static final String ability_table = "s_attack_abilities";
 
     private int pictureResource;
 
@@ -41,7 +40,7 @@ public class SpecialAttack extends WeaponAction {
     private int weaponWeight = 0; // affects the overall speed stat
 
     // constructor where database opened and closed elsewhere
-    public SpecialAttack(Cursor cursor, LootInventory lootInventory, Weapon parentInventory) throws ExecutionException, InterruptedException {
+    public SpecialAttack(Cursor cursor, LootInventory lootInventory, Weapon parentInventory) {
         setVariables(cursor, lootInventory);
         this.parentWeapon = parentInventory;
         setPictureResource();
@@ -109,7 +108,8 @@ public class SpecialAttack extends WeaponAction {
     /**
      * Creates a default special attack used for the default weapon 'fists'.
      */
-    public SpecialAttack() {
+    public SpecialAttack(Weapon defaultParentWeapon) {
+        parentWeapon = defaultParentWeapon;
         specialAttackName = "Upper Cut";
         damageMin = 2;
         damageMax = 3;
@@ -117,7 +117,7 @@ public class SpecialAttack extends WeaponAction {
         setPictureResource();
     }
 
-    private void setVariables(Cursor cursor, LootInventory lootInventory) throws ExecutionException, InterruptedException {
+    private void setVariables(Cursor cursor, LootInventory lootInventory)  {
         // set up special attack name
         int specialAttackNameColID = cursor.getColumnIndex(S_ATTACK_NAME);
         setSpecialAttackName(cursor.getString(specialAttackNameColID));
@@ -125,7 +125,7 @@ public class SpecialAttack extends WeaponAction {
         int abilityColID = cursor.getColumnIndex(ABILITY_ID);
         int abilityID = cursor.getInt(abilityColID);
         if (cursor.getInt(abilityColID) != 0) {
-            setAbility(lootInventory.getAbilityFromID(abilityID));
+            setAbility(lootInventory.getSpecialAttackAbilityFromID(abilityID));
         }
         // set up ranged boolean
         int isRangedColID = cursor.getColumnIndex(IS_RANGED);

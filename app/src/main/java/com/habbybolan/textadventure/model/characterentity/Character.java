@@ -97,12 +97,6 @@ public class Character extends CharacterEntity {
             if (characterObject.has("spdIncrease")) spdIncrease = characterObject.getInt("spdIncrease");
             if (characterObject.has("spdDecrease")) spdDecrease = characterObject.getInt("spdDecrease");
             numStatPoints = strBase + intBase + conBase + spdBase;
-            if (characterObject.has("block")) strength = characterObject.getInt("block");
-            if (characterObject.has("blockIncrease")) strength = characterObject.getInt("blockIncrease");
-            if (characterObject.has("blockDecrease")) strength = characterObject.getInt("blockDecrease");
-            if (characterObject.has("evasion")) strength = characterObject.getInt("evasion");
-            if (characterObject.has("evasionIncrease")) strength = characterObject.getInt("evasionIncrease");
-            if (characterObject.has("evasionDecrease")) strength = characterObject.getInt("evasionDecrease");
             // misc
             if (characterObject.has("level")) level = characterObject.getInt("level");
             if (characterObject.has("gold")) gold = characterObject.getInt("gold");
@@ -326,13 +320,6 @@ public class Character extends CharacterEntity {
         JSONCharacter.put("spdBase", spdBase); // base spd
         JSONCharacter.put("spdIncrease", spdIncrease);
         JSONCharacter.put("spdDecrease", spdDecrease);
-
-        JSONCharacter.put("block", block);
-        JSONCharacter.put("blockIncrease", blockIncrease);
-        JSONCharacter.put("blockDecrease", blockDecrease);
-        JSONCharacter.put("evasion", evasion);
-        JSONCharacter.put("evasionIncrease", evasionIncrease);
-        JSONCharacter.put("evasionDecrease", evasionDecrease);
         // abilities
         JSONArray abilitiesArray = new JSONArray();
         for (int i = 0; i < abilities.size(); i++) {

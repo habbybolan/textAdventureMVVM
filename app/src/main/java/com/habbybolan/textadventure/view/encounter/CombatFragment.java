@@ -1,6 +1,7 @@
 package com.habbybolan.textadventure.view.encounter;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +106,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             setCombatOrdering();
             setCombatDialogueListener();
 
-            setContinueButtonClick();
             setActionSelect();
 
             setInventoryRecyclerViewers();
@@ -117,13 +117,13 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void checkState(int state) {
         switch (state) {
-            case CombatViewModel.firstState:
+            case CombatViewModel.dialogueState:
                 // dialogue state
                 isCharacterViewsEnabled(true);
                 combatBinding.layoutBtnOptions.removeAllViews();
                 dialogueState(combatVM, combatBinding.layoutBtnOptions);
                 break;
-            case CombatViewModel.secondState:
+            case CombatViewModel.beforeCombatState:
                 // before combat state (fight/run buttons)
                 isCharacterViewsEnabled(true);
                 // remove ability to drop/consume Inventory Objects
@@ -131,7 +131,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 combatBinding.layoutBtnOptions.removeAllViews();
                 beforeCombatState();
                 break;
-            case CombatViewModel.thirdState:
+            case CombatViewModel.startCombatState:
                 // remove ability to drop/consume Inventory Objects
                 characterVM.setStateInventoryObserver(false);
                 // set up combat views state
@@ -139,7 +139,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 isCharacterViewsEnabled(false);
                 startCombatState();
                 break;
-            case CombatViewModel.fourthState:
+            case CombatViewModel.characterTurnState:
                 // remove ability to drop/consume Inventory Objects
                 characterVM.setStateInventoryObserver(false);
                 // character turn state
@@ -147,7 +147,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
                 characterTurnState();
                 break;
-            case CombatViewModel.fifthState:
+            case CombatViewModel.enemyTurnState:
                 // remove ability to drop/consume Inventory Objects
                 characterVM.setStateInventoryObserver(false);
                 // enemy turn state
@@ -155,7 +155,7 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
                 combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
                 enemyTurnState();
                 break;
-            case CombatViewModel.sixthState:
+            case CombatViewModel.endState:
                 // remove ability to drop/consume Inventory Objects
                 characterVM.setStateInventoryObserver(true);
                 // ending state for accepting rewards and button to leave encounter
@@ -216,20 +216,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
             @Override
             public void onClick(View v) {
                 combatVM.attemptInCombatRun();
-                notifyCombatOrderNextTurn();
-            }
-        });
-    }
-
-    /**
-     * button for continuing through the enemy actions
-     */
-    private void setContinueButtonClick() {
-        combatBinding.btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // applies the enemy action and updates the combat order lists.
-                combatVM.enemyAction();
                 notifyCombatOrderNextTurn();
             }
         });
@@ -418,10 +404,10 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     /**
      *  un-select all items in the inventory RVs
      */
-    private void unSelectAllActionRV() {
-        abilityRV.unSelectIfOneSelected();
-        itemRV.unSelectIfOneSelected();
-        weaponRV.unSelectIfOneSelected();
+    private void unSelectAndSetIsEnabled(boolean isEnabled) {
+        abilityRV.disableAllViews(isEnabled);
+        itemRV.disableAllViews(isEnabled);
+        weaponRV.disableAllViews(isEnabled);
     }
 
     /**
@@ -443,34 +429,50 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     private void characterTurnState() {
         if (combatBinding.inCombatContainer.getVisibility() == View.GONE)
             combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
-        unSelectAllActionRV();
-        combatBinding.btnContinue.setVisibility(View.GONE);
-        combatBinding.btnRun.setVisibility(View.VISIBLE);
     }
 
     /**
-     *  sets the character views interaction enabled or disabled
+     *  sets the character interactable views enabled or disabled
      * @param isEnabled     The boolean value to enable character views
      */
     private void isCharacterViewsEnabled(boolean isEnabled) {
         // enable/disable character selectable icon
-        combatBinding.characterActionIcon.setEnabled(isEnabled);
-        for (int i = 0; i < combatBinding.enemyActionIcons.getChildCount(); i++) {
-            // add/disable each enemy selectable icon inside enemyActionIcons
-            combatBinding.enemyActionIcons.getChildAt(i).setEnabled(isEnabled);
+        disableViewGroup(combatBinding.characterActionIcon, isEnabled);
+        disableViewGroup(combatBinding.enemyActionIcons, isEnabled);
+        disableViewGroup(combatBinding.rvCategoryOptions, isEnabled);
+        disableViewGroup(combatBinding.btnRunContinueContainer, isEnabled);
+        unSelectAndSetIsEnabled(isEnabled);
+    }
+
+    /**
+     * Recursively enable/disable views and all views inside a viewGroup
+     * @param view          The view/viewGroup to enable/disable
+     * @param isEnabled     True if enabling views, false if disabling
+     */
+    private void disableViewGroup(View view, boolean isEnabled) {
+        view.setEnabled(isEnabled);
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                disableViewGroup(viewGroup.getChildAt(i), isEnabled);
+            }
         }
-        combatBinding.inCombatContainer.setEnabled(isEnabled);
     }
 
     /**
      *  deals with the enemy action UI in combat
      */
     private void enemyTurnState() {
-        if (combatBinding.inCombatContainer.getVisibility() == View.GONE)
-            combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
-        unSelectAllActionRV();
-        combatBinding.btnContinue.setVisibility(View.VISIBLE);
-        combatBinding.btnRun.setVisibility(View.GONE);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                combatVM.enemyAction();
+                if (combatBinding.inCombatContainer.getVisibility() == View.GONE)
+                    combatBinding.inCombatContainer.setVisibility(View.VISIBLE);
+                notifyCombatOrderNextTurn();
+            }
+        }, 1000);
     }
 
     /**
@@ -515,6 +517,6 @@ public class CombatFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void onStop() {
         super.onStop();
-        combatVM.saveGame(rv);
+        saveGame(rv, combatVM);
     }
 }

@@ -98,6 +98,6 @@ public class CheckFragment extends EncounterDialogueFragment implements Encounte
     @Override
     public void onStop() {
         super.onStop();
-        checkVM.saveGame(rv);
+        saveGame(rv, checkVM);
     }
 }

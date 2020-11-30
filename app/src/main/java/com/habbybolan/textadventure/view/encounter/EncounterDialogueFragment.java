@@ -145,4 +145,12 @@ public class EncounterDialogueFragment extends Fragment {
         viewModel.gotoBeginningState();
         return dialogueRV;
     }
+
+    /**
+     * Saves the game by calling the necessary method in encounterViewModel
+     * @param encounterViewModel    The encounter viewModel that holds functionality to save the game
+     */
+    void saveGame(DialogueRecyclerView rv, EncounterViewModel encounterViewModel) {
+        encounterViewModel.saveGame(rv);
+    }
 }

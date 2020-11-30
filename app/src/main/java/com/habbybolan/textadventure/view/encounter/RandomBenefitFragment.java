@@ -166,7 +166,7 @@ public class RandomBenefitFragment extends EncounterDialogueFragment implements 
     @Override
     public void onStop() {
         super.onStop();
-        benefitVM.saveGame(rv);
+        saveGame(rv, benefitVM);
     }
 
 }

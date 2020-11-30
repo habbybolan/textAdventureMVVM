@@ -61,7 +61,7 @@ public class TempStat extends Effect {
     @Override
     public void checkValidType(String type) {
         if (!type.equals(STR) && !type.equals(INT) && !type.equals(CON)
-                && !type.equals(SPD) && !type.equals(EVASION) && !type.equals(BLOCK)) {
+                && !type.equals(SPD)) {
             throw new IllegalArgumentException();
         }
     }
@@ -75,12 +75,8 @@ public class TempStat extends Effect {
                 return R.drawable.sword;
             case Effect.CON:
                 return R.drawable.sword;
-            case Effect.SPD:
-                return R.drawable.sword;
-            case Effect.BLOCK:
-                return R.drawable.sword;
             default:
-                // otherwise, evasion
+                // SPD
                 return R.drawable.sword;
         }
     }

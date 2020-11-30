@@ -24,8 +24,8 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
     // index of selected item, -1 if nothing selected
     private int mExpandedPosition = -1;
     private int previousExpandedPosition = -1;
-
     private int selectedPosition = -1;
+    private boolean isEnabled = true;
 
     WeaponListAdapter(ArrayList<Weapon> weapons, ActionClickListener actionClickListener) {
         this.weapons = weapons;
@@ -50,12 +50,15 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
         InventorySnippetBinding attackBinding = holder.binding.attackSnippet;
         InventorySnippetBinding sAttackBinding = holder.binding.sAttackSnippet;
 
+        // if this is the view to expand, then expand and select the proper expanded view
         if (isExpanded) {
             previousExpandedPosition = position;
+            // expanded view is an attack
             if (selectedPosition == 0) {
                 attackBinding.txtName.setTextColor(Color.RED);
                 sAttackBinding.txtName.setTextColor(Color.BLACK);
             }
+            // expanded view is a special attack
             else if (selectedPosition == 1) {
                 attackBinding.txtName.setTextColor(Color.BLACK);
                 sAttackBinding.txtName.setTextColor(Color.RED);
@@ -68,11 +71,16 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
             sAttackBinding.txtName.setTextColor(Color.BLACK);
         }
 
+        /* If specific view is already expanded, then set on not expanded. Otherwise,
+            expand the new position clicked and compress the previously clicked view.
+         */
         holder.binding.weaponContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mExpandedPosition = isExpanded ? -1 : position;
+                // compress old
                 notifyItemChanged(previousExpandedPosition);
+                // expand new
                 notifyItemChanged(position);
             }
         });
@@ -84,6 +92,8 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
         int attackIconResource = weapons.get(position).getAttack().getPictureResource();
         String sAttackName = weapons.get(position).getSpecialAttack().getSpecialAttackName();
         int sAttackIconResource = weapons.get(position).getSpecialAttack().getPictureResource();
+        // disable/enable name click
+        holder.binding.weaponContainer.setEnabled(isEnabled);
         holder.bind(weaponName, weaponIconResource, attackName, attackIconResource, sAttackName, sAttackIconResource);
     }
 
@@ -159,15 +169,26 @@ public class WeaponListAdapter extends RecyclerView.Adapter<WeaponListAdapter.Vi
     }
 
     // adds new ability to the list
-    public void updateChange() {
+    void updateChange() {
         notifyDataSetChanged();
     }
 
     // if there is a selected index stored, then remove and update all elements
-    public void unSelectIfOneSelected() {
+    void unSelectIfOneSelected() {
         int position = mExpandedPosition;
         mExpandedPosition = -1;
         selectedPosition = -1;
         notifyItemChanged(position);
+    }
+
+    /**
+     * Disabled and unSelects all views inside rv.
+     * @param isEnabled true if enabling views, false if disabling
+     */
+    void disableAllViews(boolean isEnabled) {
+        mExpandedPosition = -1;
+        selectedPosition = -1;
+        this.isEnabled = isEnabled;
+        notifyDataSetChanged();
     }
 }

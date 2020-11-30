@@ -291,6 +291,6 @@ public class ShopFragment extends EncounterDialogueFragment implements Encounter
     @Override
     public void onStop() {
         super.onStop();
-        shopVM.saveGame(rv);
+        saveGame(rv, shopVM);
     }
 }

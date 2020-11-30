@@ -18,6 +18,7 @@ import com.habbybolan.textadventure.model.inventory.Item;
 import com.habbybolan.textadventure.model.inventory.weapon.Attack;
 import com.habbybolan.textadventure.model.inventory.weapon.SpecialAttack;
 import com.habbybolan.textadventure.repository.LocallySavedFiles;
+import com.habbybolan.textadventure.viewmodel.MainGameViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.CharacterEntityViewModel;
 import com.habbybolan.textadventure.viewmodel.characterEntityViewModels.EnemyViewModel;
 
@@ -34,12 +35,12 @@ public class CombatViewModel extends EncounterViewModel {
 
     private CombatModel combatModel;
 
-    public static final int firstState = 1;
-    public static final int secondState = 2;
-    public static final int thirdState = 3;
-    public static final int fourthState = 4;
-    public static final int fifthState = 5;
-    public static final int sixthState = 6;
+    public static final int dialogueState = 1;
+    public static final int beforeCombatState = 2;
+    public static final int startCombatState = 3;
+    public static final int characterTurnState = 4;
+    public static final int enemyTurnState = 5;
+    public static final int endState = 6;
 
     // inventory reward able to retrieve at the end of the encounter
     private InventoryEntity inventoryEntityToRetrieve = null;
@@ -97,7 +98,7 @@ public class CombatViewModel extends EncounterViewModel {
         // ID associated with the enemy
         int ID = 1;
         for (int i = 0; i < typeArray.length(); i++) {
-            EnemyViewModel enemyViewModel = new EnemyViewModel(typeArray.getString(i), 1, characterVM.getNumStatPoints(), ID, getApplication());
+            EnemyViewModel enemyViewModel = new EnemyViewModel(typeArray.getString(i), MainGameViewModel.getInstance().getGameTier(), characterVM.getNumStatPoints(), ID, getApplication());
             enemies.add(enemyViewModel);
             ID++;
         }
@@ -131,7 +132,7 @@ public class CombatViewModel extends EncounterViewModel {
 
     // go directly to the end state
     private void gotoEndState() {
-        setStateIndex(sixthState);
+        setStateIndex(endState);
     }
 
     /**
@@ -438,13 +439,13 @@ public class CombatViewModel extends EncounterViewModel {
 
     // Enemy
 
-
     // create and apply the enemy action
     public void enemyAction() {
         EnemyViewModel enemy = (EnemyViewModel) combatOrderCurr.get(0);
         randomEnemyAction(enemy);
         nextTurn();
     }
+
     // apply a random enemy action
     private void randomEnemyAction(EnemyViewModel enemy) {
         CharacterEntityViewModel target = getRandomTarget();
@@ -531,10 +532,10 @@ public class CombatViewModel extends EncounterViewModel {
     public void setFirstTurn() {
         if (isCharacterTurn()) {
             // state 4 corresponds to character turn
-            setStateIndex(fourthState);
+            setStateIndex(characterTurnState);
         } else {
             // state 5 corresponds to enemy turn
-            setStateIndex(fifthState);
+            setStateIndex(enemyTurnState);
         }
     }
 
@@ -563,10 +564,10 @@ public class CombatViewModel extends EncounterViewModel {
             if (isCombatInProgress()) {
                 if (isCharacterTurn()) {
                     // state 4 corresponds to character turn
-                    setStateIndex(fourthState);
+                    setStateIndex(characterTurnState);
                 } else {
                     // state 5 corresponds to enemy turn
-                    setStateIndex(fifthState);
+                    setStateIndex(enemyTurnState);
                 }
             }
         }
@@ -583,7 +584,7 @@ public class CombatViewModel extends EncounterViewModel {
             }
         }
         setReward();
-        setStateIndex(sixthState);
+        setStateIndex(endState);
         return false;
     }
 

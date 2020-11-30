@@ -111,7 +111,7 @@ public class InventoryInfoFragment extends Fragment {
             View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
             InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
             snippetBinding.setInventoryName(specialAttack.getAbility().getName());
-            snippetBinding.setInventoryPic(specialAttack.getAbility().getAbilityID());
+            snippetBinding.setInventoryPic(specialAttack.getAbility().getPictureResource());
             binding.inventorySnippet.addView(view);
             // clicker to go into new Ability fragment
             snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {
@@ -193,7 +193,7 @@ public class InventoryInfoFragment extends Fragment {
             View view = getLayoutInflater().inflate(R.layout.inventory_snippet, null);
             InventorySnippetBinding snippetBinding = DataBindingUtil.bind(view);
             snippetBinding.setInventoryName(item.getAbility().getName());
-            snippetBinding.setInventoryPic(item.getAbility().getAbilityID());
+            snippetBinding.setInventoryPic(item.getAbility().getPictureResource());
             binding.inventorySnippet.addView(view);
             // clicker to go into new Ability fragment
             snippetBinding.inventoryInfo.setOnClickListener(new View.OnClickListener() {

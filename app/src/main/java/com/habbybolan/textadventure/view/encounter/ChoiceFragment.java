@@ -105,7 +105,7 @@ public class ChoiceFragment extends EncounterDialogueFragment implements Encount
     @Override
     public void onStop() {
         super.onStop();
-        choiceViewModel.saveGame(rv);
+        saveGame(rv, choiceViewModel);
     }
 
 }

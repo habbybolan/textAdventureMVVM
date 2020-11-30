@@ -28,7 +28,7 @@ public class ChoiceBenefitModel {
     // return a new TempStat or TempBar to apply to character
     public Effect getNewTempStat() {
         Random rand = new Random();
-        int numBenefits = 8;
+        int numBenefits = 6;
         int benefit = rand.nextInt(numBenefits);
         switch(benefit) {
             case 0: // STR
@@ -39,11 +39,7 @@ public class ChoiceBenefitModel {
                 return new TempStat(TempStat.CON, 10, 30);
             case 3: // SPD
                 return new TempStat(TempStat.SPD, 10, 30);
-            case 4: // Evasion
-                return new TempStat(TempStat.EVASION, 10, 50);
-            case 5: // Block
-                return new TempStat(TempStat.BLOCK, 10, 50);
-            case 6: // Health
+            case 4: // Health
                 return TempBarFactory.createTempHealth(10, 50);
             default:
                 return TempBarFactory.createTempMana(10, 50);
@@ -53,7 +49,7 @@ public class ChoiceBenefitModel {
     // return a new String type for a stat to increase permanently
     public Effect getNewPermanentStat() {
         Random rand = new Random();
-        int numBenefits = 8;
+        int numBenefits = 6;
         int benefit = rand.nextInt(numBenefits);
         switch(benefit) {
             case 0: // STR
@@ -64,11 +60,7 @@ public class ChoiceBenefitModel {
                 return new TempStat(TempStat.CON, 5);
             case 3: // SPD
                 return new TempStat(TempStat.SPD, 5);
-            case 4: // Evasion
-                return new TempStat(TempStat.EVASION, 10);
-            case 5: // Block
-                return new TempStat(TempStat.BLOCK, 10);
-            case 6: // Health
+            case 4: // Health
                 return TempBarFactory.createIndefiniteHealth(10);
             default:
                 return TempBarFactory.createIndefiniteMana(10);

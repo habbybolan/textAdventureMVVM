@@ -79,6 +79,6 @@ public class BreakFragment extends EncounterDialogueFragment implements Encounte
     @Override
     public void onStop() {
         super.onStop();
-        breakVM.saveGame(rv);
+        saveGame(rv, breakVM);
     }
 }

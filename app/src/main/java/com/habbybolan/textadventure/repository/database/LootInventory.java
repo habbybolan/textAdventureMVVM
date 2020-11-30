@@ -108,6 +108,16 @@ public class LootInventory {
         }
     }
 
+    public Ability getSpecialAttackAbilityFromID(int id) {
+        try {
+            Cursor cursor = databaseAdapter.getSpecialAttackAbilityCursorFromID(id);
+            return new Ability(cursor);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
     /**
      * Get a number of random Items scaled towards tierScaled.
      * @param tierScaled    The tier to scale the Item rarity to. Values 1-3

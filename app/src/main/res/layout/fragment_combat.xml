@@ -143,19 +143,9 @@
                         android:id="@+id/btn_run"
                         android:layout_width="@dimen/default_btn_width"
                         android:layout_height="@dimen/default_btn_height"
-                        android:visibility="gone"
                         android:layout_marginTop="5dp"
                         android:textSize="@dimen/txt_size_medium"
                         android:text="@string/btn_run">
-                    </Button>
-
-                    <Button
-                        android:id="@+id/btn_continue"
-                        android:layout_width="@dimen/default_btn_width"
-                        android:layout_height="@dimen/default_btn_height"
-                        android:textSize="@dimen/txt_size_medium"
-                        android:visibility="gone"
-                        android:text="@string/btn_continue">
                     </Button>
 
                 </FrameLayout>

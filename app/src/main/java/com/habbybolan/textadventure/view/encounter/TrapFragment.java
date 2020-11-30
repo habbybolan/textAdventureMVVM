@@ -122,6 +122,6 @@ public class TrapFragment extends EncounterDialogueFragment implements Encounter
     @Override
     public void onStop() {
         super.onStop();
-        trapVM.saveGame(rv);
+        saveGame(rv, trapVM);
     }
 }

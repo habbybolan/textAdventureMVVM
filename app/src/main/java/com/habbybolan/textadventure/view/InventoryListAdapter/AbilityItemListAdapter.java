@@ -21,6 +21,7 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
 
     private ArrayList<? extends Action> inventoryObjects;
     private ActionClickListener actionClickListener;
+    private boolean isEnabled = true;
 
     // index of selected item, -1 if nothing selected
     private int selectedIndex = -1;
@@ -43,6 +44,9 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
         String name = inventoryObjects.get(position).getName();
         int iconResource = inventoryObjects.get(position).getPictureResource();
         holder.bind(name, iconResource);
+        // disable/enable name click and inventory info button
+        holder.binding.txtName.setEnabled(isEnabled);
+        holder.binding.inventoryInfo.setEnabled(isEnabled);
         // if the position is the selectedIndex, then color the text red, otherwise black
         if (position == selectedIndex) holder.binding.txtName.setTextColor(Color.RED);
         else holder.binding.txtName.setTextColor(Color.BLACK);
@@ -90,16 +94,28 @@ public class AbilityItemListAdapter extends RecyclerView.Adapter<AbilityItemList
     }
 
     // adds new ability to the list
-    public void updateChange() {
+    void updateChange() {
         notifyDataSetChanged();
     }
 
     // if there is a selected index stored, then remove and update all elements
-    public void unSelectIfOneSelected() {
+    void unSelectIfOneSelected() {
         if (selectedIndex >= 0) {
             int selectedPrev = selectedIndex;
             selectedIndex = -1;
             notifyItemChanged(selectedPrev);
         }
+    }
+
+    /**
+     * Disabled and unSelects all views inside rv.
+     * @param isEnabled true if enabling views, false if disabling
+     */
+    void disableAllViews(boolean isEnabled) {
+        if (selectedIndex >= 0) {
+            selectedIndex = -1;
+        }
+        this.isEnabled = isEnabled;
+        notifyDataSetChanged();
     }
 }

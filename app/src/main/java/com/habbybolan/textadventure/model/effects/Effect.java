@@ -7,8 +7,6 @@ public abstract class Effect implements Comparable<Effect>{
     public static final String INT = "INT";
     public static final String CON = "CON";
     public static final String SPD = "SPD";
-    public static final String EVASION = "Evasion";
-    public static final String BLOCK = "Block";
 
     // bars
     public static final String TEMP_HEALTH = "Temporary health";
@@ -54,8 +52,7 @@ public abstract class Effect implements Comparable<Effect>{
     }
 
     public boolean isTempStat() {
-        return getType().equals(STR) || getType().equals(INT) || getType().equals(CON) || getType().equals(SPD)
-                || getType().equals(EVASION) || getType().equals(BLOCK);
+        return getType().equals(STR) || getType().equals(INT) || getType().equals(CON) || getType().equals(SPD);
     }
 
     // returns the drawable resource ID for the icon

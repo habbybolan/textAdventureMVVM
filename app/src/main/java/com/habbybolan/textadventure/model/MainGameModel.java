@@ -56,4 +56,16 @@ public class MainGameModel {
         // todo: create tier based on dungeonType and distance
         return 1;
     }
+
+    /**
+     * Scales the tier of the game, dependent on the distance the player has travelled.
+     * @param distance  The distance the player has travelled
+     * @return          The tier, from 1-3, to scale game
+     */
+    public static int getGameTier(int distance) {
+        // TODO: needs proper scaling
+        if (distance < 10) return 1;
+        else if (distance < 20) return 2;
+        else return 3;
+    }
 }

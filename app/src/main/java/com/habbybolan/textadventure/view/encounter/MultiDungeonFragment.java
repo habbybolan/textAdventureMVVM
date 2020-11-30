@@ -140,6 +140,6 @@ public class MultiDungeonFragment  extends EncounterDialogueFragment implements 
     @Override
     public void onStop() {
         super.onStop();
-        multiDungeonVM.saveGame(rv);
+        saveGame(rv, multiDungeonVM);
     }
 }

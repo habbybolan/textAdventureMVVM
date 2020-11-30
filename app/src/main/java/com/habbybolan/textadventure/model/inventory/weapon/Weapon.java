@@ -62,12 +62,14 @@ public class Weapon implements Inventory {
     }
 
     /**
-     * Creates a default weapon object called 'fists'
+     * Creates a default weapon object called 'fists'. Created when all weapons have been deleted.
+     * Removed once a new weapon added when only fists exist.
      */
     public Weapon() {
         weaponName = DEFAULT_NAME;
-        attack = new Attack();
-        specialAttack = new SpecialAttack();
+        attack = new Attack(this);
+        specialAttack = new SpecialAttack(this);
+        setPictureResource();
     }
 
     /**

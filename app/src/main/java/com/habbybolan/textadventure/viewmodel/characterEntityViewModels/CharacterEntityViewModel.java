@@ -171,10 +171,7 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         notifyPropertyChanged(BR.speed);
         notifyPropertyChanged(BR.spdBase);
         notifyPropertyChanged(BR.evasion);
-        notifyPropertyChanged(BR.evasionBase);
         notifyPropertyChanged(BR.block);
-        notifyPropertyChanged(BR.blockBase);
-
     }
 
     // given a Stat object, find the correct base value to change
@@ -196,14 +193,6 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
             case Effect.SPD:
                 setSpdBase(getSpdBase() + amount);
                 setSpeed(getSpeed() + amount);
-                break;
-            case Effect.EVASION:
-                setEvasionBase(getEvasionBase() + amount);
-                setEvasion(getEvasion() + amount);
-                break;
-            case Effect.BLOCK:
-                setBlockBase(getBlockBase() + amount);
-                setBlock(getBlock() + amount);
                 break;
         }
     }
@@ -424,22 +413,6 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
         characterEntity.setSpdBase(spdBase);
         notifyPropertyChanged(BR.spdBase);
     }
-    @Bindable
-    public int getEvasionBase() {
-        return characterEntity.getEvasionBase();
-    }
-    public void setEvasionBase(int evasionBase) {
-        characterEntity.setEvasionBase(evasionBase);
-        notifyPropertyChanged(BR.evasionBase);
-    }
-    @Bindable
-    public int getBlockBase() {
-        return characterEntity.getBlockBase();
-    }
-    public void setBlockBase(int blockBase) {
-        characterEntity.setBlockBase(blockBase);
-        notifyPropertyChanged(BR.blockBase);
-    }
 
     @Bindable
     public int getStrength() {
@@ -481,19 +454,9 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     public int getEvasion() {
         return characterEntity.getEvasion();
     }
-    public void setEvasion(int evasion) {
-        updateAllStatChange.set(new TempStat(Effect.EVASION, evasion - characterEntity.getEvasion()));
-        characterEntity.setEvasion(evasion);
-        notifyPropertyChanged(BR.evasion);
-    }
     @Bindable
     public int getBlock() {
         return characterEntity.getBlock();
-    }
-    public void setBlock(int block) {
-        updateAllStatChange.set(new TempStat(Effect.BLOCK, block - characterEntity.getBlock()));
-        characterEntity.setBlock(block);
-        notifyPropertyChanged(BR.block);
     }
 
     public ObservableArrayList<Ability> getAbilities() {

@@ -400,4 +400,11 @@ public class MainGameViewModel extends BaseObservable {
         return (savedEncounter != null);
     }
 
+    /**
+     * @return The tier to scale the game to
+     */
+    public int getGameTier() {
+        return MainGameModel.getGameTier(characterVM.getDistance());
+    }
+
 }

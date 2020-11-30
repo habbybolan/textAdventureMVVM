@@ -341,13 +341,6 @@ public class Enemy extends CharacterEntity {
         JSONEnemy.put("spdBase", spdBase); // base spd
         JSONEnemy.put("spdIncrease", spdIncrease);
         JSONEnemy.put("spdDecrease", spdDecrease);
-
-        JSONEnemy.put("block", block);
-        JSONEnemy.put("blockIncrease", blockIncrease);
-        JSONEnemy.put("blockDecrease", blockDecrease);
-        JSONEnemy.put("evasion", evasion);
-        JSONEnemy.put("evasionIncrease", evasionIncrease);
-        JSONEnemy.put("evasionDecrease", evasionDecrease);
         // abilities
         JSONArray abilitiesArray = new JSONArray();
         for (int i = 0; i < abilities.size(); i++) {

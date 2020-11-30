@@ -76,7 +76,8 @@ public class Attack extends WeaponAction {
     /**
      * Creates a default attack used for the default weapon 'fists'.
      */
-    public Attack() {
+    public Attack(Weapon defaultParentWeapon) {
+        parentWeapon = defaultParentWeapon;
         attackName = "Punch";
         damageMin = 1;
         damageMax = 3;

@@ -206,8 +206,6 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             if (item.getIntChange() != 0) setIntelligence(character.getIntelligence() - item.getIntChange());
             if (item.getConChange() != 0) setConstitution(character.getConstitution() - item.getConChange());
             if (item.getSpdChange() != 0) setSpeed(character.getSpeed() - item.getSpdChange());
-            if (item.getEvasionChange() != 0) setEvasion(character.getEvasion() - item.getEvasionChange());
-            if (item.getBlockChange() != 0) setBlock(character.getBlock() - item.getBlockChange());
             // bar changes
             if (item.getHealthChange() != 0) {
                 // health and max health altered
@@ -286,8 +284,6 @@ public class CharacterViewModel extends CharacterEntityViewModel {
             if (item.getIntChange() != 0) setIntelligence(character.getIntelligence() + item.getIntChange());
             if (item.getConChange() != 0) setConstitution(character.getConstitution() + item.getConChange());
             if (item.getSpdChange() != 0) setSpeed(character.getSpeed() + item.getSpdChange());
-            if (item.getEvasionChange() != 0) setEvasion(character.getEvasion() + item.getEvasionChange());
-            if (item.getBlockChange() != 0) setBlock(character.getBlock() + item.getBlockChange());
             // bar changes
             if (item.getHealthChange() != 0) {
                 // health and max health altered
@@ -385,22 +381,6 @@ public class CharacterViewModel extends CharacterEntityViewModel {
         if (item.getSpdChange() < 0) {
             character.addNewStatDecrease(new TempStat(CharacterEntity.SPD, item.getDuration(), item.getSpdChange()));
             notifyPropertyChanged(BR.speed);
-        }
-        if (item.getBlockChange() > 0) {
-            character.addNewStatIncrease(new TempStat(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange()));
-            notifyPropertyChanged(BR.block);
-        }
-        if (item.getBlockChange() < 0) {
-            character.addNewStatDecrease(new TempStat(CharacterEntity.BLOCK, item.getDuration(), item.getBlockChange()));
-            notifyPropertyChanged(BR.block);
-        }
-        if (item.getEvasionChange() > 0) {
-            character.addNewStatIncrease(new TempStat(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange()));
-            notifyPropertyChanged(BR.evasion);
-        }
-        if (item.getEvasionChange() < 0) {
-            character.addNewStatDecrease(new TempStat(CharacterEntity.EVASION, item.getDuration(), item.getEvasionChange()));
-            notifyPropertyChanged(BR.evasion);
         }
         // health/mana
         if (item.getHealthChange() != 0) {
