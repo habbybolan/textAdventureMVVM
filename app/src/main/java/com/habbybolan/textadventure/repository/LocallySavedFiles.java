@@ -68,10 +68,12 @@ public class LocallySavedFiles {
                     itemsArray.put(context.getResources().getInteger(R.integer.Wizard_Start_Item));
                     jsonClassObject.put("items", itemsArray);
                     // bars
-                    jsonClassObject.put("health", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
-                    jsonClassObject.put("maxHealth", constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH);
-                    jsonClassObject.put("mana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
-                    jsonClassObject.put("maxMana", intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA);
+                    int health = constitution * Character.HEALTH_CON_MULTIPLIER + Character.BASE_HEALTH;
+                    jsonClassObject.put("health", health);
+                    jsonClassObject.put("maxHealth", health);
+                    int mana = intelligence * Character.MANA_INT_MULTIPLIER + Character.BASE_MANA;
+                    jsonClassObject.put("mana", mana);
+                    jsonClassObject.put("maxMana", mana);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

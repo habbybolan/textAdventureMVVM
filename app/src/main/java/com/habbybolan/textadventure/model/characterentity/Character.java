@@ -24,7 +24,7 @@ import org.json.JSONObject;
 public class Character extends CharacterEntity {
     public final static int HEALTH_CON_MULTIPLIER = 10;
     public final static int MANA_INT_MULTIPLIER = 10;
-    public final static int BASE_HEALTH = 20;
+    public final static int BASE_HEALTH = 40;
     public final static int BASE_MANA = 20;
 
     public static final String PALADIN_CLASS_TYPE = "Paladin";
@@ -66,7 +66,7 @@ public class Character extends CharacterEntity {
 
     public Character(String characterData, Context context) {
         JSONObject characterObject;
-        ID = 1;
+        id = 0;
         isCharacter = true;
         try {
             characterObject = new JSONObject(characterData);

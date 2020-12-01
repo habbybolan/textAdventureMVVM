@@ -193,7 +193,7 @@ public class CombatViewModel extends EncounterViewModel {
         JSONArray array = new JSONArray();
         for (CharacterEntityViewModel entity : combatOrderList) {
             // store the ID of the CharacterEntity
-            array.put(entity.getCharacterEntity().getID());
+            array.put(entity.getCharacterEntity().getId());
         }
         jsonArray.put(array);
     }
@@ -260,8 +260,10 @@ public class CombatViewModel extends EncounterViewModel {
         else {
             // otherwise, find the enemy from the enemies arrayList with the respective ID
             for (EnemyViewModel enemyVM : enemies) {
-                if (enemyVM.getEnemy().getID() == ID)
+                if (enemyVM.getEnemy().getId() == ID) {
                     combatList.add(enemyVM);
+                    break;
+                }
             }
         }
     }

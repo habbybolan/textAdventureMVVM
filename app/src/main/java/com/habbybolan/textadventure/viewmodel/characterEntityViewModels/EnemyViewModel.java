@@ -26,6 +26,6 @@ public class EnemyViewModel extends CharacterEntityViewModel {
         return enemy;
     }
     public int getID() {
-        return enemy.getID();
+        return enemy.getId();
     }
 }

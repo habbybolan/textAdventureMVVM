@@ -101,9 +101,31 @@ public class Enemy extends CharacterEntity {
         speed = numStatPoints * (spdPercent / 100);
         this.abilities = abilities;
         weapons.add(weapon);
-        health = 1;
-        maxHealth = 1;
+        scaleHealthManaFromTier(tier);
         setDrawables(type);
+    }
+
+    private void scaleHealthManaFromTier(int tier) {
+        switch (tier) {
+            case 1:
+                health = 5;
+                maxHealth = 5;
+                mana = 10;
+                maxMana = 10;
+                break;
+            case 2:
+                health = 10;
+                maxHealth = 10;
+                mana = 15;
+                maxMana = 15;
+                break;
+            case 3:
+                health = 15;
+                maxHealth = 15;
+                mana = 20;
+                maxMana = 20;
+                break;
+        }
     }
 
     /**
@@ -114,23 +136,23 @@ public class Enemy extends CharacterEntity {
         switch (type) {
             case SPIDER:
                 drawableResID = R.drawable.spider_icon;
-                drawableDeadResID = R.drawable.skeleton_dead;
+                drawableDeadResID = R.drawable.bleed_icon;
                 break;
             case OGRE:
                 drawableResID = R.drawable.ogre_icon;
-                drawableDeadResID = R.drawable.skeleton_dead;
+                drawableDeadResID = R.drawable.bleed_icon;
                 break;
             case DEMON:
                 drawableResID = R.drawable.demon_icon;
-                drawableDeadResID = R.drawable.skeleton_dead;
+                drawableDeadResID = R.drawable.bleed_icon;
                 break;
             case SKELETON:
                 drawableResID = R.drawable.skeleton_icon;
-                drawableDeadResID = R.drawable.skeleton_dead;
+                drawableDeadResID = R.drawable.bleed_icon;
                 break;
             case SLIME:
                 drawableResID = R.drawable.slime_icon;
-                drawableDeadResID = R.drawable.skeleton_dead;
+                drawableDeadResID = R.drawable.bleed_icon;
                 break;
             default:
                 throw new IllegalArgumentException(type + "is an incorrect enemy type");
@@ -149,7 +171,7 @@ public class Enemy extends CharacterEntity {
             enemyObject = new JSONObject(JSONEnemy);
             // enemy specific
             difficulty = enemyObject.getInt("difficulty");
-            ID = enemyObject.getInt("id");
+            id = enemyObject.getInt("id");
             isAlive = enemyObject.getBoolean("isAlive");
             type = enemyObject.getString("type");
             setDrawables(type);
@@ -172,12 +194,6 @@ public class Enemy extends CharacterEntity {
             if (enemyObject.has("spdIncrease")) spdIncrease = enemyObject.getInt("spdIncrease");
             if (enemyObject.has("spdDecrease")) spdDecrease = enemyObject.getInt("spdDecrease");
             numStatPoints = strBase + intBase + conBase + spdBase;
-            if (enemyObject.has("block")) strength = enemyObject.getInt("block");
-            if (enemyObject.has("blockIncrease")) strength = enemyObject.getInt("blockIncrease");
-            if (enemyObject.has("blockDecrease")) strength = enemyObject.getInt("blockDecrease");
-            if (enemyObject.has("evasion")) strength = enemyObject.getInt("evasion");
-            if (enemyObject.has("evasionIncrease")) strength = enemyObject.getInt("evasionIncrease");
-            if (enemyObject.has("evasionDecrease")) strength = enemyObject.getInt("evasionDecrease");
             // misc
             if (enemyObject.has("level")) level = enemyObject.getInt("level");
             // bars
@@ -276,13 +292,12 @@ public class Enemy extends CharacterEntity {
                     statDecreaseList.add(tempStat);
                 }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        drawableResID = R.drawable.skeleton_icon;
-        drawableDeadResID = R.drawable.skeleton_dead;
+        drawableResID = getDrawableResID();
+        drawableDeadResID = getDrawableDeadResID();
     }
 
     // returns a random action for the enemy to perform
@@ -321,7 +336,7 @@ public class Enemy extends CharacterEntity {
         JSONObject JSONEnemy = new JSONObject();
         JSONEnemy.put("isCharacter", false);
         JSONEnemy.put("difficulty", difficulty);
-        JSONEnemy.put("id", ID);
+        JSONEnemy.put("id", id);
         JSONEnemy.put("isAlive", isAlive);
         JSONEnemy.put("type", type);
 
@@ -439,6 +454,6 @@ public class Enemy extends CharacterEntity {
         return difficulty;
     }
     public void setID(int ID) {
-        this.ID = ID;
+        this.id = ID;
     }
 }

@@ -488,10 +488,4 @@ public abstract class CharacterEntityViewModel extends BaseObservable {
     public int getDrawableDeadResID() {
         return characterEntity.getDrawableDeadResID();
     }
-    public int getDrawableIconResID() {
-        return characterEntity.getDrawableIconResID();
-    }
-    public int getDrawableIconDeadResID() {
-        return characterEntity.getDrawableIconDeadResID();
-    }
 }

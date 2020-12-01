@@ -79,7 +79,7 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     protected int numItems;
 
     protected int level;
-    int ID;
+    int id;
 
     protected boolean isAlive = true;
     protected int drawableResID;
@@ -1390,8 +1390,8 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
 
     // GETTERS AND SETTERS *****
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
     // ** Dot Effects **
@@ -1658,12 +1658,6 @@ public abstract class CharacterEntity implements Comparable<CharacterEntity> {
     }
     public int getDrawableDeadResID() {
         return drawableDeadResID;
-    }
-    public int getDrawableIconResID() {
-        return drawableIconResID;
-    }
-    public int getDrawableIconDeadResID() {
-        return drawableIconDeadResID;
     }
 
     public ObservableArrayList<Dot> getDotList() {

@@ -81,8 +81,8 @@
 
         <ImageView
             android:id="@+id/health_mana_image"
-            android:layout_width="@dimen/mana_health_bar_width"
-            android:layout_height="@dimen/mana_health_bar_height"
+            android:layout_width="147dp"
+            android:layout_height="38dp"
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -91,35 +91,33 @@
 
         <TextView
             android:id="@+id/txt_health_value"
-            android:layout_width="35dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            app:current="@{characterViewModel.health}"
-            app:max="@{characterViewModel.maxHealth}"
             android:textColor="#000000"
-            android:textSize="@dimen/txt_size_medium"
+            android:textSize="@dimen/txt_size_small"
+            app:current="@{characterViewModel.health}"
             app:layout_constraintBottom_toBottomOf="@+id/health_mana_image"
             app:layout_constraintEnd_toEndOf="@+id/health_mana_image"
-            app:layout_constraintHorizontal_bias="0.16"
+            app:layout_constraintHorizontal_bias="0.12"
             app:layout_constraintStart_toStartOf="@+id/health_mana_image"
             app:layout_constraintTop_toTopOf="@+id/health_mana_image"
-            app:layout_constraintVertical_bias="0.65999997" />
+            app:max="@{characterViewModel.maxHealth}" />
 
         <TextView
             android:id="@+id/txt_mana_value"
-            android:layout_width="35dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            app:current="@{characterViewModel.mana}"
-            app:max="@{characterViewModel.maxHealth}"
             android:textColor="#000000"
-            android:textSize="@dimen/txt_size_medium"
+            android:textSize="@dimen/txt_size_small"
+            app:current="@{characterViewModel.mana}"
             app:layout_constraintBottom_toBottomOf="@+id/health_mana_image"
             app:layout_constraintEnd_toEndOf="@+id/health_mana_image"
-            app:layout_constraintHorizontal_bias="0.85"
+            app:layout_constraintHorizontal_bias="0.88"
             app:layout_constraintStart_toStartOf="@+id/health_mana_image"
             app:layout_constraintTop_toTopOf="@+id/health_mana_image"
-            app:layout_constraintVertical_bias="0.65999997" />
+            app:max="@{characterViewModel.maxMana}" />
 
         <TextView
             android:id="@+id/txt_turn"
